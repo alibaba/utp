@@ -18,7 +18,7 @@
       "readOnly": true
     },
     "trade_modes": {
-      "$ref": "../../common/entities/trade_modes.json",
+      "$ref": "trade_modes.json",
       "description": "商家支持的业务交易模式及买方当前选择。",
       "utp_request": {
         "create": "optional",

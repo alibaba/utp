@@ -3,7 +3,7 @@
   "$id": "https://ut-protocol.com/primitives/common/action_request.json",
   "version": "2026-07-27",
   "title": "UTP Action Request",
-  "description": "所有 UTP 原语操作共享的请求信封。input 的具体结构由原语定义中该操作的 input_schema 指定。",
+  "description": "所有 UTP 原语操作共享的请求信封。操作声明 input_schema 时，input 的具体结构由该 Schema 指定。",
   "type": "object",
   "properties": {
     "action": {
@@ -33,14 +33,13 @@
     },
     "input": {
       "type": "object",
-      "description": "操作特有输入。其内容由对应操作的 input_schema 校验。",
+      "description": "可选的操作特有输入；仅在对应操作声明 input_schema 时传递并由该 Schema 校验。",
       "additionalProperties": true
     }
   },
   "required": [
     "action",
-    "session_id",
-    "input"
+    "session_id"
   ],
   "additionalProperties": true
 }
