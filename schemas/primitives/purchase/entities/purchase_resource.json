@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/purchase/entities/purchase_resource.json",
+  "version": "2026-07-29",
+  "title": "PurchaseResource",
+  "description": "查询或取消订单、采购合同或框架协议后返回的资源视图。",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "object_type": {
+          "const": "order",
+          "description": "视图对象类型，固定为订单。"
+        },
+        "purchase_order": {
+          "$ref": "purchase_order.json",
+          "description": "订单聚合视图。"
+        },
+        "evidence_ref": {
+          "$ref": "../../common/entities/evidence_reference.json",
+          "description": "订单相关证据引用。"
+        }
+      },
+      "required": [
+        "object_type",
+        "purchase_order"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "type": "object",
+      "properties": {
+        "object_type": {
+          "const": "agreement",
+          "description": "视图对象类型，固定为协议。"
+        },
+        "purchase_agreement": {
+          "$ref": "purchase_agreement.json",
+          "description": "采购合同或框架协议聚合视图。"
+        },
+        "quota_summary": {
+          "type": "object",
+          "description": "框架协议的可用额度与已用额度摘要。",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "object_type",
+        "purchase_agreement"
+      ],
+      "additionalProperties": true
+    }
+  ]
+}

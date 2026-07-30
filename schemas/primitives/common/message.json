@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/message.json",
+  "version": "2026-07-30",
+  "title": "Message",
+  "description": "Action 执行过程中产生的业务错误、警告或提示信息。",
+  "type": "object",
+  "required": [
+    "type",
+    "code",
+    "content"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "error",
+        "warning",
+        "info"
+      ],
+      "description": "业务消息类型。"
+    },
+    "code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "供 Agent 识别和处理的业务消息代码。"
+    },
+    "content": {
+      "type": "string",
+      "minLength": 1,
+      "description": "面向 Agent 或用户的可读消息内容。"
+    },
+    "path": {
+      "type": "string",
+      "description": "消息关联的 output 字段路径，使用 RFC 9535 JSONPath。"
+    },
+    "actionability": {
+      "type": "string",
+      "enum": [
+        "recoverable",
+        "requires_user_input",
+        "requires_user_review",
+        "unrecoverable"
+      ],
+      "description": "消息对应的处理建议或人工介入要求。"
+    },
+    "details": {
+      "type": "object",
+      "description": "业务消息的结构化补充信息。",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

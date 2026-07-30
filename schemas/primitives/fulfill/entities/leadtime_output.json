@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/fulfill/entities/leadtime_output.json",
+  "version": "2026-07-27",
+  "title": "FulfillLeadtimeOutput",
+  "description": "utp.fulfill.leadtime 的业务输出。按阶段返回备货、运输、清关、验货或服务激活的预估时长与预估日期。",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单标识。"
+    },
+    "stages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stage": {
+            "type": "string",
+            "enum": [
+              "PREPARATION",
+              "SHIPPING",
+              "CUSTOMS",
+              "INSPECTION",
+              "SERVICE_ACTIVATION"
+            ],
+            "description": "履约阶段。"
+          },
+          "estimated_days": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "预估时长（天）。"
+          },
+          "estimated_date": {
+            "type": "string",
+            "format": "date",
+            "description": "预估完成日期。"
+          }
+        },
+        "required": [
+          "stage"
+        ],
+        "additionalProperties": true
+      },
+      "description": "分阶段预估明细。"
+    },
+    "estimated_delivery_date": {
+      "type": "string",
+      "format": "date",
+      "description": "预估交付日期。"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "本次时效预估更新时间，可选。"
+    },
+    "delay_reason_code": {
+      "type": "string",
+      "description": "延迟原因码，可选。"
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "影响交付时效的风险标记，可选。"
+    },
+    "remarks": {
+      "type": "string",
+      "description": "备注，可选。"
+    }
+  },
+  "required": [
+    "order_id",
+    "estimated_delivery_date"
+  ],
+  "additionalProperties": true
+}

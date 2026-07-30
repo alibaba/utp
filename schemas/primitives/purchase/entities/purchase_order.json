@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/purchase/entities/purchase_order.json",
+  "version": "2026-07-30",
+  "title": "PurchaseOrder",
+  "description": "买方提交并确认的订购聚合。",
+  "type": "object",
+  "required": [
+    "purchase_id",
+    "state",
+    "orders",
+    "trade_modes"
+  ],
+  "properties": {
+    "purchase_id": {
+      "type": "string",
+      "description": "买方订购聚合的唯一标识。",
+      "readOnly": true
+    },
+    "trade_modes": {
+      "$ref": "../../common/entities/trade_modes.json",
+      "description": "商家支持的业务交易模式及买方当前选择。",
+      "utp_request": {
+        "create": "optional",
+        "update": "optional",
+        "complete": "omit"
+      }
+    },
+    "state": {
+      "type": "string",
+      "description": "订单聚合的持久化状态。",
+      "readOnly": true
+    },
+    "orders": {
+      "type": "array",
+      "minItems": 1,
+      "description": "订单组。创建时表示买方提交的一个或多个订单意图组；响应中表示卖家校验和拆分后的订单。",
+      "items": {
+        "$ref": "order.json"
+      },
+      "utp_request": {
+        "create": "required",
+        "update": "required",
+        "complete": "omit"
+      }
+    },
+    "binding_terms_ref": {
+      "type": "string",
+      "description": "已绑定询盘条款引用。"
+    },
+    "agreement_ref": {
+      "type": "object",
+      "description": "已生效采购合同或框架协议引用。",
+      "required": [
+        "purchase_id",
+        "agreement_type"
+      ],
+      "properties": {
+        "purchase_id": {
+          "type": "string",
+          "description": "被引用协议在 Purchase 原语内的唯一资源标识。"
+        },
+        "agreement_type": {
+          "type": "string",
+          "enum": [
+            "purchase_contract",
+            "framework_agreement"
+          ],
+          "description": "被引用协议的类型。"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "not": {
+    "$comment": "binding_terms_ref 与 agreement_ref 最多出现一个，也可以都不出现。",
+    "required": [
+      "binding_terms_ref",
+      "agreement_ref"
+    ]
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/state.json",
+  "version": "2026-07-29",
+  "title": "UTP Global State",
+  "description": "UTP 全局状态枚举",
+  "type": "string",
+  "enum": [
+    "INIT",
+    "SOURCING",
+    "NEGOTIATING",
+    "PURCHASING",
+    "PAYING",
+    "FULFILLING",
+    "SETTLED",
+    "DISPUTED",
+    "FAILED",
+    "CANCELLED"
+  ]
+}

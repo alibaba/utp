@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/purchase/primitive.json",
+  "name": "utp.purchase",
+  "version": "2026-07-29",
+  "title": "P3 Purchase 原语定义",
+  "description": "订购原语的操作、角色、传输绑定和状态机定义。",
+  "actions": {
+    "create": {
+      "description": "Buyer 创建订单草案，Seller 校验交易依据并返回当前订单聚合。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/purchase_order.json"
+      },
+      "output_schema": {
+        "$ref": "entities/purchase_order.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/purchase"
+        }
+      ]
+    },
+    "update": {
+      "description": "Buyer 更新订单草案中的可变信息，Seller 返回重新计算后的订单聚合。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/purchase_order.json"
+      },
+      "output_schema": {
+        "$ref": "entities/purchase_order.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "PATCH",
+          "path": "/utp/v1/purchase/{purchase_id}"
+        }
+      ]
+    },
+    "complete": {
+      "description": "Buyer 确认完成订单，Seller 执行库存锁定和订单承诺处理。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/purchase_order.json"
+      },
+      "output_schema": {
+        "$ref": "entities/purchase_order.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/purchase/{purchase_id}/complete"
+        }
+      ]
+    },
+    "contract_create": {
+      "description": "Buyer 创建采购合同或框架协议草案，Seller 返回当前协议聚合。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/purchase_agreement.json"
+      },
+      "output_schema": {
+        "$ref": "entities/purchase_agreement.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/purchase/contracts"
+        }
+      ]
+    },
+    "contract_update": {
+      "description": "Buyer 更新协议草案条款，Seller 返回重新计算后的协议聚合。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/purchase_agreement.json"
+      },
+      "output_schema": {
+        "$ref": "entities/purchase_agreement.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "PATCH",
+          "path": "/utp/v1/purchase/contracts/{purchase_id}"
+        }
+      ]
+    },
+    "contract_complete": {
+      "description": "Buyer 确认完成协议，Seller 执行协议承诺处理。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "output_schema": {
+        "$ref": "entities/purchase_agreement.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/purchase/contracts/{purchase_id}/complete"
+        }
+      ]
+    },
+    "query": {
+      "description": "Buyer 查询指定订单或协议，Seller 返回对应只读视图。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "output_schema": {
+        "$ref": "entities/purchase_resource.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/v1/purchase/{purchase_id}"
+        }
+      ]
+    },
+    "cancel": {
+      "description": "Buyer 取消订单或协议草案，Seller 返回取消后的对象状态。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "output_schema": {
+        "$ref": "entities/purchase_resource.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/purchase/{purchase_id}"
+        }
+      ]
+    }
+  },
+  "state_machine": {
+    "initial_state": "INIT",
+    "states": {
+      "INIT": {
+        "description": "尚未创建订单或协议草案。"
+      },
+      "DRAFT": {
+        "description": "订单草案已创建，可继续更新、完成或取消。"
+      },
+      "SIGNING": {
+        "description": "订单已通过 Mandate 准入，正在执行库存锁定和承诺处理。"
+      },
+      "PURCHASED": {
+        "description": "订单承诺已成立。"
+      },
+      "AGREEMENT_DRAFT": {
+        "description": "采购合同或框架协议草案已创建。"
+      },
+      "AGREEMENT_SIGNING": {
+        "description": "协议已通过 Mandate 准入，正在执行承诺处理。"
+      },
+      "AGREEMENT_ACTIVE": {
+        "description": "协议已生效，可被后续订单引用。"
+      },
+      "CANCELLED": {
+        "description": "订单或协议草案已取消。"
+      },
+      "COMPENSATED": {
+        "description": "异常处理产生的补偿已完成。"
+      }
+    },
+    "transitions": [
+      {
+        "from": "INIT",
+        "action": "utp.purchase.create",
+        "to": "DRAFT"
+      },
+      {
+        "from": "AGREEMENT_ACTIVE",
+        "action": "utp.purchase.create",
+        "to": "DRAFT",
+        "condition": "agreement_ref 有效"
+      },
+      {
+        "from": "DRAFT",
+        "action": "utp.purchase.update",
+        "to": "DRAFT"
+      },
+      {
+        "from": "DRAFT",
+        "action": "utp.purchase.complete",
+        "to": "SIGNING",
+        "condition": "Mandate 准入通过"
+      },
+      {
+        "from": "SIGNING",
+        "event": "commitment_and_inventory_succeeded",
+        "to": "PURCHASED"
+      },
+      {
+        "from": "INIT",
+        "action": "utp.purchase.contract_create",
+        "to": "AGREEMENT_DRAFT"
+      },
+      {
+        "from": "AGREEMENT_DRAFT",
+        "action": "utp.purchase.contract_update",
+        "to": "AGREEMENT_DRAFT"
+      },
+      {
+        "from": "AGREEMENT_DRAFT",
+        "action": "utp.purchase.contract_complete",
+        "to": "AGREEMENT_SIGNING",
+        "condition": "Mandate 准入通过"
+      },
+      {
+        "from": "AGREEMENT_SIGNING",
+        "event": "commitment_succeeded",
+        "to": "AGREEMENT_ACTIVE"
+      },
+      {
+        "from": "DRAFT",
+        "action": "utp.purchase.cancel",
+        "to": "CANCELLED",
+        "condition": "未引用有效 agreement_ref"
+      },
+      {
+        "from": "DRAFT",
+        "action": "utp.purchase.cancel",
+        "to": "AGREEMENT_ACTIVE",
+        "condition": "引用有效 agreement_ref"
+      },
+      {
+        "from": "AGREEMENT_DRAFT",
+        "action": "utp.purchase.cancel",
+        "to": "CANCELLED"
+      }
+    ]
+  }
+}

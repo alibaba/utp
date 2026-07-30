@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/address.json",
+  "version": "2026-07-30",
+  "title": "Address",
+  "description": "结构化物理地址及其可选收件联系信息。",
+  "type": "object",
+  "required": [
+    "country",
+    "street_address"
+  ],
+  "properties": {
+    "address_id": {
+      "type": "string",
+      "description": "地址簿或能力提供方分配的地址标识。"
+    },
+    "country": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "国家或地区代码，遵循 ISO 3166-1 alpha-2。"
+    },
+    "province": {
+      "type": "string",
+      "description": "省、州或一级行政区名称。"
+    },
+    "city": {
+      "type": "string",
+      "description": "城市或对应行政区名称。"
+    },
+    "district": {
+      "type": "string",
+      "description": "区、县或对应行政区名称。"
+    },
+    "address_code": {
+      "type": "string",
+      "description": "地址中最末级有效行政区划的标准编码。"
+    },
+    "street_address": {
+      "type": "string",
+      "description": "街道、门牌、楼栋、楼层和房间等详细地址。"
+    },
+    "postal_code": {
+      "type": "string",
+      "description": "邮政编码。"
+    },
+    "recipient": {
+      "$ref": "./contact_info.json#",
+      "description": "该地址对应的收件联系信息。"
+    }
+  },
+  "additionalProperties": true
+}

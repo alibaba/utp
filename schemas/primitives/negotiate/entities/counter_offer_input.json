@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "counter_offer_input.json",
+  "version": "2026-07-29",
+  "title": "CounterOfferInput",
+  "description": "utp.negotiate.counter_offer 的业务输入。买家提交调整后的完整报价行结构（含数量与期望价格），供卖家逐项确认；不采用字段路径级修改。轮次上限仅在会话锁定轮次约束的特殊场景生效。",
+  "type": "object",
+  "properties": {
+    "quote_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "关联的报价 quote_id。"
+    },
+    "round": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "当前协商轮次（可选）。仅在会话启用轮次约束的特殊场景需要，且必须等于前一轮次 + 1。"
+    },
+    "line_items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "买家调整后的完整报价行。基于报价中的行结构修改数量、规格等，并通过 proposed_unit_price 表达期望价格（价格可能与数量相关，还价必须携带数量）。",
+      "items": {
+        "allOf": [
+          { "$ref": "../../common/entities/line_item.json" }
+        ],
+        "properties": {
+          "proposed_unit_price": {
+            "$ref": "../../common/entities/money.json",
+            "description": "买家期望的单价。"
+          },
+          "note": {
+            "type": "string",
+            "description": "该行的调整说明或理由。"
+          }
+        }
+      }
+    },
+    "additional_requests": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "附加请求（非结构化）。"
+    },
+    "response_deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "期望供应商回复的截止时间。"
+    }
+  },
+  "required": ["quote_ref", "line_items"],
+  "additionalProperties": true
+}

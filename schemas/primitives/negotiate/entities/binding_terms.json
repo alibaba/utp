@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "binding_terms.json",
+  "version": "2026-07-29",
+  "title": "BindingTerms",
+  "description": "条款绑定实体。双方确认生效的条款快照，是 Negotiate 的最终产出，被 utp.purchase.create 引用；授权凭据以 mandate_refs 记录，不再内嵌双方签名。",
+  "type": "object",
+  "properties": {
+    "binding_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "绑定唯一标识。"
+    },
+    "terms_snapshot": {
+      "$ref": "#/$defs/terms_snapshot",
+      "description": "条款快照。包含所有已达成一致的交易条款。"
+    },
+    "terms_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-fA-F0-9]{64}$",
+      "description": "条款快照哈希。计算范围与业务含义待细化（见待对齐问题清单）。"
+    },
+    "mandate_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "本次绑定所依据的授权凭据 mandate_id 列表（可审计材料，纳入 Evidence Bundle）。"
+    },
+    "inquiry_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "关联的询盘 ID。"
+    },
+    "quote_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "关联的最终报价 quote_id。"
+    },
+    "counter_offer_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "关联的反报价 ID 列表（按轮次排列）。"
+    },
+    "expiry": {
+      "type": "string",
+      "format": "date-time",
+      "description": "绑定有效期。必须晚于当前时间；过期后必须重新协商。"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "绑定创建时间。"
+    }
+  },
+  "required": [
+    "binding_id",
+    "terms_snapshot",
+    "terms_hash",
+    "inquiry_ref",
+    "quote_ref",
+    "expiry",
+    "created_at"
+  ],
+  "additionalProperties": true,
+  "$defs": {
+    "terms_snapshot": {
+      "type": "object",
+      "description": "已达成一致并可由 Purchase 直接消费的交易条款快照。",
+      "properties": {
+        "line_items": {
+          "type": "array",
+          "items": { "$ref": "../../common/entities/line_item.json" },
+          "minItems": 1,
+          "description": "商品明细。"
+        },
+        "prices": {
+          "type": "array",
+          "items": { "$ref": "../../common/entities/price.json" },
+          "minItems": 1,
+          "description": "金额构成，必须包含 type 为 total 的最终金额。"
+        },
+        "trade_mode": {
+          "$ref": "../../common/entities/trade_mode.json",
+          "description": "选定的交易安排（单项）。"
+        },
+        "fulfillment_selection": {
+          "$ref": "../../common/entities/fulfillment_selection.json",
+          "description": "交付安排（可选）。绑定阶段交货信息未必能确定。"
+        },
+        "lead_time_days": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "卖家承诺的到货天数（可选）。买家不要求时效承诺时可缺省。"
+        },
+        "estimated_delivery": {
+          "type": "string",
+          "format": "date",
+          "description": "预计到货日期（可选，非承诺）。"
+        },
+        "warranty": { "type": "string", "description": "保修条款。" },
+        "custom_terms": {
+          "type": "object",
+          "description": "自定义条款（键值对格式）。",
+          "additionalProperties": true
+        }
+      },
+      "required": ["line_items", "prices"],
+      "additionalProperties": true
+    }
+  }
+}

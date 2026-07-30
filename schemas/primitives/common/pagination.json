@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/pagination.json",
+  "version": "2026-07-27",
+  "title": "Pagination",
+  "description": "列表操作共享的分页参数与响应元数据。请求使用 page 与 page_size；响应在此基础上返回 total。具体操作的输入和输出 Schema 决定各字段的适用性。",
+  "type": "object",
+  "properties": {
+    "page": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "当前页码，从 1 开始。"
+    },
+    "page_size": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "description": "每页条目数。"
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "符合当前查询条件的总记录数，仅在响应中返回。"
+    }
+  },
+  "additionalProperties": true
+}

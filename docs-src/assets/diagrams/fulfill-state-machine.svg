@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="720px" height="630px" viewBox="-0.5 -0.5 720 630" font-family="Helvetica">
+<defs>
+<marker id="fulfillArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+</defs>
+<g>
+<path d="M 380 64 L 380 116" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="341" y="82" width="78" height="16" fill="#fff"/><text x="380" y="93">notify（发货）</text></g>
+<path d="M 320 42 L 244 42" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="243" y="24" width="78" height="16" fill="#fff"/><text x="282" y="35">notify（延迟）</text></g>
+<path d="M 180 64 L 180 142 L 316 142" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="206" y="124" width="78" height="16" fill="#fff"/><text x="245" y="135">notify（发货）</text></g>
+<path d="M 380 164 L 380 216" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="341" y="184" width="78" height="16" fill="#fff"/><text x="380" y="195">notify（妥投）</text></g>
+<path d="M 380 264 L 380 316" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="302" y="282" width="156" height="16" fill="#fff"/><text x="380" y="293">notify（验货合格，若要求）</text></g>
+<path d="M 440 242 L 620 242 L 620 316" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="505" y="226" width="40" height="16" fill="#fff"/><text x="525" y="237">reject</text></g>
+<path d="M 440 342 L 556 342" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="478" y="326" width="40" height="16" fill="#fff"/><text x="498" y="337">reject</text></g>
+<path d="M 380 364 L 380 436" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="357" y="392" width="46" height="16" fill="#fff"/><text x="380" y="403">receive</text></g>
+<path d="M 320 242 L 250 242 L 250 410 L 350 410 L 350 436" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="198" y="322" width="104" height="16" fill="#fff"/><text x="250" y="333">receive（无需验货）</text></g>
+<path d="M 380 484 L 380 556" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="330" y="512" width="100" height="16" fill="#fff"/><text x="380" y="523">all batches done</text></g>
+<path d="M 320 462 L 224 462" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="231" y="444" width="78" height="16" fill="#fff"/><text x="270" y="455">more batches</text></g>
+<path d="M 100 462 L 60 462 L 60 100 L 350 100 L 350 116" fill="none" stroke="rgb(0,0,0)" marker-end="url(#fulfillArrow)"/>
+<g font-size="11px" text-anchor="middle"><rect x="117" y="84" width="66" height="16" fill="#fff"/><text x="150" y="95">next batch</text></g>
+<rect x="320" y="20" width="120" height="44" rx="6.75" ry="6.75" fill="#dae8fc" stroke="#6c8ebf"/><text x="380" y="47" text-anchor="middle" font-size="13px" font-weight="bold">INIT</text>
+<rect x="120" y="20" width="120" height="44" rx="6.75" ry="6.75" fill="#fff2cc" stroke="#d6b656"/><text x="180" y="47" text-anchor="middle" font-size="13px" font-weight="bold">DELAYED</text>
+<rect x="320" y="120" width="120" height="44" rx="6.75" ry="6.75" fill="#fff2cc" stroke="#d6b656"/><text x="380" y="147" text-anchor="middle" font-size="13px" font-weight="bold">SHIPPED</text>
+<rect x="320" y="220" width="120" height="44" rx="6.75" ry="6.75" fill="#fff2cc" stroke="#d6b656"/><text x="380" y="247" text-anchor="middle" font-size="13px" font-weight="bold">DELIVERED</text>
+<rect x="320" y="320" width="120" height="44" rx="6.75" ry="6.75" fill="#fff2cc" stroke="#d6b656"/><text x="380" y="347" text-anchor="middle" font-size="13px" font-weight="bold">INSPECTED</text>
+<rect x="560" y="320" width="120" height="44" rx="6.75" ry="6.75" fill="#f8cecc" stroke="#b85450"/><text x="620" y="347" text-anchor="middle" font-size="13px" font-weight="bold">REJECTED</text>
+<rect x="320" y="440" width="120" height="44" rx="6.75" ry="6.75" fill="#fff2cc" stroke="#d6b656"/><text x="380" y="467" text-anchor="middle" font-size="13px" font-weight="bold">RECEIVED</text>
+<rect x="100" y="440" width="120" height="44" rx="6.75" ry="6.75" fill="#e1d5e7" stroke="#9673a6"/><text x="160" y="459" text-anchor="middle" font-size="12px" font-weight="bold">PARTIAL_</text><text x="160" y="475" text-anchor="middle" font-size="12px" font-weight="bold">DELIVERED</text>
+<rect x="320" y="560" width="120" height="44" rx="6.75" ry="6.75" fill="#d5e8d4" stroke="#82b366"/><text x="380" y="587" text-anchor="middle" font-size="13px" font-weight="bold">FULFILLED</text>
+</g>
+</svg>

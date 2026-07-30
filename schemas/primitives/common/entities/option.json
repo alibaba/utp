@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/option.json",
+  "version": "2026-07-29",
+  "title": "Option",
+  "description": "商品或服务的一项已选规格、选配或定制属性。",
+  "type": "object",
+  "required": [
+    "name",
+    "value"
+  ],
+  "properties": {
+    "option_id": {
+      "type": "string",
+      "description": "规格或选配属性标识。"
+    },
+    "name": {
+      "type": "string",
+      "description": "规格或选配属性名称。"
+    },
+    "value_id": {
+      "type": "string",
+      "description": "规格或选配属性值标识。"
+    },
+    "value": {
+      "type": "string",
+      "description": "已选规格或选配属性值。"
+    },
+    "unit": {
+      "type": "string",
+      "description": "属性值的计量单位。"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/signature.json",
+  "version": "2026-07-27",
+  "title": "Signature",
+  "description": "用于验证签署者身份和数据完整性的数字签名。",
+  "type": "object",
+  "required": [
+    "algorithm",
+    "key_id",
+    "value"
+  ],
+  "properties": {
+    "algorithm": {
+      "type": "string",
+      "enum": [
+        "ES256"
+      ],
+      "description": "签名算法。当前支持 ES256（ECDSA with P-256 and SHA-256）。"
+    },
+    "key_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "验证签名所用公钥的标识。"
+    },
+    "value": {
+      "type": "string",
+      "minLength": 1,
+      "description": "签名值，JWS Compact Serialization 格式。"
+    }
+  },
+  "additionalProperties": true
+}

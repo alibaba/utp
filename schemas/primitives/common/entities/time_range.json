@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/time_range.json",
+  "version": "2026-07-29",
+  "title": "TimeRange",
+  "description": "一个生效、交付或有效时间区间。",
+  "type": "object",
+  "properties": {
+    "start_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "区间开始时间。"
+    },
+    "end_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "区间结束时间。"
+    }
+  },
+  "additionalProperties": true
+}

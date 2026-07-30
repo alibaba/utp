@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/line_item.json",
+  "version": "2026-07-30",
+  "title": "LineItem",
+  "description": "交易中的一项商品或服务明细。",
+  "type": "object",
+  "required": [
+    "item_id",
+    "quantity"
+  ],
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "description": "商品或服务标识。"
+    },
+    "sku_id": {
+      "type": "string",
+      "description": "商品或服务的可售规格标识。"
+    },
+    "supplier_id": {
+      "type": "string",
+      "description": "商品所属供应商标识。"
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "订购数量。"
+    },
+    "unit": {
+      "type": "string",
+      "description": "计量单位。"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "$ref": "option.json"
+      },
+      "description": "已选规格、选配或定制属性。"
+    },
+    "display_name": {
+      "type": "string",
+      "readOnly": true,
+      "description": "用于展示的商品名称。"
+    },
+    "unit_price": {
+      "$ref": "money.json",
+      "readOnly": true,
+      "description": "服务端确认的单价。"
+    },
+    "prices": {
+      "type": "array",
+      "items": {
+        "$ref": "price.json"
+      },
+      "contains": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "total"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "readOnly": true,
+      "description": "行级金额构成，必须包含 type 为 total 的最终金额。"
+    }
+  },
+  "additionalProperties": true
+}

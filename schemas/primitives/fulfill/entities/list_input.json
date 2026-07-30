@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/fulfill/entities/list_input.json",
+  "version": "2026-07-27",
+  "title": "FulfillListInput",
+  "description": "utp.fulfill.list 的业务输入。Buyer 检索与自身关联的订单摘要，支持结构化筛选、排序与分页；所有筛选条件均可选。",
+  "type": "object",
+  "properties": {
+    "filters": {
+      "type": "object",
+      "properties": {
+        "order_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "可选。按订单 ID 集合筛选。"
+        },
+        "purchase_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "可选。按订购标识筛选。"
+        },
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "可选。按全局事务标识筛选。"
+        },
+        "status": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "INIT",
+              "SHIPPED",
+              "DELAYED",
+              "DELIVERED",
+              "INSPECTED",
+              "RECEIVED",
+              "PARTIAL_DELIVERED",
+              "FULFILLED",
+              "REJECTED"
+            ]
+          },
+          "description": "可选。按履约状态筛选。"
+        },
+        "supplier_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "可选。按供应商筛选。"
+        },
+        "time_range": {
+          "$ref": "#/$defs/time_range",
+          "description": "可选。按最近履约事件时间范围筛选。"
+        },
+        "promised_delivery_date_range": {
+          "$ref": "#/$defs/date_range",
+          "description": "可选。按承诺交付日期范围筛选。"
+        },
+        "has_exception": {
+          "type": "boolean",
+          "description": "可选。筛选存在延迟、拒收或异常履约事实的订单。"
+        }
+      },
+      "additionalProperties": true,
+      "description": "结构化筛选条件。"
+    },
+    "status_filter": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "INIT",
+          "SHIPPED",
+          "DELAYED",
+          "DELIVERED",
+          "INSPECTED",
+          "RECEIVED",
+          "PARTIAL_DELIVERED",
+          "FULFILLED",
+          "REJECTED"
+        ]
+      },
+      "description": "可选。按履约状态筛选。保留用于兼容早期草案；新实现 SHOULD 使用 filters.status。",
+      "deprecated": true
+    },
+    "time_range": {
+      "$ref": "#/$defs/time_range",
+      "description": "可选。按时间范围筛选。保留用于兼容早期草案；新实现 SHOULD 使用 filters.time_range。",
+      "deprecated": true
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "可选。按供应商筛选。保留用于兼容早期草案；新实现 SHOULD 使用 filters.supplier_id。",
+      "deprecated": true
+    },
+    "sort_by": {
+      "type": "string",
+      "enum": [
+        "last_event_at",
+        "promised_delivery_date",
+        "created_at"
+      ],
+      "description": "排序字段。默认 last_event_at。"
+    },
+    "sort_order": {
+      "type": "string",
+      "enum": [
+        "asc",
+        "desc"
+      ],
+      "description": "排序方向。默认 desc。"
+    },
+    "pagination": {
+      "$ref": "../../../common/pagination.json#/$defs/request",
+      "description": "游标分页参数。"
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "偏移量。"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "每页条数。"
+        }
+      },
+      "additionalProperties": true,
+      "description": "可选。偏移分页参数。保留用于兼容早期草案；新实现 SHOULD 使用 pagination。",
+      "deprecated": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "time_range": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time",
+          "description": "起始时间（含）。"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time",
+          "description": "结束时间（含）。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "date_range": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date",
+          "description": "起始日期（含）。"
+        },
+        "to": {
+          "type": "string",
+          "format": "date",
+          "description": "结束日期（含）。"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

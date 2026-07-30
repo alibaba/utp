@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/valid_next_actions.json",
+  "version": "2026-07-27",
+  "title": "Valid Next Actions",
+  "description": "当前响应可继续执行的后续操作完整 Action 名称列表；空数组表示没有可暴露的后续操作。",
+  "type": "array",
+  "items": {
+    "type": "string",
+    "minLength": 1
+  },
+  "uniqueItems": true
+}

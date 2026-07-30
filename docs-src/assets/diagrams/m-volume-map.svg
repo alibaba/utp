@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="330px" viewBox="-0.5 -0.5 760 330" font-family="Helvetica">
+<defs>
+<marker id="mVolArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+<marker id="mVolArrowO" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#d79b00"/></marker>
+</defs>
+<g>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">商家侧分册（UTP-M）与主规范（买方侧）的章节对偶</text>
+
+<!-- left column band -->
+<rect x="30" y="40" width="300" height="250" rx="8" fill="none" stroke="#d79b00" stroke-dasharray="6 3"/>
+<text x="180" y="60" text-anchor="middle" font-size="12" fill="#d79b00" font-weight="bold">供应商侧（UTP-M · 本分册）</text>
+
+<!-- right column band -->
+<rect x="430" y="40" width="300" height="250" rx="8" fill="none" stroke="#6c8ebf" stroke-dasharray="6 3"/>
+<text x="580" y="60" text-anchor="middle" font-size="12" fill="#6c8ebf" font-weight="bold">采购侧（UTP 主规范）</text>
+
+<!-- left items -->
+<g>
+<rect x="50" y="76" width="260" height="28" rx="4" fill="#ffe6cc" stroke="#d79b00"/><text x="180" y="94" text-anchor="middle" font-size="11">M2 入驻与能力声明</text>
+<rect x="50" y="112" width="260" height="28" rx="4" fill="#ffe6cc" stroke="#d79b00"/><text x="180" y="130" text-anchor="middle" font-size="11">MP1 listing 发布 / 上架</text>
+<rect x="50" y="148" width="260" height="28" rx="4" fill="#ffe6cc" stroke="#d79b00"/><text x="180" y="166" text-anchor="middle" font-size="11">MP2 inventory 库存</text>
+<rect x="50" y="184" width="260" height="28" rx="4" fill="#ffe6cc" stroke="#d79b00"/><text x="180" y="202" text-anchor="middle" font-size="11">MP3 acceptance 接单 / 拒单</text>
+<rect x="50" y="220" width="260" height="28" rx="4" fill="#ffe6cc" stroke="#d79b00"/><text x="180" y="238" text-anchor="middle" font-size="11">MP4 shipment 发货执行</text>
+<rect x="50" y="256" width="260" height="28" rx="4" fill="#d5e8d4" stroke="#82b366"/><text x="180" y="274" text-anchor="middle" font-size="11">M7 结算与对账</text>
+</g>
+
+<!-- right items -->
+<g>
+<rect x="450" y="76" width="260" height="28" rx="4" fill="#dae8fc" stroke="#6c8ebf"/><text x="580" y="94" text-anchor="middle" font-size="11">L0 发现与协商（Ch.3）</text>
+<rect x="450" y="112" width="260" height="28" rx="4" fill="#dae8fc" stroke="#6c8ebf"/><text x="580" y="130" text-anchor="middle" font-size="11">P1 Source 搜索 / 详情（Ch.11）</text>
+<rect x="450" y="148" width="260" height="28" rx="4" fill="#dae8fc" stroke="#6c8ebf"/><text x="580" y="166" text-anchor="middle" font-size="11">P3 Purchase 库存校验与锁定（Ch.13）</text>
+<rect x="450" y="184" width="260" height="28" rx="4" fill="#dae8fc" stroke="#6c8ebf"/><text x="580" y="202" text-anchor="middle" font-size="11">P3 Purchase 订购成立（Ch.13）</text>
+<rect x="450" y="220" width="260" height="28" rx="4" fill="#dae8fc" stroke="#6c8ebf"/><text x="580" y="238" text-anchor="middle" font-size="11">P5 Fulfill notify / query（Ch.15）</text>
+<rect x="450" y="256" width="260" height="28" rx="4" fill="#dae8fc" stroke="#6c8ebf"/><text x="580" y="274" text-anchor="middle" font-size="11">P4 Pay 支付确认（Ch.14）</text>
+</g>
+
+<!-- arrows: supply -> buy -->
+<path d="M 310 90 L 446 90" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mVolArrow)"/>
+<path d="M 310 126 L 446 126" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mVolArrow)"/>
+<path d="M 310 162 L 446 162" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mVolArrow)"/>
+<path d="M 446 198 L 314 198" fill="none" stroke="#d79b00" marker-end="url(#mVolArrowO)"/>
+<path d="M 310 234 L 446 234" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mVolArrow)"/>
+<path d="M 446 270 L 314 270" fill="none" stroke="#d79b00" marker-end="url(#mVolArrowO)"/>
+
+<text x="380" y="316" text-anchor="middle" font-size="10" fill="#666">黑色 = 供应商侧供给事实流向买方侧 · 橙色 = 买方侧事实回流供应商侧（订单路由 / 支付确认）</text>
+</g>
+</svg>

@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/fulfill/state_machine.json",
+  "version": "2026-07-27",
+  "title": "Fulfill 原语状态机定义",
+  "description": "履约原语的采购方可观测状态机，对应 UTP 规范第 15 章 §15.3。备货、待发等供应方内部状态不在范围内；notify 推送驱动迁移，query 只读不迁移。",
+  "initial_state": "INIT",
+  "states": {
+    "INIT": {
+      "description": "订单尚未开始履约。允许 leadtime、query。"
+    },
+    "SHIPPED": {
+      "description": "订单商品已发出。允许 leadtime（适用时）、query。"
+    },
+    "DELAYED": {
+      "description": "订单履约延迟（备货、发货前或在途延迟）。允许 leadtime、query、utp.resolve.raise。"
+    },
+    "DELIVERED": {
+      "description": "订单当前批次已妥投。无需验货时可 receive/reject；需验货时可 query、reject 或进入 Resolve。"
+    },
+    "INSPECTED": {
+      "description": "订单验货合格。允许 receive、reject、query。"
+    },
+    "RECEIVED": {
+      "description": "订单当前批次已确认收货且无后续批次待判定。允许 query。"
+    },
+    "PARTIAL_DELIVERED": {
+      "description": "当前批次已收但仍有后续批次。允许 query、leadtime，以及针对新到达批次的 receive、针对当前已交付批次的 reject。"
+    },
+    "FULFILLED": {
+      "description": "订单全部收货完成（P5 内部终态）。仅 query 只读；全局 FULFILLING→SETTLED 由全局状态机根据支付、争议、审计决定。"
+    },
+    "REJECTED": {
+      "description": "订单当前批次已拒收（P5 内部终态）。query 只读、utp.resolve.raise；被拒批次不再进入 RECEIVED/FULFILLED。"
+    }
+  },
+  "transitions": [
+    {
+      "from": "INIT",
+      "action": "utp.fulfill.notify",
+      "to": "SHIPPED",
+      "condition": "发货事件"
+    },
+    {
+      "from": "INIT",
+      "action": "utp.fulfill.notify",
+      "to": "DELAYED",
+      "condition": "延迟事件"
+    },
+    {
+      "from": "INIT",
+      "action": "utp.fulfill.notify",
+      "to": "DELIVERED",
+      "condition": "虚拟商品或服务激活/授权生效事件"
+    },
+    {
+      "from": "SHIPPED",
+      "action": "utp.fulfill.notify",
+      "to": "DELAYED",
+      "condition": "延迟事件"
+    },
+    {
+      "from": "DELAYED",
+      "action": "utp.fulfill.notify",
+      "to": "SHIPPED",
+      "condition": "发货/恢复事件"
+    },
+    {
+      "from": "DELAYED",
+      "action": "utp.fulfill.notify",
+      "to": "DELIVERED",
+      "condition": "延迟后的妥投、服务激活或授权生效事件"
+    },
+    {
+      "from": "SHIPPED",
+      "action": "utp.fulfill.notify",
+      "to": "DELIVERED",
+      "condition": "妥投事件"
+    },
+    {
+      "from": "DELIVERED",
+      "action": "utp.fulfill.notify",
+      "to": "INSPECTED",
+      "condition": "验货合格结论（仅在条款要求验货时）"
+    },
+    {
+      "from": "PARTIAL_DELIVERED",
+      "action": "utp.fulfill.notify",
+      "to": "SHIPPED",
+      "condition": "后续批次发货事件"
+    },
+    {
+      "from": "PARTIAL_DELIVERED",
+      "action": "utp.fulfill.notify",
+      "to": "DELIVERED",
+      "condition": "后续批次妥投事件"
+    },
+    {
+      "from": "DELIVERED",
+      "action": "utp.fulfill.receive",
+      "to": "RECEIVED",
+      "condition": "无需验货；当前批次为最后批次"
+    },
+    {
+      "from": "DELIVERED",
+      "action": "utp.fulfill.receive",
+      "to": "PARTIAL_DELIVERED",
+      "condition": "无需验货；仍有后续批次"
+    },
+    {
+      "from": "INSPECTED",
+      "action": "utp.fulfill.receive",
+      "to": "RECEIVED",
+      "condition": "当前批次为最后批次"
+    },
+    {
+      "from": "INSPECTED",
+      "action": "utp.fulfill.receive",
+      "to": "PARTIAL_DELIVERED",
+      "condition": "仍有后续批次"
+    },
+    {
+      "from": "PARTIAL_DELIVERED",
+      "action": "utp.fulfill.receive",
+      "to": "RECEIVED",
+      "condition": "后续批次妥投后确认收货；当前批次为最后批次"
+    },
+    {
+      "from": "PARTIAL_DELIVERED",
+      "action": "utp.fulfill.receive",
+      "to": "PARTIAL_DELIVERED",
+      "condition": "后续批次妥投后确认收货；仍有后续批次"
+    },
+    {
+      "from": "RECEIVED",
+      "event": "all_batches_received",
+      "to": "FULFILLED",
+      "condition": "当前批次收货后，协议引擎检测全部批次已收，系统自动流转"
+    },
+    {
+      "from": "DELIVERED",
+      "action": "utp.fulfill.reject",
+      "to": "REJECTED"
+    },
+    {
+      "from": "INSPECTED",
+      "action": "utp.fulfill.reject",
+      "to": "REJECTED"
+    },
+    {
+      "from": "PARTIAL_DELIVERED",
+      "action": "utp.fulfill.reject",
+      "to": "REJECTED",
+      "condition": "针对当前已交付批次"
+    }
+  ],
+  "constraints": {
+    "notes": [
+      "utp.fulfill.query 在任意状态均可执行，无状态影响。",
+      "utp.fulfill.leadtime 仅在 INIT、SHIPPED、DELAYED、PARTIAL_DELIVERED 状态可执行。",
+      "条款要求验货时，只有验货合格进入 INSPECTED 后才暴露 receive。",
+      "FULFILLED 与 REJECTED 为 P5 内部终态，全局状态迁移由全局状态机决定。",
+      "DELAYED 与 REJECTED 状态可执行 utp.resolve.raise 进入争议解决。",
+      "notify 应以 event_id 幂等去重，回调不可达时 Buyer 通过 utp.fulfill.query 轮询兜底。",
+      "虚拟商品或服务可跳过物流状态，服务激活或授权生效事件可直接使订单进入 DELIVERED，并暴露 receive/reject。",
+      "RECEIVED → FULFILLED 的系统流转在 receive 操作成功且全部批次已收时由协议引擎自动完成，不再要求 Buyer 主动调用新操作。"
+    ]
+  }
+}

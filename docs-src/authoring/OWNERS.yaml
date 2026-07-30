@@ -1,0 +1,77 @@
+version: 1
+sections:
+  index:
+    owner: documentation-editor
+    reviewers: [protocol-architecture]
+  core:
+    owner: protocol-architecture
+    reviewers: [documentation-editor]
+  concepts:
+    owner: protocol-architecture
+    reviewers: [documentation-editor]
+  protocol-core:
+    owner: protocol-architecture
+    reviewers: [documentation-editor]
+  quickstart:
+    owner: protocol-architecture
+    reviewers: [documentation-editor]
+  primitives/source:
+    owner: sourcing-team
+    reviewers: [protocol-architecture, transport-team]
+  primitives/negotiate:
+    owner: negotiation-team
+    reviewers: [protocol-architecture, transport-team]
+  primitives/purchase:
+    owner: purchase-team
+    reviewers: [protocol-architecture, transport-team]
+  primitives/pay:
+    owner: payment-team
+    reviewers: [protocol-architecture, security-team, transport-team]
+  primitives/fulfill:
+    owner: fulfillment-team
+    reviewers: [protocol-architecture, transport-team]
+  primitives/resolve:
+    owner: dispute-team
+    reviewers: [protocol-architecture, security-team, transport-team]
+  orchestration:
+    owner: protocol-architecture
+    reviewers: [primitive-leads, documentation-editor]
+  guides:
+    owner: solution-documentation
+    reviewers: [protocol-architecture, documentation-editor]
+  reference:
+    owner: documentation-editor
+    reviewers: [protocol-architecture]
+  schemas:
+    owner: schema-maintainers
+    reviewers: [protocol-architecture, primitive-leads, security-team]
+  services:
+    owner: transport-team
+    reviewers: [protocol-architecture, security-team]
+  assets:
+    owner: documentation-maintainers
+    reviewers: [documentation-editor]
+  templates:
+    owner: documentation-maintainers
+    reviewers: [documentation-editor, protocol-architecture]
+  review-checklists:
+    owner: documentation-maintainers
+    reviewers: [protocol-architecture, security-team]
+  tests:
+    owner: documentation-maintainers
+    reviewers: [documentation-editor]
+  manifest.json:
+    owner: documentation-maintainers
+    reviewers: [documentation-editor]
+  CONTRIBUTING.md:
+    owner: documentation-maintainers
+    reviewers: [documentation-editor]
+  OWNERS.yaml:
+    owner: documentation-maintainers
+    reviewers: [documentation-editor, protocol-architecture]
+  CHANGELOG.md:
+    owner: documentation-maintainers
+    reviewers: [documentation-editor]
+  merchant:
+    owner: merchant-team
+    reviewers: [protocol-architecture, primitive-leads, documentation-editor]

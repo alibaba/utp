@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 640">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif; }
+    .title { font-size: 17px; font-weight: 700; fill: #1a1a2e; }
+    .subtitle { font-size: 10.5px; font-weight: 400; fill: #6b7280; }
+    .tier { font-size: 13px; font-weight: 700; fill: #1a1a2e; }
+    .cost { font-size: 11px; font-weight: 700; }
+    .row { font-size: 10px; font-weight: 400; fill: #374151; }
+    .k { font-size: 10px; font-weight: 600; fill: #6b7280; }
+    .esc { font-size: 9.5px; font-weight: 600; fill: #b45309; }
+    .note { font-size: 9px; font-weight: 400; fill: #6b7280; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="8" refX="4.5" refY="7" orient="auto"><polygon points="0 0, 4.5 8, 9 0" fill="#d97706"/></marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <text x="30" y="34" class="title">RESOLVE 三级处置路径</text>
+  <text x="30" y="52" class="subtitle">争议按复杂度逐级升级,证据包向上层传递;绝大多数争议在 L1 即可自动解决</text>
+
+  <!-- L1 -->
+  <rect x="40" y="76" width="740" height="120" rx="8" fill="#e7f2e0" stroke="#82b366" stroke-width="1.4"/>
+  <text x="58" y="100" class="tier">L1 · 协议自治(自动补偿)</text>
+  <text x="762" y="100" class="cost" fill="#5a8a3c" text-anchor="end">耗时:秒级(自动执行)</text>
+  <text x="58" y="122" class="k">触发条件</text><text x="150" y="122" class="row">协议预定义的补偿规则匹配</text>
+  <text x="58" y="140" class="k">处理方式</text><text x="150" y="140" class="row">自动执行退款 / 释放库存 / 取消授权</text>
+  <text x="58" y="158" class="k">适用</text><text x="150" y="158" class="row">B2C 简单争议(未到货、重复扣款、超时未发货)</text>
+  <text x="58" y="176" class="k">示例</text><text x="150" y="176" class="row">物流超 7 天无更新 → 自动退款</text>
+
+  <line x1="410" y1="196" x2="410" y2="222" stroke="#d97706" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="420" y="213" class="esc">规则不匹配 或 金额超限</text>
+
+  <!-- L2 -->
+  <rect x="40" y="224" width="740" height="120" rx="8" fill="#fef8ed" stroke="#e0b46a" stroke-width="1.4"/>
+  <text x="58" y="248" class="tier">L2 · 平台 / 社会化调解</text>
+  <text x="762" y="248" class="cost" fill="#b45309" text-anchor="end">耗时:天级(3-15 个工作日)</text>
+  <text x="58" y="270" class="k">触发条件</text><text x="150" y="270" class="row">L1 无法解决 或 争议涉及主观判断</text>
+  <text x="58" y="288" class="k">处理方式</text><text x="150" y="288" class="row">平台调解员 / 行业调解机构介入</text>
+  <text x="58" y="306" class="k">适用</text><text x="150" y="306" class="row">B2B 质量争议、服务标准争议、金额较大的 B2C 争议</text>
+  <text x="58" y="324" class="k">输出</text><text x="150" y="324" class="row">MediationResult(含责任分配和补偿方案)</text>
+
+  <line x1="410" y1="344" x2="410" y2="370" stroke="#d97706" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="420" y="361" class="esc">调解失败 或 争议方不接受</text>
+
+  <!-- L3 -->
+  <rect x="40" y="372" width="740" height="120" rx="8" fill="#fdeee8" stroke="#d98a6a" stroke-width="1.4"/>
+  <text x="58" y="396" class="tier">L3 · 仲裁 / 诉讼</text>
+  <text x="762" y="396" class="cost" fill="#b91c1c" text-anchor="end">耗时:月级(30-180 天)</text>
+  <text x="58" y="418" class="k">触发条件</text><text x="150" y="418" class="row">L2 调解失败 或 跨境法律争议</text>
+  <text x="58" y="436" class="k">处理方式</text><text x="150" y="436" class="row">仲裁机构裁定 或 法院诉讼</text>
+  <text x="58" y="454" class="k">适用</text><text x="150" y="454" class="row">跨境合同纠纷、大额商业争议、涉及法律解释的争议</text>
+  <text x="58" y="472" class="k">输出</text><text x="150" y="472" class="row">ArbitrationDecision(含裁定结果和执行指令)</text>
+
+  <!-- bottom rule -->
+  <rect x="30" y="512" width="760" height="74" rx="6" fill="#f9fafb" stroke="#d1d5db" stroke-width="1"/>
+  <text x="42" y="530" class="note">读法:自上而下为争议升级方向,颜色由绿转橙再转红表示成本与耗时递增;橙色箭头标注每一级向上升级的触发条件。</text>
+  <text x="42" y="545" class="note">L1 秒级自动执行,覆盖绝大多数 B2C 简单争议;L2 天级由调解员介入处理主观判断类争议;L3 月级由仲裁或诉讼裁定跨境与大额争议。</text>
+  <text x="42" y="560" class="note">每一级的证据包可向上层传递,确保争议升级时不丢失上下文——上层始终能看到下层已积累的完整依据。</text>
+  <text x="42" y="575" class="note">升级是"逐级"而非"跳级":只有当前级无法解决(规则不匹配 / 调解失败)时才进入下一级,把成本留给复杂的争议。</text>
+</svg>

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/document_reference.json",
+  "version": "2026-07-29",
+  "title": "DocumentReference",
+  "description": "可获取并可校验的受控文档引用。digest 是内容摘要，不涉及加密或密钥。",
+  "type": "object",
+  "required": [
+    "document_id"
+  ],
+  "properties": {
+    "document_id": {
+      "type": "string",
+      "description": "文档稳定标识。"
+    },
+    "uri": {
+      "type": "string",
+      "format": "uri",
+      "description": "文档获取地址，可为受控资源 URI。"
+    },
+    "media_type": {
+      "type": "string",
+      "description": "文档媒体类型，如 application/pdf。"
+    },
+    "digest": {
+      "type": "object",
+      "description": "用于校验文档内容完整性的摘要信息。",
+      "required": [
+        "algorithm",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "const": "sha-256",
+          "description": "摘要算法。"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$",
+          "description": "文档内容的 SHA-256 十六进制摘要。"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

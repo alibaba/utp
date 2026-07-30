@@ -1,0 +1,58 @@
+<svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">B2C 标准采购原语路径</title>
+  <desc id="desc">P1 Source 形成候选集合，P3 Purchase 确认订购，P4 Pay 完成支付，P5 Fulfill 履约和收货。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif; }
+      .node { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.6; }
+      .core { fill: #eef2ff; stroke: #4f46e5; stroke-width: 1.6; }
+      .label { font-size: 14px; font-weight: 700; fill: #1e3a5f; }
+      .core-label { font-size: 14px; font-weight: 700; fill: #3730a3; }
+      .sub { font-size: 12px; fill: #64748b; }
+      .note-box { fill: #fff7ed; stroke: #f97316; stroke-width: 1; }
+      .note { font-size: 11px; fill: #9a3412; }
+    </style>
+  </defs>
+
+  <g transform="translate(24 34)">
+    <rect class="node" x="0" y="0" width="130" height="64" rx="8"/>
+    <text class="label" x="65" y="27" text-anchor="middle">P1 Source</text>
+    <text class="sub" x="65" y="46" text-anchor="middle">搜索 / 查询商品</text>
+  </g>
+
+  <g transform="translate(216 34)">
+    <rect class="core" x="0" y="0" width="130" height="64" rx="8"/>
+    <text class="core-label" x="65" y="27" text-anchor="middle">P3 Purchase</text>
+    <text class="sub" x="65" y="46" text-anchor="middle">创建并确认订购</text>
+  </g>
+
+  <g transform="translate(408 34)">
+    <rect class="core" x="0" y="0" width="130" height="64" rx="8"/>
+    <text class="core-label" x="65" y="27" text-anchor="middle">P4 Pay</text>
+    <text class="sub" x="65" y="46" text-anchor="middle">即时全额支付</text>
+  </g>
+
+  <g transform="translate(600 34)">
+    <rect class="node" x="0" y="0" width="130" height="64" rx="8"/>
+    <text class="label" x="65" y="27" text-anchor="middle">P5 Fulfill</text>
+    <text class="sub" x="65" y="46" text-anchor="middle">发货 / 收货</text>
+  </g>
+
+  <g stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow)">
+    <line x1="154" y1="66" x2="214" y2="66"/>
+    <line x1="346" y1="66" x2="406" y2="66"/>
+    <line x1="538" y1="66" x2="598" y2="66"/>
+  </g>
+
+  <g transform="translate(234 112)">
+    <rect class="note-box" x="0" y="0" width="94" height="22" rx="5"/>
+    <text class="note" x="47" y="15" text-anchor="middle">确认订购</text>
+  </g>
+  <g transform="translate(426 112)">
+    <rect class="note-box" x="0" y="0" width="94" height="22" rx="5"/>
+    <text class="note" x="47" y="15" text-anchor="middle">授权支付</text>
+  </g>
+</svg>

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/fulfill/entities/list_output.json",
+  "version": "2026-07-27",
+  "title": "FulfillListOutput",
+  "description": "utp.fulfill.list 的业务输出。返回订单摘要列表；空列表为正常结果，不使用错误响应。",
+  "type": "object",
+  "properties": {
+    "orders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "订单标识。"
+          },
+          "purchase_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "订单所属订购标识。"
+          },
+          "transaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "全局事务标识。"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "INIT",
+              "SHIPPED",
+              "DELAYED",
+              "DELIVERED",
+              "INSPECTED",
+              "RECEIVED",
+              "PARTIAL_DELIVERED",
+              "FULFILLED",
+              "REJECTED"
+            ],
+            "description": "订单当前履约状态。"
+          },
+          "promised_delivery_date": {
+            "type": "string",
+            "format": "date",
+            "description": "承诺交付日期，可选。"
+          },
+          "next_estimated_delivery_date": {
+            "type": "string",
+            "format": "date",
+            "description": "下一批次或订单整体预计交付日期，可选。"
+          },
+          "last_event_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "最近一次履约事件时间。"
+          },
+          "supplier_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "供应商标识。"
+          },
+          "summary": {
+            "type": "string",
+            "description": "订单摘要描述。"
+          },
+          "total_quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "订单总数量，可选。"
+          },
+          "received_quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "已确认收货数量，可选。"
+          },
+          "has_exception": {
+            "type": "boolean",
+            "description": "是否存在延迟、拒收或异常履约事实。"
+          }
+        },
+        "required": [
+          "order_id",
+          "status"
+        ],
+        "additionalProperties": true
+      },
+      "description": "订单摘要列表。"
+    },
+    "pagination": {
+      "$ref": "../../../common/pagination.json#/$defs/response",
+      "description": "游标分页信息，可选。"
+    }
+  },
+  "required": [
+    "orders"
+  ],
+  "additionalProperties": true
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/state_notify_response.json",
+  "version": "2026-07-29",
+  "title": "UTP State Notify Response",
+  "description": "POST /utp/state/notify 的成功响应体",
+  "type": "object",
+  "properties": {
+    "state_views": {
+      "type": "array",
+      "items": {
+        "$ref": "https://ut-protocol.com/global-state-machine/entities/state_view.json"
+      },
+      "minItems": 1,
+      "description": "接收方校验并接受后的完整当前 StateView 集合"
+    }
+  },
+  "required": [
+    "state_views"
+  ],
+  "additionalProperties": true
+}

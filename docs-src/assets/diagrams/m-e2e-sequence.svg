@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="620px" viewBox="-0.5 -0.5 760 620" font-family="Helvetica">
+<defs>
+<marker id="mE2eArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+<marker id="mE2eArrowO" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#d79b00"/></marker>
+</defs>
+<g>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">M10.1.1 供应商全链路时序总览（Phase 0—6）</text>
+
+<!-- lifelines -->
+<rect x="40" y="40" width="180" height="34" rx="6" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="130" y="61" text-anchor="middle" font-size="12" font-weight="bold">供应商（Seller/Bridge/Agent）</text>
+<rect x="300" y="40" width="160" height="34" rx="6" fill="#fff2cc" stroke="#d6b656"/>
+<text x="380" y="61" text-anchor="middle" font-size="12" font-weight="bold">Marketplace</text>
+<rect x="560" y="40" width="160" height="34" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="640" y="61" text-anchor="middle" font-size="12" font-weight="bold">买方 Agent</text>
+
+<path d="M 130 74 L 130 600" stroke="#999999" stroke-dasharray="4 4" fill="none"/>
+<path d="M 380 74 L 380 600" stroke="#999999" stroke-dasharray="4 4" fill="none"/>
+<path d="M 640 74 L 640 600" stroke="#999999" stroke-dasharray="4 4" fill="none"/>
+
+<!-- Phase labels -->
+<g font-size="10" fill="#666" font-weight="bold">
+<text x="8" y="102">P0</text>
+<text x="8" y="156">P1</text>
+<text x="8" y="230">P2</text>
+<text x="8" y="300">P3</text>
+<text x="8" y="374">P4</text>
+<text x="8" y="474">P5</text>
+<text x="8" y="552">P6</text>
+</g>
+
+<!-- Phase 0 -->
+<path d="M 130 98 L 376 98" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="160" y="82" width="190" height="14" fill="#fff"/><text x="255" y="93">注册 → 资质 → 沙箱验收（M2 五步）</text></g>
+<text x="392" y="112" font-size="10" fill="#82b366">merchant ACTIVE</text>
+
+<!-- Phase 1 -->
+<path d="M 130 152 L 376 152" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="150" y="136" width="210" height="14" fill="#fff"/><text x="255" y="147">listing.publish · inventory.set(500)</text></g>
+<path d="M 380 176 L 134 176" fill="none" stroke="#d79b00" marker-end="url(#mE2eArrowO)"/>
+<g font-size="10" text-anchor="middle" fill="#d79b00"><rect x="150" y="160" width="210" height="14" fill="#fff"/><text x="255" y="171">回调 review_result(APPROVED)</text></g>
+<text x="392" y="190" font-size="10" fill="#82b366">LISTED · sellable=500</text>
+
+<!-- Phase 2 -->
+<path d="M 640 226 L 384 226" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="430" y="210" width="160" height="14" fill="#fff"/><text x="510" y="221">source.search「降噪耳机」</text></g>
+<path d="M 640 250 L 384 250" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="430" y="234" width="160" height="14" fill="#fff"/><text x="510" y="245">source.lookup（阶梯价详情）</text></g>
+
+<!-- Phase 3 -->
+<path d="M 640 296 L 384 296" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="440" y="280" width="140" height="14" fill="#fff"/><text x="510" y="291">negotiate.inquiry（100 件）</text></g>
+<path d="M 380 314 L 134 314" fill="none" stroke="#d79b00" marker-end="url(#mE2eArrowO)"/>
+<g font-size="10" text-anchor="middle" fill="#d79b00"><rect x="170" y="298" width="170" height="14" fill="#fff"/><text x="255" y="309">inquiry_routed（passthrough 时）</text></g>
+<path d="M 130 336 L 636 336" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="270" y="320" width="230" height="14" fill="#fff"/><text x="385" y="331">quote 268/件（Agent 按 M9.3 策略 · 经 Marketplace 应答）</text></g>
+
+<!-- Phase 4 -->
+<path d="M 640 370 L 384 370" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="440" y="354" width="140" height="14" fill="#fff"/><text x="510" y="365">purchase.create（hold 100）</text></g>
+<path d="M 640 392 L 384 392" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="450" y="376" width="120" height="14" fill="#fff"/><text x="510" y="387">complete（买方签名）</text></g>
+<path d="M 380 410 L 134 410" fill="none" stroke="#d79b00" marker-end="url(#mE2eArrowO)"/>
+<g font-size="10" text-anchor="middle" fill="#d79b00"><rect x="200" y="394" width="110" height="14" fill="#fff"/><text x="255" y="405">回调 order_routed</text></g>
+<path d="M 130 432 L 376 432" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="160" y="416" width="190" height="14" fill="#fff"/><text x="255" y="427">acceptance.accept（签 terms_hash）</text></g>
+<path d="M 380 450 L 636 450" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="410" y="434" width="200" height="14" fill="#fff"/><text x="510" y="445">SIGNING→PURCHASED · 订购成立</text></g>
+
+<!-- Phase 5 -->
+<path d="M 130 496 L 376 496" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="200" y="480" width="110" height="14" fill="#fff"/><text x="255" y="491">shipment.ship</text></g>
+<path d="M 380 496 L 636 496" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)" opacity="0"/>
+<path d="M 384 514 L 636 514" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="440" y="498" width="140" height="14" fill="#fff"/><text x="510" y="509">fulfill.notify(SHIPPED)</text></g>
+<path d="M 640 530 L 384 530" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="450" y="516" width="120" height="14" fill="#fff"/><text x="510" y="527">fulfill.receive 确认收货</text></g>
+
+<!-- Phase 6 -->
+<path d="M 380 566 L 134 566" fill="none" stroke="#d79b00" marker-end="url(#mE2eArrowO)"/>
+<g font-size="10" text-anchor="middle" fill="#d79b00"><rect x="180" y="550" width="150" height="14" fill="#fff"/><text x="255" y="561">回调 statement_issued（T+7）</text></g>
+<path d="M 130 588 L 376 588" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mE2eArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="160" y="572" width="190" height="14" fill="#fff"/><text x="255" y="583">settlement 核对/确认 → PAID_OUT</text></g>
+
+<text x="380" y="614" text-anchor="middle" font-size="10" fill="#666">黑色 = 协议请求 · 橙色 = dev.utp.merchant_callback 回调 · 完整报文序列见 M10.2—M10.7（资料性）</text>
+</g>
+</svg>

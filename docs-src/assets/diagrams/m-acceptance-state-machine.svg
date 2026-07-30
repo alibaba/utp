@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="400px" viewBox="-0.5 -0.5 760 400" font-family="Helvetica">
+<defs>
+<marker id="mAccArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+</defs>
+<g>
+<text x="380" y="24" text-anchor="middle" font-size="14" font-weight="bold">M5.2.1 受理任务状态机（资源作用域：routing_id · deadline 内收敛）</text>
+
+<!-- entry -->
+<text x="110" y="66" text-anchor="middle" font-size="11" fill="#666">订单路由（order_routed 回调）</text>
+<path d="M 110 74 L 110 96" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+
+<!-- PENDING_ACCEPT -->
+<rect x="30" y="100" width="160" height="44" rx="6" fill="#fff2cc" stroke="#d6b656"/>
+<text x="110" y="119" text-anchor="middle" font-size="12" font-weight="bold">PENDING_ACCEPT</text>
+<text x="110" y="135" text-anchor="middle" font-size="10">待受理（计时开始）</text>
+
+<!-- ON_HOLD -->
+<rect x="30" y="220" width="160" height="44" rx="6" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="110" y="239" text-anchor="middle" font-size="12" font-weight="bold">ON_HOLD</text>
+<text x="110" y="255" text-anchor="middle" font-size="10">内部审批挂起（时限不延长）</text>
+
+<!-- AMEND_PROPOSED -->
+<rect x="300" y="220" width="180" height="44" rx="6" fill="#e1d5e7" stroke="#9673a6"/>
+<text x="390" y="239" text-anchor="middle" font-size="12" font-weight="bold">AMEND_PROPOSED</text>
+<text x="390" y="255" text-anchor="middle" font-size="10">交期变更待买方确认</text>
+
+<!-- ACCEPTED -->
+<rect x="560" y="100" width="170" height="44" rx="6" fill="#d5e8d4" stroke="#82b366"/>
+<text x="645" y="119" text-anchor="middle" font-size="12" font-weight="bold">ACCEPTED（终态）</text>
+<text x="645" y="135" text-anchor="middle" font-size="10">卖方签名 → SIGNING→PURCHASED</text>
+
+<!-- REJECTED -->
+<rect x="560" y="220" width="170" height="44" rx="6" fill="#f8cecc" stroke="#b85450"/>
+<text x="645" y="239" text-anchor="middle" font-size="12" font-weight="bold">REJECTED（终态）</text>
+<text x="645" y="255" text-anchor="middle" font-size="10">附原因码 → P3 补偿链</text>
+
+<!-- PENDING_ACCEPT -> ACCEPTED -->
+<path d="M 190 122 L 556 122" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="290" y="104" width="170" height="16" fill="#fff"/><text x="375" y="115">accept（ES256 签 terms_hash）</text></g>
+
+<!-- PENDING_ACCEPT -> ON_HOLD -->
+<path d="M 110 144 L 110 216" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="116" y="172" width="36" height="16" fill="#fff"/><text x="134" y="183">hold</text></g>
+
+<!-- PENDING_ACCEPT -> AMEND_PROPOSED -->
+<path d="M 176 144 L 340 216" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="204" y="164" width="100" height="16" fill="#fff"/><text x="254" y="175">amend_leadtime</text></g>
+
+<!-- PENDING_ACCEPT -> REJECTED -->
+<path d="M 190 136 L 580 216" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="360" y="160" width="44" height="16" fill="#fff"/><text x="382" y="171">reject</text></g>
+
+<!-- ON_HOLD -> ACCEPTED / REJECTED / AMEND -->
+<path d="M 190 228 L 596 148" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)" opacity="0"/>
+<path d="M 156 220 L 600 148" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="410" y="188" width="48" height="16" fill="#fff"/><text x="434" y="199">accept</text></g>
+<path d="M 190 250 L 556 246" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)" opacity="0"/>
+<path d="M 190 256 L 556 250" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="222" y="270" width="44" height="16" fill="#fff"/><text x="244" y="281">reject</text></g>
+<path d="M 190 242 L 296 242" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="196" y="224" width="96" height="14" fill="#fff"/><text x="244" y="235">amend_leadtime</text></g>
+
+<!-- AMEND -> ACCEPTED / REJECTED -->
+<path d="M 440 220 L 600 148" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="482" y="176" width="70" height="16" fill="#fff"/><text x="517" y="187">买方确认</text></g>
+<path d="M 480 242 L 556 242" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAccArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="488" y="224" width="60" height="16" fill="#fff"/><text x="518" y="235">买方拒绝</text></g>
+
+<!-- timeout band -->
+<rect x="30" y="320" width="700" height="56" rx="6" fill="none" stroke="#b85450" stroke-dasharray="4 3"/>
+<text x="380" y="342" text-anchor="middle" font-size="11" fill="#b85450">deadline 到期（任意非终态）→ 按 timeout_policy 收敛至 ACCEPTED（auto_accept）或 REJECTED（auto_reject），arrived_via = timeout_auto</text>
+<text x="380" y="360" text-anchor="middle" font-size="11" fill="#b85450">终态后任何写操作 MUST 返回 ACCEPTANCE.STATE_CONFLICT（同 idempotency_key 幂等重放除外）· 订单永不悬挂</text>
+</g>
+</svg>

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/purchase/entities/purchase_agreement.json",
+  "version": "2026-07-29",
+  "title": "PurchaseAgreement",
+  "description": "采购合同或框架协议聚合。",
+  "type": "object",
+  "required": [
+    "purchase_id",
+    "agreement_type",
+    "agreement_terms",
+    "state"
+  ],
+  "properties": {
+    "purchase_id": {
+      "type": "string",
+      "description": "Purchase 原语内采购合同或框架协议的唯一资源标识。",
+      "readOnly": true
+    },
+    "agreement_type": {
+      "type": "string",
+      "description": "协议形态：采购合同或框架协议。",
+      "enum": [
+        "purchase_contract",
+        "framework_agreement"
+      ]
+    },
+    "agreement_terms": {
+      "$ref": "agreement_terms.json",
+      "description": "协议的结构化条款快照。"
+    },
+    "state": {
+      "type": "string",
+      "description": "协议聚合的持久化状态。",
+      "readOnly": true
+    }
+  },
+  "additionalProperties": true
+}

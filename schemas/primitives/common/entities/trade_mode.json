@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/trade_mode.json",
+  "version": "2026-07-30",
+  "title": "TradeMode",
+  "description": "商家提供的业务交易方式，描述付款形态及可选的分阶段安排。",
+  "type": "object",
+  "required": [
+    "id",
+    "name"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "交易方式唯一标识。"
+    },
+    "name": {
+      "type": "string",
+      "description": "交易方式名称，例如全款预付或分阶段付款。"
+    },
+    "type": {
+      "type": "string",
+      "description": "交易方式类型，例如 prepay 或 installment。"
+    },
+    "desc": {
+      "type": "string",
+      "description": "交易方式的说明。"
+    },
+    "is_step_pay_all": {
+      "type": "boolean",
+      "description": "是否一次性付清全部款项；true 表示一次性付款，false 表示分阶段付款。"
+    },
+    "sub_steps": {
+      "type": "array",
+      "description": "分阶段付款时的付款阶段。",
+      "items": {
+        "$ref": "./trade_step.json#"
+      }
+    }
+  },
+  "additionalProperties": true
+}

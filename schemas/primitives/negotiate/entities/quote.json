@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quote.json",
+  "version": "2026-07-29",
+  "title": "Quote",
+  "description": "供应商报价实体。消息真实性与完整性由传输层消息签名（RFC 9421，见规范 §4.4）保证；卖家侧业务承诺机制待与身份域对齐。注：quote_id 为 Schema 补充字段（规范 §12.9.2 缺失但被 quote_ref 引用）。",
+  "type": "object",
+  "properties": {
+    "quote_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "报价唯一标识。被 counter_offer 与 binding 的 quote_ref 引用。"
+    },
+    "inquiry_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "关联的询盘 inquiry_id。"
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "报价供应商的 agent_id。"
+    },
+    "round": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "本报价所属协商轮次。仅在会话启用轮次约束的场景使用。"
+    },
+    "line_items": {
+      "type": "array",
+      "items": { "$ref": "../../common/entities/line_item.json" },
+      "minItems": 1,
+      "description": "报价商品明细，复用通用订购行实体；unit_price 与 prices 由卖家填写。"
+    },
+    "prices": {
+      "type": "array",
+      "items": { "$ref": "../../common/entities/price.json" },
+      "minItems": 1,
+      "description": "报价金额构成（如 item/shipping/tax/discount），必须包含 type 为 total 的最终金额。"
+    },
+    "lead_time": {
+      "type": "object",
+      "description": "交期承诺（可选）。卖家在收货地址未知等情况下未必能给出，各字段均可缺省。",
+      "properties": {
+        "preparation_days": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "备货天数。"
+        },
+        "shipping_days": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "运输天数。"
+        },
+        "total_days": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "承诺的总交期天数（多少天到货）。"
+        },
+        "estimated_delivery": {
+          "type": "string",
+          "format": "date",
+          "description": "预计到货日期（可选，非承诺）。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "available_trade_modes": {
+      "type": "array",
+      "items": { "$ref": "../../common/entities/trade_mode.json" },
+      "minItems": 1,
+      "description": "卖家提供的可选业务交易方式列表，包含付款形态及分阶段安排；买家在 binding 时从中选定一项。"
+    },
+    "answers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/question_answer" },
+      "description": "对询盘中问题的回复，与 questions 顺序对应。"
+    },
+    "validity": {
+      "$ref": "../../common/entities/time_range.json",
+      "description": "报价有效期区间（可选）。卖家不一定能提供。"
+    },
+    "stock_guaranteed": {
+      "type": "boolean",
+      "description": "是否在有效期内保证库存（可选）。为 true 时供应商应锁定对应库存。"
+    },
+    "terms_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-fA-F0-9]{64}$",
+      "description": "报价条款快照哈希。计算范围与业务含义待细化（见待对齐问题清单）。"
+    }
+  },
+  "required": [
+    "quote_id",
+    "inquiry_ref",
+    "supplier_id",
+    "line_items",
+    "prices",
+    "available_trade_modes",
+    "terms_hash"
+  ],
+  "additionalProperties": true,
+  "$defs": {
+    "question_answer": {
+      "type": "object",
+      "properties": {
+        "question": { "type": "string", "description": "询盘问题。" },
+        "answer": { "type": "string", "description": "供应商回答。" }
+      },
+      "required": ["question", "answer"],
+      "additionalProperties": true
+    }
+  }
+}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="310px" viewBox="-0.5 -0.5 760 310" font-family="Helvetica">
+<defs>
+<marker id="mBrgArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+</defs>
+<g>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">M8.1 Merchant Bridge：北向协议面 × 南向集成面</text>
+
+<!-- Marketplace -->
+<rect x="20" y="70" width="130" height="120" rx="8" fill="#fff2cc" stroke="#d6b656"/>
+<text x="85" y="100" text-anchor="middle" font-size="12" font-weight="bold">Marketplace</text>
+<text x="85" y="120" text-anchor="middle" font-size="10">dev.utp.merchant</text>
+<text x="85" y="136" text-anchor="middle" font-size="10">回调推送</text>
+
+<!-- Bridge -->
+<rect x="230" y="50" width="300" height="170" rx="8" fill="#e1d5e7" stroke="#9673a6"/>
+<text x="380" y="74" text-anchor="middle" font-size="13" font-weight="bold">Merchant Bridge</text>
+<rect x="248" y="88" width="126" height="88" rx="4" fill="#ffffff" stroke="#9673a6"/>
+<text x="311" y="106" text-anchor="middle" font-size="11" font-weight="bold">北向（协议面）</text>
+<text x="311" y="124" text-anchor="middle" font-size="9.5">MP1—MP4 调用 · 回调接收</text>
+<text x="311" y="139" text-anchor="middle" font-size="9.5">签名与幂等 · 重试队列</text>
+<rect x="386" y="88" width="126" height="88" rx="4" fill="#ffffff" stroke="#9673a6"/>
+<text x="449" y="106" text-anchor="middle" font-size="11" font-weight="bold">南向（集成面）</text>
+<text x="449" y="124" text-anchor="middle" font-size="9.5">单据订阅/轮询 · DB 视图</text>
+<text x="449" y="139" text-anchor="middle" font-size="9.5">API 适配 · MQ 消费</text>
+
+<!-- shared state inside bridge -->
+<rect x="288" y="186" width="184" height="26" rx="4" fill="#f5f5f5" stroke="#666666"/>
+<text x="380" y="203" text-anchor="middle" font-size="10">ID 映射表（M8.3）· 同步游标 · 对账基线</text>
+
+<!-- ERP -->
+<rect x="610" y="70" width="130" height="120" rx="8" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="675" y="100" text-anchor="middle" font-size="12" font-weight="bold">ERP / WMS / OMS</text>
+<text x="675" y="120" text-anchor="middle" font-size="10">内部单据权威系统</text>
+<text x="675" y="136" text-anchor="middle" font-size="10">物料 · SO · 出库 · 应收</text>
+
+<!-- arrows -->
+<path d="M 226 112 L 154 112" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mBrgArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="152" y="94" width="76" height="14" fill="#fff"/><text x="190" y="105">MP 原语请求</text></g>
+<path d="M 150 148 L 226 148" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mBrgArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="152" y="152" width="76" height="14" fill="#fff"/><text x="190" y="163">回调 / 轮询兜底</text></g>
+
+<path d="M 534 112 L 606 112" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mBrgArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="532" y="94" width="76" height="14" fill="#fff"/><text x="570" y="105">下行写单</text></g>
+<path d="M 606 148 L 534 148" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mBrgArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="532" y="152" width="76" height="14" fill="#fff"/><text x="570" y="163">上行事实同步</text></g>
+
+<!-- constraint band -->
+<rect x="20" y="242" width="720" height="48" rx="6" fill="none" stroke="#b85450" stroke-dasharray="4 3"/>
+<text x="380" y="262" text-anchor="middle" font-size="10" fill="#b85450">映射 MUST 一对一（同一 purchase_id 不得映射多个 SO）· ERP 单据号 MUST NOT 进入协议语义字段（external_ref 唯一例外，平台只透传）</text>
+<text x="380" y="279" text-anchor="middle" font-size="10" fill="#b85450">映射表 MUST 可导出用于对账与争议举证 · 回调不可达时按游标定时拉取收敛（M8.4）</text>
+</g>
+</svg>

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_output.json",
+  "version": "2026-07-27",
+  "title": "NegotiateQueryOutput",
+  "description": "utp.negotiate.query 的业务输出。返回本方可见的协商状态与数据；可见范围受角色、能力提供方访问策略和 L3 竞争规则限制。轮询获取的报价与回调交付的报价具有同等效力，不改变签名、有效期或协商状态。",
+  "type": "object",
+  "properties": {
+    "inquiry_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "询盘 ID。",
+      "readOnly": true
+    },
+    "negotiation_status": {
+      "type": "string",
+      "enum": [
+        "SKIPPED",
+        "READY",
+        "INQUIRED",
+        "QUOTED",
+        "COUNTERED",
+        "BOUND",
+        "RELEASED"
+      ],
+      "description": "当前协商状态，取值与 Negotiate 状态机一致。",
+      "readOnly": true
+    },
+    "current_round": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "当前协商轮次。未开始协商时为 0。",
+      "readOnly": true
+    },
+    "quotes": {
+      "type": "array",
+      "items": {
+        "$ref": "quote.json"
+      },
+      "description": "本方可见的报价列表（L3 竞价场景下按分支返回）。",
+      "readOnly": true
+    },
+    "binding": {
+      "$ref": "binding_terms.json",
+      "description": "已生成的条款绑定（仅 BOUND 状态存在）。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "inquiry_id",
+    "negotiation_status"
+  ],
+  "additionalProperties": true
+}

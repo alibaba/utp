@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="300px" viewBox="-0.5 -0.5 760 300" font-family="Helvetica">
+<defs>
+<marker id="mTopArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+<marker id="mTopArrowO" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#d79b00"/></marker>
+</defs>
+<g>
+<text x="380" y="24" text-anchor="middle" font-size="14" font-weight="bold">M1.4.1 平台托管拓扑（主线拓扑）：调用方向与 Service 挂载</text>
+
+<!-- Seller -->
+<rect x="30" y="90" width="170" height="90" rx="8" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="115" y="118" text-anchor="middle" font-size="13" font-weight="bold">Seller</text>
+<text x="115" y="136" text-anchor="middle" font-size="10">ERP / Bridge / Merchant Agent</text>
+<text x="115" y="152" text-anchor="middle" font-size="10">initiator：MP1—MP4</text>
+<text x="115" y="168" text-anchor="middle" font-size="10">部署 dev.utp.merchant_callback</text>
+
+<!-- Marketplace -->
+<rect x="300" y="80" width="180" height="110" rx="8" fill="#fff2cc" stroke="#d6b656"/>
+<text x="390" y="106" text-anchor="middle" font-size="13" font-weight="bold">Marketplace</text>
+<text x="390" y="124" text-anchor="middle" font-size="10">UTP Server</text>
+<text x="390" y="140" text-anchor="middle" font-size="10">handler：MP1—MP4（dev.utp.merchant）</text>
+<text x="390" y="156" text-anchor="middle" font-size="10">handler：P1—P6（dev.utp.trade）</text>
+<text x="390" y="172" text-anchor="middle" font-size="10">审核 · 路由 · 代收代付</text>
+
+<!-- Buyer -->
+<rect x="580" y="90" width="150" height="90" rx="8" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="655" y="120" text-anchor="middle" font-size="13" font-weight="bold">买方 Agent</text>
+<text x="655" y="140" text-anchor="middle" font-size="10">initiator：P1—P6</text>
+<text x="655" y="156" text-anchor="middle" font-size="10">不感知供应商侧实现</text>
+
+<!-- Seller -> Marketplace (MP) -->
+<path d="M 200 112 L 296 112" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mTopArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="200" y="94" width="96" height="14" fill="#fff"/><text x="248" y="105">MP1—MP4 请求</text></g>
+
+<!-- Marketplace -> Seller (callback) -->
+<path d="M 296 156 L 204 156" fill="none" stroke="#d79b00" marker-end="url(#mTopArrowO)"/>
+<g font-size="10" text-anchor="middle" fill="#d79b00"><rect x="196" y="160" width="104" height="14" fill="#fff"/><text x="248" y="171">回调（路由/账单/审核）</text></g>
+
+<!-- Buyer -> Marketplace -->
+<path d="M 580 112 L 484 112" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mTopArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="484" y="94" width="92" height="14" fill="#fff"/><text x="530" y="105">P1—P6 请求</text></g>
+
+<!-- Marketplace -> Buyer (notify) -->
+<path d="M 484 156 L 576 156" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mTopArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="478" y="160" width="104" height="14" fill="#fff"/><text x="530" y="171">fulfill.notify 等推送</text></g>
+
+<!-- bottom note -->
+<rect x="30" y="220" width="700" height="56" rx="6" fill="none" stroke="#666666" stroke-dasharray="4 3"/>
+<text x="380" y="242" text-anchor="middle" font-size="10" fill="#666">MP1/MP2 发布的商品与库存是 P1 Source 搜索结果与 P3 库存校验的同源数据（闭环不变式 1、2）</text>
+<text x="380" y="260" text-anchor="middle" font-size="10" fill="#666">P2 询盘 / P6 争议的卖方应答按 delegation_policy 分流：direct 平台代答 / passthrough 透传商家（M1.4.4）</text>
+</g>
+</svg>

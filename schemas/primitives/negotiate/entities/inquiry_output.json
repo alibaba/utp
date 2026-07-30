@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "inquiry_output.json",
+  "version": "2026-07-27",
+  "title": "InquiryOutput",
+  "description": "utp.negotiate.inquiry 的业务输出。询盘为异步流程：本输出仅是接收回执，报价由供应商通过 quote 回调交付，或经 query 轮询获取。原语状态与后续可执行操作由统一响应信封的 primitive_state / valid_next_actions 承载。",
+  "type": "object",
+  "properties": {
+    "inquiry_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "回显采购方提交的询盘标识。",
+      "readOnly": true
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "供应商接收询盘的时间。",
+      "readOnly": true
+    },
+    "estimated_quote_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "供应商预计给出报价的时间（可选）。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "inquiry_id",
+    "received_at"
+  ],
+  "additionalProperties": true
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="utp-section" content="transport">
+  <meta name="utp-primitive" content="{{PRIMITIVE_ID}}">
+  <meta name="utp-owner" content="{{OWNER}}">
+  <meta name="utp-status" content="skeleton">
+  <meta name="utp-version" content="{{VERSION}}">
+  <link rel="stylesheet" href="/documentation/assets/styles/site.css">
+  <script defer src="/documentation/assets/scripts/site.js"></script>
+  <title>{{TITLE}} — UTP Specification</title>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="brand" href="/documentation/specification/index.html"><span class="brand-mark">UTP</span><span>Universal Trade Protocol</span></a>
+    <span class="header-page-title" data-current-page-title>{{TITLE}}</span>
+    <div class="header-actions"><a class="search-link" href="/search">搜索</a><button class="menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-navigation">目录</button></div>
+  </header>
+  <div class="site-layout">
+    <nav class="site-sidebar" id="site-navigation" aria-label="规范导航" data-site-nav></nav>
+    <main class="site-main" id="main"><div class="content-wrap">
+      <div class="breadcrumbs" data-breadcrumbs></div><div class="doc-meta" data-doc-meta></div>
+      <article class="spec-content">
+        <h1>{{TITLE}}</h1>
+        <p class="draft-note">当前 Draft 尚未规定本传输映射，不得作为实现依据。</p>
+        <h2 id="fundamentals">基础约束</h2><p>定义协议版本、端点和内容协商。</p>
+        <h2 id="mapping">操作映射</h2><p>将原语操作映射到本传输，不重新定义其语义。</p>
+        <h2 id="envelope">请求响应封装</h2><p>定义 P0 信封在本传输中的表示。</p>
+        <h2 id="errors">状态和错误</h2><p>区分传输错误与原语业务结果。</p>
+        <h2 id="reliability">幂等、重试与超时</h2><p>定义可靠性、顺序和重复消息处理。</p>
+        <h2 id="security">认证与安全</h2><p>定义调用身份、授权和完整性映射。</p>
+        <h2 id="examples">示例</h2><p>提供与原语正文一致的消息示例。</p>
+      </article>
+      <nav class="page-navigation" aria-label="前后页" data-page-navigation></nav>
+    </div></main>
+    <aside class="page-toc" aria-label="页内目录"><div class="page-toc-title">本页目录</div><nav data-page-toc></nav></aside>
+  </div>
+  <noscript><p class="nav-error">正文可直接阅读。<a href="/documentation/specification/index.html">返回规范首页</a></p></noscript>
+</body>
+</html>

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/state_view.json",
+  "version": "2026-07-29",
+  "title": "UTP StateView",
+  "description": "某个商业意图上下文或独立交易当前的 UTP 全局状态视图",
+  "type": "object",
+  "properties": {
+    "trade_context_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "商业意图上下文标识。上下文级和交易级 StateView 均携带"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "交易全生命周期标识。仅交易级 StateView 携带"
+    },
+    "state": {
+      "$ref": "https://ut-protocol.com/global-state-machine/entities/state.json"
+    },
+    "state_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "同一业务锚点下的状态版本，从 1 开始"
+    },
+    "previous_state": {
+      "type": "string",
+      "enum": [
+        "PURCHASING",
+        "PAYING",
+        "FULFILLING"
+      ],
+      "description": "进入 DISPUTED 前的交易级非终态。仅 DISPUTED 状态携带"
+    }
+  },
+  "required": [
+    "trade_context_id",
+    "state",
+    "state_version"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": [
+              "INIT",
+              "SOURCING",
+              "NEGOTIATING"
+            ]
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "transaction_id"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": [
+              "PURCHASING",
+              "PAYING",
+              "FULFILLING",
+              "SETTLED",
+              "DISPUTED",
+              "FAILED",
+              "CANCELLED"
+            ]
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "transaction_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "DISPUTED"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "previous_state"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "previous_state"
+          ]
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

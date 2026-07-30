@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/price.json",
+  "version": "2026-07-29",
+  "title": "Price",
+  "description": "订单、协议或支付条款中的一项金额构成。",
+  "type": "object",
+  "required": [
+    "type",
+    "amount"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "金额类型，如 item、shipping、tax、discount 或 total；total 表示所属范围的最终金额。"
+    },
+    "amount": {
+      "$ref": "money.json",
+      "description": "金额与币种。"
+    },
+    "code": {
+      "type": "string",
+      "description": "费用、税种或优惠的业务代码。"
+    },
+    "description": {
+      "type": "string",
+      "description": "面向使用方的金额说明。"
+    }
+  },
+  "additionalProperties": true
+}

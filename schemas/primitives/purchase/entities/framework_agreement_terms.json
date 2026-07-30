@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/purchase/entities/framework_agreement_terms.json",
+  "version": "2026-07-29",
+  "title": "FrameworkAgreementTerms",
+  "description": "框架协议的采购范围、配额、周期和默认交易条款。",
+  "type": "object",
+  "properties": {
+    "purchase_range": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "协议允许采购的范围。"
+    },
+    "pricing_rules": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "价目或定价规则。"
+    },
+    "quotas": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "总量或分项配额。"
+    },
+    "order_cycle": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "订单频率或周期约束。"
+    },
+    "delivery": {
+      "$ref": "../../common/entities/delivery.json",
+      "description": "框架协议约定的默认交付方式与交付信息。"
+    },
+    "trade_mode": {
+      "$ref": "../../common/entities/trade_mode.json",
+      "description": "框架协议约定的默认业务交易模式。"
+    }
+  },
+  "additionalProperties": true
+}

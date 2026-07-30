@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/state_result_type.json",
+  "version": "2026-07-29",
+  "title": "UTP State Result Type",
+  "description": "Action Response 被状态机接受后的状态结果类型",
+  "type": "string",
+  "enum": [
+    "KEEP",
+    "TRANSITION",
+    "CREATE_TRANSACTIONS"
+  ]
+}

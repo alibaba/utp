@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="330px" viewBox="-0.5 -0.5 760 330" font-family="Helvetica">
+<defs>
+<marker id="mEntArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+<marker id="mEntArrowR" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#b85450"/></marker>
+</defs>
+<g>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">M7.3 结算条目生命周期（Entry Lifecycle）</text>
+
+<!-- entry point -->
+<text x="120" y="52" text-anchor="middle" font-size="10" fill="#666">PaymentConfirmation（P4）</text>
+<path d="M 120 58 L 120 84" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mEntArrow)"/>
+<g font-size="9.5" text-anchor="middle"><rect x="128" y="60" width="180" height="14" fill="#fff"/><text x="218" y="71">买方确认收货 / Escrow 释放条件满足</text></g>
+
+<!-- SETTLEABLE -->
+<rect x="40" y="88" width="160" height="44" rx="6" fill="#d5e8d4" stroke="#82b366"/>
+<text x="120" y="107" text-anchor="middle" font-size="12" font-weight="bold">SETTLEABLE</text>
+<text x="120" y="123" text-anchor="middle" font-size="9.5">可结算（收货确认且无争议）</text>
+
+<!-- FROZEN -->
+<rect x="560" y="88" width="160" height="44" rx="6" fill="#f8cecc" stroke="#b85450"/>
+<text x="640" y="107" text-anchor="middle" font-size="12" font-weight="bold">FROZEN</text>
+<text x="640" y="123" text-anchor="middle" font-size="9.5">争议冻结（同 Escrow 冻结语义）</text>
+
+<path d="M 200 110 L 556 110" fill="none" stroke="#b85450" marker-end="url(#mEntArrowR)"/>
+<g font-size="10" text-anchor="middle" fill="#b85450"><rect x="290" y="92" width="180" height="14" fill="#fff"/><text x="380" y="103">争议发生（P6 DISPUTED）</text></g>
+
+<!-- BILLED -->
+<rect x="40" y="180" width="160" height="44" rx="6" fill="#fff2cc" stroke="#d6b656"/>
+<text x="120" y="199" text-anchor="middle" font-size="12" font-weight="bold">BILLED</text>
+<text x="120" y="215" text-anchor="middle" font-size="9.5">已列入某期账单</text>
+
+<path d="M 120 132 L 120 176" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mEntArrow)"/>
+<g font-size="9.5" text-anchor="middle"><rect x="128" y="148" width="120" height="14" fill="#fff"/><text x="188" y="159">进入结算周期账单</text></g>
+
+<!-- FROZEN -> BILLED -->
+<path d="M 640 132 L 640 202 L 204 202" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mEntArrow)"/>
+<g font-size="9.5" text-anchor="middle"><rect x="330" y="186" width="150" height="14" fill="#fff"/><text x="405" y="197">裁决完毕（含调整项入账）</text></g>
+
+<!-- PAID_OUT -->
+<rect x="40" y="266" width="160" height="44" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="120" y="285" text-anchor="middle" font-size="12" font-weight="bold">PAID_OUT（终态）</text>
+<text x="120" y="301" text-anchor="middle" font-size="9.5">已打款，附 payout_ref 流水</text>
+
+<path d="M 120 224 L 120 262" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mEntArrow)"/>
+<g font-size="9.5" text-anchor="middle"><rect x="128" y="236" width="180" height="14" fill="#fff"/><text x="218" y="247">账单确认（供应商确认或异议期满）</text></g>
+
+<!-- PAYOUT_FAILED -->
+<rect x="380" y="266" width="180" height="44" rx="6" fill="#f8cecc" stroke="#b85450"/>
+<text x="470" y="285" text-anchor="middle" font-size="12" font-weight="bold">PAYOUT_FAILED</text>
+<text x="470" y="301" text-anchor="middle" font-size="9.5">MUST 通知供应商并重试 / 人工介入</text>
+
+<path d="M 200 280 L 376 280" fill="none" stroke="#b85450" marker-end="url(#mEntArrowR)"/>
+<g font-size="9.5" text-anchor="middle" fill="#b85450"><rect x="252" y="262" width="60" height="14" fill="#fff"/><text x="282" y="273">打款失败</text></g>
+<path d="M 470 266 L 470 240 L 160 240 L 160 262" fill="none" stroke="rgb(0,0,0)" stroke-dasharray="4 3" marker-end="url(#mEntArrow)" opacity="0"/>
+<path d="M 420 266 L 420 250 L 178 250 L 178 262" fill="none" stroke="rgb(0,0,0)" stroke-dasharray="4 3" marker-end="url(#mEntArrow)"/>
+<g font-size="9.5" text-anchor="middle"><rect x="238" y="242" width="60" height="14" fill="#fff"/><text x="268" y="253">重试成功</text></g>
+
+<text x="380" y="326" text-anchor="middle" font-size="10" fill="#666">条目粒度：transaction_id 级 · FROZEN 不阻塞同账单其他条目 · 全部迁移由平台驱动，供应商经 statement/entry 查询与回调可观测</text>
+</g>
+</svg>

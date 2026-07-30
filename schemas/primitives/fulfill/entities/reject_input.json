@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/fulfill/entities/reject_input.json",
+  "version": "2026-07-27",
+  "title": "FulfillRejectInput",
+  "description": "utp.fulfill.reject 的业务输入。Buyer 对不符合约定的已交付批次提交结构化拒收理由与证据，MUST 携带 Buyer 签名；当前批次进入 REJECTED 终态，生成 RejectionConfirmation 并激活 Resolve。",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单标识。"
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单交付批次标识，可选。"
+    },
+    "reason_code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "结构化拒收原因码。"
+    },
+    "reason_detail": {
+      "type": "string",
+      "description": "拒收原因详情，可选。"
+    },
+    "rejected_quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "本次拒收数量，可选。未提供时由 order_id/batch_id 与服务端履约记录推导。"
+    },
+    "line_items": {
+      "type": "array",
+      "items": {
+        "$ref": "partial_delivery.json#/$defs/partial_delivery_line_item"
+      },
+      "description": "本次拒收涉及的订单行项目与数量，可选。分批或部分拒收场景 SHOULD 提供。"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "description": "证据引用列表，MUST 提供。"
+    },
+    "rejected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "拒收时间，可选。"
+    },
+    "desired_resolution": {
+      "type": "string",
+      "enum": [
+        "REFUND",
+        "REPLACEMENT",
+        "REWORK",
+        "PRICE_ADJUSTMENT",
+        "CANCEL_REMAINING",
+        "OTHER"
+      ],
+      "description": "采购方期望的后续处理方向，可选；实际争议处理仍由 Resolve 原语确定。"
+    },
+    "signature": {
+      "$ref": "../../common/entities/signature.json",
+      "description": "Buyer 签名。"
+    }
+  },
+  "required": [
+    "order_id",
+    "reason_code",
+    "evidence_refs",
+    "signature"
+  ],
+  "additionalProperties": true
+}

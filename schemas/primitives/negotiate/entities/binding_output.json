@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "binding_output.json",
+  "version": "2026-07-27",
+  "title": "BindingOutput",
+  "description": "utp.negotiate.binding 的业务输出。双签验证通过后返回完整的条款绑定实体；原语状态进入 BOUND，binding_id 供 utp.purchase.create 引用。",
+  "$ref": "binding_terms.json"
+}

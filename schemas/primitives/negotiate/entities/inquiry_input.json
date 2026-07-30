@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "inquiry_input.json",
+  "version": "2026-07-29",
+  "title": "InquiryInput",
+  "description": "utp.negotiate.inquiry 的业务输入。幂等键由统一请求信封承载。competitive 为 true 表示竞争性询盘（pricing_mode == L3 时必须为 true，由会话上下文校验）。",
+  "type": "object",
+  "properties": {
+    "inquiry_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "询盘唯一标识，UUID v4，由采购方生成。"
+    },
+    "subject": {
+      "type": "string",
+      "minLength": 1,
+      "description": "询盘主题（人类可读摘要）。"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "采购商品列表，复用通用订购行实体；询盘场景下每行必须给出目标供应商。",
+      "items": {
+        "allOf": [
+          { "$ref": "../../common/entities/line_item.json" }
+        ],
+        "required": ["supplier_id"]
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "description": "采购需求详情（交期、地址、付款偏好、质量要求、问答），全部可选。",
+      "properties": {
+        "delivery_deadline": {
+          "type": "string",
+          "format": "date",
+          "description": "期望交货日期（ISO 8601）。"
+        },
+        "delivery_address": {
+          "$ref": "../../common/entities/address.json",
+          "description": "收货地址。"
+        },
+        "payment_preference": {
+          "type": "string",
+          "description": "付款方式偏好的自然语言描述，如预付、分期、账期。"
+        },
+        "quality_requirements": {
+          "type": "string",
+          "description": "质量要求描述。"
+        },
+        "questions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "向供应商提出的问题列表，如起批量、材质、定制能力。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "competitive": {
+      "type": "boolean",
+      "default": false,
+      "description": "是否为竞争性询盘（同时向多家供应商发起）。"
+    },
+    "response_deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "期望供应商回复报价的截止时间（ISO 8601）。"
+    }
+  },
+  "required": ["inquiry_id", "subject", "items", "response_deadline"],
+  "additionalProperties": true
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/state_query_request.json",
+  "version": "2026-07-29",
+  "title": "UTP State Query Request",
+  "description": "POST /utp/state/query 的请求体。支持上下文级查询和交易级查询",
+  "type": "object",
+  "properties": {
+    "trade_context_id": {
+      "type": "string",
+      "minLength": 1,
+      "utp_request": "required",
+      "description": "商业意图上下文标识"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "utp_request": "optional",
+      "description": "交易全生命周期标识。交易级查询时必须传递；上下文级查询时禁止传递"
+    }
+  },
+  "required": [
+    "trade_context_id"
+  ],
+  "oneOf": [
+    {
+      "title": "Trade Context State Query",
+      "required": [
+        "trade_context_id"
+      ],
+      "not": {
+        "required": [
+          "transaction_id"
+        ]
+      }
+    },
+    {
+      "title": "Transaction State Query",
+      "required": [
+        "trade_context_id",
+        "transaction_id"
+      ]
+    }
+  ],
+  "additionalProperties": true
+}

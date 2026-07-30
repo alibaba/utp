@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="280px" viewBox="-0.5 -0.5 760 280" font-family="Helvetica">
+<defs>
+<marker id="mPxArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+<marker id="mPxArrowB" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#6c8ebf"/></marker>
+</defs>
+<g>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">M2.3 双 Profile 互读：各自发布、互相拉取、用途相反</text>
+
+<!-- Supplier side -->
+<rect x="40" y="50" width="280" height="130" rx="8" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="180" y="72" text-anchor="middle" font-size="12" font-weight="bold">供应商 Business Domain</text>
+<text x="180" y="90" text-anchor="middle" font-size="10">supplier.example.com</text>
+<rect x="60" y="102" width="240" height="64" rx="4" fill="#ffffff" stroke="#d79b00"/>
+<text x="180" y="120" text-anchor="middle" font-size="10" font-weight="bold">/.well-known/utp（供应商 Profile）</text>
+<text x="180" y="136" text-anchor="middle" font-size="9">utp.primitives: MP1—MP4 · roles.seller</text>
+<text x="180" y="150" text-anchor="middle" font-size="9">services: dev.utp.merchant_callback</text>
+<text x="180" y="162" text-anchor="middle" font-size="9">signing_keys（验商家业务签名的公钥）</text>
+
+<!-- Marketplace side -->
+<rect x="440" y="50" width="280" height="130" rx="8" fill="#fff2cc" stroke="#d6b656"/>
+<text x="580" y="72" text-anchor="middle" font-size="12" font-weight="bold">Marketplace Business Domain</text>
+<text x="580" y="90" text-anchor="middle" font-size="10">marketplace.example.com</text>
+<rect x="460" y="102" width="240" height="64" rx="4" fill="#ffffff" stroke="#d6b656"/>
+<text x="580" y="120" text-anchor="middle" font-size="10" font-weight="bold">/.well-known/utp（平台 Profile）</text>
+<text x="580" y="136" text-anchor="middle" font-size="9">roles.marketplace（MP handler）+ roles.seller（P1—P6）</text>
+<text x="580" y="150" text-anchor="middle" font-size="9">services: dev.utp.merchant + dev.utp.trade</text>
+<text x="580" y="162" text-anchor="middle" font-size="9">supported_mode_range（Profile 级）</text>
+
+<!-- pull arrows -->
+<path d="M 440 208 L 180 208 L 180 184" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mPxArrow)" opacity="0"/>
+<path d="M 460 196 L 300 196 L 300 184" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mPxArrow)" opacity="0"/>
+<path d="M 500 184 L 500 214 L 246 214 L 246 188" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mPxArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="270" y="206" width="220" height="16" fill="#fff"/><text x="380" y="218">① 注册时平台反向拉取：结构校验 + 发布 Domain 信任（3.5.1）</text></g>
+
+<path d="M 260 184 L 260 240 L 514 240 L 514 188" fill="none" stroke="#6c8ebf" marker-end="url(#mPxArrowB)"/>
+<g font-size="10" text-anchor="middle" fill="#6c8ebf"><rect x="270" y="232" width="220" height="16" fill="#fff"/><text x="380" y="244">② 建会话前供应商拉取：版本解析 + 角色对协商（3.4—3.7）</text></g>
+
+<text x="380" y="270" text-anchor="middle" font-size="10" fill="#666">Profile 唯一权威副本永远在发布方自己的 Domain 下；变更即重新发布，对方按缓存规则刷新 · 无自有 Domain 的商家可由平台 Registry 代管公示（3.3.1）</text>
+</g>
+</svg>

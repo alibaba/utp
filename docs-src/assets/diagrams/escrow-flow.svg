@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 380">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif; }
+    .title { font-size: 17px; font-weight: 700; fill: #1a1a2e; }
+    .subtitle { font-size: 10.5px; font-weight: 400; fill: #6b7280; }
+    .bname { font-size: 11.5px; font-weight: 600; fill: #1a1a2e; }
+    .elbl { font-size: 9.5px; font-weight: 600; fill: #5a8a3c; }
+    .wlbl { font-size: 9.5px; font-weight: 600; fill: #b45309; }
+    .note { font-size: 9px; font-weight: 400; fill: #6b7280; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><polygon points="0 0, 9 4, 0 8" fill="#82b366"/></marker>
+    <marker id="aw" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><polygon points="0 0, 9 4, 0 8" fill="#d97706"/></marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <text x="30" y="34" class="title">Escrow 托管资金流转</text>
+  <text x="30" y="52" class="subtitle">托管方独立于买卖双方,验收通过则释放资金,争议发生则冻结待裁</text>
+
+  <!-- 采购方 -->
+  <rect x="40" y="120" width="130" height="48" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.3"/>
+  <text x="105" y="149" class="bname" text-anchor="middle">采购方</text>
+
+  <!-- Escrow 托管方 -->
+  <rect x="290" y="120" width="150" height="48" rx="6" fill="#faf8fc" stroke="#c3aed6" stroke-width="1.4"/>
+  <text x="365" y="149" class="bname" text-anchor="middle">Escrow 托管方</text>
+
+  <!-- 供应商 -->
+  <rect x="640" y="120" width="130" height="48" rx="6" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.3"/>
+  <text x="705" y="149" class="bname" text-anchor="middle">供应商</text>
+
+  <!-- 采购方 → Escrow  付款 -->
+  <line x1="170" y1="144" x2="288" y2="144" stroke="#82b366" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="229" y="136" class="elbl" text-anchor="middle">付款</text>
+
+  <!-- Escrow → 供应商  验收通过 释放资金 -->
+  <line x1="440" y1="144" x2="638" y2="144" stroke="#82b366" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="539" y="136" class="elbl" text-anchor="middle">验收通过 → 释放资金</text>
+
+  <!-- 争议分支 -->
+  <line x1="365" y1="168" x2="365" y2="236" stroke="#d97706" stroke-width="1.5" marker-end="url(#aw)"/>
+  <text x="375" y="200" class="wlbl">争议发生</text>
+  <rect x="270" y="240" width="190" height="44" rx="6" fill="#fef3e2" stroke="#d97706" stroke-width="1.3"/>
+  <text x="365" y="260" class="bname" text-anchor="middle">冻结资金</text>
+  <text x="365" y="276" class="wlbl" text-anchor="middle">仲裁结果决定资金归属</text>
+
+  <!-- bottom rule -->
+  <rect x="30" y="316" width="760" height="42" rx="6" fill="#f9fafb" stroke="#d1d5db" stroke-width="1"/>
+  <text x="42" y="334" class="note">读法:绿色主路径为正常流转——采购方付款进托管,满足释放条件后由托管方放款给供应商。</text>
+  <text x="42" y="349" class="note">橙色分支为异常路径——争议发生时资金冻结,由仲裁结果决定最终归属。Escrow 方 MUST NOT 在未满足释放条件时放款。</text>
+</svg>

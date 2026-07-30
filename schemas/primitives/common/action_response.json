@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "action_response.json",
+  "version": "2026-07-30",
+  "title": "UTP Action Response",
+  "description": "所有 UTP 原语操作共享的响应信封。output 的具体结构由原语定义中该操作的 output_schema 指定。",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "minLength": 1,
+      "description": "本次响应对应的完整操作标识。"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "当前 UTP 协议会话的唯一标识。"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "本次响应所属交易的唯一标识；操作未创建或关联具体交易时不传递该字段。"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "请求携带时原样回显的幂等键。"
+    },
+    "primitive_state": {
+      "type": "string",
+      "minLength": 1,
+      "description": "操作完成后的原语内部状态；该字段不表示全局 StateView，具体取值由对应原语状态机定义。"
+    },
+    "execution_result": {
+      "type": "string",
+      "enum": [
+        "SUCCESS",
+        "PENDING",
+        "REJECTED",
+        "FAILURE"
+      ],
+      "description": "本次 Action 的执行结果；该字段不表示全局状态机是否迁移。"
+    },
+    "output": {
+      "type": "object",
+      "description": "操作特有输出。其内容由对应操作的 output_schema 校验。",
+      "additionalProperties": true
+    },
+    "messages": {
+      "type": "array",
+      "description": "本次 Action 产生的业务错误、警告或提示信息。",
+      "items": {
+        "$ref": "message.json"
+      }
+    },
+    "valid_next_actions": {
+      "$ref": "valid_next_actions.json"
+    },
+    "hai": {
+      "$ref": "hai.json",
+      "description": ""
+    },
+    "data_visibility": {
+      "type": "string",
+      "enum": [
+        "V0",
+        "V1",
+        "V2"
+      ],
+      "description": "数据可见性"
+    },
+    "mandate": {
+      "type": "object",
+      "description": ""
+    }
+  },
+  "required": [
+    "action",
+    "session_id",
+    "output",
+    "valid_next_actions"
+  ],
+  "additionalProperties": true
+}

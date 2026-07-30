@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="utp-section" content="orchestration">
+  <meta name="utp-owner" content="{{OWNER}}">
+  <meta name="utp-status" content="skeleton">
+  <meta name="utp-version" content="{{VERSION}}">
+  <link rel="stylesheet" href="/documentation/assets/styles/site.css">
+  <script defer src="/documentation/assets/scripts/site.js"></script>
+  <title>{{TITLE}} — UTP Specification</title>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="brand" href="/documentation/specification/index.html"><span class="brand-mark">UTP</span><span>Universal Trade Protocol</span></a>
+    <span class="header-page-title" data-current-page-title>{{TITLE}}</span>
+    <div class="header-actions"><a class="search-link" href="/search">搜索</a><button class="menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-navigation">目录</button></div>
+  </header>
+  <div class="site-layout">
+    <nav class="site-sidebar" id="site-navigation" aria-label="规范导航" data-site-nav></nav>
+    <main class="site-main" id="main"><div class="content-wrap">
+      <div class="breadcrumbs" data-breadcrumbs></div><div class="doc-meta" data-doc-meta></div>
+      <article class="spec-content">
+        <h1>{{TITLE}}</h1>
+        <p class="draft-note">当前 Draft 尚未规定本编排主题的规范性行为，不得作为实现依据。</p>
+        <h2 id="scope">范围与参与方</h2><p>说明编排目标、参与角色和协议边界。</p>
+        <h2 id="composition">原语组合</h2><p>定义原语之间的依赖、顺序与并发关系。</p>
+        <h2 id="state">状态与恢复</h2><p>定义全局状态、失败传播和补偿行为。</p>
+        <h2 id="security">安全与治理</h2><p>说明跨原语授权、审计和人工介入。</p>
+      </article>
+      <nav class="page-navigation" aria-label="前后页" data-page-navigation></nav>
+    </div></main>
+    <aside class="page-toc" aria-label="页内目录"><div class="page-toc-title">本页目录</div><nav data-page-toc></nav></aside>
+  </div>
+  <noscript><p class="nav-error">正文可直接阅读。<a href="/documentation/specification/index.html">返回规范首页</a></p></noscript>
+</body>
+</html>

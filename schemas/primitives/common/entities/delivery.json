@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/delivery.json",
+  "version": "2026-07-30",
+  "title": "Delivery",
+  "description": "订单或协议条款中确认的交付方式与交付信息。",
+  "type": "object",
+  "required": [
+    "delivery_mode"
+  ],
+  "properties": {
+    "delivery_mode": {
+      "type": "string",
+      "enum": [
+        "shipment",
+        "pickup",
+        "digital",
+        "service"
+      ],
+      "description": "交付方式。"
+    },
+    "delivery_address": {
+      "$ref": "address.json",
+      "description": "运输配送的收货地址。"
+    },
+    "pickup_location": {
+      "$ref": "address.json",
+      "description": "自提地点。"
+    },
+    "delivery_window": {
+      "$ref": "time_range.json",
+      "description": "约定交付窗口。"
+    },
+    "instructions": {
+      "type": "string",
+      "description": "交付备注或操作说明。"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "delivery_mode": {
+            "const": "shipment"
+          }
+        },
+        "required": [
+          "delivery_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "delivery_address"
+        ],
+        "properties": {
+          "delivery_address": {
+            "required": [
+              "recipient"
+            ],
+            "properties": {
+              "recipient": {
+                "required": [
+                  "name",
+                  "phone"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "delivery_mode": {
+            "const": "pickup"
+          }
+        },
+        "required": [
+          "delivery_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "pickup_location"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

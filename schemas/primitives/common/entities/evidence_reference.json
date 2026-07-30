@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/evidence_reference.json",
+  "version": "2026-07-29",
+  "title": "EvidenceReference",
+  "description": "可审计证据包或不可变证据的引用。",
+  "type": "object",
+  "required": [
+    "evidence_id"
+  ],
+  "properties": {
+    "evidence_id": {
+      "type": "string",
+      "description": "证据或证据包标识。"
+    },
+    "uri": {
+      "type": "string",
+      "format": "uri",
+      "description": "证据获取地址或受控资源 URI。"
+    },
+    "digest": {
+      "$ref": "document_reference.json#/properties/digest",
+      "description": "证据内容摘要。"
+    }
+  },
+  "additionalProperties": true
+}

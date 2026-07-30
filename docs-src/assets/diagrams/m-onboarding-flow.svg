@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="300px" viewBox="-0.5 -0.5 760 300" font-family="Helvetica">
+<defs>
+<marker id="mOnbArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+</defs>
+<g>
+<text x="380" y="24" text-anchor="middle" font-size="14" font-weight="bold">M2.1 供应商入驻五步流程（每步产出是下一步的前置条件）</text>
+
+<!-- Step boxes -->
+<rect x="20" y="60" width="128" height="56" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="84" y="83" text-anchor="middle" font-size="12" font-weight="bold">Step 1</text>
+<text x="84" y="100" text-anchor="middle" font-size="12">身份与密钥</text>
+
+<rect x="168" y="60" width="128" height="56" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="232" y="83" text-anchor="middle" font-size="12" font-weight="bold">Step 2</text>
+<text x="232" y="100" text-anchor="middle" font-size="12">Profile 发布</text>
+
+<rect x="316" y="60" width="128" height="56" rx="6" fill="#fff2cc" stroke="#d6b656"/>
+<text x="380" y="83" text-anchor="middle" font-size="12" font-weight="bold">Step 3</text>
+<text x="380" y="100" text-anchor="middle" font-size="12">Marketplace 注册</text>
+
+<rect x="464" y="60" width="128" height="56" rx="6" fill="#fff2cc" stroke="#d6b656"/>
+<text x="528" y="83" text-anchor="middle" font-size="12" font-weight="bold">Step 4</text>
+<text x="528" y="100" text-anchor="middle" font-size="12">资质与合规</text>
+
+<rect x="612" y="60" width="128" height="56" rx="6" fill="#e1d5e7" stroke="#9673a6"/>
+<text x="676" y="83" text-anchor="middle" font-size="12" font-weight="bold">Step 5</text>
+<text x="676" y="100" text-anchor="middle" font-size="12">回调与沙箱验收</text>
+
+<!-- Arrows between steps -->
+<path d="M 148 88 L 164 88" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mOnbArrow)"/>
+<path d="M 296 88 L 312 88" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mOnbArrow)"/>
+<path d="M 444 88 L 460 88" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mOnbArrow)"/>
+<path d="M 592 88 L 608 88" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mOnbArrow)"/>
+
+<!-- Outputs -->
+<g font-size="11" text-anchor="middle" fill="#333333">
+<text x="84" y="140">agent_id</text>
+<text x="84" y="155">+ JWK 密钥对</text>
+<text x="232" y="140">UTP Profile</text>
+<text x="232" y="155">(/.well-known/utp)</text>
+<text x="380" y="140">merchant_id</text>
+<text x="380" y="155">PENDING_QUALIFICATION</text>
+<text x="528" y="140">SupplierCredentials</text>
+<text x="528" y="155">QUALIFIED → SANDBOX</text>
+<text x="676" y="140">验收 7 项通过</text>
+<text x="676" y="155">（M2.6.2）</text>
+</g>
+
+<!-- ACTIVE result -->
+<path d="M 676 165 L 676 200" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mOnbArrow)"/>
+<rect x="592" y="204" width="168" height="48" rx="6" fill="#d5e8d4" stroke="#82b366"/>
+<text x="676" y="224" text-anchor="middle" font-size="13" font-weight="bold">ACTIVE</text>
+<text x="676" y="242" text-anchor="middle" font-size="11">可发布商品（MP1 publish）</text>
+
+<!-- Gate note -->
+<rect x="20" y="204" width="540" height="48" rx="6" fill="none" stroke="#b85450" stroke-dasharray="4 3"/>
+<text x="290" y="224" text-anchor="middle" font-size="11" fill="#b85450">全部步骤完成前，Marketplace MUST 拒绝 publish（LISTING.PUBLISH.MERCHANT_NOT_ACTIVE）</text>
+<text x="290" y="241" text-anchor="middle" font-size="11" fill="#b85450">Step 3 注册与商户协议签署 MUST 由商家主体完成，MUST NOT 委托 Agent（M2.4.3）</text>
+</g>
+</svg>

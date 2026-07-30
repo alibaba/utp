@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="470px" viewBox="-0.5 -0.5 760 470" font-family="Helvetica">
+<defs>
+<marker id="mLstArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+</defs>
+<g>
+<text x="380" y="24" text-anchor="middle" font-size="14" font-weight="bold">M3.2.1 Listing 资源状态机（资源作用域：listing_id）</text>
+
+<!-- PENDING_REVIEW -->
+<rect x="300" y="48" width="160" height="44" rx="6" fill="#fff2cc" stroke="#d6b656"/>
+<text x="380" y="74" text-anchor="middle" font-size="12" font-weight="bold">PENDING_REVIEW</text>
+
+<!-- REJECTED -->
+<rect x="580" y="48" width="140" height="44" rx="6" fill="#f8cecc" stroke="#b85450"/>
+<text x="650" y="74" text-anchor="middle" font-size="12" font-weight="bold">REJECTED</text>
+
+<!-- PUBLISHED -->
+<rect x="300" y="160" width="160" height="44" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="380" y="186" text-anchor="middle" font-size="12" font-weight="bold">PUBLISHED</text>
+
+<!-- LISTED -->
+<rect x="300" y="272" width="160" height="44" rx="6" fill="#d5e8d4" stroke="#82b366"/>
+<text x="380" y="291" text-anchor="middle" font-size="12" font-weight="bold">LISTED</text>
+<text x="380" y="307" text-anchor="middle" font-size="10">可搜索 · 可订购</text>
+
+<!-- SUSPENDED_BY_PLATFORM -->
+<rect x="560" y="272" width="180" height="44" rx="6" fill="#f8cecc" stroke="#b85450"/>
+<text x="650" y="291" text-anchor="middle" font-size="11" font-weight="bold">SUSPENDED_BY_PLATFORM</text>
+<text x="650" y="307" text-anchor="middle" font-size="10">平台强制下架</text>
+
+<!-- DELISTED -->
+<rect x="300" y="384" width="160" height="44" rx="6" fill="#e1d5e7" stroke="#9673a6"/>
+<text x="380" y="403" text-anchor="middle" font-size="12" font-weight="bold">DELISTED</text>
+<text x="380" y="419" text-anchor="middle" font-size="10">不可搜索 · 不可订购</text>
+
+<!-- ARCHIVED -->
+<rect x="40" y="384" width="140" height="44" rx="6" fill="#f5f5f5" stroke="#666666"/>
+<text x="110" y="403" text-anchor="middle" font-size="12" font-weight="bold">ARCHIVED</text>
+<text x="110" y="419" text-anchor="middle" font-size="10">终态（不可逆）</text>
+
+<!-- entry: publish -->
+<path d="M 380 8 L 380 44" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)" opacity="0"/>
+<path d="M 200 70 L 296 70" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="200" y="52" width="64" height="16" fill="#fff"/><text x="232" y="63">publish</text></g>
+<text x="160" y="74" text-anchor="middle" font-size="11" fill="#666">（协议外草稿）</text>
+
+<!-- PENDING_REVIEW -> REJECTED -->
+<path d="M 460 70 L 576 70" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="488" y="52" width="60" height="16" fill="#fff"/><text x="518" y="63">审核驳回</text></g>
+
+<!-- REJECTED -> PENDING_REVIEW (update) -->
+<path d="M 650 92 L 650 126 L 470 126 L 470 92 L 462 92" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)" opacity="0"/>
+<path d="M 610 92 L 610 118 L 440 118 L 440 96" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="470" y="110" width="110" height="16" fill="#fff"/><text x="525" y="121">update（重新提交）</text></g>
+
+<!-- PENDING_REVIEW -> PUBLISHED -->
+<path d="M 380 92 L 380 156" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="390" y="116" width="60" height="16" fill="#fff"/><text x="420" y="127">审核通过</text></g>
+
+<!-- PUBLISHED <-> LISTED -->
+<path d="M 360 204 L 360 268" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="316" y="228" width="30" height="16" fill="#fff"/><text x="331" y="239">list</text></g>
+<path d="M 400 268 L 400 204" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)" opacity="0"/>
+
+<!-- LISTED -> DELISTED / DELISTED -> LISTED -->
+<path d="M 360 316 L 360 380" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="308" y="340" width="44" height="16" fill="#fff"/><text x="330" y="351">delist</text></g>
+<path d="M 400 380 L 400 316" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="406" y="340" width="80" height="16" fill="#fff"/><text x="446" y="351">list（重新上架）</text></g>
+
+<!-- LISTED -> SUSPENDED -->
+<path d="M 460 294 L 556 294" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="478" y="276" width="60" height="16" fill="#fff"/><text x="508" y="287">平台强制</text></g>
+
+<!-- SUSPENDED -> PUBLISHED (整改通过) -->
+<path d="M 650 272 L 650 182 L 464 182" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="540" y="174" width="88" height="16" fill="#fff"/><text x="584" y="185">整改通过恢复</text></g>
+
+<!-- major update: LISTED -> PENDING_REVIEW -->
+<path d="M 300 294 L 240 294 L 240 70 L 260 70" fill="none" stroke="rgb(0,0,0)" stroke-dasharray="4 3" marker-end="url(#mLstArrow)" opacity="0"/>
+<path d="M 300 280 L 220 280 L 220 82 L 296 82" fill="none" stroke="rgb(0,0,0)" stroke-dasharray="4 3" marker-end="url(#mLstArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="150" y="166" width="140" height="28" fill="#fff"/><text x="220" y="177">update（major）新版本送审</text><text x="220" y="189">旧版本保持 LISTED 可售</text></g>
+
+<!-- archive paths -->
+<path d="M 300 406 L 184 406" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLstArrow)"/>
+<g font-size="11" text-anchor="middle"><rect x="212" y="388" width="56" height="16" fill="#fff"/><text x="240" y="399">archive</text></g>
+<path d="M 110 384 L 110 240 L 296 182" fill="none" stroke="rgb(0,0,0)" stroke-dasharray="4 3" opacity="0"/>
+<text x="110" y="368" text-anchor="middle" font-size="10" fill="#666">PUBLISHED / REJECTED 亦可 archive</text>
+<text x="110" y="354" text-anchor="middle" font-size="10" fill="#b85450">存在未完结订单 MUST 拒绝</text>
+</g>
+</svg>

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/mode_condition.json",
+  "version": "2026-07-29",
+  "title": "UTP Mode Condition",
+  "description": "状态机定义中使用的 Mode 条件示例。每个字段直接枚举适用值",
+  "type": "object",
+  "properties": {
+    "pricing_mode": {
+      "$ref": "#/$defs/mode_levels"
+    },
+    "decision_path": {
+      "$ref": "#/$defs/mode_levels"
+    },
+    "payment_structure": {
+      "$ref": "#/$defs/mode_levels"
+    },
+    "fulfillment_structure": {
+      "$ref": "#/$defs/mode_levels"
+    },
+    "relationship_mode": {
+      "$ref": "#/$defs/mode_levels"
+    },
+    "compliance_level": {
+      "$ref": "#/$defs/mode_levels"
+    }
+  },
+  "minProperties": 1,
+  "additionalProperties": true,
+  "$defs": {
+    "mode_levels": {
+      "type": "array",
+      "description": "适用的 Mode Level 集合",
+      "items": {
+        "type": "string",
+        "enum": [
+          "L0",
+          "L1",
+          "L2",
+          "L3"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  }
+}

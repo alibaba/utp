@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/invoice_profile.json",
+  "version": "2026-07-30",
+  "title": "InvoiceProfile",
+  "description": "开票资料与接收信息。",
+  "type": "object",
+  "properties": {
+    "invoice_type": {
+      "type": "string",
+      "description": "发票类型。"
+    },
+    "title": {
+      "type": "string",
+      "description": "发票抬头。"
+    },
+    "tax_id": {
+      "type": "string",
+      "description": "纳税人识别号。"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "电子发票接收邮箱。"
+    },
+    "address": {
+      "$ref": "address.json",
+      "description": "纸质发票寄送地址。"
+    },
+    "contact_info": {
+      "$ref": "./contact_info.json#",
+      "description": "开票联系人。"
+    }
+  },
+  "additionalProperties": true
+}

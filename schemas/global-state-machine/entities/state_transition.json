@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/state_transition.json",
+  "version": "2026-07-29",
+  "title": "UTP State Transition",
+  "description": "Action Response 在指定前置状态下对应的状态结果声明",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "状态迁移项标识"
+    },
+    "from_state": {
+      "$ref": "https://ut-protocol.com/global-state-machine/entities/state.json"
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1,
+      "description": "完整 UTP Action 标识"
+    },
+    "execution_result": {
+      "$ref": "https://ut-protocol.com/primitives/common/action_response.json#/properties/execution_result"
+    },
+    "result_type": {
+      "$ref": "https://ut-protocol.com/global-state-machine/entities/state_result_type.json"
+    },
+    "to_state": {
+      "$ref": "https://ut-protocol.com/global-state-machine/entities/state.json"
+    }
+  },
+  "required": [
+    "id",
+    "from_state",
+    "action",
+    "execution_result",
+    "result_type"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result_type": {
+            "const": "TRANSITION"
+          }
+        },
+        "required": [
+          "result_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "to_state"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result_type": {
+            "const": "CREATE_TRANSACTIONS"
+          }
+        },
+        "required": [
+          "result_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_state": {
+            "const": "PURCHASING"
+          }
+        },
+        "required": [
+          "to_state"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result_type": {
+            "const": "KEEP"
+          }
+        },
+        "required": [
+          "result_type"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "to_state"
+          ]
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

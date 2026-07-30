@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/fulfill/entities/partial_delivery.json",
+  "version": "2026-07-30",
+  "title": "PartialDelivery",
+  "description": "订单分批交付记录。记录单个批次的商品明细、物流关联、交付/验收数量、批次状态与凭证引用。",
+  "type": "object",
+  "properties": {
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单交付批次标识。"
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单标识。可选，用于分批记录脱离容器时独立关联订单。"
+    },
+    "shipment_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "关联发货或物流批次标识，可选。"
+    },
+    "tracking_number": {
+      "type": "string",
+      "minLength": 1,
+      "description": "承运商物流单号，可选。"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "SHIPPED",
+        "DELAYED",
+        "DELIVERED",
+        "INSPECTED",
+        "RECEIVED",
+        "REJECTED"
+      ],
+      "description": "批次当前履约状态。"
+    },
+    "line_items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/partial_delivery_line_item"
+      },
+      "description": "批次商品明细，可选。"
+    },
+    "expected_quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "批次预计交付总数量，可选。"
+    },
+    "delivered_quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "批次已交付数量。"
+    },
+    "received_quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "批次已确认收货数量。"
+    },
+    "rejected_quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "批次已拒收数量。"
+    },
+    "delivered_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "批次妥投时间，可选。"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "批次确认收货时间，可选。"
+    },
+    "inspection": {
+      "$ref": "#/$defs/inspection_summary",
+      "description": "批次验货摘要，可选。"
+    },
+    "receipt_confirmation_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "关联的收货凭证 receipt_id。"
+    },
+    "rejection_confirmation_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "关联的拒收凭证 rejection_id。"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "批次相关证据引用，可选。"
+    }
+  },
+  "required": [
+    "batch_id",
+    "status"
+  ],
+  "additionalProperties": true,
+  "$defs": {
+    "partial_delivery_line_item": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "商品或服务标识。"
+        },
+        "sku_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "SKU 标识。"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "本批次涉及数量。"
+        },
+        "unit_of_measure": {
+          "type": "string",
+          "description": "计量单位，可选。"
+        }
+      },
+      "required": [
+        "item_id",
+        "quantity"
+      ],
+      "additionalProperties": true
+    },
+    "inspection_summary": {
+      "type": "object",
+      "properties": {
+        "inspection_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "验货记录标识，可选。"
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "CONDITIONAL"
+          ],
+          "description": "验货结论。"
+        },
+        "inspected_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "验货完成时间，可选。"
+        },
+        "report_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "验货报告或证据引用，可选。"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

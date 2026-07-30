@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="300px" viewBox="-0.5 -0.5 760 300" font-family="Helvetica">
+<defs>
+<marker id="mAuthArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+<marker id="mAuthArrowR" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#b85450"/></marker>
+</defs>
+<g>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">M9.4 Agent 授权链：每个签名可回溯到 Principal（策略即授权）</text>
+
+<!-- Principal -->
+<rect x="30" y="60" width="160" height="70" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="110" y="84" text-anchor="middle" font-size="12" font-weight="bold">Principal</text>
+<text x="110" y="102" text-anchor="middle" font-size="9.5">商家法人 / 授权经营者</text>
+<text x="110" y="117" text-anchor="middle" font-size="9.5">持 Profile 主密钥</text>
+
+<!-- Mandate -->
+<rect x="250" y="52" width="230" height="88" rx="6" fill="#fff2cc" stroke="#d6b656"/>
+<text x="365" y="72" text-anchor="middle" font-size="12" font-weight="bold">授权凭证（operation Mandate）</text>
+<text x="365" y="90" text-anchor="middle" font-size="9.5">类型/验证同主规范 Ch.6 · Scope 显式枚举（附录 MC）</text>
+<text x="365" y="105" text-anchor="middle" font-size="9.5">单笔金额上限 + 累计限额 + 过期时间</text>
+<text x="365" y="120" text-anchor="middle" font-size="9.5">承诺性签名（accept / 报价）MUST 有金额时效</text>
+<text x="365" y="134" text-anchor="middle" font-size="9.5" fill="#b85450">MAY 随时吊销：新签名拒绝，既有签名不撤销</text>
+
+<!-- Agent -->
+<rect x="540" y="60" width="190" height="70" rx="6" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="635" y="84" text-anchor="middle" font-size="12" font-weight="bold">Merchant Agent</text>
+<text x="635" y="102" text-anchor="middle" font-size="9.5">持工作密钥 · 按策略决策</text>
+<text x="635" y="117" text-anchor="middle" font-size="9.5">AcceptancePolicy / 报价策略（M9.3）</text>
+
+<path d="M 190 95 L 246 95" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAuthArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="182" y="76" width="76" height="14" fill="#fff"/><text x="220" y="87">主密钥签发</text></g>
+<path d="M 480 95 L 536 95" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAuthArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="472" y="76" width="76" height="14" fill="#fff"/><text x="510" y="87">授予工作密钥</text></g>
+
+<!-- signed action -->
+<rect x="250" y="180" width="230" height="66" rx="6" fill="#d5e8d4" stroke="#82b366"/>
+<text x="365" y="202" text-anchor="middle" font-size="12" font-weight="bold">签名动作（协议事实）</text>
+<text x="365" y="220" text-anchor="middle" font-size="9.5">accept 签 terms_hash · quote · ship 签 shipment_hash</text>
+<text x="365" y="236" text-anchor="middle" font-size="9.5">decided_by: human | agent | policy_auto（禁止伪标）</text>
+
+<path d="M 635 130 L 480 200" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAuthArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="524" y="158" width="104" height="14" fill="#fff"/><text x="576" y="169">策略内自主执行</text></g>
+
+<!-- audit -->
+<rect x="30" y="180" width="160" height="66" rx="6" fill="#e1d5e7" stroke="#9673a6"/>
+<text x="110" y="202" text-anchor="middle" font-size="12" font-weight="bold">审计记录</text>
+<text x="110" y="220" text-anchor="middle" font-size="9.5">decided_by + 授权凭证引用</text>
+<text x="110" y="235" text-anchor="middle" font-size="9.5">append-only · 争议可举证</text>
+
+<path d="M 246 213 L 194 213" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAuthArrow)"/>
+<g font-size="10" text-anchor="middle"><rect x="188" y="194" width="52" height="14" fill="#fff"/><text x="214" y="205">MUST 记录</text></g>
+
+<!-- traceback dashed -->
+<path d="M 300 180 L 130 134" fill="none" stroke="#b85450" stroke-dasharray="4 3" marker-end="url(#mAuthArrowR)"/>
+<g font-size="10" text-anchor="middle" fill="#b85450"><rect x="140" y="148" width="130" height="14" fill="#fff"/><text x="205" y="159">每个签名可回溯到授权</text></g>
+
+<text x="380" y="284" text-anchor="middle" font-size="10" fill="#666">注册与商户协议签署不在本链内（MUST 由 Principal 亲自完成，M2.4.3）· 控制点矩阵见 M9.5</text>
+</g>
+</svg>

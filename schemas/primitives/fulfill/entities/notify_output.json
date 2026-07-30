@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/fulfill/entities/notify_output.json",
+  "version": "2026-07-27",
+  "title": "FulfillNotifyOutput",
+  "description": "utp.fulfill.notify 的业务输出。Buyer 返回成功仅表示已接收通知，不构成对履约事实的验收；迁移后的状态经响应信封 primitive_state 表达。",
+  "type": "object",
+  "properties": {
+    "accepted": {
+      "type": "boolean",
+      "description": "是否已接收该通知。true 仅表示通知被接收，不构成收货或事实验收。"
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单标识。"
+    },
+    "acknowledged_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "接收确认时间，可选。"
+    }
+  },
+  "additionalProperties": true
+}

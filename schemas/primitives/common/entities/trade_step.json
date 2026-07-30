@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/trade_step.json",
+  "version": "2026-07-30",
+  "title": "TradeStep",
+  "description": "分阶段付款中的一个付款阶段。",
+  "type": "object",
+  "required": [
+    "id",
+    "step_no",
+    "name",
+    "percent",
+    "totals"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "付款阶段唯一标识。"
+    },
+    "step_no": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "付款阶段序号，从 1 开始。"
+    },
+    "name": {
+      "type": "string",
+      "description": "付款阶段名称，例如定金、进度款或尾款。"
+    },
+    "percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "该阶段分摊比例的百分数，例如 30 表示 30%。"
+    },
+    "totals": {
+      "type": "array",
+      "description": "该付款阶段的金额构成。",
+      "items": {
+        "$ref": "./price.json#"
+      }
+    }
+  },
+  "additionalProperties": true
+}

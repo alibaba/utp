@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="760px" height="230px" viewBox="-0.5 -0.5 760 230" font-family="Helvetica">
+<defs>
+<marker id="mQsArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+</defs>
+<g>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">供应商接入三阶段：一次入驻 · 一次铺货 · 持续循环</text>
+
+<rect x="30" y="46" width="210" height="120" rx="8" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="135" y="70" text-anchor="middle" font-size="12" font-weight="bold">阶段一 · 入驻（一次）</text>
+<text x="135" y="92" text-anchor="middle" font-size="10">M2 五步：密钥 → Profile →</text>
+<text x="135" y="107" text-anchor="middle" font-size="10">注册 → 资质 → 沙箱验收</text>
+<text x="135" y="129" text-anchor="middle" font-size="10" fill="#82b366" font-weight="bold">产出：merchant ACTIVE</text>
+<text x="135" y="150" text-anchor="middle" font-size="9" fill="#b85450">注册签约必须法人亲自完成</text>
+
+<rect x="276" y="46" width="210" height="120" rx="8" fill="#fff2cc" stroke="#d6b656"/>
+<text x="381" y="70" text-anchor="middle" font-size="12" font-weight="bold">阶段二 · 铺货（批量）</text>
+<text x="381" y="92" text-anchor="middle" font-size="10">listings/batch + inventory/batch</text>
+<text x="381" y="107" text-anchor="middle" font-size="10">单批 ≤500 · 逐条成败 · 幂等</text>
+<text x="381" y="129" text-anchor="middle" font-size="10" fill="#82b366" font-weight="bold">产出：LISTED 可被全网搜索</text>
+<text x="381" y="150" text-anchor="middle" font-size="9" fill="#666">N 个商品 = ⌈N/500⌉ 个批次</text>
+
+<rect x="522" y="46" width="210" height="120" rx="8" fill="#d5e8d4" stroke="#82b366"/>
+<text x="627" y="70" text-anchor="middle" font-size="12" font-weight="bold">阶段三 · 日常循环（持续）</text>
+<text x="627" y="92" text-anchor="middle" font-size="10">上行：adjust / update / ship</text>
+<text x="627" y="107" text-anchor="middle" font-size="10">下行：订单路由 → accept → 结算</text>
+<text x="627" y="129" text-anchor="middle" font-size="10" fill="#82b366" font-weight="bold">事件驱动 · 回调 + 轮询兜底</text>
+<text x="627" y="150" text-anchor="middle" font-size="9" fill="#666">订单永不悬挂（超时策略兜底）</text>
+
+<path d="M 240 106 L 272 106" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mQsArrow)"/>
+<path d="M 486 106 L 518 106" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mQsArrow)"/>
+
+<text x="380" y="196" text-anchor="middle" font-size="10" fill="#666">最小实现面：一个 REST 客户端 + 一个 Webhook 端点 · 零 Mode 配置即可跑通（M1.8）</text>
+<text x="380" y="214" text-anchor="middle" font-size="10" fill="#666">Agent 与 ERP Bridge 均为可选组件，可在任意阶段后补（本页第 5 节选型表）</text>
+</g>
+</svg>

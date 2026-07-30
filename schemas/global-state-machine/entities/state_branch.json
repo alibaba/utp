@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/state_branch.json",
+  "version": "2026-07-29",
+  "title": "UTP State Branch",
+  "description": "Mode 条件下的状态结果声明",
+  "allOf": [
+    {
+      "$ref": "https://ut-protocol.com/global-state-machine/entities/state_transition.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "$ref": "https://ut-protocol.com/global-state-machine/entities/mode_condition.json"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "additionalProperties": true
+    }
+  ]
+}

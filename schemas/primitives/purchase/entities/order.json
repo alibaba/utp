@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/purchase/entities/order.json",
+  "version": "2026-07-30",
+  "title": "Order",
+  "description": "订购聚合中的订单组；创建时承载买方订单意图，响应和更新时承载卖家拆分后的订单。",
+  "type": "object",
+  "required": [
+    "order_id",
+    "line_items",
+    "state",
+    "prices"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "description": "卖家分配的业务订单标识。",
+      "utp_request": {
+        "create": "omit",
+        "update": "required",
+        "complete": "omit"
+      }
+    },
+    "supplier_id": {
+      "type": "string",
+      "readOnly": true,
+      "description": "承接该订单的供应商标识。"
+    },
+    "line_items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "该订单组包含的商品或服务明细。",
+      "items": {
+        "$ref": "../../common/entities/line_item.json"
+      },
+      "utp_request": {
+        "create": "required",
+        "update": "optional",
+        "complete": "omit"
+      }
+    },
+    "delivery": {
+      "$ref": "../../common/entities/delivery.json",
+      "description": "该订单组选择或确认的交付方式与交付安排。",
+      "utp_request": {
+        "create": "optional",
+        "update": "optional",
+        "complete": "omit"
+      }
+    },
+    "note": {
+      "type": "string",
+      "description": "买方为该订单组提交的补充说明。",
+      "utp_request": {
+        "create": "optional",
+        "update": "optional",
+        "complete": "omit"
+      }
+    },
+    "invoice_profile": {
+      "$ref": "../../common/entities/invoice_profile.json",
+      "description": "该订单组使用的开票资料。",
+      "utp_request": {
+        "create": "optional",
+        "update": "optional",
+        "complete": "omit"
+      }
+    },
+    "state": {
+      "type": "string",
+      "readOnly": true,
+      "description": "该订单当前的会话状态。"
+    },
+    "prices": {
+      "type": "array",
+      "readOnly": true,
+      "description": "该订单的金额构成及总额。",
+      "items": {
+        "$ref": "../../common/entities/price.json"
+      }
+    }
+  },
+  "additionalProperties": true
+}

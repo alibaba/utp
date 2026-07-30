@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/risk_signals.json",
+  "version": "2026-07-29",
+  "title": "Risk Signals",
+  "description": "风控信号。用于支持交易风险分析的环境数据，由平台基于直接观察或第三方可独立验证的证明提供，而非买方自行声明的主观声称。",
+  "type": "object",
+  "propertyNames": {
+    "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$",
+    "description": "反向域名标识符（例如 org.utp.transport.buyer_ip、com.example.device_id）。"
+  },
+  "properties": {
+    "org.utp.transport.buyer_ip": {
+      "type": "string",
+      "description": "买方客户端 IP 地址（IPv4 或 IPv6）。"
+    },
+    "org.utp.device.user_agent": {
+      "type": "string",
+      "description": "买方客户端 HTTP User-Agent 或等效标识。"
+    }
+  },
+  "additionalProperties": true
+}

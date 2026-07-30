@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/global-state-machine/entities/state_scope.json",
+  "version": "2026-07-29",
+  "title": "UTP State Scope",
+  "description": "StateView 所属的状态作用域",
+  "type": "string",
+  "enum": [
+    "trade_context",
+    "transaction"
+  ]
+}

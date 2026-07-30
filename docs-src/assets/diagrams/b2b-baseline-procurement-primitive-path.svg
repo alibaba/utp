@@ -1,0 +1,61 @@
+<svg viewBox="0 0 780 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">B2B 最低标准采购原语路径</title>
+  <desc id="desc">P1 Source 管理采购意图、企业主体核验和候选商品，跳过 P2 Negotiate，P3 Purchase 形成采购凭证，P4 Pay 使用企业账户全额支付，P5 Fulfill 由卖方直接履约。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif; }
+      .node { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.6; }
+      .core { fill: #eef2ff; stroke: #4f46e5; stroke-width: 1.6; }
+      .label { font-size: 14px; font-weight: 700; fill: #1e3a5f; }
+      .core-label { font-size: 14px; font-weight: 700; fill: #3730a3; }
+      .sub { font-size: 12px; fill: #64748b; }
+      .skip { font-size: 12px; fill: #2563eb; font-weight: 600; }
+      .note-box { fill: #fff7ed; stroke: #f97316; stroke-width: 1; }
+      .note { font-size: 11px; fill: #9a3412; }
+    </style>
+  </defs>
+
+  <g transform="translate(24 38)">
+    <rect class="node" x="0" y="0" width="140" height="66" rx="8"/>
+    <text class="label" x="70" y="27" text-anchor="middle">P1 Source</text>
+    <text class="sub" x="70" y="46" text-anchor="middle">企业价 + 资质核验</text>
+  </g>
+
+  <g transform="translate(220 38)">
+    <rect class="core" x="0" y="0" width="140" height="66" rx="8"/>
+    <text class="core-label" x="70" y="27" text-anchor="middle">P3 Purchase</text>
+    <text class="sub" x="70" y="46" text-anchor="middle">采购凭证</text>
+  </g>
+
+  <g transform="translate(416 38)">
+    <rect class="core" x="0" y="0" width="140" height="66" rx="8"/>
+    <text class="core-label" x="70" y="27" text-anchor="middle">P4 Pay</text>
+    <text class="sub" x="70" y="46" text-anchor="middle">企业账户全额支付</text>
+  </g>
+
+  <g transform="translate(612 38)">
+    <rect class="node" x="0" y="0" width="140" height="66" rx="8"/>
+    <text class="label" x="70" y="27" text-anchor="middle">P5 Fulfill</text>
+    <text class="sub" x="70" y="46" text-anchor="middle">卖方直接履约</text>
+  </g>
+
+  <g stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow)">
+    <line x1="164" y1="71" x2="218" y2="71"/>
+    <line x1="360" y1="71" x2="414" y2="71"/>
+    <line x1="556" y1="71" x2="610" y2="71"/>
+  </g>
+
+  <text class="skip" x="192" y="58" text-anchor="middle">跳过 P2</text>
+
+  <g transform="translate(238 118)">
+    <rect class="note-box" x="0" y="0" width="104" height="22" rx="5"/>
+    <text class="note" x="52" y="15" text-anchor="middle">采购授权确认</text>
+  </g>
+  <g transform="translate(434 118)">
+    <rect class="note-box" x="0" y="0" width="104" height="22" rx="5"/>
+    <text class="note" x="52" y="15" text-anchor="middle">支付授权确认</text>
+  </g>
+</svg>

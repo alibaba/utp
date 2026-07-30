@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/action_request.json",
+  "version": "2026-07-27",
+  "title": "UTP Action Request",
+  "description": "所有 UTP 原语操作共享的请求信封。input 的具体结构由原语定义中该操作的 input_schema 指定。",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "minLength": 1,
+      "description": "完整操作标识。"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "当前 UTP 协议会话的唯一标识。"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "当前操作所属交易的唯一标识；尚未进入具体交易时不传递该字段。"
+    },
+    "trade_context_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "当前操作所属贸易上下文的唯一标识；Purchase 创建交易边界时必须传递。"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "调用方提供的幂等键，用于关联同一副作用请求的重试。"
+    },
+    "input": {
+      "type": "object",
+      "description": "操作特有输入。其内容由对应操作的 input_schema 校验。",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "action",
+    "session_id",
+    "input"
+  ],
+  "additionalProperties": true
+}

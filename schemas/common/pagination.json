@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/common/pagination.json",
+  "version": "2026-07-27",
+  "title": "Pagination",
+  "description": "列表操作共享的游标分页定义。请求与响应使用不同子 Schema，避免将响应元数据作为请求参数。",
+  "type": "object",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "上一页响应返回的不透明游标；省略时表示从第一页开始。"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 10,
+          "description": "请求页大小。实现方 MAY 按服务能力裁剪为更低的上限。"
+        }
+      },
+      "additionalProperties": true,
+      "description": "列表请求分页参数。"
+    },
+    "response": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "用于获取下一页的不透明游标；has_next_page=true 时 MUST 提供。"
+        },
+        "has_next_page": {
+          "type": "boolean",
+          "description": "是否还有下一页结果。"
+        },
+        "total_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "符合当前查询条件的总记录数；实现方可选提供。"
+        }
+      },
+      "required": [
+        "has_next_page"
+      ],
+      "if": {
+        "properties": {
+          "has_next_page": {
+            "const": true
+          }
+        },
+        "required": [
+          "has_next_page"
+        ]
+      },
+      "then": {
+        "required": [
+          "cursor"
+        ]
+      },
+      "additionalProperties": true,
+      "description": "列表响应分页元数据。"
+    }
+  },
+  "additionalProperties": true
+}
