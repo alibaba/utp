@@ -22,7 +22,7 @@
       "description": "是否在结果中包含各付款阶段的状态明细。"
     }
   },
-  "anyOf": [
+  "oneOf": [
     { "required": ["payment_request_id"] },
     { "required": ["purchase_id"] }
   ],

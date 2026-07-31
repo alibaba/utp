@@ -3,11 +3,12 @@
   "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/compensate_input.json",
   "version": "2026-07-31",
   "title": "ResolveCompensateInput",
-  "description": "执行已生效处置结果中资金和非资金补偿所需的业务输入。",
+  "description": "按权威争议档案中的处置结果和补偿单标识执行资金及非资金补偿。",
   "type": "object",
   "required": [
     "dispute_id",
-    "compensation_order"
+    "resolution_outcome_id",
+    "compensation_order_id"
   ],
   "properties": {
     "dispute_id": {
@@ -15,13 +16,25 @@
       "minLength": 1,
       "description": "补偿所依据的争议档案标识。"
     },
+    "resolution_outcome_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "已生效且包含待执行指令的 ResolutionOutcome 标识。"
+    },
+    "compensation_order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ResolutionOutcome 关联的权威补偿单标识。"
+    },
     "compensation_order": {
       "$ref": "compensation_order.json",
-      "description": "已由调解、仲裁或 L1 规则确认生效的补偿单。"
+      "deprecated": true,
+      "description": "兼容旧调用方的补偿单快照；处理方不得将其作为权威来源，且出现时必须与 compensation_order_id 指向的档案完全一致。"
     },
     "refund_instruction": {
       "$ref": "../../pay/entities/refund_instruction.json",
-      "description": "补偿包含资金退款时交给 utp.pay.refund 的标准退款指令。"
+      "deprecated": true,
+      "description": "兼容旧调用方的退款指令快照；处理方必须执行权威 ResolutionOutcome 中的同一指令。"
     }
   },
   "additionalProperties": true

@@ -48,5 +48,11 @@
   "then": {
     "required": ["refund_instruction"]
   },
+  "else": {
+    "required": ["target_action"],
+    "not": {
+      "required": ["refund_instruction"]
+    }
+  },
   "additionalProperties": true
 }

@@ -64,5 +64,108 @@
       "description": "支持初始主张的不可变证据或证据包标识。"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dispute_scope": { "const": "source", "description": "Source 范围争议。" }
+        },
+        "required": ["dispute_scope"]
+      },
+      "then": {
+        "required": ["dispute_scope_detail"],
+        "properties": {
+          "related_primitive": { "const": "utp.source", "description": "Source 范围必须关联 utp.source。" },
+          "dispute_scope_detail": {
+            "anyOf": [
+              { "required": ["listing_id"] },
+              { "required": ["item_refs"] }
+            ],
+            "description": "Source 争议必须定位供给发布或商品服务项。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "dispute_scope": { "const": "negotiate", "description": "Negotiate 范围争议。" }
+        },
+        "required": ["dispute_scope"]
+      },
+      "then": {
+        "required": ["dispute_scope_detail"],
+        "properties": {
+          "related_primitive": { "const": "utp.negotiate", "description": "Negotiate 范围必须关联 utp.negotiate。" },
+          "dispute_scope_detail": {
+            "required": ["negotiation_id"],
+            "description": "Negotiate 争议必须定位询盘、报价或协商聚合。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "dispute_scope": { "const": "purchase", "description": "Purchase 范围争议。" }
+        },
+        "required": ["dispute_scope"]
+      },
+      "then": {
+        "required": ["dispute_scope_detail"],
+        "properties": {
+          "related_primitive": { "const": "utp.purchase", "description": "Purchase 范围必须关联 utp.purchase。" },
+          "dispute_scope_detail": {
+            "required": ["order_id"],
+            "description": "Purchase 争议必须定位订单。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "dispute_scope": { "const": "pay", "description": "Pay 范围争议。" }
+        },
+        "required": ["dispute_scope"]
+      },
+      "then": {
+        "required": ["dispute_scope_detail"],
+        "properties": {
+          "related_primitive": { "const": "utp.pay", "description": "Pay 范围必须关联 utp.pay。" },
+          "dispute_scope_detail": {
+            "anyOf": [
+              { "required": ["payment_request_id"] },
+              { "required": ["payment_confirmation_id"] },
+              { "required": ["claimed_amount"] }
+            ],
+            "description": "Pay 争议必须定位支付请求、支付确认或争议金额。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "dispute_scope": { "const": "fulfill", "description": "Fulfill 范围争议。" }
+        },
+        "required": ["dispute_scope"]
+      },
+      "then": {
+        "required": ["dispute_scope_detail"],
+        "properties": {
+          "related_primitive": { "const": "utp.fulfill", "description": "Fulfill 范围必须关联 utp.fulfill。" },
+          "dispute_scope_detail": {
+            "anyOf": [
+              { "required": ["order_id"] },
+              { "required": ["batch_id"] },
+              { "required": ["item_refs"] }
+            ],
+            "description": "Fulfill 争议必须定位订单、履约批次或商品服务项。"
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": true
 }

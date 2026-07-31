@@ -33,7 +33,7 @@
       "description": "证明本阶段已满足履约前置条件的结构化引用。"
     },
     "amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "本付款阶段应扣付的金额。"
     }
   },

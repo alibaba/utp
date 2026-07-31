@@ -3,20 +3,20 @@
   "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/fulfillment_trigger.json",
   "version": "2026-07-31",
   "title": "FulfillmentTrigger",
-  "description": "多阶段付款场景中引用履约事件、批次或付款阶段的结构化触发条件。",
+  "description": "多阶段付款场景中证明付款前置条件已经满足的履约事件或里程碑事实。",
   "type": "object",
   "required": [
-    "trigger_type"
+    "evidence_ref",
+    "occurred_at"
   ],
   "properties": {
     "trigger_type": {
       "type": "string",
       "enum": [
-        "on_payment_confirmed",
-        "on_payment_term_confirmed",
-        "on_escrow_funded"
+        "fulfillment_event_ref",
+        "milestone_ref"
       ],
-      "description": "触发类型：整笔支付确认、指定付款阶段确认或托管资金到账。"
+      "description": "触发引用类型：fulfillment_event_ref 表示已发生的 Fulfill 事件；milestone_ref 表示交易条款定义的履约里程碑。"
     },
     "fulfillment_action": {
       "type": "string",
@@ -25,18 +25,60 @@
         "utp.fulfill.query",
         "utp.fulfill.receive"
       ],
-      "description": "作为本付款阶段前置事实来源的 Fulfill Action。"
+      "description": "产生本付款阶段前置事实的 Fulfill Action。"
+    },
+    "fulfillment_event_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "已发生且经处理方验证的 Fulfill 事件稳定引用。"
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "前置履约事实关联的订单标识。"
     },
     "batch_id": {
       "type": "string",
       "minLength": 1,
-      "description": "触发条件关联的履约批次标识。"
+      "description": "前置履约事实关联的履约批次标识。"
     },
-    "payment_term_id": {
+    "event_status": {
       "type": "string",
       "minLength": 1,
-      "description": "触发条件关联的付款阶段标识。"
+      "description": "Fulfill Action 已确认的状态或结果，例如 SHIPPED、RECEIVED。"
+    },
+    "milestone_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "交易条款中定义的履约里程碑标识。"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "前置履约事实实际发生的 RFC 3339 时间。"
+    },
+    "evidence_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "证明履约事件或里程碑已完成的不可变证据标识。"
     }
   },
+  "allOf": [
+    { "$ref": "fulfillment_condition.json" },
+    {
+      "if": {
+        "properties": {
+          "trigger_type": {
+            "const": "fulfillment_event_ref",
+            "description": "引用已发生的 Fulfill 事件时必须提供事件引用。"
+          }
+        },
+        "required": ["trigger_type"]
+      },
+      "then": {
+        "required": ["fulfillment_event_ref"]
+      }
+    }
+  ],
   "additionalProperties": true
 }

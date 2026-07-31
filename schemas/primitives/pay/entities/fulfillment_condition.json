@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/fulfillment_condition.json",
+  "version": "2026-07-31",
+  "title": "FulfillmentCondition",
+  "description": "付款阶段尚待满足的结构化履约事件或里程碑条件，不包含完成证据。",
+  "type": "object",
+  "required": [
+    "trigger_type"
+  ],
+  "properties": {
+    "trigger_type": {
+      "type": "string",
+      "enum": ["fulfillment_event_ref", "milestone_ref"],
+      "description": "条件类型：fulfillment_event_ref 表示预期的 Fulfill 事件；milestone_ref 表示交易条款定义的履约里程碑。"
+    },
+    "fulfillment_action": {
+      "type": "string",
+      "enum": ["utp.fulfill.notify", "utp.fulfill.query", "utp.fulfill.receive"],
+      "description": "预期产生付款前置事实的 Fulfill Action。"
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "预期履约事实关联的订单标识。"
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "预期履约事实关联的履约批次标识。"
+    },
+    "event_status": {
+      "type": "string",
+      "minLength": 1,
+      "description": "付款条件要求 Fulfill Action 达到的状态或结果。"
+    },
+    "milestone_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "交易条款中定义的履约里程碑标识。"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "trigger_type": { "const": "fulfillment_event_ref", "description": "使用 Fulfill 事件作为条件。" }
+        },
+        "required": ["trigger_type"]
+      },
+      "then": {
+        "required": ["fulfillment_action", "event_status"],
+        "anyOf": [
+          { "required": ["order_id"] },
+          { "required": ["batch_id"] }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "trigger_type": { "const": "milestone_ref", "description": "使用交易里程碑作为条件。" }
+        },
+        "required": ["trigger_type"]
+      },
+      "then": {
+        "required": ["milestone_id"]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

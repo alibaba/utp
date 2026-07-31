@@ -2,16 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/dispute_scope.json",
   "version": "2026-07-31",
-  "title": "DisputeScope",
-  "description": "争议影响的具体支付、订单、履约批次、商品或金额范围；非 global 争议应尽量绑定具体资源。",
+  "title": "DisputeScopeDetail",
+  "description": "争议影响的具体支付、订单、履约批次、商品或金额范围；范围类型由父级 dispute_scope 唯一声明。",
   "type": "object",
-  "required": [
-    "scope_type"
-  ],
   "properties": {
-    "scope_type": {
-      "$ref": "dispute_scope_type.json",
-      "description": "争议所属的原语或全局范围。"
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "受争议影响的供给、商品或服务发布标识。"
+    },
+    "negotiation_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "受争议影响的询盘、报价或协商聚合标识。"
     },
     "payment_request_id": {
       "type": "string",
@@ -34,11 +37,12 @@
       "description": "受争议影响的履约批次标识。"
     },
     "claimed_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "争议范围内被主张或需要锁定的金额。"
     },
     "item_refs": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "string",
         "minLength": 1
@@ -47,5 +51,15 @@
       "description": "受争议影响的商品行或服务项标识。"
     }
   },
+  "anyOf": [
+    { "required": ["listing_id"] },
+    { "required": ["negotiation_id"] },
+    { "required": ["payment_request_id"] },
+    { "required": ["payment_confirmation_id"] },
+    { "required": ["order_id"] },
+    { "required": ["batch_id"] },
+    { "required": ["claimed_amount"] },
+    { "required": ["item_refs"] }
+  ],
   "additionalProperties": true
 }

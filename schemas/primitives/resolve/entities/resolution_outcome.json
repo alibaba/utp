@@ -34,6 +34,10 @@
       },
       "description": "落实该处置结果需要执行的有序指令；无补偿的驳回结果可为空数组。"
     },
+    "compensation_order": {
+      "$ref": "compensation_order.json",
+      "description": "部分补偿或终止退款结果对应的权威补偿单。"
+    },
     "next_global_state_hint": {
       "$ref": "next_global_state_hint.json",
       "description": "提供给全局状态机的下一状态建议。"
@@ -44,5 +48,136 @@
       "description": "包含事实、责任判定、签名和处置依据的证据标识。"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "enum": ["continue", "dismissed", "escalated"],
+            "description": "不执行补偿的继续、驳回或升级结果。"
+          }
+        },
+        "required": ["result"]
+      },
+      "then": {
+        "properties": {
+          "instructions": {
+            "maxItems": 0,
+            "description": "不执行补偿的结果不得携带处置指令。"
+          }
+        },
+        "not": { "required": ["compensation_order"] }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "enum": ["partial_compensation", "terminate_with_refund"],
+            "description": "需要执行补偿或退款的处置结果。"
+          }
+        },
+        "required": ["result"]
+      },
+      "then": {
+        "required": ["compensation_order"],
+        "properties": {
+          "instructions": {
+            "minItems": 1,
+            "description": "需要补偿或退款的结果至少包含一条可执行指令。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "const": "terminate_with_refund",
+            "description": "终止并退款的结果必须包含退款指令。"
+          }
+        },
+        "required": ["result"]
+      },
+      "then": {
+        "required": ["compensation_order", "next_global_state_hint"],
+        "properties": {
+          "instructions": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "instruction_type": {
+                  "const": "refund",
+                  "description": "终止并退款结果中的标准退款指令。"
+                }
+              },
+              "required": ["instruction_type"]
+            },
+            "description": "terminate_with_refund 至少包含一条 refund 指令。"
+          },
+          "next_global_state_hint": {
+            "enum": ["FAILED", "CANCELLED"],
+            "description": "终止并退款后全局状态只能收敛到 FAILED 或 CANCELLED。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": { "const": "terminate_with_refund", "description": "终止退款必须同时终止受影响交易义务。" }
+        },
+        "required": ["result"]
+      },
+      "then": {
+        "properties": {
+          "instructions": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "instruction_type": { "const": "cancel_transaction", "description": "终止受影响交易义务的指令。" }
+              },
+              "required": ["instruction_type"]
+            },
+            "description": "terminate_with_refund 至少包含一条 cancel_transaction 指令。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "enum": ["continue", "partial_compensation"],
+            "description": "交易仍有义务需要继续的结果。"
+          }
+        },
+        "required": ["result"]
+      },
+      "then": {
+        "required": ["next_global_state_hint"],
+        "properties": {
+          "next_global_state_hint": {
+            "enum": ["prior_state", "PAYING", "FULFILLING"],
+            "description": "继续履行类结果只能恢复先前状态或进入支付、履约阶段。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": { "const": "dismissed", "description": "驳回争议后恢复争议前状态。" }
+        },
+        "required": ["result"]
+      },
+      "then": {
+        "required": ["next_global_state_hint"],
+        "properties": {
+          "next_global_state_hint": { "const": "prior_state", "description": "驳回结果必须恢复争议前状态。" }
+        }
+      }
+    }
+  ],
   "additionalProperties": true
 }

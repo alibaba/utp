@@ -6,22 +6,27 @@
   "description": "调解或仲裁产生的补偿单；资金退款必须进一步转换为 RefundInstruction。",
   "type": "object",
   "required": [
+    "compensation_order_id",
     "total_compensation",
-    "refund_source",
     "deadline"
   ],
   "properties": {
+    "compensation_order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "补偿单的稳定唯一标识，用于处置结果、执行请求和审计记录关联。"
+    },
     "refund_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "需要通过 utp.pay.refund 退回的金额。"
     },
     "penalty_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "处置结果确定的违约金或附加赔偿金额。"
     },
     "total_compensation": {
-      "$ref": "../../common/entities/money.json",
-      "description": "资金补偿、违约金及其他可计价补偿的总金额。"
+      "$ref": "../../common/entities/non_negative_money.json",
+      "description": "资金补偿、违约金及其他可计价补偿的总金额；仅包含非资金动作时允许为零。"
     },
     "refund_source": {
       "type": "string",
@@ -35,6 +40,7 @@
     },
     "additional_actions": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "$ref": "compensation_action.json"
       },
@@ -46,5 +52,20 @@
       "description": "全部补偿动作应完成的 RFC 3339 截止时间。"
     }
   },
+  "anyOf": [
+    { "required": ["refund_amount"] },
+    { "required": ["penalty_amount"] },
+    { "required": ["additional_actions"] }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": ["refund_amount"]
+      },
+      "then": {
+        "required": ["refund_source"]
+      }
+    }
+  ],
   "additionalProperties": true
 }

@@ -18,5 +18,39 @@
       "description": "补偿包含资金退款时由 utp.pay.refund 返回的标准结果。"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dispute_record": {
+            "description": "用于判断本次补偿是否包含退款指令的权威争议档案。",
+            "properties": {
+              "resolution_outcome": {
+                "description": "本次补偿所执行的权威处置结果。",
+                "properties": {
+                  "instructions": {
+                    "description": "用于识别资金退款动作的处置指令列表。",
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "instruction_type": { "const": "refund", "description": "待执行或已执行的退款指令。" }
+                      },
+                      "required": ["instruction_type"]
+                    }
+                  }
+                },
+                "required": ["instructions"]
+              }
+            },
+            "required": ["resolution_outcome"]
+          }
+        },
+        "required": ["dispute_record"]
+      },
+      "then": {
+        "required": ["refund_result"]
+      }
+    }
+  ],
   "additionalProperties": true
 }

@@ -44,7 +44,7 @@
       "description": "本次争议明确锁定的资源集合。"
     },
     "locked_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "支付或托管争议中被冻结、暂停结算或保留可退的金额。"
     },
     "allowed_readonly_actions": {
@@ -62,5 +62,20 @@
       "description": "锁定策略需要复核或自动升级的 RFC 3339 时间。"
     }
   },
+  "anyOf": [
+    {
+      "properties": {
+        "locked_actions": { "minItems": 1, "description": "至少锁定一个有副作用 Action。" }
+      },
+      "required": ["locked_actions"]
+    },
+    {
+      "properties": {
+        "locked_resources": { "minItems": 1, "description": "至少锁定一个业务资源。" }
+      },
+      "required": ["locked_resources"]
+    },
+    { "required": ["locked_amount"] }
+  ],
   "additionalProperties": true
 }

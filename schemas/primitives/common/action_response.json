@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "action_response.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/action_response.json",
   "version": "2026-07-31",
   "title": "UTP Action Response",
   "description": "所有 UTP 原语操作共享的响应信封。output 的具体结构由原语定义中该操作的 output_schema 指定。",
@@ -8,7 +8,7 @@
   "properties": {
     "action": {
       "type": "string",
-      "minLength": 1,
+      "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
       "description": "本次响应对应的完整操作标识。"
     },
     "session_id": {
@@ -54,11 +54,12 @@
       }
     },
     "valid_next_actions": {
-      "$ref": "valid_next_actions.json"
+      "$ref": "valid_next_actions.json",
+      "description": "执行编排启用时返回的完整后续 Action 名称列表。"
     },
     "hai": {
       "$ref": "hai.json",
-      "description": ""
+      "description": "Action 被人机协同控制时返回的执行门、挂起、Surface 与权威数据源上下文。"
     },
     "data_visibility": {
       "type": "string",
@@ -76,9 +77,36 @@
   },
   "required": [
     "action",
-    "session_id",
-    "output",
-    "valid_next_actions"
+    "session_id"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "execution_result": {
+            "const": "REJECTED",
+            "description": "业务拒绝结果必须提供至少一条可处理错误消息。"
+          }
+        },
+        "required": ["execution_result"]
+      },
+      "then": {
+        "required": ["messages"],
+        "properties": {
+          "messages": {
+            "minItems": 1,
+            "contains": {
+              "type": "object",
+              "properties": {
+                "type": { "const": "error", "description": "REJECTED 至少包含一条 error 消息。" }
+              },
+              "required": ["type"]
+            },
+            "description": "解释业务拒绝原因并提供恢复建议的错误消息。"
+          }
+        }
+      }
+    }
   ],
   "additionalProperties": true
 }

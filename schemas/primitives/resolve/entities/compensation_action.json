@@ -6,7 +6,8 @@
   "description": "退货、补发、物流逆向或其他非资金补偿动作。",
   "type": "object",
   "required": [
-    "action_type"
+    "action_type",
+    "target_action"
   ],
   "properties": {
     "action_type": {

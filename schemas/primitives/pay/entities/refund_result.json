@@ -8,9 +8,6 @@
   "required": [
     "refund_id",
     "status",
-    "refunded_amount",
-    "channel_refund_id",
-    "payment_event_ref",
     "evidence_ref"
   ],
   "properties": {
@@ -29,7 +26,7 @@
       "description": "退款状态：processing 渠道处理中；refunded 已退款；failed 最终失败。"
     },
     "refunded_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "渠道实际接受或完成退款的金额。"
     },
     "channel_refund_id": {
@@ -48,5 +45,40 @@
       "description": "保存退款指令、渠道结果和签名材料的证据标识。"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": ["processing", "refunded"],
+            "description": "渠道已受理退款时应用渠道流水要求。"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["channel_refund_id"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "refunded",
+            "description": "退款完成时应用最终金额与事件要求。"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["refunded_amount", "payment_event_ref"]
+      },
+      "else": {
+        "not": {
+          "required": ["payment_event_ref"]
+        }
+      }
+    }
+  ],
   "additionalProperties": true
 }

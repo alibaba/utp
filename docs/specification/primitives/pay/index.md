@@ -26,7 +26,7 @@ precondition:   valid PurchaseCredential exists
 
 ### 意图 {#s-1411}
 
-Pay 是 UTP 第四个交易原语（P4），其意图是**执行资金转移** —— 将采购方（或其指定的支付方）的资金按照 PurchaseCredential 中约定的条款转移至供应商（或其指定的收款方）。Pay 的产出是** 支付确认凭证（PaymentConfirmation）**，包含 `transaction_id`、金额、时间戳、支付工具标识和证据包引用。
+Pay 是 UTP 第四个交易原语（P4），其意图是**执行资金转移** —— 将采购方（或其指定的支付方）的资金按照 PurchaseCredential 中约定的条款转移至供应商（或其指定的收款方）。Pay 的产出是** 支付确认凭证（PaymentConfirmation）**，包含支付请求、采购聚合、金额、时间戳、支付工具标识和证据包引用；协议级 `transaction_id` 由统一 Action 信封承载。
 
 Pay 是交易从"订购确认"走向"执行"的第一个实质动作。在 P3 标准响应确认独立交易边界，且该响应被 `evaluate_result` 接受并由路径编排生成 `transaction_id` 后，Pay 原语负责将财务义务转化为实际的资金流动。Pay 原语的设计核心是**安全**（敏感支付凭证不明文传输）和** 可收敛性**（渠道回调、主动查询与退款补偿必须收敛到同一交易锚点）。
 
@@ -101,8 +101,7 @@ Pay 覆盖以下场景：
   ],
   "invariants": [
     "Σ(payment_confirmations.amount) <= purchase_credential.total",
-    "payment_request.transaction_id == purchase_credential.transaction_id",
-    "payment_confirmation.transaction_id == payment_request.transaction_id",
+    "action_request.transaction_id == purchase_credential.transaction_id",
     "payment_request.purchase_id == purchase_credential.purchase_id (标的物一经绑定不可篡改)",
     "payment_request.amount_breakdown != null → (amount_breakdown.subtotal + amount_breakdown.shipping_fee + amount_breakdown.tax - amount_breakdown.discount == payment_request.amount)",
     "payment_request.settlement != null → Σ(payment_request.settlement.splits[].amount) == payment_request.amount",
@@ -111,7 +110,7 @@ Pay 覆盖以下场景：
     "payment_confirmation.token != plaintext_credential (Tokenizer 安全不变式)",
     "mandate_chain.verify() == true (Agent 支付场景)",
     "payment_binding.status == 'active' → binding.constraints.amount_limit >= payment_request.amount",
-    "delegation_credential.consumed_amount + payment_request.amount ,
+    "delegation_credential.consumed_amount + payment_request.amount <= delegation_credential.amount_limit",
     "audit_log.append(payment_event) == true (所有支付安全事件)"
   ],
   "side_effects": [
@@ -155,9 +154,9 @@ Pay 覆盖以下场景：
 | `INIT` | 尚未发起支付 | 会话进入 `PAYING` 阶段，PurchaseCredential 已就绪 | `pay.initiate` |
 | `AUTHORIZED` | 支付授权已冻结 | `pay.initiate` 成功，支付工具已授权（如预授权冻结）。当使用支付方式绑定时，表示绑定关系已验证且支付工具引用有效。 | `pay.confirm`, `pay.term` |
 | `PROCESSING` | 支付正在处理中 | `pay.confirm` 或 `pay.term` 已调用，等待支付渠道确认 | 等待支付渠道回调 |
-| `CONFIRMED` | 当期支付已确认到账 | 支付渠道返回成功确认 | 若仍有未付阶段：`pay.term`；若全部完成：自动迁移至 `COMPLETED` |
-| `PARTIAL` | 部分款项已付 | 至少一个付款阶段已完成，但仍有未付阶段 | `pay.term`（下一付款阶段） |
-| `COMPLETED` | 全部支付完成 | 所有付款阶段均已 `CONFIRMED` | 只读。全局状态迁移至 `FULFILLING`，进入 Fulfill 原语 |
+| `CONFIRMED` | 当期支付已确认到账 | 支付渠道返回 `PAYMENT_CAPTURED` | 自动判定后续付款阶段；经授权可执行 `pay.refund` |
+| `PARTIAL` | 部分款项已付 | 至少一个付款阶段已完成，但仍有未付阶段 | `pay.term`（下一付款阶段）或经授权执行 `pay.refund` |
+| `COMPLETED` | 全部支付完成 | 所有付款阶段均已 `CONFIRMED` | 只读查询，或经授权执行 `pay.refund`；全局状态迁移至 `FULFILLING` |
 | `FAILED` | 支付失败 | 支付渠道返回失败 | 补偿链执行后可重试 `pay.initiate` |
 | `COMPENSATED` | 补偿完成 | 补偿链执行完毕（退款/解除授权） | 可重新发起 `pay.initiate` |
 
@@ -201,7 +200,7 @@ Pay 的公共语义以 `transaction_id`、`payment_request_id` 和标准 Payment
 | `PAYMENT_AUTHORIZED` | 支付工具预授权或余额冻结成功 | `AUTHORIZED` | 保持 `PAYING` |
 | `PAYMENT_CAPTURED` | 渠道确认扣款或入托管成功 | `CONFIRMED` / `PARTIAL` / `COMPLETED` | 按付款义务是否完成保持 `PAYING` 或进入 `FULFILLING` |
 | `PAYMENT_FAILED` | 渠道拒绝、授权失效、风控拒绝或超时后最终状态确认失败 | `FAILED` | 保持 `PAYING`，可重试或进入 Resolve |
-| `PAYMENT_REFUNDED` | `utp.pay.refund` 或 Escrow 退款完成 | `REFUNDED` 或 `PARTIAL` | 由 Resolve 或 Saga 规则决定恢复、继续或终止交易 |
+| `PAYMENT_REFUNDED` | `utp.pay.refund` 或 Escrow 退款完成 | 全额终止性退款进入 `COMPENSATED`；部分退款保留 `CONFIRMED`、`PARTIAL` 或 `COMPLETED` | 由 Resolve 或 Saga 规则决定恢复、继续或终止交易 |
 
 Payment Adapter Contract（支付适配契约）至少包含三项职责：验证渠道回调签名；将渠道状态映射为标准 PaymentEvent；保证同一 `idempotency_key` 与渠道流水不会重复触发资金变动。公共协议不得把渠道原始枚举作为全局迁移条件。
 
@@ -279,12 +278,14 @@ TEE 验证失败            →    中止支付
       "transaction_id": "utp-txn-20260718-001",
       "payment_request_id": "pay-req-20260720-001",
       "payment_term_id": "定金",
-      "amount": { "amount": 25074.40, "currency": "CNY" },
+      "amount": { "amount": "25074.40", "currency": "CNY" },
       "instrument_type": "alipay",
       "channel_error_code": "INSUFFICIENT_BALANCE",
       "compensation_executed": ["auth_release", "audit_log"]
     },
     "retryable": true,
+    "request_id": "req-pay-confirm-20260720-001",
+    "timestamp": "2026-07-20T10:05:40Z",
     "recovery_actions": [
       {
         "action": "switch_instrument",
@@ -450,13 +451,15 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 {
   "action": "utp.pay.initiate",
   "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "pay-init-20260720-001",
   "input": {
     "purchase_id": "pur-20260718-001",
-    "transaction_id": "utp-txn-20260718-001",
     "payment_instrument": {
       "type": "alipay",
       "tokenizer_ref": "tok-alipay-buyer-2026-001",
-      "token": "eyJhbGciOiJFUzI1NiJ9.dG9rLWFsaXBheS1idXllci0yMDI2LTAwMT..."
+      "token": "eyJhbGciOiJFUzI1NiJ9.dG9rLWFsaXBheS1idXllci0yMDI2LTAwMT...",
+      "currency": "CNY"
     },
     "mandate_chain": {
       "open_checkout_mandate": "eyJhbGciOiJFUzI1NiIsImtpZCI6InVzZXIta2V5In0...",
@@ -464,10 +467,9 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
       "closed_checkout_mandate": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImFnZW50LWtleSJ9...",
       "closed_payment_mandate": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImFnZW50LWtleSJ9..."
     },
-    "amount": { "amount": 25074.40, "currency": "CNY" },
+    "amount": { "amount": "25074.40", "currency": "CNY" },
     "payment_term_id": "定金",
     "escrow_mode": false,
-    "idempotency_key": "pay-init-20260720-001",
     "payment_binding_ref": "bnd-alipay-agent-2026-001",
     "delegation_credential": "eyJhbGciOiJFUzI1NiIsImtpZCI6InVzZXIta2V5In0..."
   }
@@ -479,23 +481,27 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 ```json
 {
   "action": "utp.pay.initiate",
+  "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "pay-init-20260720-001",
+  "primitive_state": "AUTHORIZED",
+  "execution_result": "SUCCESS",
   "output": {
     "payment_request_id": "pay-req-20260720-001",
     "purchase_id": "pur-20260718-001",
-    "transaction_id": "utp-txn-20260718-001",
     "status": "authorized",
-    "amount": { "amount": 25074.40, "currency": "CNY" },
+    "amount": { "amount": "25074.40", "currency": "CNY" },
     "payment_term_id": "定金",
     "instrument_type": "alipay",
     "authorization_code": "auth-alipay-20260720-abc123",
     "channel_transaction_id": "2026072022001423450500000001",
     "mandate_verified": true,
     "tee_verified": true,
-    "binding_verified": true,
-    "valid_next_actions": [
-      "utp.pay.confirm"
-    ]
-  }
+    "binding_verified": true
+  },
+  "valid_next_actions": [
+    "utp.pay.confirm"
+  ]
 }
 ```
 
@@ -509,12 +515,14 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 {
   "action": "utp.pay.confirm",
   "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "pay-confirm-20260720-001",
   "input": {
     "payment_request_id": "pay-req-20260720-001",
     "channel_callback": {
       "status": "success",
       "channel_transaction_id": "2026072022001423450500000001",
-      "settled_amount": { "amount": 25074.40, "currency": "CNY" },
+      "settled_amount": { "amount": "25074.40", "currency": "CNY" },
       "settled_at": "2026-07-20T10:05:32Z",
       "channel_signature": "eyJhbGciOiJSUzI1NiJ9..."
     }
@@ -527,14 +535,19 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 ```json
 {
   "action": "utp.pay.confirm",
+  "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "pay-confirm-20260720-001",
+  "primitive_state": "PARTIAL",
+  "execution_result": "SUCCESS",
   "output": {
+    "status": "confirmed",
     "payment_confirmation": {
       "payment_confirmation_id": "pay-cfm-20260720-001",
       "payment_request_id": "pay-req-20260720-001",
       "purchase_id": "pur-20260718-001",
-      "transaction_id": "utp-txn-20260718-001",
       "status": "confirmed",
-      "amount": { "amount": 25074.40, "currency": "CNY" },
+      "amount": { "amount": "25074.40", "currency": "CNY" },
       "payment_term_id": "定金",
       "instrument_type": "alipay",
       "channel_transaction_id": "2026072022001423450500000001",
@@ -542,21 +555,35 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
       "evidence_ref": "evd-pay-20260720-001"
     },
     "payment_progress": {
-      "total_amount": { "amount": 125372.00, "currency": "CNY" },
-      "paid_amount": { "amount": 25074.40, "currency": "CNY" },
-      "remaining_amount": { "amount": 100297.60, "currency": "CNY" },
+      "total_amount": { "amount": "125372.00", "currency": "CNY" },
+      "paid_amount": { "amount": "25074.40", "currency": "CNY" },
+      "remaining_amount": { "amount": "100297.60", "currency": "CNY" },
       "completed_terms": ["定金"],
       "next_term": {
-        "name": "发货前",
-        "amount": { "amount": 62686.00, "currency": "CNY" },
-        "trigger_condition": "fulfill.notify.status == 'SHIPPED'"
+        "payment_term_id": "发货前",
+        "amount": { "amount": "62686.00", "currency": "CNY" },
+        "fulfillment_trigger": {
+          "trigger_type": "fulfillment_event_ref",
+          "fulfillment_action": "utp.fulfill.notify",
+          "order_id": "ord-20260718-001",
+          "event_status": "SHIPPED"
+        }
       }
     },
-    "valid_next_actions": [
-      "utp.fulfill.leadtime",
-      "utp.fulfill.query"
-    ]
-  }
+    "payment_event": {
+      "payment_event_id": "payevt-capture-20260720-001",
+      "payment_request_id": "pay-req-20260720-001",
+      "event_type": "PAYMENT_CAPTURED",
+      "amount": { "amount": "25074.40", "currency": "CNY" },
+      "channel": "alipay",
+      "channel_transaction_id": "2026072022001423450500000001",
+      "occurred_at": "2026-07-20T10:05:32Z",
+      "evidence_ref": "evd-pay-20260720-001"
+    }
+  },
+  "valid_next_actions": [
+    "utp.fulfill.query"
+  ]
 }
 ```
 
@@ -570,24 +597,27 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 {
   "action": "utp.pay.term",
   "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "pay-term-20260728-001",
   "input": {
     "purchase_id": "pur-20260718-001",
-    "transaction_id": "utp-txn-20260718-001",
     "payment_term_id": "发货前",
     "payment_instrument": {
       "type": "alipay",
       "tokenizer_ref": "tok-alipay-buyer-2026-001",
-      "token": "eyJhbGciOiJFUzI1NiJ9.dG9rLWFsaXBheS1idXllci0yMDI2LTAwMi0..."
+      "token": "eyJhbGciOiJFUzI1NiJ9.dG9rLWFsaXBheS1idXllci0yMDI2LTAwMi0...",
+      "currency": "CNY"
     },
     "fulfillment_trigger": {
-      "type": "fulfillment_event_ref",
-      "fulfill_action": "utp.fulfill.notify",
+      "trigger_type": "fulfillment_event_ref",
+      "fulfillment_action": "utp.fulfill.notify",
+      "fulfillment_event_ref": "fulfill-event-ship-20260725-001",
       "order_id": "ord-20260718-001",
       "event_status": "SHIPPED",
+      "occurred_at": "2026-07-25T09:30:00Z",
       "evidence_ref": "evd-fulfill-ship-20260725-001"
     },
-    "amount": { "amount": 62686.00, "currency": "CNY" },
-    "idempotency_key": "pay-term-20260728-001"
+    "amount": { "amount": "62686.00", "currency": "CNY" }
   }
 }
 ```
@@ -597,13 +627,19 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 ```json
 {
   "action": "utp.pay.term",
+  "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "pay-term-20260728-001",
+  "primitive_state": "PARTIAL",
+  "execution_result": "SUCCESS",
   "output": {
+    "status": "confirmed",
     "payment_confirmation": {
       "payment_confirmation_id": "pay-cfm-20260728-001",
+      "payment_request_id": "pay-req-20260728-001",
       "purchase_id": "pur-20260718-001",
-      "transaction_id": "utp-txn-20260718-001",
       "status": "confirmed",
-      "amount": { "amount": 62686.00, "currency": "CNY" },
+      "amount": { "amount": "62686.00", "currency": "CNY" },
       "payment_term_id": "发货前",
       "instrument_type": "alipay",
       "channel_transaction_id": "2026072822001423450500000042",
@@ -611,20 +647,35 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
       "evidence_ref": "evd-pay-20260728-001"
     },
     "payment_progress": {
-      "total_amount": { "amount": 125372.00, "currency": "CNY" },
-      "paid_amount": { "amount": 87760.40, "currency": "CNY" },
-      "remaining_amount": { "amount": 37611.60, "currency": "CNY" },
+      "total_amount": { "amount": "125372.00", "currency": "CNY" },
+      "paid_amount": { "amount": "87760.40", "currency": "CNY" },
+      "remaining_amount": { "amount": "37611.60", "currency": "CNY" },
       "completed_terms": ["定金", "发货前"],
       "next_term": {
         "payment_term_id": "验收后30天",
-        "amount": { "amount": 37611.60, "currency": "CNY" },
-        "trigger_condition": "fulfill.receive.status == 'received' && days_after(receive_date, 30)"
+        "amount": { "amount": "37611.60", "currency": "CNY" },
+        "fulfillment_trigger": {
+          "trigger_type": "fulfillment_event_ref",
+          "fulfillment_action": "utp.fulfill.receive",
+          "order_id": "ord-20260718-001",
+          "event_status": "RECEIVED"
+        }
       }
     },
-    "valid_next_actions": [
-      "utp.fulfill.query"
-    ]
-  }
+    "payment_event": {
+      "payment_event_id": "payevt-capture-20260728-001",
+      "payment_request_id": "pay-req-20260728-001",
+      "event_type": "PAYMENT_CAPTURED",
+      "amount": { "amount": "62686.00", "currency": "CNY" },
+      "channel": "alipay",
+      "channel_transaction_id": "2026072822001423450500000042",
+      "occurred_at": "2026-07-28T14:22:18Z",
+      "evidence_ref": "evd-pay-20260728-001"
+    }
+  },
+  "valid_next_actions": [
+    "utp.fulfill.query"
+  ]
 }
 ```
 
@@ -645,12 +696,12 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 {
   "action": "utp.pay.request_payment",
   "session_id": "utp-session-auto-001",
+  "idempotency_key": "pay-req-auto-20260705-001",
   "input": {
     "resource_id": "res-api-premium-2026-001",
-    "amount": { "amount": 99.00, "currency": "CNY" },
+    "amount": { "amount": "99.00", "currency": "CNY" },
     "payment_binding_ref": "bnd-alipay-agent-2026-001",
-    "pay_before": "2026-07-05T14:00:00Z",
-    "idempotency_key": "pay-req-auto-20260705-001"
+    "pay_before": "2026-07-05T14:00:00Z"
   }
 }
 ```
@@ -660,19 +711,20 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 ```json
 {
   "action": "utp.pay.request_payment",
+  "session_id": "utp-session-auto-001",
+  "idempotency_key": "pay-req-auto-20260705-001",
+  "execution_result": "SUCCESS",
   "output": {
     "payment_proof": {
       "proof_id": "prf-auto-20260705-001",
       "trade_no": "2026070522001423450500000099",
       "resource_id": "res-api-premium-2026-001",
-      "amount": { "amount": 99.00, "currency": "CNY" },
+      "amount": { "amount": "99.00", "currency": "CNY" },
       "expires_at": "2026-07-05T14:30:00Z",
       "signature": "eyJhbGciOiJFUzI1NiJ9..."
-    },
-    "valid_next_actions": [
-      "access_resource_with_proof"
-    ]
-  }
+    }
+  },
+  "valid_next_actions": []
 }
 ```
 
@@ -700,7 +752,7 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 **前置条件：**
 
 - 调用方为该支付记录的可见参与方
-- 提供 `payment_request_id` 或 `purchase_id` 至少其一
+- `payment_request_id` 与 `purchase_id` 必须且只能提供一个
 
 **请求（按订购凭证查询汇总状态）：**
 
@@ -708,9 +760,9 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 {
   "action": "utp.pay.query",
   "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
   "input": {
     "purchase_id": "pur-20260718-001",
-    "transaction_id": "utp-txn-20260718-001",
     "include_terms": true
   }
 }
@@ -721,39 +773,56 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 ```json
 {
   "action": "utp.pay.query",
+  "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "primitive_state": "PARTIAL",
+  "execution_result": "SUCCESS",
   "output": {
     "purchase_id": "pur-20260718-001",
-    "transaction_id": "utp-txn-20260718-001",
-    "aggregate_status": "PARTIALLY_PAID",
-    "total_amount": { "amount": 125372.00, "currency": "CNY" },
-    "paid_amount": { "amount": 25074.40, "currency": "CNY" },
-    "outstanding_amount": { "amount": 100297.60, "currency": "CNY" },
+    "status": "partial",
+    "total_amount": { "amount": "125372.00", "currency": "CNY" },
+    "paid_amount": { "amount": "25074.40", "currency": "CNY" },
+    "outstanding_amount": { "amount": "100297.60", "currency": "CNY" },
     "terms": [
       {
         "payment_term_id": "定金",
         "payment_request_id": "pay-req-20260720-001",
-        "status": "CONFIRMED",
-        "amount": { "amount": 25074.40, "currency": "CNY" },
+        "status": "confirmed",
+        "amount": { "amount": "25074.40", "currency": "CNY" },
         "confirmed_at": "2026-07-20T10:15:32Z",
         "payment_confirmation_id": "pcf-20260720-001"
       },
       {
         "payment_term_id": "进度款",
         "payment_request_id": null,
-        "status": "PENDING",
-        "amount": { "amount": 62686.00, "currency": "CNY" },
-        "precondition": "fulfill.query.status == 'shipped'"
+        "status": "pending",
+        "amount": { "amount": "62686.00", "currency": "CNY" },
+        "fulfillment_trigger": {
+          "trigger_type": "fulfillment_event_ref",
+          "fulfillment_action": "utp.fulfill.notify",
+          "order_id": "ord-20260718-001",
+          "event_status": "SHIPPED"
+        }
       },
       {
         "payment_term_id": "尾款",
         "payment_request_id": null,
-        "status": "PENDING",
-        "amount": { "amount": 37611.60, "currency": "CNY" },
-        "precondition": "fulfill.acceptance_passed"
+        "status": "pending",
+        "amount": { "amount": "37611.60", "currency": "CNY" },
+        "fulfillment_trigger": {
+          "trigger_type": "fulfillment_event_ref",
+          "fulfillment_action": "utp.fulfill.receive",
+          "order_id": "ord-20260718-001",
+          "event_status": "RECEIVED"
+        }
       }
     ],
     "as_of": "2026-07-21T08:00:00Z"
-  }
+  },
+  "valid_next_actions": [
+    "utp.pay.term",
+    "utp.pay.query"
+  ]
 }
 ```
 
@@ -765,7 +834,7 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 
 ### utp.pay.refund {#s-1478-utppayrefund}
 
-**意图：** 执行退款或解除支付授权。`refund` 是 Pay 原语中唯一允许逆向资金变动的核心 Action，用于承接 Resolve 裁决、Saga 补偿或具备协议授权的资金服务退款指令。该操作 MUST 绑定原支付的 `transaction_id`、`payment_request_id` 或 `payment_confirmation_id`，并生成 `PAYMENT_REFUNDED` PaymentEvent。
+**意图：** 执行退款或解除支付授权。`refund` 是 Pay 原语中唯一允许逆向资金变动的核心 Action，用于承接 Resolve 裁决、Saga 补偿或具备协议授权的资金服务退款指令。该操作 MUST 绑定原支付的 `transaction_id`，并通过 `payment_request_id` 或 `payment_confirmation_id` 定位支付。只有渠道完成退款后才能生成 `PAYMENT_REFUNDED` PaymentEvent；`processing` 或 `failed` 结果不得提前改变原支付事实状态。
 
 **调用约束：** Buyer 与 Seller MUST NOT 直接调用 `utp.pay.refund`。该操作只能由协议引擎、Resolve 原语、Escrow Provider 或具备资金服务授权的 Platform 发起。退款金额 MUST NOT 超过原支付可退余额；多阶段付款或部分收货场景下，退款 MUST 绑定具体付款阶段、订单或批次范围。
 
@@ -775,13 +844,18 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 {
   "action": "utp.pay.refund",
   "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "pay-refund-20260821-001",
   "input": {
-    "transaction_id": "utp-txn-20260718-001",
     "payment_confirmation_id": "pay-cfm-20260720-001",
     "source_instruction_ref": "res-outcome-20260820-001",
-    "refund_amount": { "amount": 2430.00, "currency": "CNY" },
+    "refund_amount": { "amount": "2430.00", "currency": "CNY" },
     "refund_reason": "resolve.partial_quality_compensation",
-    "idempotency_key": "pay-refund-20260821-001"
+    "scope_ref": {
+      "order_id": "ord-20260718-001",
+      "batch_id": "batch-20260805-A",
+      "item_refs": ["item-servo-200w-001"]
+    }
   }
 }
 ```
@@ -791,15 +865,23 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 ```json
 {
   "action": "utp.pay.refund",
+  "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "pay-refund-20260821-001",
+  "primitive_state": "PARTIAL",
+  "execution_result": "SUCCESS",
   "output": {
     "refund_id": "rfnd-20260821-001",
-    "transaction_id": "utp-txn-20260718-001",
     "status": "refunded",
-    "refunded_amount": { "amount": 2430.00, "currency": "CNY" },
+    "refunded_amount": { "amount": "2430.00", "currency": "CNY" },
     "channel_refund_id": "refund-alipay-20260821-001",
     "payment_event_ref": "payevt-refund-20260821-001",
     "evidence_ref": "evd-refund-20260821-001"
-  }
+  },
+  "valid_next_actions": [
+    "utp.fulfill.receive",
+    "utp.pay.term"
+  ]
 }
 ```
 
