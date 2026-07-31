@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/discovery/agent_authentication.json",
+  "version": "2026-07-31",
+  "title": "Agent Authentication",
+  "description": "UTP Profile 中的 Agent 身份认证能力声明。该配置声明响应方支持的认证机制及其发现或信任配置；具体认证过程、密钥验证和运行时准入策略由对应机制规范与运行时处理。",
+  "type": "object",
+  "required": [
+    "version",
+    "schema",
+    "supported_mechanisms"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Agent Authentication 配置格式版本。"
+    },
+    "schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "本配置块对应的 JSON Schema URI。"
+    },
+    "supported_mechanisms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/agent_authentication_mechanism"
+      },
+      "description": "响应方支持的 Agent 身份认证机制列表。请求方从中选择可用机制。"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "agent_authentication_mechanism": {
+      "type": "object",
+      "required": [
+        "type",
+        "issuer",
+        "config"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "mtls",
+            "api_keys",
+            "http_message_signatures",
+            "wimse"
+          ],
+          "description": "Agent 身份认证机制类型。"
+        },
+        "issuer": {
+          "type": "string",
+          "minLength": 1,
+          "description": "认证机制的信任或凭证发行方标识；其可验证性和信任域由运行时策略确定。"
+        },
+        "config": {
+          "type": "object",
+          "description": "与 type 对应的开放式机制配置 map。字段含义、必选项和格式由对应认证机制规范或运行时协商定义；通用 Agent Authentication schema 不对其内部字段施加约束。",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

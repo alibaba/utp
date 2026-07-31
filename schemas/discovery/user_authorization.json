@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/discovery/user_authorization.json",
+  "version": "2026-07-31",
+  "title": "User Authorization",
+  "description": "UTP Profile 中的用户授权能力声明。该配置只声明授权机制和 Authorization Server 发现入口；scope、授权流程、JWKS 及运行时策略由 Authorization Server metadata、原语定义和授权流程确定。",
+  "type": "object",
+  "required": [
+    "version",
+    "schema",
+    "supported_mechanisms"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "User Authorization 配置格式版本。"
+    },
+    "schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "本配置块对应的 JSON Schema URI。"
+    },
+    "supported_mechanisms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/user_authorization_mechanism"
+      },
+      "description": "资源提供方支持的用户授权机制列表。请求方从中选择可用机制。"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "user_authorization_mechanism": {
+      "type": "object",
+      "required": [
+        "type",
+        "endpoint"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "授权机制类型。当前规范定义 oauth2；未来机制可使用新的开放字符串值。"
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
+          "description": "Authorization Server 发现入口。请求方从该入口获取 RFC 8414 metadata，并验证 issuer、授权端点、token 端点与 jwks_uri。"
+        }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": { "const": "oauth2" }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "description": "OAuth 2.0 / 2.1 Authorization Server；授权流程和客户端认证要求由 Authorization Server metadata 与双方客户端配置确定，UTP 不强制要求 PKCE。"
+          }
+        }
+      ]
+    }
+  }
+}

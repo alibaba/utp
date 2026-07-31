@@ -219,7 +219,7 @@ format: html
 
 <h3 id="s-634">6.3.4 授权流程</h3>
 
-<p>采用 OAuth 2.1 Authorization Code + PKCE（S256）标准流程：</p>
+<p>采用 OAuth 2.0 / 2.1 Authorization Code 标准流程；是否启用 PKCE 由 Authorization Server metadata、客户端类型与双方配置决定，UTP 不将 PKCE 作为所有实现的强制要求：</p>
 
 <pre><code>Agent Platform                          Merchant AS
      |                                      |
@@ -232,7 +232,7 @@ format: html
      |     client_id=&lt;agent_id&gt;             |
      |     redirect_uri=&lt;platform callback&gt; |
      |     scope=&lt;derived scopes&gt;           |
-     |     code_challenge=S256(...)         |
+     |     [code_challenge=S256(...)]       |
      |     state=&lt;unguessable&gt;              |
      |                                      |
      |     [用户认证并授权]                  |
@@ -243,7 +243,7 @@ format: html
      |-- (4) Token Request ----------------&gt;|
      |     grant_type=authorization_code    |
      |     code, redirect_uri               |
-     |     code_verifier                    |
+     |     [code_verifier]                  |
      |     client auth                      |
      |                                      |
      |&lt;-- (5) Token Response ----------------
@@ -254,10 +254,10 @@ format: html
 <p><strong>要求</strong>：</p>
 <ol>
 <li><code>client_id</code> SHOULD 使用 Agent 的 <code>agent_id</code>；</li>
-<li>PKCE <code>code_challenge_method</code> MUST 为 <code>S256</code>；</li>
+<li>若使用 PKCE，<code>code_challenge_method</code> MUST 为 <code>S256</code>；</li>
 <li>平台 MUST 验证 <code>state</code> 与 <code>iss</code> 匹配；</li>
 <li>机密客户端 SHOULD 优先使用 <code>private_key_jwt</code> 或 <code>tls_client_auth</code>；</li>
-<li>公共客户端 MUST 使用 <code>none</code> + PKCE，禁止嵌入 <code>client_secret</code>。</li>
+<li>公共客户端 MUST 遵循 Authorization Server 的客户端认证要求，禁止在客户端中嵌入无法安全保护的 <code>client_secret</code>。</li>
 </ol>
 
 <p><strong>实现要点（Token 生命周期与验证）</strong>：</p>
