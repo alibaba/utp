@@ -60,20 +60,9 @@
         },
         "status": {
           "type": "array",
-          "description": "按一个或多个履约状态筛选。",
+          "description": "按一个或多个商家订单业务状态筛选。",
           "items": {
-            "type": "string",
-            "enum": [
-              "INIT",
-              "SHIPPED",
-              "DELAYED",
-              "DELIVERED",
-              "INSPECTED",
-              "RECEIVED",
-              "PARTIAL_DELIVERED",
-              "FULFILLED",
-              "REJECTED"
-            ]
+            "type": "string"
           }
         },
         "keyword": {

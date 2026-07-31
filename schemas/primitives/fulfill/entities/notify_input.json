@@ -97,11 +97,6 @@
       "format": "uri",
       "description": "承运商物流查询链接。"
     },
-    "location": {
-      "type": "string",
-      "minLength": 1,
-      "description": "事件发生地点，例如城市、网点或海关。"
-    },
     "description": {
       "type": "string",
       "minLength": 1,
