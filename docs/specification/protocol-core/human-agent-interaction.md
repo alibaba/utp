@@ -8,7 +8,7 @@ version: 2026-07-29
 
 # 人机协同交互控制（Human-Agent Interaction Control） {#s-human-agent-interaction-control}
 
-UTP 中，Agent 代理 Principal（人类委托人）经 Agent 接口调用业务原语推进交易。**人机协同交互控制**解决的不是界面体验问题，而是 Agent 交易中的**控制权边界**问题：哪些 Action 可由 Agent 自主推进，哪些 Action 必须保持 Principal 可观察、可中断，哪些 Action 必须等待 Principal 明确确认后再执行。协议以**执行门**（`interaction_level`）、**HAI 信封**与**挂起凭证**（`suspend_id`）约束上述边界：Agent 发起调用为默认路径；当执行门要求人工确认时，Agent 首次调用 MUST 返回 HAI 信封并挂起执行，Platform 代表 Principal 确认续跑 MUST 调用与该挂起绑定的 `suspended_action` 并携带对应 `suspend_id`（见 确认后续跑）。各 Action 的控制等级由**实现方**在其原语定义文件中静态声明（见 10.2.8）。敏感数据 MUST NOT 进入 Agent 推理链路，关键交易事实 MUST 来自权威数据源，并在最终执行前完成一致性校验。
+UTP 中，Agent 代理 Principal（人类委托人）经 Agent 接口调用业务原语推进交易。**人机协同交互控制**解决的不是界面体验问题，而是 Agent 交易中的**控制权边界**问题：哪些 Action 可由 Agent 自主推进，哪些 Action 必须保持 Principal 可观察、可中断，哪些 Action 必须等待 Principal 明确确认后再执行。协议以**执行门**（`interaction_level`）、**HAI 信封**与**挂起凭证**（`suspend_id`）约束上述边界：Agent 发起调用为默认路径；当执行门要求人工确认时，Agent 首次调用 MUST 返回 HAI 信封并挂起执行，Platform 代表 Principal 确认续跑 MUST 调用与该挂起绑定的 `suspended_action` 并携带对应 `suspend_id`（见 确认后续跑）。各 Action 的控制等级由**实现方**在其原语定义文件中静态声明。敏感数据 MUST NOT 进入 Agent 推理链路，关键交易事实 MUST 来自权威数据源，并在最终执行前完成一致性校验。
 
 本章定义执行门、HAI 信封、挂起凭证（`suspend_id`）、数据可见性、权威数据读取、一致性校验及其与证据和安全要求的绑定关系。Mandate 范围、信任策略等分别由[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)、[风控与审计](/documentation/specification/protocol-core/risk-audit.html)在 Action 执行前校验；本章不定义上述策略求值规则，只规定各 `interaction_level` 下的执行与约束语义。业务 Action 的 input 语义、UI 技术栈及渲染机制不属于本章规范性要求。
 
