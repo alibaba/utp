@@ -66,7 +66,7 @@ format: html
     </table>
 
     <h2 id="s-m95">M9.5 人机控制点（HAI Control Points）</h2>
-    <p>复用主规范 Ch.20 的交互控制等级（AUTONOMOUS / CONFIRMED，<a href="/documentation/specification/protocol-core/human-agent-interaction.html#s-1912">20.1.2</a>）与 HAI 挂起语义（Suspend Record，20.7.2；执行前控制，17.1.6.6），定义供应商侧默认控制点矩阵：</p>
+    <p>复用<a href="/documentation/specification/protocol-core/human-agent-interaction.html#s-19-1-2">人机协同交互控制</a>的交互控制等级（AUTONOMOUS / CONFIRMED）与 HAI 挂起语义，定义供应商侧默认控制点矩阵：</p>
     <table>
       <thead><tr><th>决策场景</th><th>默认交互等级</th><th>说明</th></tr></thead>
       <tbody>
@@ -80,7 +80,7 @@ format: html
         <tr><td>平台账号注册、商户协议签署、密钥轮换、授权变更</td><td>CONFIRMED（仅 Principal）</td><td>MUST NOT 委托给 Agent（M2.4.3）。</td></tr>
       </tbody>
     </table>
-    <p><strong>与买方侧 HAI 挂起的关系：</strong>供应商侧人工确认发生在 MP3 受理窗口内（<code>ON_HOLD</code> 状态），属于供应商内部流程，<strong>不产生</strong>买方会话的 HAI 挂起记录（Suspend Record）——后者是买方 Principal 对待确认 Action 的控制语义（主规范 20.7.2，执行前控制见 17.1.6.6）。两侧时限的衔接由 M5 的 <code>deadline</code> 统一约束。</p>
+    <p><strong>与买方侧 HAI 挂起的关系：</strong>供应商侧人工确认发生在 MP3 受理窗口内（<code>ON_HOLD</code> 状态），属于供应商内部流程，<strong>不产生</strong>买方会话的 HAI 挂起记录（Suspend Record）——后者是买方 Principal 对待确认 Action 的控制语义（见<a href="/documentation/specification/protocol-core/human-agent-interaction.html">人机协同交互控制</a>）。两侧时限的衔接由 M5 的 <code>deadline</code> 统一约束。</p>
 
     <h2 id="s-m96">M9.6 决策审计（Decision Audit）</h2>
     <ul>

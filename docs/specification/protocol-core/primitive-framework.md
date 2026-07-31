@@ -66,6 +66,9 @@ Action:           utp.{primitive}.{action}
   "idempotency_key": "optional-idempotency-key",
   "input": {
     "...": "action-specific input fields"
+  },
+  "hai": {
+    "suspend_id": "sus_..."
   }
 }
 ```
@@ -78,6 +81,7 @@ Action:           utp.{primitive}.{action}
 | `session_id` | string | MUST | 当前协议会话标识，用于关联原语内状态和上下文。 |
 | `idempotency_key` | string | 写操作 MUST | 幂等键。对产生副作用的写操作 MUST 提供，只读操作 MAY 省略；键格式与幂等行为的完整规则见[幂等性规则](/documentation/specification/protocol-core/agent-friendly-interface.html#s-183)。 |
 | `input` | object | MUST | 操作特有输入。字段由所属原语的实体定义、Mode 约束和具体操作语义决定。 |
+| `hai` | object | 条件必需 | Principal 对已挂起的 `CONFIRMED` Action 进行确认续跑时 MUST 包含；该对象在本路径仅包含 `suspend_id`，其语义见[人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html)。 |
 
 所有原语操作共享下列响应体骨架：
 
@@ -91,7 +95,10 @@ Action:           utp.{primitive}.{action}
   "output": {
     "...": "action-specific output fields"
   },
-  "valid_next_actions": ["utp.{primitive}.{next_action}"]
+  "valid_next_actions": ["utp.{primitive}.{next_action}"],
+  "hai": {
+    "...": "human-agent interaction envelope when applicable"
+  }
 }
 ```
 
@@ -106,6 +113,7 @@ Action:           utp.{primitive}.{action}
 | `execution_result` | enum | 执行编排和约束场景 MUST；其他场景 MAY | 本次 Action 的执行结果。取值为 `SUCCESS`、`REJECTED` 或 `FAILURE`；该字段不表示全局状态机是否迁移。 |
 | `output` | object | MUST | 操作特有输出。字段由所属原语的实体定义和当前 Mode 决定。 |
 | `valid_next_actions` | string[] | 执行编排和约束场景 MUST；其他场景按需 | 当前响应可继续执行的后续操作。数组元素 MUST 使用完整 Action 名称，例如 `utp.pay.initiate`；无后续操作时返回空数组。 |
+| `hai` | object | 条件必需 | Action 响应包含人机协同控制语义时使用的 HAI 信封；对象定义见[人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html)。 |
 
 `execution_result` 的取值语义如下：
 
