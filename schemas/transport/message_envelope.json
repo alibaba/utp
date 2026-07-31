@@ -36,7 +36,7 @@
     },
     {
       "if": { "properties": { "message_type": { "const": "error" } }, "required": ["message_type"] },
-      "then": { "properties": { "payload": { "$ref": "../primitives/common/error_detail.json" } }, "not": { "required": ["event_type"] } }
+      "then": { "properties": { "payload": { "$ref": "../primitives/common/error_response.json" } }, "not": { "required": ["event_type"] } }
     },
     {
       "if": { "properties": { "message_type": { "const": "notification" } }, "required": ["message_type"] },
