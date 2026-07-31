@@ -43,7 +43,7 @@
     "line_items": {
       "type": "array",
       "items": {
-        "$ref": "partial_delivery.json#/$defs/partial_delivery_line_item"
+        "$ref": "../../common/entities/line_item.json"
       },
       "description": "本次拒收涉及的订单行项目与数量，可选。"
     },

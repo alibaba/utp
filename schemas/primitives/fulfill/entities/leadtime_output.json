@@ -20,11 +20,11 @@
       "description": "分阶段预估明细；阶段时效已知时通过 leadtime 表达预计天数和预计完成时间。"
     },
     "estimated_delivery_leadtime": {
-      "$ref": "../../common/entities/leadtime.json",
+      "$ref": "../../common/entities/time_value.json",
       "description": "订单预计交付时效。"
     },
     "promised_delivery_leadtime": {
-      "$ref": "../../common/entities/leadtime.json",
+      "$ref": "../../common/entities/time_value.json",
       "description": "订单承诺交付时效，可选；由订单或 TradeMethod 提供。"
     },
     "updated_at": {
@@ -70,7 +70,7 @@
           "description": "履约阶段。"
         },
         "leadtime": {
-          "$ref": "../../common/entities/leadtime.json",
+          "$ref": "../../common/entities/time_value.json",
           "description": "该阶段的履约时效，可选；暂无法估算时可仅返回 stage。"
         }
       },

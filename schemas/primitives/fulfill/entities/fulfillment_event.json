@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/fulfillment_event.json",
+  "version": "2026-07-31",
+  "title": "FulfillmentEvent",
+  "description": "订单履约过程中产生的追加式事件，记录事件涉及的商品、物流与交付事实。",
+  "type": "object",
+  "required": [
+    "event_id",
+    "order_id",
+    "occurred_at",
+    "type",
+    "line_items"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "履约事件的唯一标识，用于事件去重和追溯。"
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "事件关联的逻辑交付批次标识。"
+    },
+    "shipment_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "事件关联的发货或物流单元标识。"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "事件实际发生时间。"
+    },
+    "type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "履约事件类型。标准值包括 processing、shipped、in_transit、delayed、delivered、inspected、failed_attempt、undeliverable、returned_to_sender 和 service_activated；实现可扩展其他事件类型。"
+    },
+    "line_items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "本次履约事件涉及的商品或服务及其数量。",
+      "items": {
+        "$ref": "../../common/entities/line_item.json"
+      }
+    },
+    "method": {
+      "type": "string",
+      "description": "履约方式，例如 shipment、pickup、digital 或 service。"
+    },
+    "tracking_number": {
+      "type": "string",
+      "minLength": 1,
+      "description": "事件关联的承运商物流单号。"
+    },
+    "tracking_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "承运商提供的物流查询地址。"
+    },
+    "carrier": {
+      "type": "string",
+      "description": "承运商名称。"
+    },
+    "carrier_code": {
+      "type": "string",
+      "description": "承运商编码。"
+    },
+    "description": {
+      "type": "string",
+      "description": "事件的可读说明。"
+    }
+  },
+  "additionalProperties": true
+}

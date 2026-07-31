@@ -17,7 +17,7 @@
       }
     },
     "pagination": {
-      "$ref": "../../../common/pagination.json#/$defs/response",
+      "$ref": "../../common/pagination.json#/$defs/response",
       "description": "游标分页信息。"
     }
   },
