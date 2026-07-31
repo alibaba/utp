@@ -440,7 +440,7 @@ format: html
 <figure id="s-528-sequence" style="margin: 20px 0 28px;">
   <div style="max-height: 900px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 8px; background: #ffffff;">
     <img
-      src="docs/assets/diagrams/agent-trust-handshake-sequence.svg"
+      src="/documentation/assets/diagrams/agent-trust-handshake-sequence.svg"
       alt="陌生 Agent 交互的信任准入时序图：用先验身份、确定安全对话方式、获取必要授权、每次操作前重新检查、全程留证五个阶段说明信任准入逻辑"
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>

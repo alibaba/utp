@@ -213,12 +213,12 @@ format: html
 <figure id="s-721-architecture" style="margin: 24px 0 32px;">
   <div style="max-height: 900px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 8px; background: #ffffff;">
     <img
-      src="docs/assets/diagrams/evidence-bundle-audit-architecture.svg"
+      src="/documentation/assets/diagrams/evidence-bundle-audit-architecture.svg"
       alt="UTP Evidence Bundle 审计架构：事实产生方把事实交给交易参与方整理成 Evidence Bundle，审计方、风控系统、争议解决方和监管机构按授权读取并独立验证"
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>
   <figcaption style="margin-top: 10px; color: #6b7280; font-size: 13px; text-align: center;">
-    图 7-1 Evidence Bundle 审计架构与责任边界（可在图内滚动查看完整架构；<a href="diagrams/png2x/evidence-bundle-audit-architecture.png">PNG 大图</a>）
+    图 7-1 Evidence Bundle 审计架构与责任边界（可在图内滚动查看完整架构；<a href="/documentation/assets/diagrams/png2x/evidence-bundle-audit-architecture.png">PNG 大图</a>）
   </figcaption>
 </figure>
 
