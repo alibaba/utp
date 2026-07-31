@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/refund_result.json",
+  "version": "2026-07-31",
+  "title": "RefundResult",
+  "description": "utp.pay.refund 执行后的标准退款结果。",
+  "type": "object",
+  "required": [
+    "refund_id",
+    "status",
+    "refunded_amount",
+    "channel_refund_id",
+    "payment_event_ref",
+    "evidence_ref"
+  ],
+  "properties": {
+    "refund_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "协议侧退款结果的唯一标识。"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "processing",
+        "refunded",
+        "failed"
+      ],
+      "description": "退款状态：processing 渠道处理中；refunded 已退款；failed 最终失败。"
+    },
+    "refunded_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "渠道实际接受或完成退款的金额。"
+    },
+    "channel_refund_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "支付渠道侧退款流水号。"
+    },
+    "payment_event_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "本次退款产生的 PAYMENT_REFUNDED 标准事件标识。"
+    },
+    "evidence_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "保存退款指令、渠道结果和签名材料的证据标识。"
+    }
+  },
+  "additionalProperties": true
+}

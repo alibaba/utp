@@ -31,7 +31,7 @@
       "type": "object",
       "properties": {
         "roles": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
-        "services": { "type": "array", "items": { "$ref": "https://ut-protocol.com/schemas/discovery/profile.json#/$defs/service" }, "minItems": 1 }
+        "services": { "type": "array", "items": { "$ref": "profile.json#/$defs/service" }, "minItems": 1 }
       },
       "required": ["roles", "services"],
       "additionalProperties": false

@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_request.json",
+  "version": "2026-07-31",
+  "title": "PaymentRequest",
+  "description": "支付请求聚合，锚定采购凭证、令牌化支付工具、金额和结算约束。",
+  "type": "object",
+  "required": [
+    "payment_request_id",
+    "purchase_id",
+    "payment_instrument",
+    "amount",
+    "status"
+  ],
+  "properties": {
+    "payment_request_id": {
+      "type": "string",
+      "minLength": 1,
+      "readOnly": true,
+      "description": "支付处理方生成的支付请求唯一标识。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "本次支付所依据的 Purchase 聚合标识。"
+    },
+    "payment_instrument": {
+      "$ref": "payment_instrument.json",
+      "writeOnly": true,
+      "description": "调用方提交的令牌化支付工具；处理方不得在响应中回显令牌。"
+    },
+    "mandate_chain": {
+      "type": "object",
+      "writeOnly": true,
+      "description": "Agent 代付时提交的 Mandate Chain；具体凭证结构由身份与授权规范约束。",
+      "additionalProperties": true
+    },
+    "amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "本次请求授权或扣付的金额。"
+    },
+    "amount_breakdown": {
+      "$ref": "amount_breakdown.json",
+      "description": "可选的金额分项及合计。"
+    },
+    "settlement": {
+      "$ref": "settlement_instruction.json",
+      "description": "本次支付适用的清分、分账和担保结算指令。"
+    },
+    "payment_term_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "多阶段付款中本次请求对应的付款阶段标识。"
+    },
+    "escrow_mode": {
+      "type": "boolean",
+      "default": false,
+      "description": "是否使用 Escrow 托管；为 true 时 settlement_type 必须为 escrow。"
+    },
+    "fulfillment_trigger": {
+      "$ref": "fulfillment_trigger.json",
+      "description": "本付款阶段关联的履约触发条件。"
+    },
+    "payment_binding_ref": {
+      "type": "string",
+      "minLength": 1,
+      "writeOnly": true,
+      "description": "HAI 或会话协商产生的支付方式绑定引用。"
+    },
+    "delegation_credential": {
+      "type": "string",
+      "minLength": 1,
+      "writeOnly": true,
+      "description": "Agent 代付时证明额度与范围授权的委托凭证。"
+    },
+    "status": {
+      "$ref": "payment_status.json",
+      "readOnly": true,
+      "description": "处理方返回的当前支付状态。"
+    },
+    "instrument_type": {
+      "type": "string",
+      "minLength": 1,
+      "readOnly": true,
+      "description": "处理方确认使用的支付工具类型，不包含敏感令牌。"
+    },
+    "authorization_code": {
+      "type": "string",
+      "minLength": 1,
+      "readOnly": true,
+      "description": "渠道授权成功后返回的非敏感授权引用。"
+    },
+    "channel_transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "readOnly": true,
+      "description": "支付渠道侧交易流水号。"
+    },
+    "mandate_verified": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "Mandate Chain 是否通过完整性与授权范围校验。"
+    },
+    "tee_verified": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "需要可信执行环境确认时，其确认结果是否有效。"
+    },
+    "binding_verified": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "支付绑定是否有效且满足本次金额与渠道约束。"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "escrow_mode": {
+            "const": true,
+            "description": "当请求明确启用 Escrow 托管时应用后续约束。"
+          }
+        },
+        "required": ["escrow_mode"]
+      },
+      "then": {
+        "required": ["settlement"],
+        "properties": {
+          "settlement": {
+            "description": "Escrow 模式下必须提供的结算指令。",
+            "properties": {
+              "settlement_type": {
+                "const": "escrow",
+                "description": "Escrow 模式下结算类型必须为 escrow。"
+              }
+            },
+            "required": ["settlement_type"]
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

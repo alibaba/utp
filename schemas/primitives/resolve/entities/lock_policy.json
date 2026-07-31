@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/lock_policy.json",
+  "version": "2026-07-31",
+  "title": "LockPolicy",
+  "description": "争议期间暂停的有副作用 Action 与资源；未列入锁定范围的义务可以继续推进。",
+  "type": "object",
+  "required": [
+    "locked_actions",
+    "locked_resources"
+  ],
+  "properties": {
+    "locked_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+      },
+      "uniqueItems": true,
+      "description": "争议有效期间禁止执行的完整 UTP Action 名称。"
+    },
+    "locked_resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "resource_type",
+          "resource_id"
+        ],
+        "properties": {
+          "resource_type": {
+            "type": "string",
+            "minLength": 1,
+            "description": "被锁定资源的业务类型，例如 payment、order 或 fulfillment_batch。"
+          },
+          "resource_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "被锁定资源的唯一标识。"
+          }
+        },
+        "additionalProperties": true
+      },
+      "description": "本次争议明确锁定的资源集合。"
+    },
+    "locked_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "支付或托管争议中被冻结、暂停结算或保留可退的金额。"
+    },
+    "allowed_readonly_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+      },
+      "uniqueItems": true,
+      "description": "争议期间仍允许执行的只读 Action 名称。"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "锁定策略需要复核或自动升级的 RFC 3339 时间。"
+    }
+  },
+  "additionalProperties": true
+}

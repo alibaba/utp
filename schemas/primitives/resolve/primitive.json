@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/primitive.json",
+  "name": "utp.resolve",
+  "version": "2026-07-31",
+  "title": "P6 Resolve 原语定义",
+  "description": "定义争议登记、范围锁定、调解、仲裁和补偿执行；资金退款必须生成 RefundInstruction 并通过 utp.pay.refund 完成。",
+  "actions": {
+    "raise": {
+      "description": "Buyer 代表交易参与方提交争议事实、范围和初始证据，Arbiter 登记争议、评估 L1 规则并返回权威争议档案。",
+      "initiator_role": "Buyer",
+      "handler_role": "Arbiter",
+      "input_schema": {
+        "$ref": "entities/dispute_request.json"
+      },
+      "output_schema": {
+        "$ref": "entities/dispute_record.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/disputes" },
+        { "type": "mcp", "tool": "utp.resolve.raise" },
+        { "type": "a2a", "action": "utp.resolve.raise" }
+      ]
+    },
+    "mediate": {
+      "description": "Buyer 提交调解请求或补充材料，Arbiter 组织调解并在形成结论后返回包含 ResolutionOutcome 的争议档案。",
+      "initiator_role": "Buyer",
+      "handler_role": "Arbiter",
+      "input_schema": {
+        "$ref": "entities/mediate_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/dispute_record.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/disputes/{dispute_id}/mediation" },
+        { "type": "mcp", "tool": "utp.resolve.mediate" },
+        { "type": "a2a", "action": "utp.resolve.mediate" }
+      ]
+    },
+    "arbitrate": {
+      "description": "Buyer 将争议直接提交或从调解升级至仲裁，Arbiter 返回具有约束力的裁定和可执行处置结果。",
+      "initiator_role": "Buyer",
+      "handler_role": "Arbiter",
+      "input_schema": {
+        "$ref": "entities/arbitrate_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/dispute_record.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/disputes/{dispute_id}/arbitration" },
+        { "type": "mcp", "tool": "utp.resolve.arbitrate" },
+        { "type": "a2a", "action": "utp.resolve.arbitrate" }
+      ]
+    },
+    "compensate": {
+      "description": "Arbiter 根据已生效的调解、仲裁或 L1 结果触发补偿，PaymentProcessor 执行资金退款并回传更新后的争议档案和退款结果。",
+      "initiator_role": "Arbiter",
+      "handler_role": "PaymentProcessor",
+      "input_schema": {
+        "$ref": "entities/compensate_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/compensate_output.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/disputes/{dispute_id}/compensation" },
+        { "type": "mcp", "tool": "utp.resolve.compensate" },
+        { "type": "a2a", "action": "utp.resolve.compensate" }
+      ]
+    }
+  },
+  "state_machine": {
+    "initial_state": "INIT",
+    "states": {
+      "INIT": { "description": "尚未登记争议，交易按原全局状态继续。" },
+      "RAISED": { "description": "争议已登记，相关 Action、资源或金额已按范围锁定。" },
+      "MEDIATING": { "description": "调解方已受理，争议方可以按规则补充证据。" },
+      "ARBITRATING": { "description": "仲裁机构已受理，正在形成具有约束力的裁定。" },
+      "RESOLVED": { "description": "争议已形成处置结果；需要补偿时可执行 compensate。" },
+      "COMPENSATED": { "description": "处置结果要求的退款、退货或其他补偿已经执行。" },
+      "DISMISSED": { "description": "争议主张被驳回，受影响交易义务可以恢复。" },
+      "ESCALATED": { "description": "当前层级失败或超时，等待进入更高级处置路径。" }
+    },
+    "transitions": [
+      { "from": "INIT", "action": "utp.resolve.raise", "to": "RAISED" },
+      { "from": "RAISED", "event": "l1_resolution_succeeded", "to": "RESOLVED" },
+      { "from": "RAISED", "action": "utp.resolve.mediate", "to": "MEDIATING" },
+      { "from": "RAISED", "action": "utp.resolve.arbitrate", "to": "ARBITRATING", "condition": "允许直接进入 L3 仲裁" },
+      { "from": "MEDIATING", "event": "mediation_resolved", "to": "RESOLVED" },
+      { "from": "MEDIATING", "event": "mediation_dismissed", "to": "DISMISSED" },
+      { "from": "MEDIATING", "event": "mediation_failed_or_timed_out", "to": "ESCALATED" },
+      { "from": "ESCALATED", "action": "utp.resolve.mediate", "to": "MEDIATING", "condition": "从 L1 升级至 L2" },
+      { "from": "ESCALATED", "action": "utp.resolve.arbitrate", "to": "ARBITRATING", "condition": "从 L2 升级至 L3" },
+      { "from": "ARBITRATING", "event": "arbitration_resolved", "to": "RESOLVED" },
+      { "from": "ARBITRATING", "event": "arbitration_dismissed", "to": "DISMISSED" },
+      { "from": "RESOLVED", "action": "utp.resolve.compensate", "to": "COMPENSATED", "condition": "ResolutionOutcome 包含待执行补偿指令" }
+    ],
+    "constraints": {
+      "notes": [
+        "Resolve 激活时全局状态进入 DISPUTED，并保存争议前状态。",
+        "锁定范围不得大于 DisputeScope；仅 global 争议可以默认暂停整笔交易的有副作用 Action。",
+        "证据包进入追加锁定状态，已有证据不得修改或删除。",
+        "资金补偿必须转换为 RefundInstruction 并调用 utp.pay.refund；Resolve 不直接修改支付渠道状态。",
+        "RESOLVED、DISMISSED 或 COMPENSATED 后的全局状态由全局状态机决定，不得直接写入全局 COMPENSATED。"
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/compensate_input.json",
+  "version": "2026-07-31",
+  "title": "ResolveCompensateInput",
+  "description": "执行已生效处置结果中资金和非资金补偿所需的业务输入。",
+  "type": "object",
+  "required": [
+    "dispute_id",
+    "compensation_order"
+  ],
+  "properties": {
+    "dispute_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "补偿所依据的争议档案标识。"
+    },
+    "compensation_order": {
+      "$ref": "compensation_order.json",
+      "description": "已由调解、仲裁或 L1 规则确认生效的补偿单。"
+    },
+    "refund_instruction": {
+      "$ref": "../../pay/entities/refund_instruction.json",
+      "description": "补偿包含资金退款时交给 utp.pay.refund 的标准退款指令。"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payout_split.json",
+  "version": "2026-07-31",
+  "title": "PayoutSplit",
+  "description": "结算指令中单个收款方的分账份额。",
+  "type": "object",
+  "required": [
+    "payee_ref",
+    "payee_type",
+    "fee_type",
+    "amount"
+  ],
+  "properties": {
+    "payee_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "收款方在本次交易拓扑中的主体或账户引用。"
+    },
+    "payee_type": {
+      "type": "string",
+      "enum": [
+        "supplier",
+        "platform",
+        "logistics_provider",
+        "tax_authority",
+        "agent",
+        "custom"
+      ],
+      "description": "收款方类型：supplier 供应商；platform 平台；logistics_provider 物流服务商；tax_authority 税务机构；agent 代理服务方；custom 自定义参与方。"
+    },
+    "fee_type": {
+      "type": "string",
+      "enum": [
+        "goods",
+        "commission",
+        "service_fee",
+        "logistics",
+        "tax",
+        "custom"
+      ],
+      "description": "分账费用类型：goods 货款；commission 佣金；service_fee 服务费；logistics 物流费；tax 税费；custom 自定义费用。"
+    },
+    "amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "分配给该收款方的金额。"
+    },
+    "note": {
+      "type": "string",
+      "description": "分账原因或计算依据的补充说明。"
+    }
+  },
+  "additionalProperties": true
+}

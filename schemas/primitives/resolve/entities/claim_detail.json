@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/claim_detail.json",
+  "version": "2026-07-31",
+  "title": "ClaimDetail",
+  "description": "争议方提交的事实摘要、请求处置和可选金额主张。",
+  "type": "object",
+  "required": [
+    "summary",
+    "requested_resolution"
+  ],
+  "properties": {
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "争议事实和主张理由的简要说明。"
+    },
+    "requested_resolution": {
+      "type": "string",
+      "minLength": 1,
+      "description": "争议方期望的处置方式，例如退款、换货、继续履行或终止交易。"
+    },
+    "requested_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "争议方主张的退款、折价或赔偿金额。"
+    },
+    "detail": {
+      "type": "string",
+      "description": "事实时间线、影响范围和计算依据等补充说明。"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "争议方期望完成处置的 RFC 3339 截止时间。"
+    }
+  },
+  "additionalProperties": true
+}

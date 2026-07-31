@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/fulfillment_trigger.json",
+  "version": "2026-07-31",
+  "title": "FulfillmentTrigger",
+  "description": "多阶段付款场景中引用履约事件、批次或付款阶段的结构化触发条件。",
+  "type": "object",
+  "required": [
+    "trigger_type"
+  ],
+  "properties": {
+    "trigger_type": {
+      "type": "string",
+      "enum": [
+        "on_payment_confirmed",
+        "on_payment_term_confirmed",
+        "on_escrow_funded"
+      ],
+      "description": "触发类型：整笔支付确认、指定付款阶段确认或托管资金到账。"
+    },
+    "fulfillment_action": {
+      "type": "string",
+      "enum": [
+        "utp.fulfill.notify",
+        "utp.fulfill.query",
+        "utp.fulfill.receive"
+      ],
+      "description": "作为本付款阶段前置事实来源的 Fulfill Action。"
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "触发条件关联的履约批次标识。"
+    },
+    "payment_term_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "触发条件关联的付款阶段标识。"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/primitive.json",
+  "name": "utp.pay",
+  "version": "2026-07-31",
+  "title": "P4 Pay 原语定义",
+  "description": "定义支付授权、渠道确认、分阶段付款、状态查询和退款执行；争议裁决由 P6 Resolve 产生退款指令后调用本原语执行。",
+  "actions": {
+    "initiate": {
+      "description": "Payer 基于 Purchase 聚合和令牌化支付工具发起支付授权，PaymentProcessor 返回包含协议支付请求标识与当前状态的聚合。",
+      "initiator_role": "Payer",
+      "handler_role": "PaymentProcessor",
+      "input_schema": {
+        "$ref": "entities/payment_request.json"
+      },
+      "output_schema": {
+        "$ref": "entities/payment_request.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/payments" },
+        { "type": "mcp", "tool": "utp.pay.initiate" },
+        { "type": "a2a", "action": "utp.pay.initiate" }
+      ]
+    },
+    "confirm": {
+      "description": "Payer 或协议引擎提交支付渠道事实，PaymentProcessor 验签并返回支付确认、累计进度和标准支付事件。",
+      "initiator_role": "Payer",
+      "handler_role": "PaymentProcessor",
+      "input_schema": {
+        "$ref": "entities/confirm_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/confirm_output.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/payments/{payment_request_id}/confirm" },
+        { "type": "mcp", "tool": "utp.pay.confirm" },
+        { "type": "a2a", "action": "utp.pay.confirm" }
+      ]
+    },
+    "term": {
+      "description": "Payer 在结构化履约条件满足后执行一个付款阶段，PaymentProcessor 返回该阶段确认与累计支付进度。",
+      "initiator_role": "Payer",
+      "handler_role": "PaymentProcessor",
+      "input_schema": {
+        "$ref": "entities/term_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/term_output.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/payments/terms" },
+        { "type": "mcp", "tool": "utp.pay.term" },
+        { "type": "a2a", "action": "utp.pay.term" }
+      ]
+    },
+    "query": {
+      "description": "Payer 只读查询单笔支付或 Purchase 下全部付款阶段的协议侧状态快照，不产生资金或状态副作用。",
+      "initiator_role": "Payer",
+      "handler_role": "PaymentProcessor",
+      "input_schema": {
+        "$ref": "entities/query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/query_output.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/payments/query" },
+        { "type": "mcp", "tool": "utp.pay.query" },
+        { "type": "a2a", "action": "utp.pay.query" }
+      ]
+    },
+    "refund": {
+      "description": "Arbiter 代表已授权的 Resolve 或 Saga 处置请求退款，PaymentProcessor 执行后返回渠道退款结果；Buyer 与 Seller 不得直接调用。",
+      "initiator_role": "Arbiter",
+      "handler_role": "PaymentProcessor",
+      "input_schema": {
+        "$ref": "entities/refund_instruction.json"
+      },
+      "output_schema": {
+        "$ref": "entities/refund_result.json"
+      },
+      "transport_bindings": [
+        { "type": "rest", "method": "POST", "path": "/utp/v1/payments/refunds" },
+        { "type": "mcp", "tool": "utp.pay.refund" },
+        { "type": "a2a", "action": "utp.pay.refund" }
+      ]
+    }
+  },
+  "state_machine": {
+    "initial_state": "INIT",
+    "states": {
+      "INIT": { "description": "尚未发起支付；Purchase 聚合与支付授权上下文已经就绪。" },
+      "AUTHORIZED": { "description": "支付工具已授权或资金已预冻结，可继续确认支付或执行付款阶段。" },
+      "PROCESSING": { "description": "支付正在渠道侧处理中，等待签名回调或权威查询结果。" },
+      "CONFIRMED": { "description": "当前支付或付款阶段已确认到账。" },
+      "PARTIAL": { "description": "至少一个付款阶段已完成，但仍有未完成阶段。" },
+      "COMPLETED": { "description": "全部付款义务已完成，仅允许查询或经授权执行退款。" },
+      "FAILED": { "description": "支付最终失败；补偿处理后可重新发起，或进入 Resolve。" },
+      "COMPENSATED": { "description": "退款或授权解除等补偿已完成，可按交易规则重新发起支付。" }
+    },
+    "transitions": [
+      { "from": "INIT", "action": "utp.pay.initiate", "to": "AUTHORIZED" },
+      { "from": "AUTHORIZED", "action": "utp.pay.confirm", "to": "PROCESSING" },
+      { "from": "AUTHORIZED", "action": "utp.pay.term", "to": "PROCESSING" },
+      { "from": "PROCESSING", "event": "payment_captured", "to": "CONFIRMED" },
+      { "from": "PROCESSING", "event": "payment_failed", "to": "FAILED" },
+      { "from": "CONFIRMED", "event": "remaining_terms_detected", "to": "PARTIAL" },
+      { "from": "CONFIRMED", "event": "all_terms_completed", "to": "COMPLETED" },
+      { "from": "PARTIAL", "action": "utp.pay.term", "to": "PROCESSING" },
+      { "from": "FAILED", "action": "utp.pay.initiate", "to": "AUTHORIZED", "condition": "失败补偿已完成且仍允许重试" },
+      { "from": "CONFIRMED", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "退款覆盖当前已确认金额" },
+      { "from": "PARTIAL", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "退款终止剩余付款义务" },
+      { "from": "COMPLETED", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "Resolve 或 Saga 授权退款" }
+    ],
+    "constraints": {
+      "notes": [
+        "utp.pay.query 在所有状态均为只读操作，不触发状态迁移。",
+        "支付渠道原始状态必须先通过 PaymentAdapterContract 映射为标准 PaymentEvent。",
+        "一个交易可产生多个渠道流水，但所有 Pay Action 必须使用统一请求信封中的 transaction_id 关联交易。",
+        "退款金额不得超过原支付可退余额，并必须产生 PAYMENT_REFUNDED 事件。"
+      ]
+    }
+  }
+}

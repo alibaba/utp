@@ -1,2 +1,12 @@
 # IDE
 .idea/
+
+# Local system files
+.DS_Store
+
+# Temporary backup files
+*.bak
+**/*.bak
+
+# Editable diagram sources are design assets, not CDN artifacts
+docs/assets/diagrams/*.puml

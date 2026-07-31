@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/query_output.json",
+  "version": "2026-07-31",
+  "title": "PayQueryOutput",
+  "description": "协议引擎记录的单笔支付或 Purchase 级支付状态快照。",
+  "type": "object",
+  "required": [
+    "status",
+    "as_of"
+  ],
+  "properties": {
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "结果关联的 Purchase 聚合标识。"
+    },
+    "status": {
+      "$ref": "payment_status.json",
+      "description": "单笔支付或 Purchase 付款义务的汇总状态。"
+    },
+    "total_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "查询范围内的应付总金额。"
+    },
+    "paid_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "查询时点已确认支付的金额。"
+    },
+    "outstanding_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "查询时点尚未确认支付的金额。"
+    },
+    "confirmations": {
+      "type": "array",
+      "items": {
+        "$ref": "payment_confirmation.json"
+      },
+      "description": "查询范围内已产生的支付确认凭证。"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "payment_event.json"
+      },
+      "description": "查询范围内的标准支付事件时间线。"
+    },
+    "terms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "payment_term_id",
+          "status",
+          "amount"
+        ],
+        "properties": {
+          "payment_term_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "付款阶段标识。"
+          },
+          "payment_request_id": {
+            "type": ["string", "null"],
+            "minLength": 1,
+            "description": "该阶段已发起时对应的支付请求标识；尚未发起时为 null。"
+          },
+          "status": {
+            "$ref": "payment_status.json",
+            "description": "该付款阶段的当前状态。"
+          },
+          "amount": {
+            "$ref": "../../common/entities/money.json",
+            "description": "该付款阶段的应付金额。"
+          },
+          "confirmed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "该阶段确认成功的 RFC 3339 时间。"
+          },
+          "payment_confirmation_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "该阶段的支付确认凭证标识。"
+          },
+          "precondition": {
+            "type": "string",
+            "minLength": 1,
+            "description": "尚未执行阶段的前置条件说明。"
+          }
+        },
+        "additionalProperties": true
+      },
+      "description": "请求 include_terms 时返回的付款阶段明细。"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time",
+      "description": "该查询快照的 RFC 3339 生成时间。"
+    }
+  },
+  "additionalProperties": true
+}

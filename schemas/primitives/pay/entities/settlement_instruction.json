@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/settlement_instruction.json",
+  "version": "2026-07-31",
+  "title": "SettlementInstruction",
+  "description": "收款方清分与分账指令；结算担保模型与清分时点相互独立。",
+  "type": "object",
+  "required": [
+    "settlement_id",
+    "mode",
+    "splits"
+  ],
+  "properties": {
+    "settlement_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "结算或分账指令的唯一标识。"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "single",
+        "split"
+      ],
+      "description": "清分模式：single 表示单一收款方；split 表示多个收款方分账。"
+    },
+    "settlement_type": {
+      "type": "string",
+      "enum": [
+        "instant",
+        "escrow",
+        "deferred"
+      ],
+      "default": "instant",
+      "description": "结算担保模型：instant 即时到账；escrow 第三方托管；deferred 账期结算。"
+    },
+    "settlement_trigger": {
+      "type": "string",
+      "enum": [
+        "on_payment",
+        "on_fulfillment",
+        "on_escrow_release"
+      ],
+      "default": "on_payment",
+      "description": "清分触发点：支付确认、履约条件完成或托管资金释放。"
+    },
+    "splits": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "payout_split.json"
+      },
+      "description": "各收款方的分账份额；single 模式仍需包含一个份额。"
+    }
+  },
+  "additionalProperties": true
+}

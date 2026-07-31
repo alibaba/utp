@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/confirm_input.json",
+  "version": "2026-07-31",
+  "title": "PayConfirmInput",
+  "description": "确认支付渠道结果所需的业务输入。",
+  "type": "object",
+  "required": [
+    "payment_request_id"
+  ],
+  "properties": {
+    "payment_request_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "等待确认的支付请求标识。"
+    },
+    "channel_callback": {
+      "type": "object",
+      "writeOnly": true,
+      "description": "支付渠道回调原始载荷；处理方必须先验证签名，再映射为标准事件。",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

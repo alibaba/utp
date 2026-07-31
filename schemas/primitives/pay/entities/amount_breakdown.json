@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/amount_breakdown.json",
+  "version": "2026-07-31",
+  "title": "AmountBreakdown",
+  "description": "支付金额构成；各分项与总额的一致性由协议实现校验。",
+  "type": "object",
+  "required": [
+    "subtotal",
+    "total"
+  ],
+  "properties": {
+    "subtotal": {
+      "$ref": "../../common/entities/money.json",
+      "description": "商品或服务的税费、运费和优惠前小计。"
+    },
+    "shipping_fee": {
+      "$ref": "../../common/entities/money.json",
+      "description": "本次支付承担的运输或交付费用。"
+    },
+    "tax": {
+      "$ref": "../../common/entities/money.json",
+      "description": "本次支付承担的税费。"
+    },
+    "discount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "从应付金额中扣减的优惠金额，使用非负值表达。"
+    },
+    "total": {
+      "$ref": "../../common/entities/money.json",
+      "description": "完成各分项计算后的本次支付总额。"
+    }
+  },
+  "additionalProperties": true
+}

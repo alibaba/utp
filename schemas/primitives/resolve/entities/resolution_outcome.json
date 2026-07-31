@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/resolution_outcome.json",
+  "version": "2026-07-31",
+  "title": "ResolutionOutcome",
+  "description": "Resolve 形成的可执行处置结果；不得将其内部 COMPENSATED 状态直接写入全局状态。",
+  "type": "object",
+  "required": [
+    "outcome_id",
+    "dispute_id",
+    "result",
+    "instructions",
+    "evidence_ref"
+  ],
+  "properties": {
+    "outcome_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "处置结果的唯一标识。"
+    },
+    "dispute_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "产生该结果的争议档案标识。"
+    },
+    "result": {
+      "$ref": "resolution_result.json",
+      "description": "争议对交易后续执行的标准结论。"
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "$ref": "resolution_instruction.json"
+      },
+      "description": "落实该处置结果需要执行的有序指令；无补偿的驳回结果可为空数组。"
+    },
+    "next_global_state_hint": {
+      "$ref": "next_global_state_hint.json",
+      "description": "提供给全局状态机的下一状态建议。"
+    },
+    "evidence_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "包含事实、责任判定、签名和处置依据的证据标识。"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/dispute_request.json",
+  "version": "2026-07-31",
+  "title": "DisputeRequest",
+  "description": "utp.resolve.raise 的业务输入，描述争议类型、影响范围、参与方、主张和初始证据。",
+  "type": "object",
+  "required": [
+    "dispute_type",
+    "dispute_scope",
+    "related_primitive",
+    "claimant",
+    "claim",
+    "evidence_refs"
+  ],
+  "properties": {
+    "dispute_type": {
+      "$ref": "dispute_type.json",
+      "description": "争议事实的标准分类。"
+    },
+    "dispute_scope": {
+      "$ref": "dispute_scope_type.json",
+      "description": "争议影响的原语或全局范围。"
+    },
+    "dispute_scope_detail": {
+      "$ref": "dispute_scope.json",
+      "description": "限定争议具体支付、订单、批次、商品或金额的结构化范围。"
+    },
+    "lock_policy": {
+      "$ref": "lock_policy.json",
+      "description": "争议登记后应暂停的 Action、资源和金额。"
+    },
+    "related_primitive": {
+      "type": "string",
+      "pattern": "^utp\\.[a-z][a-z0-9_]*$",
+      "description": "争议直接关联的原语完整名称。"
+    },
+    "related_shipment_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "交付争议直接关联的物流或发运标识。"
+    },
+    "related_payment_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "支付争议直接关联的支付请求、确认或退款标识。"
+    },
+    "claimant": {
+      "$ref": "dispute_party.json",
+      "description": "发起争议并提交主张的参与方。"
+    },
+    "claim": {
+      "$ref": "claim_detail.json",
+      "description": "争议事实、期望处置和可选金额主张。"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "支持初始主张的不可变证据或证据包标识。"
+    }
+  },
+  "additionalProperties": true
+}
