@@ -2,51 +2,214 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/negotiate/primitive.json",
   "name": "utp.negotiate",
-  "version": "2026-07-29",
+  "version": "2026-07-31",
   "title": "P2 Negotiate 询盘原语定义",
-  "description": "询盘原语核心定义文件。声明本版本的完整核心操作集合、各操作的业务输入/输出 Schema 与传输绑定，以及状态机定义。请求/响应统一信封见 primitives/common/action_request.json 与 action_response.json，采用两段式校验。",
+  "description": "询盘原语核心定义文件。声明本版本的完整核心操作集合、各操作的业务输入/输出实体、角色、传输绑定，以及原语内部状态机。请求/响应统一信封见 primitives/common/action_request.json 与 action_response.json，采用两段式校验。",
   "actions": {
     "inquiry": {
-      "description": "采购方提交询盘。前置条件 pricing_mode >= L1 且 Source 已完成；成功后原语状态进入 INQUIRED。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/inquiry_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/inquiry_output.json",
+      "description": "Buyer 提交询盘，Seller 接收并返回受理回执。前置条件为 pricing_mode >= L1 且 Source 已完成；询盘为异步流程，回执不代表报价。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/inquiry_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/inquiry_output.json"
+      },
       "transport_bindings": [
-        { "type": "rest", "method": "POST", "path": "/utp/negotiate/inquiry" }
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/negotiate/inquiries"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.negotiate.inquiry"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.negotiate.inquiry"
+        }
       ]
     },
     "quote": {
-      "description": "供应商交付报价。方向为 Seller → Buyer 的异步回调；采购方返回成功仅表示已接收，不构成对报价的接受。消息真实性与完整性由传输层消息签名（RFC 9421）保证；采购方验证后还 MUST 校验报价归属：inquiry_ref 必须是本方发起的询盘，且 supplier_id 与该询盘的目标供应商一致，不匹配的报价 MUST 拒收。回调不可达时采购方通过 query 轮询兜底。",
-      "direction": "seller_to_buyer",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/quote_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/quote_output.json",
+      "description": "Seller 交付报价，Buyer 接收并返回接收回执。本操作方向与其他操作相反，由 Seller 发起；Buyer 返回成功仅表示已接收，不构成对报价条款的接受。消息真实性与完整性由传输层消息签名（RFC 9421）保证；Buyer 验证后还 MUST 校验报价归属：inquiry_ref 必须是本方发起的询盘，且 supplier_id 与该询盘的目标供应商一致，不匹配的报价 MUST 拒收。MCP 绑定下报价以 Resource 更新通知交付，不暴露可调用 Tool。回调不可达时 Buyer 通过 query 轮询兜底。",
+      "initiator_role": "Seller",
+      "handler_role": "Buyer",
+      "input_schema": {
+        "$ref": "entities/quote_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/quote_output.json"
+      },
       "transport_bindings": [
-        { "type": "rest", "method": "POST", "path": "{callback_base}/utp/negotiate/quote" }
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "{callback_base}/utp/v1/negotiate/quotes"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.negotiate.quote"
+        }
       ]
     },
     "counter_offer": {
-      "description": "采购方基于报价提出还价：提交调整后的完整报价行结构（含数量与期望价格）供卖家逐项确认。轮次上限仅在会话锁定轮次约束的特殊场景（如改价审批、竞标）生效，普通场景不做轮次限制。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/counter_offer_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/counter_offer_output.json",
+      "description": "Buyer 基于报价提出还价，提交调整后的完整报价行结构（含数量与期望价格）供 Seller 逐项确认。Seller 的实质回应通过新一轮 quote 交付。轮次上限仅在会话锁定轮次约束的特殊场景（如改价审批、竞标）生效，普通场景不做轮次限制。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/counter_offer_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/counter_offer_output.json"
+      },
       "transport_bindings": [
-        { "type": "rest", "method": "POST", "path": "/utp/negotiate/counter-offer" }
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/negotiate/counter-offers"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.negotiate.counter_offer"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.negotiate.counter_offer"
+        }
       ]
     },
     "binding": {
-      "description": "采购方确认接受指定报价并选定交易安排，生成条款绑定。授权凭据通过 mandate_chain 携带（Operation Mandate「接受报价或 counter-offer」场景），会话协商要求 Mandate 时 MUST 携带；只能选择一个报价分支。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/binding_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/binding_output.json",
+      "description": "Buyer 确认接受指定报价并选定交易安排，Seller 校验后返回条款绑定。授权凭证由统一信封的 mandate 承载（Operation Mandate 覆盖「接受报价或 counter-offer」场景），会话或操作准入要求凭证时 MUST 提供；只能选择一个报价分支。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/binding_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/binding_output.json"
+      },
       "transport_bindings": [
-        { "type": "rest", "method": "POST", "path": "/utp/negotiate/binding" }
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/negotiate/bindings"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.negotiate.binding"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.negotiate.binding"
+        }
       ]
     },
     "query": {
-      "description": "查询本方可见的协商状态与授权数据。无状态影响；查询方身份 MUST 经会话鉴权，返回范围受角色、能力提供方访问策略和 L3 竞争规则限制，禁止仅凭 inquiry_id 越权访问。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/query_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/negotiate/entities/query_output.json",
+      "description": "Buyer 查询本方可见的协商状态与授权数据，作为报价交付的轮询兜底通道。无状态影响；查询方身份 MUST 经会话鉴权，返回范围受角色、能力提供方访问策略和 L3 竞争规则限制，禁止仅凭 inquiry_id 越权访问。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/query_output.json"
+      },
       "transport_bindings": [
-        { "type": "rest", "method": "GET", "path": "/utp/negotiate/{inquiry_id}" }
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/v1/negotiate/inquiries/{inquiry_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.negotiate.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.negotiate.query"
+        }
       ]
     }
   },
-  "state_machine": "https://ut-protocol.com/schemas/primitives/negotiate/state_machine.json"
+  "state_machine": {
+    "initial_state": "READY",
+    "states": {
+      "SKIPPED": {
+        "description": "Negotiate 被跳过。进入条件为 pricing_mode == L0，后续由 utp.purchase.create 进入 Purchase。"
+      },
+      "READY": {
+        "description": "准备发起协商。进入条件为 pricing_mode >= L1 且 Source 已完成。"
+      },
+      "INQUIRED": {
+        "description": "询盘已提交，等待 Seller 报价。"
+      },
+      "QUOTED": {
+        "description": "Seller 已交付报价，Buyer 可还价或绑定。"
+      },
+      "COUNTERED": {
+        "description": "Buyer 已提出还价，等待 Seller 回应新一轮报价。"
+      },
+      "BOUND": {
+        "description": "条款已绑定，全局状态机迁移至 PURCHASING。"
+      },
+      "RELEASED": {
+        "description": "协商资源已释放。协商失败、超时或 Buyer 主动退出后进入，可重新发起 inquiry。"
+      }
+    },
+    "transitions": [
+      {
+        "from": "READY",
+        "action": "utp.negotiate.inquiry",
+        "to": "INQUIRED"
+      },
+      {
+        "from": "INQUIRED",
+        "action": "utp.negotiate.quote",
+        "to": "QUOTED"
+      },
+      {
+        "from": "QUOTED",
+        "action": "utp.negotiate.counter_offer",
+        "to": "COUNTERED",
+        "condition": "会话启用轮次约束时不得超过上限"
+      },
+      {
+        "from": "COUNTERED",
+        "action": "utp.negotiate.quote",
+        "to": "QUOTED"
+      },
+      {
+        "from": "QUOTED",
+        "action": "utp.negotiate.binding",
+        "to": "BOUND"
+      },
+      {
+        "from": "INQUIRED",
+        "event": "failure_timeout_or_exit",
+        "to": "RELEASED"
+      },
+      {
+        "from": "QUOTED",
+        "event": "failure_timeout_or_exit",
+        "to": "RELEASED"
+      },
+      {
+        "from": "COUNTERED",
+        "event": "failure_timeout_or_exit",
+        "to": "RELEASED"
+      },
+      {
+        "from": "RELEASED",
+        "action": "utp.negotiate.inquiry",
+        "to": "INQUIRED"
+      }
+    ],
+    "constraints": {
+      "round_limit_policy": "轮次限制不是普通场景的默认行为。仅当会话锁定的 Mode 明确要求（如 decision_path L1 改价审批 1 轮、L3 竞标场景约定上限）时，协议引擎才拒绝超限的 counter_offer 并返回 NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS。",
+      "query_availability": "utp.negotiate.query 在 INQUIRED、QUOTED、COUNTERED、BOUND、RELEASED 状态均可执行，无状态影响。RELEASED 后此前已收集的报价与协商数据仍可通过 query 获取。",
+      "competitive_branch": "L3 竞价场景下各供应商报价分支相互独立，binding 只能选择其中一个分支。"
+    }
+  }
 }

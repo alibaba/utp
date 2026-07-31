@@ -1,10 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "inquiry_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/inquiry_input.json",
   "version": "2026-07-29",
   "title": "InquiryInput",
   "description": "utp.negotiate.inquiry 的业务输入。幂等键由统一请求信封承载。competitive 为 true 表示竞争性询盘（pricing_mode == L3 时必须为 true，由会话上下文校验）。",
   "type": "object",
+  "required": [
+    "inquiry_id",
+    "subject",
+    "items",
+    "response_deadline"
+  ],
   "properties": {
     "inquiry_id": {
       "type": "string",
@@ -22,9 +28,13 @@
       "description": "采购商品列表，复用通用订购行实体；询盘场景下每行必须给出目标供应商。",
       "items": {
         "allOf": [
-          { "$ref": "../../common/entities/line_item.json" }
+          {
+            "$ref": "../../common/entities/line_item.json"
+          }
         ],
-        "required": ["supplier_id"]
+        "required": [
+          "supplier_id"
+        ]
       }
     },
     "requirements": {
@@ -50,7 +60,9 @@
         },
         "questions": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "向供应商提出的问题列表，如起批量、材质、定制能力。"
         }
       },
@@ -67,6 +79,5 @@
       "description": "期望供应商回复报价的截止时间（ISO 8601）。"
     }
   },
-  "required": ["inquiry_id", "subject", "items", "response_deadline"],
   "additionalProperties": true
 }

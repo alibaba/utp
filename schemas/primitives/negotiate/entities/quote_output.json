@@ -1,10 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "quote_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/quote_output.json",
   "version": "2026-07-27",
   "title": "QuoteOutput",
   "description": "utp.negotiate.quote 的业务输出（采购方对报价回调的接收回执）。返回成功仅表示已接收，不构成对报价条款的接受；接受以 binding 操作为准。",
   "type": "object",
+  "required": [
+    "quote_ref",
+    "received_at"
+  ],
   "properties": {
     "quote_ref": {
       "type": "string",
@@ -25,9 +29,5 @@
       "readOnly": true
     }
   },
-  "required": [
-    "quote_ref",
-    "received_at"
-  ],
   "additionalProperties": true
 }
