@@ -1,0 +1,500 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/order.json",
+  "version": "2026-07-31",
+  "title": "Order",
+  "description": "订单响应对象。兼容 UCP shopping order 的买家展示语义，并纳入 UTP Purchase、Fulfill 和 B2B 采购上下文。订单是履约的直接业务锚点，purchase_id 和 transaction_id 用于关联订购聚合及交易边界。",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "卖家分配的业务订单唯一标识，对应 UCP shopping order 的 id。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "UTP Purchase 订购聚合标识；同一 purchase 可拆分为多个订单。"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该订单对应的独立交易边界标识。"
+    },
+    "checkout_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "来源结算会话或结算上下文标识，用于订单对账。"
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "承接该订单的供应商标识。"
+    },
+    "label": {
+      "type": "string",
+      "description": "用于买家展示和识别订单的人类可读标签。"
+    },
+    "permalink_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "商家侧订单详情链接。"
+    },
+    "line_items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "line_item.json"
+      },
+      "description": "订单中的商品或服务明细。履约事件通过 item_id 关联订单行。"
+    },
+    "status": {
+      "type": "string",
+      "description": "订单业务状态，由卖家返回；例如待确认、待发货、待收货、退款中或交易完成。具体状态机由业务原语定义。"
+    },
+    "status_events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/status_event"
+      },
+      "description": "订单状态变更历史。事件只追加，不覆盖已发生的状态事实。"
+    },
+    "prices": {
+      "type": "array",
+      "items": {
+        "$ref": "price.json"
+      },
+      "description": "订单金额构成及最终总额，对应 UCP shopping order 的 totals。必须包含 type 为 total 的金额项。"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "订单结算币种，遵循 ISO 4217；应与 prices 中金额的币种一致。"
+    },
+    "delivery": {
+      "$ref": "delivery.json",
+      "description": "订单确认的交付方式、地址和交付窗口。"
+    },
+    "fulfillment": {
+      "$ref": "#/$defs/fulfillment",
+      "description": "买家可见的履约预期、物流轨迹和实际履约事件。"
+    },
+    "invoice_profile": {
+      "$ref": "invoice_profile.json",
+      "description": "订单开票资料，对应 B2B shopping order 的 invoice。"
+    },
+    "trade_mode": {
+      "$ref": "trade_mode.json",
+      "description": "本订单采用的交易方式，对应结算阶段买家选定的 trade_mode。"
+    },
+    "note": {
+      "type": "string",
+      "description": "买方为订单提交的补充说明。"
+    },
+    "remark": {
+      "type": "string",
+      "description": "B2B 订单备注。与 note 语义相近，供兼容 UCP-B shopping order 使用。"
+    },
+    "quote": {
+      "$ref": "#/$defs/quote",
+      "description": "关联报价单；从询盘—报价链路发起的订单可回显。"
+    },
+    "purchase_order": {
+      "$ref": "#/$defs/purchase_order",
+      "description": "关联企业内部采购单，用于审批、成本中心和预算对账。"
+    },
+    "adjustments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/adjustment"
+      },
+      "description": "订单成立后的退款、退货、折让、争议或取消等调整记录；独立于履约事件。"
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/message"
+      },
+      "description": "商家需要向买家传达的错误、警告或信息提示。"
+    }
+  },
+  "required": [
+    "order_id",
+    "line_items",
+    "status",
+    "prices",
+    "fulfillment"
+  ],
+  "additionalProperties": true,
+  "$defs": {
+    "status_event": {
+      "type": "object",
+      "required": [
+        "status",
+        "occurred_at"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "发生的订单状态。"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "状态发生时间，使用 RFC 3339 格式。"
+        },
+        "description": {
+          "type": "string",
+          "description": "状态变更说明。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "fulfillment": {
+      "type": "object",
+      "properties": {
+        "current_state": {
+          "type": "string",
+          "description": "UTP Fulfill 买家可观测履约状态，例如 INIT、SHIPPED、DELIVERED 或 FULFILLED。"
+        },
+        "expectations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fulfillment_expectation"
+          },
+          "description": "买家可见的交付预期分组，可因拆单、合单或履约调整而变化。"
+        },
+        "trace_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/trace_info"
+          },
+          "description": "按包裹或运单聚合的物流轨迹。"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fulfillment_event"
+          },
+          "description": "实际履约事件追加日志；事件可关联订单行、批次和运单。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "fulfillment_expectation": {
+      "type": "object",
+      "required": [
+        "expectation_id",
+        "line_items",
+        "delivery"
+      ],
+      "properties": {
+        "expectation_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "交付预期分组标识。"
+        },
+        "line_items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/fulfillment_line_item"
+          },
+          "description": "该交付预期包含的订单行及数量。"
+        },
+        "delivery": {
+          "$ref": "delivery.json",
+          "description": "该交付预期的交付方式和目的地。"
+        },
+        "leadtime": {
+          "$ref": "leadtime.json",
+          "description": "该交付预期的履约时效。"
+        },
+        "description": {
+          "type": "string",
+          "description": "面向买家的交付说明。"
+        },
+        "fulfillable_on": {
+          "type": "string",
+          "format": "date-time",
+          "description": "预计可履约时间，使用 RFC 3339 格式。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "fulfillment_line_item": {
+      "type": "object",
+      "required": [
+        "item_id",
+        "quantity"
+      ],
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "关联订单行的 item_id。"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "该交付预期或履约事件涉及的数量。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "fulfillment_event": {
+      "type": "object",
+      "required": [
+        "event_id",
+        "occurred_at",
+        "status",
+        "line_items"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "履约事件唯一标识。"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "履约事件发生时间，使用 RFC 3339 格式。"
+        },
+        "status": {
+          "type": "string",
+          "description": "履约事件状态，如 SHIPPED、IN_TRANSIT、DELIVERED 或 RETURNED_TO_SENDER。"
+        },
+        "line_items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/fulfillment_line_item"
+          },
+          "description": "该履约事件实际涉及的订单行及数量。"
+        },
+        "shipment_id": {
+          "type": "string",
+          "description": "关联发货单标识。"
+        },
+        "batch_id": {
+          "type": "string",
+          "description": "关联交付批次标识。"
+        },
+        "tracking_number": {
+          "type": "string",
+          "description": "承运商物流单号。"
+        },
+        "tracking_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "物流查询链接。"
+        },
+        "carrier": {
+          "type": "string",
+          "description": "承运商名称。"
+        },
+        "carrier_code": {
+          "type": "string",
+          "description": "承运商编码。"
+        },
+        "location": {
+          "type": "string",
+          "description": "事件发生地点。"
+        },
+        "description": {
+          "type": "string",
+          "description": "面向买家的履约事件说明。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "trace_info": {
+      "type": "object",
+      "properties": {
+        "shipment_id": {
+          "type": "string",
+          "description": "关联发货单或物流批次标识。"
+        },
+        "tracking_number": {
+          "type": "string",
+          "description": "物流单号。"
+        },
+        "carrier": {
+          "type": "string",
+          "description": "承运商名称。"
+        },
+        "carrier_code": {
+          "type": "string",
+          "description": "承运商编码。"
+        },
+        "tracking_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "承运商物流查询链接。"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/trace_node"
+          },
+          "description": "承运商物流扫描节点列表。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "trace_node": {
+      "type": "object",
+      "required": [
+        "occurred_at",
+        "status"
+      ],
+      "properties": {
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "物流节点发生时间，使用 RFC 3339 格式。"
+        },
+        "status": {
+          "type": "string",
+          "description": "物流节点状态，例如 IN_TRANSIT、OUT_FOR_DELIVERY 或 DELIVERED。"
+        },
+        "location": {
+          "type": "string",
+          "description": "物流节点地点。"
+        },
+        "description": {
+          "type": "string",
+          "description": "物流节点说明。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "quote": {
+      "type": "object",
+      "required": [
+        "quote_id"
+      ],
+      "properties": {
+        "quote_id": {
+          "type": "string",
+          "description": "报价单标识。"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "报价有效期，使用 RFC 3339 格式。"
+        },
+        "special_discount_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "协商特价折扣率，0 到 1 之间。"
+        },
+        "negotiated_price_note": {
+          "type": "string",
+          "description": "协商价格说明。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "purchase_order": {
+      "type": "object",
+      "required": [
+        "purchase_order_id"
+      ],
+      "properties": {
+        "purchase_order_id": {
+          "type": "string",
+          "description": "企业内部采购单或 PO 号。"
+        },
+        "title": {
+          "type": "string",
+          "description": "采购事由或项目名称。"
+        },
+        "approver": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "additionalProperties": true
+        },
+        "cost_center": {
+          "type": "string",
+          "description": "成本中心代码。"
+        },
+        "budget_code": {
+          "type": "string",
+          "description": "预算科目代码。"
+        },
+        "notes": {
+          "type": "string",
+          "description": "采购备注。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "adjustment": {
+      "type": "object",
+      "required": [
+        "type",
+        "occurred_at"
+      ],
+      "properties": {
+        "adjustment_id": {
+          "type": "string",
+          "description": "调整记录标识。"
+        },
+        "type": {
+          "type": "string",
+          "description": "调整类型，例如 refund、return、credit、dispute 或 cancellation。"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "调整发生时间，使用 RFC 3339 格式。"
+        },
+        "prices": {
+          "type": "array",
+          "items": {
+            "$ref": "price.json"
+          },
+          "description": "调整涉及的金额构成。"
+        },
+        "description": {
+          "type": "string",
+          "description": "调整说明。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "message": {
+      "type": "object",
+      "required": [
+        "type",
+        "content"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "消息类型，例如 error、warning 或 info。"
+        },
+        "code": {
+          "type": "string",
+          "description": "结构化消息码。"
+        },
+        "content": {
+          "type": "string",
+          "description": "面向买家的消息内容。"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

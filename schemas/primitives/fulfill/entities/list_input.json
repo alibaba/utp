@@ -71,7 +71,7 @@
       "description": "排序方向。默认 desc。"
     },
     "pagination": {
-      "$ref": "../../../common/pagination.json#/$defs/request",
+      "$ref": "../../common/pagination.json#/$defs/request",
       "description": "游标分页参数。"
     }
   },

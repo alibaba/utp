@@ -9,7 +9,7 @@
     "merchant_authorization": {
       "type": "string",
       "minLength": 1,
-      "description": "商家对最终 Checkout（不含 ap2 字段）的 JCS 规范化载荷所作的 JWS Detached Payload 签名。该字段随完整 Checkout 进入 Checkout Mandate，使用户授权绑定已签署的交易条款。"
+      "description": "商家对最终下单内容的 JCS 规范化载荷所作的 JWS Detached Payload 签名。该字段随完整 Checkout 进入 Checkout Mandate，使用户授权绑定已签署的交易条款。"
     },
     "checkout": {
       "type": "string",

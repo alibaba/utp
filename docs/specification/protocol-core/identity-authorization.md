@@ -8,7 +8,7 @@ format: html
 
 <h1 id="s-6-identity">第 6 章：认证与授权（Identity and Authorization — L2）</h1>
 
-<p>本章为 UTP 协议 Layer 2 的身份基础层，系统定义 Agent 身份认证（Agent Authentication）、用户授权委托（User Authorization）与操作级授权（Operation-Level Authorization）三类机制。通过将机器身份、人类委托与单笔交易授权解耦，本章为 UTP 交易构建一条从「谁发起请求」到「谁允许执行」再到「本次允许做什么」的可验证信任链。本章与<a href="/documentation/specification/protocol-core/security-trust.html">第 5 章</a>的操作准入语义、Profile 机制声明以及信任画像共同构成 UTP 的信任准入基础；与<a href="/documentation/specification/protocol-core/discovery-negotiation.html">第 3 章</a>的发现基础设施、<a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章</a>的安全审计能力协同，形成覆盖发现、认证、授权、执行、审计的完整闭环。</p>
+<p>本章为 UTP 协议 Layer 2 的身份基础层，系统定义 Agent 身份认证（Agent Authentication）、用户授权委托（User Authorization）与操作级授权（Operation-Level Authorization）三类机制。通过将机器身份、人类委托与单笔交易授权解耦，本章为 UTP 交易构建一条从「谁发起请求」到「谁允许执行」再到「本次允许做什么」的可验证信任链。</p>
 
 <hr />
 
