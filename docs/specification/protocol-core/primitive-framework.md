@@ -218,8 +218,6 @@ Action:           utp.{primitive}.{action}
 
 核心原语定义文件只描述稳定的接口契约，不包含实体清单、错误码或能力提供方的授权策略；状态机语义由其引用文件定义，授权策略由 Profile 原语声明中的 `authorization` 提供。Action 的 `initiator_role` 与 `handler_role` 定义静态职责，不直接填写具体 Agent 或 Endpoint；具体主体由拓扑与握手结果绑定。UTP 官方核心原语定义文件的 URL MUST 使用 `https://ut-protocol.com/schemas/primitives/{primitive}/{version}.json`。可复用实体模型的 URL MUST 使用 `https://ut-protocol.com/schemas/entities/{entity}/{version}.json`；生态扩展使用其受控域名下的等价路径，并在扩展声明中给出权威 URL。
 
-实体字段的结构、必填性与条件约束 MUST 以 Action 所引用的 JSON Schema 为准，规范正文不得形成另一套字段级约束。日期时间字段 MUST 使用 JSON Schema `date-time` 格式并遵循 RFC 3339；仅表示日历日期的字段 MUST 使用 `date` 格式；相对时长统一使用非负整数自然日。一个时间值允许使用绝对日期时间或相对自然日表达时，两种表示 MUST 互斥。
-
 
 ## 协议行为约定（Protocol Behavior Conventions） {#s-103-protocol-behavior-conventions}
 
