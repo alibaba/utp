@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/lookup_output.json",
+  "version": "2026-07-29",
+  "title": "LookupOutput",
+  "description": "utp.source.lookup 的业务输出。详情快照可供 Cart、Negotiate 或 Purchase 使用，但本身不锁定价格或库存。",
+  "type": "object",
+  "properties": {
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "详情快照唯一标识。",
+      "readOnly": true
+    },
+    "candidate": {
+      "$ref": "./candidate_detail.json",
+      "description": "单个 lookup 结果详情。请求使用 item_id + supplier_id 或 id 时通常返回该字段。",
+      "readOnly": true
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "./candidate_detail.json"
+      },
+      "description": "批量 lookup 结果详情列表。请求使用 ids 时返回该字段；结果数量可以少于请求标识数量。",
+      "readOnly": true
+    },
+    "candidate_set_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "来源候选集合标识。",
+      "readOnly": true
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "详情快照失效时间。",
+      "readOnly": true
+    },
+    "etag": {
+      "type": "string",
+      "minLength": 1,
+      "description": "REST 条件请求使用的缓存标识。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "snapshot_id"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "candidate"
+      ]
+    },
+    {
+      "required": [
+        "candidates"
+      ]
+    }
+  ],
+  "additionalProperties": true
+}

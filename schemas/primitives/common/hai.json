@@ -23,7 +23,7 @@
         },
         "suspended_action": {
           "type": "string",
-          "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+          "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$",
           "description": "挂起解除后允许续跑的唯一业务 Action。"
         },
         "reason": {
@@ -35,16 +35,6 @@
           "type": "string",
           "enum": ["ACTIVE", "RESUMED", "CANCELLED", "EXPIRED"],
           "description": "挂起记录当前状态。"
-        },
-        "session_id": {
-          "type": "string",
-          "minLength": 1,
-          "description": "关联的 UTP 会话标识。"
-        },
-        "transaction_id": {
-          "type": "string",
-          "minLength": 1,
-          "description": "适用时关联的交易标识。"
         },
         "created_at": {
           "type": "string",
@@ -77,7 +67,7 @@
         },
         "action": {
           "type": "string",
-          "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+          "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$",
           "description": "该 Surface 服务的完整 UTP Action 名称。"
         },
         "description": {

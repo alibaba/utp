@@ -14,7 +14,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+        "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$"
       },
       "uniqueItems": true,
       "description": "争议有效期间禁止执行的完整 UTP Action 名称。"
@@ -51,7 +51,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+        "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$"
       },
       "uniqueItems": true,
       "description": "争议期间仍允许执行的只读 Action 名称。"

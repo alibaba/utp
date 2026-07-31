@@ -52,9 +52,7 @@
   },
   "required": [
     "order_id",
-    "reason_code",
-    "evidence_refs",
-    "signature"
+    "reason_code"
   ],
   "additionalProperties": true
 }

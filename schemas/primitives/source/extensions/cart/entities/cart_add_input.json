@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_add_input.json",
+  "version": "2026-07-29",
+  "title": "CartAddInput",
+  "description": "utp.source_cart.add 的业务输入。snapshot_id 必须引用当前会话可见且尚未过期的 Lookup 快照。",
+  "type": "object",
+  "properties": {
+    "cart_ref": {
+      "$ref": "./cart_ref.json",
+      "description": "目标购物车；省略时使用当前 session 购物车。",
+      "writeOnly": true
+    },
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "有效的 Lookup 详情快照标识。",
+      "writeOnly": true
+    },
+    "item_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "商品或服务标识，必须与快照一致。",
+      "writeOnly": true
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "供应商标识，必须与快照一致。",
+      "writeOnly": true
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "加入购物车的数量。",
+      "writeOnly": true
+    },
+    "selected": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否默认选中用于后续询盘或采购。",
+      "writeOnly": true
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "item_id",
+    "supplier_id",
+    "quantity"
+  ],
+  "additionalProperties": true
+}

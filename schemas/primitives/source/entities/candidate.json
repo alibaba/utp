@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/candidate.json",
+  "version": "2026-07-29",
+  "title": "Candidate",
+  "description": "Search 返回的商品或服务候选摘要。固定价、阶梯价和资质字段的条件必填规则由会话 Mode 的业务校验执行。",
+  "type": "object",
+  "$defs": {
+    "sales": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "number",
+          "minimum": 0,
+          "description": "历史销量数值。",
+          "readOnly": true
+        },
+        "unit": {
+          "type": "string",
+          "description": "销量单位，如件、箱或千克。",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "description": "人类可读的销量说明。",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "match_details": {
+      "type": "object",
+      "properties": {
+        "certifications_matched": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "readOnly": true,
+          "description": "已满足的必需认证列表。"
+        },
+        "certifications_preferred_matched": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "readOnly": true,
+          "description": "已满足的偏好认证列表。"
+        },
+        "verification_level_met": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "是否满足最低供应商验证等级。"
+        },
+        "delivery_rate_above_threshold": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "是否满足最低准时交货率。"
+        }
+      },
+      "description": "Search 对硬性条件和偏好条件的命中摘要。",
+      "additionalProperties": true
+    }
+  },
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "商品或服务在供应商域内的唯一标识。",
+      "readOnly": true
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "供应商 agent_id，必须引用有效 Profile。",
+      "readOnly": true
+    },
+    "supplier_display_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "供应商可读名称。",
+      "readOnly": true
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "商品或服务标题。",
+      "readOnly": true
+    },
+    "category": {
+      "type": "string",
+      "description": "标准品类标识，如 UNSPSC 或服务端声明的分类体系标识。",
+      "readOnly": true
+    },
+    "description": {
+      "type": "string",
+      "description": "商品或服务简要描述。",
+      "readOnly": true
+    },
+    "main_image": {
+      "type": "string",
+      "format": "uri",
+      "description": "兼容既有 UCP-B 商品模型的主图 URL。",
+      "readOnly": true
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "description": "商品图片 URL 列表。",
+      "readOnly": true
+    },
+    "product_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "商品或服务详情页 URL。",
+      "readOnly": true
+    },
+    "unit_price": {
+      "$ref": "../../common/entities/money.json",
+      "description": "固定售价；pricing_mode == L0 时由业务层要求必填。",
+      "readOnly": true
+    },
+    "tiered_pricing": {
+      "$ref": "./tiered_pricing.json",
+      "description": "阶梯定价；pricing_mode >= L1 时由业务层要求必填。",
+      "readOnly": true
+    },
+    "supplier_credentials_summary": {
+      "$ref": "./supplier_credentials_summary.json",
+      "description": "供应商资质摘要；compliance_level >= L1 时由业务层要求必填。",
+      "readOnly": true
+    },
+    "mode_response": {
+      "$ref": "./mode_response_summary.json",
+      "readOnly": true,
+      "description": "候选供应商支持的交易模式范围摘要。"
+    },
+    "lead_time_estimate": {
+      "type": "string",
+      "description": "预估交期的人类可读说明。",
+      "readOnly": true
+    },
+    "lead_time_days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "可供程序比较的预估交期天数。",
+      "readOnly": true
+    },
+    "supplier_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "兼容既有 UCP-B 的供应商画像标签。",
+      "readOnly": true
+    },
+    "sales": {
+      "$ref": "#/$defs/sales",
+      "readOnly": true,
+      "description": "候选商品或服务的历史销量摘要。"
+    },
+    "protection_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "商品保障标签，如质量保证或退货保障。",
+      "readOnly": true
+    },
+    "match_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Search 在执行召回、筛选和偏好评分后生成的匹配度。",
+      "readOnly": true
+    },
+    "match_details": {
+      "$ref": "#/$defs/match_details",
+      "readOnly": true,
+      "description": "候选与搜索条件的匹配详情。"
+    }
+  },
+  "required": [
+    "item_id",
+    "supplier_id",
+    "supplier_display_name",
+    "title"
+  ],
+  "additionalProperties": true
+}

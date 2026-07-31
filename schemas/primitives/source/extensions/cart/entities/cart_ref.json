@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_ref.json",
+  "version": "2026-07-29",
+  "title": "CartRef",
+  "description": "Source Cart 的目标购物车引用。session 作用域可省略 cart_id 并使用当前会话默认购物车；persistent 作用域必须提供 cart_id。",
+  "type": "object",
+  "properties": {
+    "scope": {
+      "type": "string",
+      "enum": [
+        "session",
+        "persistent"
+      ],
+      "description": "购物车作用域。"
+    },
+    "cart_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "购物车唯一标识；persistent 作用域必填。"
+    }
+  },
+  "required": [
+    "scope"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "scope": {
+            "const": "persistent"
+          }
+        },
+        "required": [
+          "scope"
+        ]
+      },
+      "then": {
+        "required": [
+          "cart_id"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

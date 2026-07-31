@@ -7,7 +7,6 @@
   "type": "object",
   "required": [
     "event_id",
-    "order_id",
     "occurred_at",
     "type",
     "line_items"

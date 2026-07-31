@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/candidate_detail.json",
+  "version": "2026-07-29",
+  "title": "CandidateDetail",
+  "description": "Lookup 返回的完整商品与供应商组合详情，在 Candidate 摘要上增加资质、规格、选项和履约信息。",
+  "allOf": [
+    {
+      "$ref": "./candidate.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "supplier_profile_uri": {
+          "type": "string",
+          "format": "uri",
+          "description": "供应商 Profile 的可解析引用。",
+          "readOnly": true
+        },
+        "supplier_credentials": {
+          "$ref": "./supplier_credentials.json",
+          "description": "供应商完整资质信息。",
+          "readOnly": true
+        },
+        "attributes": {
+          "type": "object",
+          "description": "适合检索和展示的结构化商品属性。",
+          "readOnly": true,
+          "additionalProperties": true
+        },
+        "specifications": {
+          "type": "object",
+          "description": "详细技术规格。",
+          "readOnly": true,
+          "additionalProperties": true
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/option"
+          },
+          "description": "可选规格轴及其取值。",
+          "readOnly": true
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "description": "可购买变体列表；具体变体扩展字段由供应商声明。",
+          "readOnly": true
+        },
+        "logistics_options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logistics_option"
+          },
+          "description": "可用履约或物流方案摘要。",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": true
+    }
+  ],
+  "$defs": {
+    "option": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "readOnly": true,
+          "description": "规格轴名称。"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "readOnly": true,
+          "description": "规格轴可选值列表。"
+        }
+      },
+      "required": [
+        "name",
+        "values"
+      ],
+      "additionalProperties": true
+    },
+    "logistics_option": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "readOnly": true,
+          "description": "履约或物流方式。"
+        },
+        "shipping_from_country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "readOnly": true,
+          "description": "发货国家或地区的 ISO 3166-1 alpha-2 代码。"
+        },
+        "estimated_lead_time_days": {
+          "type": "integer",
+          "minimum": 0,
+          "readOnly": true,
+          "description": "预计交付时长，单位为自然日。"
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "additionalProperties": true
+    }
+  }
+}

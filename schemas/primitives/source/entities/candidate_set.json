@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/candidate_set.json",
+  "version": "2026-07-29",
+  "title": "CandidateSet",
+  "description": "一次 Search 生成的带有效期候选集合快照。",
+  "type": "object",
+  "properties": {
+    "candidate_set_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "候选集合唯一标识；重新 Search 会生成新的标识。",
+      "readOnly": true
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "./candidate.json"
+      },
+      "description": "当前页候选列表，允许为空。",
+      "readOnly": true
+    },
+    "pagination": {
+      "$ref": "../../common/pagination.json#/$defs/response",
+      "readOnly": true,
+      "description": "当前候选集合的分页结果。"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "候选集合快照失效时间。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "candidate_set_id",
+    "candidates",
+    "pagination"
+  ],
+  "additionalProperties": true
+}

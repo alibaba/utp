@@ -39,28 +39,7 @@
     }
   },
   "required": [
-    "order_id",
-    "received_quantity",
-    "signature"
+    "order_id"
   ],
-  "additionalProperties": true,
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "result": {
-            "const": "CONDITIONAL"
-          }
-        },
-        "required": [
-          "result"
-        ]
-      },
-      "then": {
-        "required": [
-          "reason_code"
-        ]
-      }
-    }
-  ]
+  "additionalProperties": true
 }

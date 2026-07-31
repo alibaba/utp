@@ -50,31 +50,9 @@
   "required": [
     "receipt_id",
     "order_id",
-    "purchase_id",
-    "transaction_id",
     "result",
     "received_quantity",
-    "received_at",
-    "signature"
+    "received_at"
   ],
-  "additionalProperties": true,
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "result": {
-            "const": "CONDITIONAL"
-          }
-        },
-        "required": [
-          "result"
-        ]
-      },
-      "then": {
-        "required": [
-          "reason_code"
-        ]
-      }
-    }
-  ]
+  "additionalProperties": true
 }

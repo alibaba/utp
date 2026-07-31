@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_query_output.json",
+  "version": "2026-07-29",
+  "title": "CartQueryOutput",
+  "description": "utp.source_cart.query 的业务输出。query_token 证明调用方已看到本次返回的购物车项集合。",
+  "type": "object",
+  "properties": {
+    "cart": {
+      "$ref": "./cart.json",
+      "readOnly": true,
+      "description": "当前查询返回的购物车。"
+    },
+    "query_token": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Update/Remove 必须回传的短期不透明令牌。",
+      "readOnly": true
+    },
+    "pagination": {
+      "$ref": "../../../../common/pagination.json#/$defs/response",
+      "readOnly": true,
+      "description": "购物车项分页结果。"
+    }
+  },
+  "required": [
+    "cart",
+    "query_token"
+  ],
+  "additionalProperties": true
+}
