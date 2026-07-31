@@ -83,7 +83,7 @@
           "description": "选定的交易安排（单项）。"
         },
         "fulfillment_selection": {
-          "$ref": "../../common/entities/fulfillment_selection.json",
+          "$ref": "../../common/entities/delivery.json",
           "description": "交付安排（可选）。绑定阶段交货信息未必能确定。"
         },
         "lead_time_days": {

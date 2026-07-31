@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/dispute_scope_type.json",
+  "version": "2026-07-31",
+  "title": "DisputeScopeType",
+  "description": "争议影响的原语或交易范围。",
+  "type": "string",
+  "oneOf": [
+    { "const": "source", "description": "争议限定于供给发现、商品或服务信息。" },
+    { "const": "negotiate", "description": "争议限定于询盘、报价或协商条款。" },
+    { "const": "purchase", "description": "争议覆盖采购订单或协议承诺。" },
+    { "const": "pay", "description": "争议限定于支付、托管、分账或退款。" },
+    { "const": "fulfill", "description": "争议限定于交付、履约、验收或拒收。" },
+    { "const": "global", "description": "争议影响整笔交易，允许暂停全部有副作用 Action。" }
+  ]
+}

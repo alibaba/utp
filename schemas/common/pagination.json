@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/common/pagination.json",
+  "$id": "https://ut-protocol.com/schemas/common/pagination.json",
   "version": "2026-07-27",
   "title": "Pagination",
   "description": "列表操作共享的游标分页定义。请求与响应使用不同子 Schema，避免将响应元数据作为请求参数。",

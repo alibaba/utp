@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/mediate_input.json",
+  "version": "2026-07-31",
+  "title": "ResolveMediateInput",
+  "description": "发起调解、指定调解方或补充调解材料的业务输入。",
+  "type": "object",
+  "required": [
+    "dispute_id"
+  ],
+  "properties": {
+    "dispute_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "需要进入或继续调解的争议档案标识。"
+    },
+    "mediator_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "已分配调解方的主体标识；尚未分配时省略。"
+    },
+    "mediation_request": {
+      "type": "object",
+      "description": "调解偏好、补充证据与和解建议等结构化材料。",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

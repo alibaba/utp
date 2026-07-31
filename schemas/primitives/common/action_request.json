@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/action_request.json",
-  "version": "2026-07-27",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/action_request.json",
+  "version": "2026-07-31",
   "title": "UTP Action Request",
-  "description": "所有 UTP 原语操作共享的请求信封。input 的具体结构由原语定义中该操作的 input_schema 指定。",
+  "description": "所有 UTP 原语操作共享的请求信封。操作声明 input_schema 时，input 的具体结构由该 Schema 指定。",
   "type": "object",
   "properties": {
     "action": {
@@ -31,16 +31,19 @@
       "minLength": 1,
       "description": "调用方提供的幂等键，用于关联同一副作用请求的重试。"
     },
+    "mandate": {
+      "$ref": "entities/mandate.json",
+      "description": "执行当前 Action 所携带的 Mandate 凭证。会话或操作准入要求对应凭证时 MUST 提供。"
+    },
     "input": {
       "type": "object",
-      "description": "操作特有输入。其内容由对应操作的 input_schema 校验。",
+      "description": "可选的操作特有输入；仅在对应操作声明 input_schema 时传递并由该 Schema 校验。",
       "additionalProperties": true
     }
   },
   "required": [
     "action",
-    "session_id",
-    "input"
+    "session_id"
   ],
   "additionalProperties": true
 }

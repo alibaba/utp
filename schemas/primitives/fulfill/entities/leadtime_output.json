@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/leadtime_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/leadtime_output.json",
   "version": "2026-07-27",
   "title": "FulfillLeadtimeOutput",
   "description": "utp.fulfill.leadtime 的业务输出。按阶段返回备货、运输、清关、验货或服务激活的预估时长与预估日期。",
@@ -13,51 +13,28 @@
     },
     "stages": {
       "type": "array",
+      "minItems": 1,
       "items": {
-        "type": "object",
-        "properties": {
-          "stage": {
-            "type": "string",
-            "enum": [
-              "PREPARATION",
-              "SHIPPING",
-              "CUSTOMS",
-              "INSPECTION",
-              "SERVICE_ACTIVATION"
-            ],
-            "description": "履约阶段。"
-          },
-          "estimated_days": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "预估时长（天）。"
-          },
-          "estimated_date": {
-            "type": "string",
-            "format": "date",
-            "description": "预估完成日期。"
-          }
-        },
-        "required": [
-          "stage"
-        ],
-        "additionalProperties": true
+        "$ref": "#/$defs/fulfillment_stage"
       },
-      "description": "分阶段预估明细。"
+      "description": "分阶段预估明细；阶段时效已知时通过 leadtime 表达预计天数和预计完成时间。"
     },
-    "estimated_delivery_date": {
-      "type": "string",
-      "format": "date",
-      "description": "预估交付日期。"
+    "estimated_delivery_leadtime": {
+      "$ref": "../../common/entities/leadtime.json",
+      "description": "订单预计交付时效。"
+    },
+    "promised_delivery_leadtime": {
+      "$ref": "../../common/entities/leadtime.json",
+      "description": "订单承诺交付时效，可选；由订单或 TradeMethod 提供。"
     },
     "updated_at": {
       "type": "string",
       "format": "date-time",
       "description": "本次时效预估更新时间，可选。"
     },
-    "delay_reason_code": {
+    "delay_reason": {
       "type": "string",
-      "description": "延迟原因码，可选。"
+      "description": "延迟原因，可选。"
     },
     "risk_flags": {
       "type": "array",
@@ -74,7 +51,33 @@
   },
   "required": [
     "order_id",
-    "estimated_delivery_date"
+    "estimated_delivery_leadtime"
   ],
-  "additionalProperties": true
+  "additionalProperties": true,
+  "$defs": {
+    "fulfillment_stage": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": [
+            "PREPARATION",
+            "SHIPPING",
+            "CUSTOMS",
+            "INSPECTION",
+            "SERVICE_ACTIVATION"
+          ],
+          "description": "履约阶段。"
+        },
+        "leadtime": {
+          "$ref": "../../common/entities/leadtime.json",
+          "description": "该阶段的履约时效，可选；暂无法估算时可仅返回 stage。"
+        }
+      },
+      "required": [
+        "leadtime"
+      ],
+      "additionalProperties": true
+    }
+  }
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/global-state-machine/entities/state_query_request.json",
+  "$id": "https://ut-protocol.com/schemas/global-state-machine/entities/state_query_request.json",
   "version": "2026-07-29",
   "title": "UTP State Query Request",
   "description": "POST /utp/state/query 的请求体。支持上下文级查询和交易级查询",

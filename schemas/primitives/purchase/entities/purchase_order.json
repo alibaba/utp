@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/purchase/entities/purchase_order.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/purchase/entities/purchase_order.json",
   "version": "2026-07-30",
   "title": "PurchaseOrder",
   "description": "买方提交并确认的订购聚合。",
@@ -18,7 +18,7 @@
       "readOnly": true
     },
     "trade_modes": {
-      "$ref": "../../common/entities/trade_modes.json",
+      "$ref": "trade_modes.json",
       "description": "商家支持的业务交易模式及买方当前选择。",
       "utp_request": {
         "create": "optional",

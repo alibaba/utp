@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/purchase/primitive.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/purchase/primitive.json",
   "name": "utp.purchase",
   "version": "2026-07-29",
   "title": "P3 Purchase 原语定义",
@@ -21,6 +21,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/purchase"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.purchase.create"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.purchase.create"
         }
       ]
     },
@@ -39,6 +47,14 @@
           "type": "rest",
           "method": "PATCH",
           "path": "/utp/v1/purchase/{purchase_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.purchase.update"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.purchase.update"
         }
       ]
     },
@@ -57,6 +73,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/purchase/{purchase_id}/complete"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.purchase.complete"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.purchase.complete"
         }
       ]
     },
@@ -75,6 +99,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/purchase/contracts"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.purchase.contract_create"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.purchase.contract_create"
         }
       ]
     },
@@ -93,6 +125,14 @@
           "type": "rest",
           "method": "PATCH",
           "path": "/utp/v1/purchase/contracts/{purchase_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.purchase.contract_update"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.purchase.contract_update"
         }
       ]
     },
@@ -100,6 +140,9 @@
       "description": "Buyer 确认完成协议，Seller 执行协议承诺处理。",
       "initiator_role": "Buyer",
       "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/purchase_agreement.json"
+      },
       "output_schema": {
         "$ref": "entities/purchase_agreement.json"
       },
@@ -108,6 +151,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/purchase/contracts/{purchase_id}/complete"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.purchase.contract_complete"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.purchase.contract_complete"
         }
       ]
     },
@@ -123,6 +174,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/v1/purchase/{purchase_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.purchase.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.purchase.query"
         }
       ]
     },
@@ -138,6 +197,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/purchase/{purchase_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.purchase.cancel"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.purchase.cancel"
         }
       ]
     }

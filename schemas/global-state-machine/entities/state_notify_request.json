@@ -1,19 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/global-state-machine/entities/state_notify_request.json",
+  "$id": "https://ut-protocol.com/schemas/global-state-machine/entities/state_notify_request.json",
   "version": "2026-07-29",
   "title": "UTP State Notify Request",
   "description": "POST /utp/state/notify 的请求体",
   "type": "object",
   "properties": {
     "action_response": {
-      "$ref": "https://ut-protocol.com/primitives/common/action_response.json",
+      "$ref": "../../primitives/common/action_response.json",
       "utp_request": "required"
     },
     "state_views": {
       "type": "array",
       "items": {
-        "$ref": "https://ut-protocol.com/global-state-machine/entities/state_view.json"
+        "$ref": "state_view.json"
       },
       "minItems": 1,
       "utp_request": "required",

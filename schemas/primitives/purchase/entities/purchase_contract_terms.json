@@ -1,21 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/purchase/entities/purchase_contract_terms.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/purchase/entities/purchase_contract_terms.json",
   "version": "2026-07-29",
   "title": "PurchaseContractTerms",
-  "description": "采购合同的交易标的、计价、交付和交易条款。",
+  "description": "采购合同的结构化交付与交易条款。",
   "type": "object",
   "properties": {
-    "subject": {
-      "type": "object",
-      "additionalProperties": true,
-      "description": "合同交易范围或标的。"
-    },
-    "price_basis": {
-      "type": "object",
-      "additionalProperties": true,
-      "description": "计价依据。"
-    },
     "delivery": {
       "$ref": "../../common/entities/delivery.json",
       "description": "采购合同约定的交付方式与交付信息。"

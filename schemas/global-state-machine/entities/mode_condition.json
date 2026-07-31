@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/global-state-machine/entities/mode_condition.json",
+  "$id": "https://ut-protocol.com/schemas/global-state-machine/entities/mode_condition.json",
   "version": "2026-07-29",
   "title": "UTP Mode Condition",
   "description": "状态机定义中使用的 Mode 条件示例。每个字段直接枚举适用值",

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/discovery/discovery_request.json",
+  "version": "2026-07-31",
+  "title": "UTP Discovery Request",
+  "description": "发现与协商的范围输入。Buyer 以本地 Profile 的 utp.version 作为唯一提出版本，本对象不重复声明版本。",
+  "type": "object",
+  "properties": {
+    "role_domain_bindings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$"
+      },
+      "minProperties": 2,
+      "description": "相关 Role 到不含 scheme、path、query 和 fragment 的 Business Domain 映射。"
+    },
+    "role_relationships": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "string", "minLength": 1 },
+        "minItems": 2,
+        "maxItems": 2,
+        "uniqueItems": true
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "必须完成兼容性校验的无方向 Role 对。"
+    }
+  },
+  "required": ["role_domain_bindings", "role_relationships"],
+  "additionalProperties": false
+}

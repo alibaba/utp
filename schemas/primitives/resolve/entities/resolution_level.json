@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/resolution_level.json",
+  "version": "2026-07-31",
+  "title": "ResolutionLevel",
+  "description": "争议当前采用的处置层级。",
+  "type": "string",
+  "oneOf": [
+    { "const": "L1", "description": "协议规则自治处置或自动补偿。" },
+    { "const": "L2", "description": "平台、行业机构或社会化调解。" },
+    { "const": "L3", "description": "仲裁、诉讼或司法衔接处置。" }
+  ]
+}

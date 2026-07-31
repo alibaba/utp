@@ -1,16 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/global-state-machine/entities/state_definition.json",
+  "$id": "https://ut-protocol.com/schemas/global-state-machine/entities/state_definition.json",
   "version": "2026-07-29",
   "title": "UTP State Definition",
   "description": "状态机定义中的单个状态声明",
   "type": "object",
   "properties": {
     "name": {
-      "$ref": "https://ut-protocol.com/global-state-machine/entities/state.json"
+      "$ref": "state.json"
     },
     "scope": {
-      "$ref": "https://ut-protocol.com/global-state-machine/entities/state_scope.json"
+      "$ref": "state_scope.json"
     },
     "terminal": {
       "type": "boolean",

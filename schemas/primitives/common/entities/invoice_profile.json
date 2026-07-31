@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/invoice_profile.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/invoice_profile.json",
   "version": "2026-07-30",
   "title": "InvoiceProfile",
   "description": "开票资料与接收信息。",

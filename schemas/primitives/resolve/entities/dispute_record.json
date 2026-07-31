@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/dispute_record.json",
+  "version": "2026-07-31",
+  "title": "DisputeRecord",
+  "description": "争议从登记、调解、仲裁到补偿完成的权威档案。",
+  "type": "object",
+  "required": [
+    "dispute_id",
+    "status",
+    "dispute_type",
+    "dispute_scope",
+    "claimant",
+    "respondent",
+    "claim",
+    "resolution_level",
+    "evidence_bundle_ref",
+    "raised_at"
+  ],
+  "properties": {
+    "dispute_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "争议档案的唯一标识。"
+    },
+    "status": {
+      "$ref": "dispute_status.json",
+      "description": "争议当前所处的 Resolve 内部状态。"
+    },
+    "dispute_type": {
+      "$ref": "dispute_type.json",
+      "description": "争议事实分类。"
+    },
+    "dispute_scope": {
+      "$ref": "dispute_scope_type.json",
+      "description": "争议影响的原语或全局范围。"
+    },
+    "dispute_scope_detail": {
+      "$ref": "dispute_scope.json",
+      "description": "争议影响的具体业务资源与金额范围。"
+    },
+    "lock_policy": {
+      "$ref": "lock_policy.json",
+      "description": "争议有效期间实际生效的锁定策略。"
+    },
+    "claimant": {
+      "$ref": "dispute_party.json",
+      "description": "提交主张的争议方。"
+    },
+    "respondent": {
+      "$ref": "dispute_party.json",
+      "description": "需要对主张进行答辩的争议方。"
+    },
+    "claim": {
+      "$ref": "claim_detail.json",
+      "description": "已登记的争议主张。"
+    },
+    "resolution_level": {
+      "$ref": "resolution_level.json",
+      "description": "当前或最终采用的处置层级。"
+    },
+    "auto_resolution_check": {
+      "type": "object",
+      "properties": {
+        "l1_applicable": {
+          "type": "boolean",
+          "description": "是否存在可直接执行的 L1 自治处置规则。"
+        },
+        "reason": {
+          "type": "string",
+          "description": "适用或不适用 L1 规则的判定理由。"
+        }
+      },
+      "description": "争议登记时对 L1 自动处置适用性的评估。",
+      "additionalProperties": true
+    },
+    "recommended_level": {
+      "$ref": "resolution_level.json",
+      "description": "基于争议类型、金额、证据和合规等级推荐的处置层级。"
+    },
+    "paused_operations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "依据锁定策略已暂停的 Action 或资源说明。"
+    },
+    "respondent_deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "答辩方提交回应与证据的 RFC 3339 截止时间。"
+    },
+    "mediation_result": {
+      "type": "object",
+      "description": "调解方签发的结构化调解结果。",
+      "additionalProperties": true
+    },
+    "arbitration_decision": {
+      "type": "object",
+      "description": "仲裁机构签发的结构化裁定。",
+      "additionalProperties": true
+    },
+    "compensation_result": {
+      "type": "object",
+      "description": "补偿动作的执行结果、失败原因和完成时间。",
+      "additionalProperties": true
+    },
+    "resolution_outcome": {
+      "$ref": "resolution_outcome.json",
+      "description": "调解、仲裁或 L1 规则形成的可执行处置结果。"
+    },
+    "evidence_bundle_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "争议期间只允许追加且保持哈希链完整的证据包标识。"
+    },
+    "raised_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "争议成功登记的 RFC 3339 时间。"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "争议形成终局处置结果的 RFC 3339 时间。"
+    }
+  },
+  "additionalProperties": true
+}

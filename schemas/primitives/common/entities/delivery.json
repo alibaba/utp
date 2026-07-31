@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/delivery.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/delivery.json",
   "version": "2026-07-30",
   "title": "Delivery",
   "description": "订单或协议条款中确认的交付方式与交付信息。",

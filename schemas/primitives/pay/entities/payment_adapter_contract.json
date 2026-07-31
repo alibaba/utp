@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_adapter_contract.json",
+  "version": "2026-07-31",
+  "title": "PaymentAdapterContract",
+  "description": "支付渠道或资金服务接入 Pay 原语的确定性映射契约。",
+  "type": "object",
+  "required": [
+    "adapter_id",
+    "channel",
+    "signature_verification",
+    "status_mapping",
+    "finality_rules",
+    "idempotency_window"
+  ],
+  "properties": {
+    "adapter_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "支付适配器实现或配置的唯一标识。"
+    },
+    "channel": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该适配契约覆盖的支付渠道。"
+    },
+    "signature_verification": {
+      "type": "object",
+      "description": "渠道回调签名算法、密钥定位和验证要求。",
+      "additionalProperties": true
+    },
+    "status_mapping": {
+      "type": "object",
+      "description": "渠道原始状态到标准 PaymentEventType 的映射。",
+      "additionalProperties": {
+        "$ref": "payment_event_type.json"
+      }
+    },
+    "finality_rules": {
+      "type": "object",
+      "description": "判断渠道状态是否最终、是否允许补偿查询的规则。",
+      "additionalProperties": true
+    },
+    "idempotency_window": {
+      "type": "string",
+      "minLength": 1,
+      "description": "适配器保证同一渠道事实不重复产生资金影响的时间窗口，使用 ISO 8601 duration 或等价表达。"
+    }
+  },
+  "additionalProperties": true
+}

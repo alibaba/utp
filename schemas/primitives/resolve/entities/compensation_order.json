@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/compensation_order.json",
+  "version": "2026-07-31",
+  "title": "CompensationOrder",
+  "description": "调解或仲裁产生的补偿单；资金退款必须进一步转换为 RefundInstruction。",
+  "type": "object",
+  "required": [
+    "total_compensation",
+    "refund_source",
+    "deadline"
+  ],
+  "properties": {
+    "refund_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "需要通过 utp.pay.refund 退回的金额。"
+    },
+    "penalty_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "处置结果确定的违约金或附加赔偿金额。"
+    },
+    "total_compensation": {
+      "$ref": "../../common/entities/money.json",
+      "description": "资金补偿、违约金及其他可计价补偿的总金额。"
+    },
+    "refund_source": {
+      "type": "string",
+      "enum": [
+        "escrow_holdback",
+        "escrow_full_release_to_buyer",
+        "seller_account",
+        "platform_guarantee"
+      ],
+      "description": "补偿资金来源：托管留存、托管全额退回买方、卖方账户或平台保障资金。"
+    },
+    "additional_actions": {
+      "type": "array",
+      "items": {
+        "$ref": "compensation_action.json"
+      },
+      "description": "资金退款之外需要执行的补偿动作。"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "全部补偿动作应完成的 RFC 3339 截止时间。"
+    }
+  },
+  "additionalProperties": true
+}

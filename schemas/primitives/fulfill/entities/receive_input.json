@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/receive_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receive_input.json",
   "version": "2026-07-27",
   "title": "FulfillReceiveInput",
   "description": "utp.fulfill.receive 的业务输入。Buyer 对已妥投且满足验货要求的订单/批次确认收货，MUST 携带 Buyer 签名；当前批次进入 RECEIVED，全部批次完成时进入 FULFILLED。",
@@ -15,11 +15,6 @@
       "type": "string",
       "minLength": 1,
       "description": "订单交付批次标识，可选。"
-    },
-    "received_quantity": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "本次确认收货数量。"
     },
     "line_items": {
       "type": "array",
@@ -37,43 +32,10 @@
       "default": "ACCEPTED",
       "description": "收货结论，缺省 ACCEPTED。CONDITIONAL 表示条件接受，应提供 reason_code。"
     },
-    "reason_code": {
-      "type": "string",
-      "description": "条件接受的原因码，可选。"
-    },
-    "evidence_refs": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
-      "description": "证据引用，可选。"
-    },
-    "inspection_report_refs": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
-      "description": "验货报告引用，可选。"
-    },
-    "remarks": {
-      "type": "string",
-      "description": "备注，可选。"
-    },
     "received_at": {
       "type": "string",
       "format": "date-time",
       "description": "确认收货时间，可选。"
-    },
-    "fulfillment_receipt_ref": {
-      "type": "string",
-      "minLength": 1,
-      "description": "调用方已知的履约收据引用，可选；服务端可用于幂等关联和汇总更新。"
-    },
-    "signature": {
-      "$ref": "../../common/entities/signature.json",
-      "description": "Buyer 签名，覆盖收货关键字段。"
     }
   },
   "required": [

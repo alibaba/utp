@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_status.json",
+  "version": "2026-07-31",
+  "title": "PaymentStatus",
+  "description": "支付请求、支付确认或支付汇总的标准状态。",
+  "type": "string",
+  "oneOf": [
+    { "const": "authorized", "description": "支付工具已授权或资金已预冻结，尚未完成渠道确认。" },
+    { "const": "processing", "description": "支付正在渠道侧处理中。" },
+    { "const": "pending", "description": "支付尚未达到可确认条件或正在等待后续付款阶段。" },
+    { "const": "confirmed", "description": "当前支付或付款阶段已确认成功。" },
+    { "const": "partial", "description": "部分付款义务已完成，仍存在未付款项。" },
+    { "const": "completed", "description": "全部付款义务已完成。" },
+    { "const": "failed", "description": "支付最终失败，可按策略重试或进入争议处理。" },
+    { "const": "refunded", "description": "相关支付金额已完成退款。" }
+  ]
+}

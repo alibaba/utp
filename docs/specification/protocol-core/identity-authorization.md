@@ -73,7 +73,7 @@ format: html
 <li><strong>私钥不可导出</strong>：当目标操作要求不可导出私钥、硬件隔离或运行时证明时，认证机制 MUST 提供相应的密钥保护与证明材料。</li>
 <li><strong>协议引擎独立判定</strong>：操作准入结论必须由协议引擎根据双方 Profile、运行时证据、授权凭证与 Mandate 内容独立判定，请求方不得自行声明。</li>
 <li><strong>最小权限与窄授权</strong>：OAuth scope 与 Mandate Chain 均遵循最小权限原则。scope 限定原语级操作范围，Mandate 限定单笔交易的内容与边界。</li>
-<li><strong>可审计性</strong>：所有身份验证、授权决策、密钥轮换、Mandate 签发与撤销事件 MUST 进入 Evidence Bundle，确保事后可追溯、可举证。</li>
+<li><strong>可审计性</strong>：所有身份验证、授权决策、密钥轮换与 Mandate 签发事件 MUST 进入 Evidence Bundle，确保事后可追溯、可举证。</li>
 </ul>
 
 <h2 id="s-62">6.2 身份认证机制（Agent Authentication）</h2>
@@ -347,7 +347,7 @@ Content-Type: application/json
 
 <p>Mandate Chain 是 UTP 协议的操作级授权机制，以可验证数字凭证（Verifiable Digital Credential, VDC）的形式记录用户对特定商业操作的授权事实。每个 Mandate 采用 SD-JWT+kb（Selective Disclosure JWT with Key Binding）格式，具备防篡改、不可否认、跨系统可验证三项核心属性，使任何持有公钥的参与方均可独立验证凭证真实性。Mandate 与 Agent authentication、User authorization 共同构成操作准入的完整证据链——前两者分别证明"谁在执行"和"是否被委托"，Mandate 则证明"该具体操作是否被授权"。</p>
 
-<p>Mandate 在 UTP 中并非孤立运行。它与 OAuth 委托关系、WIMSE workload 身份共同构成三层可审计信任链，确保从用户委托到 Agent 执行再到具体操作的每一步均可追溯、可验证。同时，UTP Mandate 模型兼容 AP2（Agent Procurement Protocol）Mandate 规范，将 AP2 面向 AI Agent 采购场景的三层凭证链（Intent / Checkout / Payment）映射至 UTP 原语体系，确保跨协议互操作性。</p>
+<p>Mandate 在 UTP 中并非孤立运行。它与 OAuth 委托关系、WIMSE workload 身份共同构成三层可审计信任链，确保从用户委托到 Agent 执行再到具体操作的每一步均可追溯、可验证。UTP 通过 Intent、Checkout 与 Payment 三类凭证，将用户意图、订单确认和支付授权关联为可验证的授权链。</p>
 
 <p>UTP v1.0 的 Mandate 版本范围与完整链路流程详见 <a href="#s-645">§6.4.5</a>。各类型凭证的定义与字段规范详见 <a href="#s-642">§6.4.2</a>，签名与规范化规则详见 <a href="#s-643">§6.4.3</a>，验证规则详见 <a href="#s-644">§6.4.4</a>，审计消费语义与 Evidence Bundle 规范详见 <a href="/documentation/specification/protocol-core/risk-audit.html#s-72-evidence-bundle">§7.2</a>。操作响应中 Mandate 凭证的回传格式详见 <a href="#s-646">§6.4.6</a>。</p>
 
@@ -396,7 +396,7 @@ Content-Type: application/json
 
 <p>Checkout Mandate 用于授权完成一笔具体 checkout（订单）。商家 MUST 先创建并签署订单对象；Checkout Mandate 以 SD-JWT+kb 格式承载该商家签名的 <code>checkout_jwt</code> 及其 <code>checkout_hash</code>，将商家确认的交易条款与用户授权绑定。买方用户在受信确认面审阅该商家签名对象后签发凭证。</p>
 
-<p>UTP v1.0 采用 AP2 closed Checkout Mandate，其 <code>vct</code> MUST 为 <code>mandate.checkout.1</code>。核心声明包括：</p>
+<p>Checkout Mandate 的 <code>vct</code> MUST 为 <code>mandate.checkout.1</code>。核心声明包括：</p>
 
 <ul>
 <li><code>checkout_jwt</code>：商家对订单对象签名的 JWT（base64url 序列化），含最终交易条款。</li>
@@ -420,7 +420,7 @@ Content-Type: application/json
 
 <p>Payment Mandate 用于授权对特定订单的支付。买方用户在受信确认面签发凭证，绑定交易标识、收款方、最终金额与支付工具；商家支付处理方、PSP / Tokenizer 与支付网络各自独立验证。</p>
 
-<p>UTP v1.0 采用 AP2 closed Payment Mandate，其 <code>vct</code> MUST 为 <code>mandate.payment.1</code>。核心声明包括：</p>
+<p>Payment Mandate 的 <code>vct</code> MUST 为 <code>mandate.payment.1</code>。核心声明包括：</p>
 
 <ul>
 <li><code>transaction_id</code>：<code>checkout_jwt</code> 值的 base64url 编码哈希，唯一标识关联的 checkout。哈希算法 MUST 与 SD-JWT 的 <code>sd_hash</code> 算法一致，缺省为 SHA-256。该字段与 Checkout Mandate 的 <code>checkout_hash</code> 指向同一哈希值，构成从「授权下单」到「授权支付」的绑定锚点。</li>
@@ -489,7 +489,7 @@ Content-Type: application/json
 
 <p>Operation Mandate 是面向自定义 action 的授权票据。当某个 UTP primitive action（如 <code>fulfill.notify</code>、<code>fulfill.receive</code>、<code>pay.term</code>、<code>resolve.raise</code>、<code>negotiate.counter_offer</code> 等）的准入声明要求超出 Checkout / Payment Mandate 覆盖范围的额外授权时，授权方为该 action 签发一张 Operation Mandate 票据，提交方在执行 action 时携带，接收方验证票据的签名、操作绑定、约束与 Mandate Chain 后放行。</p>
 
-<p>UTP v1.0 采用 AP2 closed Operation Mandate，其 <code>vct</code> MUST 为 <code>mandate.operation.1</code>。核心声明包括：</p>
+<p>Operation Mandate 的 <code>vct</code> MUST 为 <code>mandate.operation.1</code>。核心声明包括：</p>
 
 <ul>
 <li><code>operation</code>：被授权的具体 action，格式为 <code>utp.{primitive}.{action}</code>。接收方 MUST 核对该字段与当前请求的 primitive action 完全一致。</li>
@@ -526,55 +526,40 @@ Content-Type: application/json
 
 <h3 id="s-643">6.4.3 签名与规范化（Signing and Canonicalization）</h3>
 
-<p>Mandate 签名的目的是使交易条款、用户确认与支付授权在跨系统传递、存储和事后举证时保持可重放验证能力。所有 Mandate 签名载荷 SHOULD 使用 RFC 8785 JSON Canonicalization Scheme（JCS）进行规范化；若采用 JWS Detached Payload 格式，签名输入 MUST 覆盖 protected header 与规范化后的业务载荷，且 JWS header MUST 至少包含 <code>alg</code> 与 <code>kid</code>。</p>
+<p>UTP 的 Checkout 授权按三个层次组织：商家先对 Checkout 条款作出签名承诺；用户或其受信签署方再签发 Mandate；两类签名都按相同的规范化规则重建载荷。三者共同将商家确认的条款、用户授权和后续支付关联起来。</p>
+
+<h4>商家授权（Business Authorization）</h4>
+
+<p>商家 MUST 在每个 Checkout 响应的 <code>merchant_authorization</code> 字段中写入对 Checkout 条款的签名。该值采用 JWS Detached Payload 格式（RFC 7515 Appendix F），格式为 <code>&lt;base64url(header)&gt;..&lt;base64url(signature)&gt;</code>；双点表示 Checkout 载荷不在 JWS 字符串中，而是随 Checkout 响应单独传递。</p>
+
+<p>商家签名的载荷 MUST 为创建订单 input 的完整业务内容。签名输入 MUST 同时覆盖 JWS Protected Header 与该规范化载荷；Protected Header MUST 包含 <code>alg</code> 和 <code>kid</code>，其中 <code>kid</code> 指向商家在 Profile <code>signing_keys</code> 中登记的公钥。商家授权使用 <code>ES256</code>、<code>ES384</code> 或 <code>ES512</code>，且实现 MUST 支持 <code>ES256</code>。</p>
+
+<p>受信确认面 MUST 在向用户展示 Checkout 前验证 <code>merchant_authorization</code>，并核对签名载荷与创建订单 input 的完整业务内容一致。该签名证明商品、金额、收款方及适用条款由商家确认；它本身不构成用户对交易或资金的授权。</p>
+
+<h4>Mandate 签名（Mandate Signing）</h4>
+
+<p>用户确认后，用户钱包或受信平台代理使用其授权签名密钥签发 Mandate。Checkout Mandate 与 Payment Mandate 使用 SD-JWT+kb；Operation Mandate 也使用与其授权主体绑定的可验证凭证。Mandate 签名证明授权主体同意其所覆盖的交易或操作，不能替代商家对 Checkout 条款的签名。</p>
 
 <table>
 <thead>
 <tr><th>签名对象</th><th>签名方</th><th>签名覆盖范围</th><th>验签方</th></tr>
 </thead>
 <tbody>
-<tr><td>Checkout Mandate</td><td>买方用户</td><td>商家签署的订单对象、订单哈希及最终订单条款。</td><td>商家、支付方、争议裁决方。</td></tr>
+<tr><td>Checkout Mandate</td><td>买方用户或其受信签署方</td><td>包含 <code>merchant_authorization</code> 的完整 Checkout、<code>checkout_jwt</code>、<code>checkout_hash</code>、有效期与 Key Binding。</td><td>商家、支付方、争议裁决方。</td></tr>
 <tr><td>Payment Mandate</td><td>买方用户</td><td>订单哈希、收款方、金额、支付工具和风险数据。</td><td>支付原语执行方、PSP / Tokenizer、支付网络或发卡方、争议裁决方。</td></tr>
 <tr><td>Operation Mandate</td><td>操作授权主体</td><td>具体 <code>utp.{primitive}.{action}</code>、交易对象引用、上游 Mandate 引用、操作约束与有效期。</td><td>该操作的接收方、协议引擎、争议裁决方。</td></tr>
 </tbody>
 </table>
 
-<p>实现方 MAY 将 Mandate 打包为具备 Key Binding 的选择性披露凭证，但接收方验证后 MUST 能还原出与本节实体表一致的逻辑字段。无论采用 JWS、JWS Detached Payload 或其他可验证凭证包装，协议层验证语义均以本节定义的 Mandate 字段、引用关系和约束为准。</p>
+<p>Checkout Mandate MUST 包含带有 <code>merchant_authorization</code> 的完整 Checkout。用户或受信签署方的 Mandate 签名由此绑定商家已经签署的条款，形成由用户签名覆盖商家签名所在 Checkout 上下文的嵌套关系。支付场景中，Payment Mandate 的 <code>transaction_id</code> MUST 与 Checkout Mandate 的 <code>checkout_hash</code> 指向同一哈希值。</p>
 
-<h4>AP2 对齐：JWS Detached Payload 签名格式</h4>
+<p>提交 Checkout 时，请求方携带 Checkout Mandate；支付凭证令牌中携带 Payment Mandate。接收方 MUST 先验证 Mandate 的 SD-JWT+kb 签名、Key Binding 和有效期，再从已验证的 Checkout Mandate 中取出完整 Checkout，验证其中的 <code>merchant_authorization</code>，并核对其与当前 Checkout 状态的条款一致性。</p>
 
-<p>为与 AP2 Protocol 保持互操作，UTP Mandate 签名推荐采用 JWS Detached Payload 格式（RFC 7515 §3）。Detached 格式将签名与载荷分离，便于跨系统传递时按需附带或省略载荷原文：</p>
+<p>实现方 MAY 将 Mandate 打包为具备 Key Binding 的选择性披露凭证，但接收方验证后 MUST 能还原出与本节实体表一致的逻辑字段。无论采用何种可验证凭证包装，协议层验证语义均以本节定义的 Mandate 字段、引用关系和约束为准。</p>
 
-<p>签名输出格式：<code>&lt;base64url(header)&gt;..&lt;base64url(signature)&gt;</code><br>
-正则表达式：<code>^[A-Za-z0-9_-]+\.\.[A-Za-z0-9_-]+$</code></p>
+<h4>规范化要求（Canonicalization）</h4>
 
-<p><strong>签名计算步骤：</strong></p>
-
-<ol>
-<li>提取签名载荷：收集 Mandate 的业务字段（<code>vct</code>、核心声明、约束等）</li>
-<li>规范化：使用 JCS（RFC 8785 JSON Canonicalization Scheme）将 JSON 载荷转换为确定性字节序列</li>
-<li>构造 JWS Protected Header：<code>{"alg": "ES256", "kid": "&lt;signing_key_id&gt;"}</code>，其中 <code>kid</code> 指向签名方在 Profile <code>signing_keys</code> 中登记的公钥标识</li>
-<li>编码 Header：<code>base64url_encode(header_json)</code> → <code>encoded_header</code></li>
-<li>编码 Payload：<code>base64url_encode(canonical_bytes)</code> → <code>encoded_payload</code></li>
-<li>构造签名输入：<code>signing_input = encoded_header + "." + encoded_payload</code></li>
-<li>计算签名：<code>signature = ECDSA(signing_input, private_key, ES256)</code></li>
-<li>输出 Detached JWS：<code>result = encoded_header + ".." + base64url_encode(signature)</code></li>
-</ol>
-
-<p><strong>签名算法选择：</strong></p>
-
-<table>
-<thead>
-<tr><th>算法</th><th>标识符</th><th>RFC</th><th>安全等级</th><th>推荐场景</th></tr>
-</thead>
-<tbody>
-<tr><td>Ed25519</td><td><code>EdDSA</code></td><td>RFC 8037</td><td>高</td><td>默认推荐，签名短、验证快</td></tr>
-<tr><td>P-256 (secp256r1)</td><td><code>ES256</code></td><td>RFC 7518</td><td>高</td><td>AP2 兼容默认选择，广泛 HSM/TEE 支持</td></tr>
-<tr><td>P-384 (secp384r1)</td><td><code>ES384</code></td><td>RFC 7518</td><td>极高</td><td>高安全场景，金融与合规要求</td></tr>
-</tbody>
-</table>
-
-<p><strong>密钥发现与轮换：</strong>JWS Protected Header 中的 <code>kid</code> 字段指向签名方在 UTPProfile <code>signing_keys</code> 数组或 JWKS 端点中登记的特定公钥。验证方通过 <code>kid</code> 定位公钥进行验签。多个有效密钥可并存以支持无缝轮换；签发方 SHOULD 至少每年轮换一次签名密钥，密钥泄露时 MUST 在 24 小时内更新 DID 文档或 Profile。</p>
+<p>所有参与商家授权或 Mandate 签名的 JSON 载荷 MUST 按 RFC 8785 JSON Canonicalization Scheme（JCS）规范化。JCS 将逻辑等价的 JSON 转换为确定性字节序列，使签名在跨系统传递、重新序列化和长期存证后仍可重放验证。</p>
 
 <h3 id="s-644">6.4.4 验证规则</h3>
 
@@ -589,8 +574,7 @@ Content-Type: application/json
 <li><strong>状态与引用一致性</strong>：Checkout Mandate 与 Payment Mandate MUST 由买方用户签发并使用同一哈希（Checkout Mandate 的 <code>checkout_hash</code> 与 Payment Mandate 的 <code>transaction_id</code>）；</li>
 <li><strong>金额一致性</strong>：Payment Mandate 的 <code>payment_amount</code> MUST 与关联订单总额一致；</li>
 <li><strong>操作边界一致性</strong>：Operation Mandate 的 <code>operation</code> MUST 与当前执行的 primitive action 一致，且 <code>constraints</code> MUST NOT 扩大其引用的上游 Mandate 或交易凭证边界；</li>
-<li><strong>时效性</strong>：未过期，且未在有效期内被撤销；</li>
-<li><strong>撤销状态</strong>：MUST NOT 存在生效时间早于本操作执行时间的 Mandate Revocation；</li>
+<li><strong>时效性</strong>：未过期；</li>
 <li><strong>受信确认或运行时证明</strong>：当目标操作要求硬件隔离、受信确认或运行时证明时，MUST 附通过验证的相应证据；资金、高风险授权或状态迁移操作 SHOULD 提供远程证明。</li>
 </ol>
 
@@ -602,7 +586,7 @@ Content-Type: application/json
 <li><strong>签名验证</strong>：验证 Mandate 签名、JWS header、算法白名单与规范化载荷；签名无效时 MUST 拒绝。</li>
 <li><strong>关联验证</strong>：验证 Checkout、Payment、Operation 之间已声明的引用可解析且内容一致；Checkout Mandate 的 <code>checkout_hash</code> 与 Payment Mandate 的 <code>transaction_id</code> MUST 指向同一哈希。</li>
 <li><strong>条款一致性验证</strong>：验证当前 Purchase / Payment / Fulfill / Resolve 请求中的金额、商品、收款方、操作、交易对象与 Mandate 内容一致。</li>
-<li><strong>时效与撤销验证</strong>：验证 <code>iat</code> / <code>exp</code>、订单对象有效期、商家条款承诺及 MandateRevocation 状态。</li>
+<li><strong>时效验证</strong>：验证 <code>iat</code> / <code>exp</code>、订单对象有效期与商家条款承诺。</li>
 <li><strong>操作准入与 HAI 验证</strong>：根据第 5 章确认目标操作的准入要求是否满足，并根据第 20 章确认是否需要人类确认或升级控制等级。</li>
 <li><strong>审计落库</strong>：将验证结果、Mandate 哈希、签名方主体、使用操作与异常原因写入 Evidence Bundle；验证失败亦 MUST 记录为 Authorization Decision。</li>
 </ol>
@@ -622,7 +606,7 @@ Content-Type: application/json
 
 <h3 id="s-645">6.4.5 Mandate Chain 完整链路</h3>
 
-<p>Mandate Chain 不是一条独立业务流程，而是附着在 UTP 会话和原语请求上的授权证据链。其顺序与 <a href="https://ucp.dev/latest/specification/ap2-mandates/">AP2 Mandates</a> 的核心模型一致：能力激活后锁定；商家先签署最终交易条款；用户或其受信签署方再生成绑定该条款的 Mandate；业务方与支付方分别验证后才执行操作。UTP 将该模型用于 Purchase、Pay 及需要额外操作授权的原语。</p>
+<p>Mandate Chain 不是一条独立业务流程，而是附着在 UTP 会话和原语请求上的授权证据链。其顺序为：能力激活后锁定；商家先签署最终交易条款；用户或其受信签署方再生成绑定该条款的 Mandate；业务方与支付方分别验证后才执行操作。该机制适用于 Purchase、Pay 及需要额外操作授权的原语。</p>
 
 <p id="s-6451"><strong>发现（Discovery）</strong></p>
 
@@ -634,7 +618,7 @@ Content-Type: application/json
 </thead>
 <tbody>
 <tr><td>Mandate 类型支持</td><td><code>mandates.supported_mandate_types</code></td><td>声明是否支持 <code>"checkout"</code>、<code>"payment"</code>、<code>"operation"</code>。</td></tr>
-<tr><td>签名公钥</td><td><code>signing_keys</code> / JWKS / Trust Anchor</td><td>解析买方用户、Agent、商家和支付相关主体的签名公钥，验证订单对象、Mandate 与撤销记录。</td></tr>
+<tr><td>签名公钥</td><td><code>signing_keys</code> / JWKS / Trust Anchor</td><td>解析买方用户、Agent、商家和支付相关主体的签名公钥，验证订单对象与 Mandate。</td></tr>
 <tr><td>授权入口</td><td><code>user_authorization</code></td><td>发现 OAuth Authorization Server、scope 与授权流程；OAuth 提供一般性用户委托，具体下单与支付授权仍须由成对的 Mandate 证明。</td></tr>
 </tbody>
 </table>
@@ -649,27 +633,9 @@ Content-Type: application/json
 
 <p id="s-6453"><strong>生成与确认（Generation and Consent）</strong></p>
 
-<p>商家 MUST 先签署包含最终商品、金额、收款方及适用条款的订单对象。买方用户或其受信签署方在确认该对象后生成两项核心凭证：Checkout Mandate 证明对该订单的确认；Payment Mandate 证明对该订单付款的授权。二者 MUST 以同一订单哈希绑定。平台、钱包、TEE 或企业审批系统可以执行签名，但 MUST 有可验证的授权事件。</p>
+<p>商家 MUST 先创建包含最终商品、金额、收款方及适用条款的订单对象，并对创建订单 input 的完整业务内容生成 Detached JWT（JWS Detached Payload）签名。商家 MUST 将该签名写入订单的 <code>merchant_authorization</code> 字段，并随订单一并返回。买方用户或其受信签署方 MUST 在验证该签名并确认订单后，生成两项核心凭证：Checkout Mandate 证明对该签名订单的确认；Payment Mandate 证明对该订单付款的授权。二者 MUST 以同一订单哈希绑定。平台、钱包、TEE 或企业审批系统可以执行签名，但 MUST 有可验证的授权事件。</p>
 
 <p>当目标操作需要超出该订单或付款授权范围的额外同意时，授权方 MAY 签发 Operation Mandate。它通过 <code>parent_mandate_refs</code> 关联上游 Mandate 或交易凭证，并且 MUST 只收窄、不扩大上游授权边界。</p>
-
-<p id="s-6454"><strong>传递（Transmission）</strong></p>
-
-<p>Mandate 随使用它的原语请求传递：完整凭证可直接携带，也可传递可解析的 <code>mandate_id</code> 引用；接收方无法解析引用时，请求方 MUST 提供完整凭证。</p>
-
-<table>
-<thead>
-<tr><th>阶段</th><th>推荐传递位置</th><th>要求</th></tr>
-</thead>
-<tbody>
-<tr><td>Purchase 完成</td><td>Purchase 请求体或扩展字段</td><td>携带商家签署的订单对象及 Checkout Mandate。</td></tr>
-<tr><td>Pay 发起 / 确认</td><td><code>PaymentRequest.mandate_chain</code></td><td>携带成对的 Checkout Mandate 与 Payment Mandate；额外操作授权 MAY 携带 <code>operation_mandates</code>。</td></tr>
-<tr><td>其他受保护操作</td><td>对应原语请求体或 Evidence Bundle 引用</td><td>仅当目标操作要求时携带适用的 Operation Mandate 或其可解析引用。</td></tr>
-<tr><td>撤销通知</td><td>消息信封 <code>message_type = "mandate_revocation"</code></td><td>载荷为完整 MandateRevocation 实体，接收方 MUST 幂等处理。</td></tr>
-</tbody>
-</table>
-
-<p>Mandate 属于可审计安全材料。接收方在验签通过后 SHOULD 存储 Mandate 的原文、规范化哈希、签名验证结果与使用该 Mandate 的操作 ID，并将其纳入第 7 章定义的 AuthorizationArchive 与 Evidence Bundle。</p>
 
 <p id="s-6455"><strong>验证与处理（Verification and Processing）</strong></p>
 
@@ -683,13 +649,12 @@ Content-Type: application/json
 
 <p><strong>响应侧：</strong>当响应涉及 Mandate 的签发、消费或更新时，响应体 MUST 在 <code>mandate</code> 字段回传授权凭证上下文。Ch.10 响应骨架（参见 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023">§10.2.3</a>）声明了 <code>mandate</code> 字段的存在位置；其内部凭证结构由本节定义。</p>
 
-<p><code>mandate</code> 响应对象将本次操作产出或消费的 Mandate 凭证按 AP2 对齐的分层结构回传，每个字段对应一类凭证或一组链式引用：</p>
+<p><code>mandate</code> 响应对象按分层结构回传本次操作产出或消费的 Mandate 凭证，每个字段对应一类凭证：</p>
 
 <ul>
-<li><code>merchant_authorization</code>：商家对最终订单对象的密码学签名（JWS Detached Payload），证明交易条款真实未篡改。对标 AP2 <code>merchant_authorization</code>。接收方可独立验证商品、金额、收款方及适用条款的完整性。Checkout Mandate 通过 <code>checkout_jwt</code> 声明内嵌该签名，构成嵌套凭证链。</li>
-<li><code>checkout</code>：Checkout Mandate 凭证令牌（SD-JWT+kb 编码），证明买方用户对该订单的确认授权。对标 AP2 <code>checkout_mandate</code>。仅在 <code>purchase.complete</code> 等签发 Checkout Mandate 的操作响应中返回。</li>
-<li><code>payment</code>：Payment Mandate 凭证令牌（SD-JWT+kb 编码），证明买方用户对该订单付款的授权。对标 AP2 <code>payment.instruments[*].credential.token</code>（支付凭证复合令牌）。仅在 <code>pay.initiate</code> / <code>pay.confirm</code> 等支付操作的响应中返回。</li>
-<li><code>chain</code>：当前 Mandate Chain 的有序哈希列表（string[]），从根凭证（<code>merchant_authorization</code> 的订单哈希）到最新凭证。用于审计追溯与链完整性验证。</li>
+<li><code>merchant_authorization</code>：商家对最终订单对象的密码学签名（JWS Detached Payload），证明交易条款真实未篡改。接收方可独立验证商品、金额、收款方及适用条款的完整性。Checkout Mandate 通过 <code>checkout_jwt</code> 声明内嵌该签名，构成嵌套凭证链。</li>
+<li><code>checkout</code>：Checkout Mandate 凭证令牌（SD-JWT+kb 编码），证明买方用户对该订单的确认授权。仅在 <code>purchase.complete</code> 等签发 Checkout Mandate 的操作响应中返回。</li>
+<li><code>payment</code>：Payment Mandate 凭证令牌（SD-JWT+kb 编码），证明买方用户对该订单付款的授权。仅在 <code>pay.initiate</code> / <code>pay.confirm</code> 等支付操作的响应中返回。</li>
 <li><code>operation</code>：Operation Mandate 凭证令牌（SD-JWT+kb 编码）。仅当本次操作消费或签发了 Operation Mandate 时返回。</li>
 </ul>
 
@@ -697,11 +662,7 @@ Content-Type: application/json
   "mandate": {
     "merchant_authorization": "eyJhbGciOiJFUzI1NiJ9..dGVzdC1zaWduYXR1cmU",
     "checkout": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK3NkLWp3dCJ9...",
-    "payment": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK3NkLWp3dCJ9...",
-    "chain": [
-      "NivWhuqfzcvZNapvIEJ2-3tsdQLkiuIcye2g46WVgX8",
-      "G2DuU6IjyDkD-9ItStdsUo48C5uJqDs1E9Hf5GT3TgM"
-    ]
+    "payment": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK3NkLWp3dCJ9..."
   }
 }</code></pre>
 
@@ -709,19 +670,18 @@ Content-Type: application/json
 
 <h3 id="s-647">6.4.7 错误处理（Error Handling）</h3>
 
-<p>Mandate Chain 的生命周期（声明、传递、验证、撤销）中可能发生多类故障。本节集中汇总所有 Mandate 相关的错误码，覆盖权限缺失、密码学验证失败、时效性、撤销状态、作用域不匹配与委托链断裂等场景，为协议实现者提供统一的错误处理参考。</p>
+<p>Mandate Chain 的生命周期（声明、传递、验证）中可能发生多类故障。本节集中汇总所有 Mandate 相关的错误码，覆盖权限缺失、密码学验证失败、时效性、作用域不匹配与委托链断裂等场景，为协议实现者提供统一的错误处理参考。</p>
 
 <p>协议引擎在返回下述任何错误时，MUST 按第 10 章 P0 原语通用框架的标准错误响应结构返回足够的诊断信息（失败的具体 <code>mandate_id</code>、失败验证步骤、期望与实际的差异），帮助调用方快速定位问题根源。</p>
 
 <table>
 <thead>
-<tr><th>错误码</th><th>HTTP Status</th><th>触发条件</th><th>AP2 对应</th></tr>
+<tr><th>错误码</th><th>HTTP Status</th><th>触发条件</th><th>错误标识</th></tr>
 </thead>
 <tbody>
 <tr><td><code>MANDATE_REQUIRED</code></td><td>403</td><td>会话已协商锁定 Mandate，但请求未携带所需凭证</td><td><code>mandate_required</code></td></tr>
 <tr><td><code>MANDATE_INVALID_SIGNATURE</code></td><td>403</td><td>Mandate 密码学签名验证失败</td><td><code>mandate_invalid_signature</code></td></tr>
 <tr><td><code>MANDATE_EXPIRED</code></td><td>403</td><td>Mandate 的 <code>exp</code> 已超过当前时间</td><td><code>mandate_expired</code></td></tr>
-<tr><td><code>MANDATE_REVOKED</code></td><td>403</td><td>存在生效时间早于本操作执行时间的 MandateRevocation</td><td>—</td></tr>
 <tr><td><code>MANDATE_SCOPE_MISMATCH</code></td><td>403</td><td>Mandate 的作用域（商家、金额、商品项、操作）与当前请求不匹配</td><td><code>mandate_scope_mismatch</code></td></tr>
 <tr><td><code>MANDATE_CHAIN_BROKEN</code></td><td>403</td><td>Mandate 委托链验证失败（凭证签名链不完整或引用绑定断裂）</td><td>—</td></tr>
 <tr><td><code>MERCHANT_AUTHORIZATION_INVALID</code></td><td>403</td><td>商家签署的订单对象（merchant_authorization）签名验证失败</td><td><code>merchant_authorization_invalid</code></td></tr>
@@ -802,7 +762,6 @@ Content-Type: application/json
 <tr><td>PaymentInstrument</td><td>6.4.2</td><td>支付工具标识（<code>id</code>、<code>type</code>、<code>description</code>）</td></tr>
 <tr><td>OperationMandate</td><td>6.4.2</td><td>面向自定义 action 的授权票据（<code>vct: mandate.operation.1</code>），绑定 operation、subject_ref、constraints 与 parent_mandate_refs</td></tr>
 <tr><td>OperationMandateConstraints</td><td>6.4.2</td><td>操作授权约束（max_amount_effect、resource_scope、requires_hai_level）</td></tr>
-<tr><td>MandateRevocation</td><td>6.4.5</td><td>Mandate 撤销记录，支持级联失效与通知传播</td></tr>
 </tbody>
 </table>
 
@@ -920,7 +879,7 @@ Content-Type: application/json
 <ul>
 <li>Agent Authentication 机制详情见 6.2 节；</li>
 <li>User Authorization 流程、Discovery、Token 验证与 Scope 设计见 6.3 节；</li>
-<li>Mandate Chain 字段、示例与撤销规则见 6.4 节；</li>
+<li>Mandate Chain 字段与示例见 6.4 节；</li>
 <li>Trust Anchor 与 Evidence Bundle 要求见 <a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章</a>。</li>
 </ul>
 

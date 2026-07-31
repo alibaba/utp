@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/money.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/money.json",
   "version": "2026-07-27",
   "title": "Money",
   "description": "货币金额。amount 使用 decimal 字符串表达，避免浮点精度问题；精度由货币决定（CNY 精确到分）。",

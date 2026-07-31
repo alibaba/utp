@@ -1,11 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/list_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_input.json",
   "version": "2026-07-27",
   "title": "FulfillListInput",
   "description": "utp.fulfill.list 的业务输入。Buyer 检索与自身关联的订单摘要，支持结构化筛选、排序与分页；所有筛选条件均可选。",
   "type": "object",
   "properties": {
+    // 过滤条件 ==》 ucp
     "filters": {
       "type": "object",
       "properties": {
@@ -32,18 +33,10 @@
           "items": {
             "type": "string",
             "enum": [
-              "INIT",
-              "SHIPPED",
-              "DELAYED",
-              "DELIVERED",
-              "INSPECTED",
-              "RECEIVED",
-              "PARTIAL_DELIVERED",
-              "FULFILLED",
-              "REJECTED"
+            // 订单的状态， 不是原语里的动作状态
             ]
           },
-          "description": "可选。按履约状态筛选。"
+         // "description": "可选。按履约状态筛选。"
         },
         "supplier_id": {
           "type": "string",
@@ -52,58 +45,22 @@
         },
         "time_range": {
           "$ref": "#/$defs/time_range",
-          "description": "可选。按最近履约事件时间范围筛选。"
+          "description": "可选。按最近创建订单时间范围筛选。"
         },
-        "promised_delivery_date_range": {
-          "$ref": "#/$defs/date_range",
-          "description": "可选。按承诺交付日期范围筛选。"
-        },
-        "has_exception": {
-          "type": "boolean",
-          "description": "可选。筛选存在延迟、拒收或异常履约事实的订单。"
+        "keyword": {
+          "type": "string",
+          "description": "按购买关键词筛选，模糊匹配订单中任一行项目的商品名称。"
         }
       },
       "additionalProperties": true,
       "description": "结构化筛选条件。"
     },
-    "status_filter": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "enum": [
-          "INIT",
-          "SHIPPED",
-          "DELAYED",
-          "DELIVERED",
-          "INSPECTED",
-          "RECEIVED",
-          "PARTIAL_DELIVERED",
-          "FULFILLED",
-          "REJECTED"
-        ]
-      },
-      "description": "可选。按履约状态筛选。保留用于兼容早期草案；新实现 SHOULD 使用 filters.status。",
-      "deprecated": true
-    },
-    "time_range": {
-      "$ref": "#/$defs/time_range",
-      "description": "可选。按时间范围筛选。保留用于兼容早期草案；新实现 SHOULD 使用 filters.time_range。",
-      "deprecated": true
-    },
-    "supplier_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "可选。按供应商筛选。保留用于兼容早期草案；新实现 SHOULD 使用 filters.supplier_id。",
-      "deprecated": true
-    },
     "sort_by": {
       "type": "string",
       "enum": [
-        "last_event_at",
-        "promised_delivery_date",
         "created_at"
       ],
-      "description": "排序字段。默认 last_event_at。"
+      "description": "排序字段。默认 created_at。"
     },
     "sort_order": {
       "type": "string",
@@ -116,24 +73,6 @@
     "pagination": {
       "$ref": "../../../common/pagination.json#/$defs/request",
       "description": "游标分页参数。"
-    },
-    "page": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "偏移量。"
-        },
-        "limit": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "每页条数。"
-        }
-      },
-      "additionalProperties": true,
-      "description": "可选。偏移分页参数。保留用于兼容早期草案；新实现 SHOULD 使用 pagination。",
-      "deprecated": true
     }
   },
   "additionalProperties": true,
@@ -142,6 +81,7 @@
       "type": "object",
       "properties": {
         "from": {
+          // RFC 339 ==> 标准化
           "type": "string",
           "format": "date-time",
           "description": "起始时间（含）。"

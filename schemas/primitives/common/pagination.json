@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/pagination.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/pagination.json",
   "version": "2026-07-27",
   "title": "Pagination",
   "description": "列表操作共享的分页参数与响应元数据。请求使用 page 与 page_size；响应在此基础上返回 total。具体操作的输入和输出 Schema 决定各字段的适用性。",

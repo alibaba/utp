@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/primitive.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/primitive.json",
   "name": "utp.fulfill",
   "version": "2026-07-27",
   "title": "P5 Fulfill 履约原语定义",
@@ -8,8 +8,8 @@
   "actions": {
     "leadtime": {
       "description": "Buyer 请求备货、运输、清关或服务激活预估。适用状态 INIT/SHIPPED/DELAYED/PARTIAL_DELIVERED；无状态影响。",
-      "input_schema": "https://ut-protocol.com/primitives/fulfill/entities/leadtime_input.json",
-      "output_schema": "https://ut-protocol.com/primitives/fulfill/entities/leadtime_output.json",
+      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/leadtime_input.json",
+      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/leadtime_output.json",
       "transport_bindings": [
         {
           "type": "rest",
@@ -20,8 +20,8 @@
     },
     "list": {
       "description": "Buyer 检索与自身关联的订单摘要，支持状态、时间、供应商筛选。任意状态可执行；无状态影响；空列表为正常结果。",
-      "input_schema": "https://ut-protocol.com/primitives/fulfill/entities/list_input.json",
-      "output_schema": "https://ut-protocol.com/primitives/fulfill/entities/list_output.json",
+      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_input.json",
+      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_output.json",
       "transport_bindings": [
         {
           "type": "rest",
@@ -32,8 +32,8 @@
     },
     "query": {
       "description": "Buyer 按 order_id 查询单笔订单履约事件、批次、物流、验货和凭证摘要。任意状态可执行；无状态影响。",
-      "input_schema": "https://ut-protocol.com/primitives/fulfill/entities/query_input.json",
-      "output_schema": "https://ut-protocol.com/primitives/fulfill/entities/query_output.json",
+      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/query_input.json",
+      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/query_output.json",
       "transport_bindings": [
         {
           "type": "rest",
@@ -45,8 +45,8 @@
     "notify": {
       "description": "Seller 在发货、延迟、妥投、验货结论等关键节点推送履约事件，驱动采购方可观测状态迁移。MUST 携带 order_id，以对端签名保证来源可信；Buyer 返回成功仅表示已接收；回调不可达时 Buyer 通过 query 轮询兜底。",
       "direction": "seller_to_buyer",
-      "input_schema": "https://ut-protocol.com/primitives/fulfill/entities/notify_input.json",
-      "output_schema": "https://ut-protocol.com/primitives/fulfill/entities/notify_output.json",
+      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/notify_input.json",
+      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/notify_output.json",
       "transport_bindings": [
         {
           "type": "rest",
@@ -57,8 +57,8 @@
     },
     "receive": {
       "description": "Buyer 对已妥投且满足验货要求的订单/批次确认收货，MUST 携带 Buyer 签名。当前批次进入 RECEIVED，全部批次完成时进入 FULFILLED；幂等——重复提交返回既有凭证（FULFILL.ALREADY_RECEIVED）。",
-      "input_schema": "https://ut-protocol.com/primitives/fulfill/entities/receive_input.json",
-      "output_schema": "https://ut-protocol.com/primitives/fulfill/entities/receive_output.json",
+      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receive_input.json",
+      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receive_output.json",
       "transport_bindings": [
         {
           "type": "rest",
@@ -69,8 +69,8 @@
     },
     "reject": {
       "description": "Buyer 对不符合约定的已交付批次提交结构化拒收理由与证据，MUST 携带 Buyer 签名。当前批次进入 REJECTED 终态，生成 RejectionConfirmation 并激活 Resolve；幂等（FULFILL.ALREADY_REJECTED）。",
-      "input_schema": "https://ut-protocol.com/primitives/fulfill/entities/reject_input.json",
-      "output_schema": "https://ut-protocol.com/primitives/fulfill/entities/reject_output.json",
+      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/reject_input.json",
+      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/reject_output.json",
       "transport_bindings": [
         {
           "type": "rest",
@@ -80,5 +80,5 @@
       ]
     }
   },
-  "state_machine": "https://ut-protocol.com/primitives/fulfill/state_machine.json"
+  "state_machine": "https://ut-protocol.com/schemas/primitives/fulfill/state_machine.json"
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/state_machine.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/state_machine.json",
   "version": "2026-07-27",
   "title": "Fulfill 原语状态机定义",
   "description": "履约原语的采购方可观测状态机，对应 UTP 规范第 15 章 §15.3。备货、待发等供应方内部状态不在范围内；notify 推送驱动迁移，query 只读不迁移。",

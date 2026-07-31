@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/receipt_confirmation.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receipt_confirmation.json",
   "version": "2026-07-27",
   "title": "ReceiptConfirmation",
   "description": "采购方收货确认凭证。receive 的产出；重复 receive 幂等返回既有凭证。receive 完成可按 TradeMethod 触发 Escrow 释放。",
@@ -15,16 +15,6 @@
       "type": "string",
       "minLength": 1,
       "description": "订单标识。"
-    },
-    "purchase_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "订单所属订购标识。"
-    },
-    "transaction_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "全局事务标识。"
     },
     "batch_id": {
       "type": "string",
@@ -51,43 +41,10 @@
       },
       "description": "本次确认收货涉及的订单行项目与数量，可选。"
     },
-    "reason_code": {
-      "type": "string",
-      "description": "条件接受的原因码，可选。"
-    },
-    "evidence_refs": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
-      "description": "证据引用，可选。"
-    },
-    "inspection_report_refs": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
-      "description": "验货报告引用，可选。"
-    },
-    "remarks": {
-      "type": "string",
-      "description": "备注，可选。"
-    },
     "received_at": {
       "type": "string",
       "format": "date-time",
       "description": "确认收货时间。"
-    },
-    "fulfillment_receipt_ref": {
-      "type": "string",
-      "minLength": 1,
-      "description": "更新后的履约收据引用，可选。"
-    },
-    "signature": {
-      "$ref": "../../common/entities/signature.json",
-      "description": "Buyer ES256 签名，JWS 格式。"
     }
   },
   "required": [

@@ -108,7 +108,7 @@ format: html
 <tr>
 <td>Mandate</td>
 <td>第 6 章 / 各原语章节</td>
-<td>该操作是否要求 Intent、Cart、Payment 或 Operation Mandate，以及 Mandate Chain 的边界校验。</td>
+<td>该操作是否要求 Checkout、Payment 或 Operation Mandate，以及 Mandate Chain 的边界校验。</td>
 </tr>
 <tr>
 <td>Human Confirmation</td>
@@ -378,7 +378,7 @@ format: html
 <td><code>supported_mandate_types</code></td>
 <td>string[]</td>
 <td>是</td>
-<td>支持的 Mandate 类型列表。有效值包含：<code>"intent"</code>、<code>"cart"</code>、<code>"payment"</code>、<code>"operation"</code>。</td>
+<td>支持的 Mandate 类型列表。有效值包含：<code>"checkout"</code>、<code>"payment"</code>、<code>"operation"</code>。</td>
 </tr>
 </tbody>
 </table>
@@ -393,7 +393,7 @@ format: html
 <li>若资源提供方声明 <code>user_authorization</code>，则 <code>supported_mechanisms</code> MUST 非空，且每个 mechanism 的 <code>type</code> 与 <code>endpoint</code> MUST 同时存在。</li>
 <li>请求方 Agent MUST 校验 <code>user_authorization.supported_mechanisms[].endpoint</code> 为 HTTPS URL，且其域名 MUST 与 Profile 发布域同属一个治理登记的信任域，或具备跨域信任锚背书。</li>
 <li>协议引擎 MUST 通过 <code>endpoint</code> 发现并校验 Authorization Server metadata；后续收到的 Access Token 的 <code>iss</code> MUST 与 metadata 中的 <code>issuer</code> 一致，否则 MUST 拒绝该委托凭证。</li>
-<li>若 Profile 发布方声明 <code>mandates</code>，则 <code>supported_mandate_types</code> MUST 非空，且每个取值 MUST 属于 <code>"intent"</code>、<code>"cart"</code>、<code>"payment"</code>、<code>"operation"</code>。</li>
+<li>若 Profile 发布方声明 <code>mandates</code>，则 <code>supported_mandate_types</code> MUST 非空，且每个取值 MUST 属于 <code>"checkout"</code>、<code>"payment"</code>、<code>"operation"</code>。</li>
 </ol>
 
 <h3 id="s-526">5.2.6 授权机制发现（Authorization Mechanism Discovery）</h3>
@@ -426,7 +426,7 @@ format: html
 <tr><td>Profile 验证结果</td><td>第 3 章 Profile、Registry、Trust Anchor</td><td>确认 <code>agent_id</code>、签名公钥、issuer、trust domain 与撤销状态</td><td>绑定 Participant 身份、Profile 摘要与后续验签材料</td></tr>
 <tr><td>Agent Authentication 选择</td><td>双方 <code>agent_authentication.supported_mechanisms</code> 的交集</td><td>确认请求方 workload 可用哪种机制证明自身身份</td><td>每次请求验证 mTLS、HTTP Message Signatures、WIMSE WIT/WPT 或等价凭证</td></tr>
 <tr><td>User Authorization 入口</td><td>资源提供方 <code>user_authorization.supported_mechanisms</code></td><td>确认需要代表用户访问资源时应从哪个 Authorization Server 获取授权</td><td>发现 OAuth metadata，获取并校验 Access Token、issuer 与 scope</td></tr>
-<tr><td>Mandate 能力边界</td><td>双方 <code>mandates.supported_mandate_types</code> 与第 6 章 Mandate Chain</td><td>确认双方是否支持目标操作所需的 Intent、Cart、Payment 或 Operation Mandate</td><td>在下单、支付、验收、退款、取消等操作前校验 Mandate Chain</td></tr>
+<tr><td>Mandate 能力边界</td><td>双方 <code>mandates.supported_mandate_types</code> 与第 6 章 Mandate Chain</td><td>确认双方是否支持目标操作所需的 Checkout、Payment 或 Operation Mandate</td><td>在下单、支付、验收、退款、取消等操作前校验 Mandate Chain</td></tr>
 <tr><td>操作准入条件</td><td>原语定义、Mode、会话协商、运行时授权挑战或本地策略</td><td>明确本次 action 需要哪些认证、授权、Mandate、人类确认与证据</td><td>按 5.1.2 的顺序执行准入判定，并将结果写入 Authorization Decision</td></tr>
 <tr><td>证据引用</td><td>第 7 章 Evidence Bundle 与 AuthorizationArchive</td><td>保留 Profile 验证、机制选择、授权决策和拒绝原因</td><td>支撑审计、争议举证、监管导出与后续风险判断</td></tr>
 </tbody>
@@ -445,7 +445,7 @@ format: html
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>
   <figcaption style="margin-top: 10px; color: #6b7280; font-size: 13px; text-align: center;">
-    图 5-1　陌生 Agent 交互的信任准入时序图（易读版；发现与协商主流程见第 3 章；可在图内滚动查看完整链路；<a href="diagrams/agent-trust-handshake-sequence.puml">PlantUML 源文件</a>）
+    图 5-1　陌生 Agent 交互的信任准入时序图（易读版；发现与协商主流程见第 3 章；可在图内滚动查看完整链路）
   </figcaption>
 </figure>
 
@@ -875,7 +875,7 @@ format: html
   "mandates": {
     "version": "2026-04-08",
     "schema": "https://schemas.utp.example/common/mandates.json",
-    "supported_mandate_types": ["intent", "cart", "payment", "operation"]
+    "supported_mandate_types": ["checkout", "payment", "operation"]
   },
   "trust_profile": {
     "version": "2026-04-08",

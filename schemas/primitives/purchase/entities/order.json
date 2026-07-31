@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/purchase/entities/order.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/purchase/entities/order.json",
   "version": "2026-07-30",
   "title": "Order",
   "description": "订购聚合中的订单组；创建时承载买方订单意图，响应和更新时承载卖家拆分后的订单。",

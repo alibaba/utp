@@ -1,52 +1,95 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="880" height="1010" viewBox="0 0 880 1010" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1110" viewBox="0 0 1120 1110" role="img" aria-labelledby="title desc">
   <title id="title">路径编排总体时序</title>
-  <desc id="desc">纵向主路径展示路径编排从锁定输入到状态提交的总体时序；右侧为拒绝、挂起和调用结果未知时的恢复分支。</desc>
+  <desc id="desc">纵向主路径展示路径编排从编排输入到状态机推进的总体时序；右侧展示拒绝、挂起和调用结果未知时的处理分支。</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#475569"/></marker>
     <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#b85450"/></marker>
     <marker id="arrow-yellow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#a16207"/></marker>
     <style>
-      .node { stroke-width: 2; rx: 10; ry: 10; }
-      .label { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; fill: #172033; text-anchor: middle; font-size: 18px; font-weight: 600; }
-      .sub { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; fill: #475569; text-anchor: middle; font-size: 14px; }
-      .edge { fill: none; stroke: #475569; stroke-width: 2.4; marker-end: url(#arrow); }
-      .edge-red { fill: none; stroke: #b85450; stroke-width: 2.4; marker-end: url(#arrow-red); }
-      .edge-yellow { fill: none; stroke: #a16207; stroke-width: 2.4; marker-end: url(#arrow-yellow); }
-      .loop { fill: none; stroke: #64748b; stroke-width: 2; stroke-dasharray: 7 5; marker-end: url(#arrow); }
-      .note { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; fill: #64748b; font-size: 13px; }
+      .node { stroke-width: 2.5; rx: 12; ry: 12; }
+      .label { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; fill: #172033; text-anchor: middle; font-size: 20px; font-weight: 650; }
+      .sub { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; fill: #475569; text-anchor: middle; font-size: 15px; }
+      .edge { fill: none; stroke: #475569; stroke-width: 2.6; marker-end: url(#arrow); }
+      .edge-red { fill: none; stroke: #b85450; stroke-width: 2.6; marker-end: url(#arrow-red); }
+      .edge-yellow { fill: none; stroke: #a16207; stroke-width: 2.6; marker-end: url(#arrow-yellow); }
+      .loop { fill: none; stroke: #64748b; stroke-width: 2.2; stroke-dasharray: 8 6; marker-end: url(#arrow); }
+      .note { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; fill: #64748b; font-size: 14px; }
     </style>
   </defs>
-  <rect width="880" height="1010" fill="#ffffff"/>
+  <rect width="1120" height="1110" fill="#ffffff"/>
 
-  <path class="edge" d="M430 108V137"/><path class="edge" d="M430 215V244"/><path class="edge" d="M430 322V351"/><path class="edge" d="M430 429V461"/><path class="edge" d="M430 579V621"/><path class="edge" d="M430 699V728"/><path class="edge" d="M430 806V835"/>
-  <path class="edge-red" d="M540 520H620"/><path class="edge-red" d="M580 660H620"/><path class="edge-yellow" d="M720 700V728"/>
-  <path class="loop" d="M280 874H118V393H278"/>
+  <!-- 主路径 -->
+  <path class="edge" d="M460 123V155"/>
+  <path class="edge" d="M460 243V275"/>
+  <path class="edge" d="M460 363V395"/>
+  <path class="edge" d="M460 493V540"/>
+  <path class="edge" d="M460 675V720"/>
+  <path class="edge" d="M460 810V842"/>
+  <path class="edge" d="M460 932V964"/>
 
-  <rect class="node" x="280" y="30" width="300" height="78" fill="#e8f1ff" stroke="#3b82f6"/>
-  <text class="label" x="430" y="62">锁定输入</text><text class="sub" x="430" y="86">SelectedMode · CommerceTopology · NegotiationResult</text>
-  <rect class="node" x="280" y="137" width="300" height="78" fill="#f1ebf7" stroke="#8b5ca7"/>
-  <text class="label" x="430" y="169">生成 execution_dag</text><text class="sub" x="430" y="193">角色定向的路径快照</text>
-  <rect class="node" x="280" y="244" width="300" height="78" fill="#f1ebf7" stroke="#8b5ca7"/>
-  <text class="label" x="430" y="276">初始化 StateView</text><text class="sub" x="430" y="300">形成 trade_context_id 与 INIT StateView</text>
-  <rect class="node" x="280" y="351" width="300" height="78" fill="#f1ebf7" stroke="#8b5ca7"/>
-  <text class="label" x="430" y="383">行动空间与 Agent 选择</text><text class="sub" x="430" y="407">available_actions → dag_id + Action + P0 input</text>
-  <polygon points="430,461 540,520 430,579 320,520" fill="#fff0d9" stroke="#d97706" stroke-width="2"/>
-  <text class="label" x="430" y="512">执行前约束</text><text class="sub" x="430" y="535">挂起 · DAG · 状态 · 授权/风控 · HAI</text>
-  <rect class="node" x="280" y="621" width="300" height="78" fill="#e7f5e5" stroke="#4d9b58"/>
-  <text class="label" x="430" y="653">通信层逐请求确认并投递</text><text class="sub" x="430" y="677">Service · Endpoint · transport</text>
-  <rect class="node" x="280" y="728" width="300" height="78" fill="#e7f5e5" stroke="#4d9b58"/>
-  <text class="label" x="430" y="760">Handler 返回标准 ActionResponse</text><text class="sub" x="430" y="784">PENDING 也是标准响应</text>
-  <rect class="node" x="280" y="835" width="300" height="78" fill="#e7f5e5" stroke="#4d9b58"/>
-  <text class="label" x="430" y="867">提交权威 StateView</text><text class="sub" x="430" y="891">commit_state_transition → 更新行动空间</text>
+  <!-- 异常与恢复分支 -->
+  <path class="edge-red" d="M610 608H735"/>
+  <path class="edge-red" d="M670 765H735"/>
+  <path class="edge-yellow" d="M840 800V840"/>
+  <path class="edge-yellow" d="M735 892H670"/>
 
-  <rect class="node" x="620" y="487" width="210" height="66" fill="#fde8e7" stroke="#b85450"/>
-  <text class="label" x="725" y="514">拒绝或 HAI 挂起</text><text class="sub" x="725" y="537">不投递 · 不提交状态</text>
-  <rect class="node" x="620" y="627" width="200" height="66" fill="#fde8e7" stroke="#b85450"/>
-  <text class="label" x="720" y="654">调用观察结果未知</text><text class="sub" x="720" y="677">保留会话与幂等上下文</text>
-  <rect class="node" x="620" y="728" width="200" height="82" fill="#fff7d6" stroke="#d4a72c"/>
-  <text class="label" x="720" y="754">通信恢复</text><text class="sub" x="720" y="777">重试 · 查询 · 等待通知</text><text class="sub" x="720" y="798">取得标准响应后回到主路径</text>
+  <!-- 状态提交后的下一轮 -->
+  <path class="loop" d="M250 1012H138V444H248"/>
 
-  <text class="note" x="448" y="603">通过</text><text class="note" x="557" y="508" fill="#b85450">拒绝 / 挂起</text>
-  <text class="note" x="135" y="630">下一轮</text>
-  <text class="note" x="30" y="970">调用观察结果未知时，不伪造 ActionResponse 或推进状态；取得标准响应后才继续路径。</text>
+  <!-- 编排准备 -->
+  <rect class="node" x="250" y="35" width="420" height="88" fill="#e8f1ff" stroke="#3b82f6"/>
+  <text class="label" x="460" y="71">编排输入</text>
+  <text class="sub" x="460" y="97">SelectedMode · CommerceTopology</text>
+  <text class="sub" x="460" y="116">NegotiationResult</text>
+
+  <rect class="node" x="250" y="155" width="420" height="88" fill="#f2ecf8" stroke="#8b5ca7"/>
+  <text class="label" x="460" y="191">DAG 生成</text>
+  <text class="sub" x="460" y="217">execution_dag：结构与角色快照</text>
+
+  <rect class="node" x="250" y="275" width="420" height="88" fill="#f2ecf8" stroke="#8b5ca7"/>
+  <text class="label" x="460" y="311">状态机初始化</text>
+  <text class="sub" x="460" y="337">trade_context_id · INIT StateView</text>
+
+  <rect class="node" x="250" y="395" width="420" height="98" fill="#f2ecf8" stroke="#8b5ca7"/>
+  <text class="label" x="460" y="431">路径选择</text>
+  <text class="sub" x="460" y="456">available_actions</text>
+  <text class="sub" x="460" y="477">选择：dag_id · Action · P0 input</text>
+
+  <!-- 约束校验 -->
+  <polygon points="460,540 610,608 460,675 310,608" fill="#fff5e8" stroke="#d97706" stroke-width="2.5"/>
+  <text class="label" x="460" y="600">约束校验</text>
+  <text class="sub" x="460" y="624">DAG · 状态 · 授权/风控 · HAI</text>
+
+  <!-- 执行与状态推进 -->
+  <rect class="node" x="250" y="720" width="420" height="90" fill="#e9f7e8" stroke="#4d9b58"/>
+  <text class="label" x="460" y="756">通信确认并投递</text>
+  <text class="sub" x="460" y="782">Service · Endpoint · transport</text>
+
+  <rect class="node" x="250" y="842" width="420" height="90" fill="#e9f7e8" stroke="#4d9b58"/>
+  <text class="label" x="460" y="878">标准 ActionResponse</text>
+  <text class="sub" x="460" y="904">Handler 返回；PENDING 也是标准响应</text>
+
+  <rect class="node" x="250" y="964" width="420" height="90" fill="#e9f7e8" stroke="#4d9b58"/>
+  <text class="label" x="460" y="1000">状态机推进</text>
+  <text class="sub" x="460" y="1026">commit_state_transition → 更新行动空间</text>
+
+  <!-- 右侧分支 -->
+  <rect class="node" x="735" y="570" width="280" height="76" fill="#fdebea" stroke="#b85450"/>
+  <text class="label" x="875" y="601">拒绝或 HAI 挂起</text>
+  <text class="sub" x="875" y="626">不投递 · 不提交状态</text>
+
+  <rect class="node" x="735" y="727" width="280" height="73" fill="#fdebea" stroke="#b85450"/>
+  <text class="label" x="875" y="757">调用结果未知</text>
+  <text class="sub" x="875" y="782">保留会话与幂等上下文</text>
+
+  <rect class="node" x="735" y="840" width="280" height="104" fill="#fff9df" stroke="#d4a72c"/>
+  <text class="label" x="875" y="873">通信恢复</text>
+  <text class="sub" x="875" y="899">重试 · 查询 · 等待通知</text>
+  <text class="sub" x="875" y="922">取得标准响应后继续主路径</text>
+
+  <!-- 连线注记 -->
+  <text class="note" x="485" y="704">通过</text>
+  <text class="note" x="634" y="595" fill="#b85450">拒绝 / 挂起</text>
+  <text class="note" x="158" y="730">下一轮</text>
+  <text class="note" x="250" y="1088">调用结果未知时，不伪造 ActionResponse 或推进状态；取得标准响应后才继续路径。</text>
 </svg>

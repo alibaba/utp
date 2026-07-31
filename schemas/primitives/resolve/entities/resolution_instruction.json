@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/resolution_instruction.json",
+  "version": "2026-07-31",
+  "title": "ResolutionInstruction",
+  "description": "ResolutionOutcome 中可由其他原语或协议引擎执行的结构化处置指令。",
+  "type": "object",
+  "required": [
+    "instruction_type"
+  ],
+  "properties": {
+    "instruction_type": {
+      "type": "string",
+      "enum": [
+        "refund",
+        "escrow_operation",
+        "return_shipment",
+        "replacement",
+        "continue_fulfillment",
+        "cancel_transaction"
+      ],
+      "description": "指令类型：refund 退款；escrow_operation 托管处置；return_shipment 退货物流；replacement 换货；continue_fulfillment 继续履约；cancel_transaction 取消交易。"
+    },
+    "refund_instruction": {
+      "$ref": "../../pay/entities/refund_instruction.json",
+      "description": "instruction_type 为 refund 时交给 utp.pay.refund 执行的退款指令。"
+    },
+    "target_action": {
+      "type": "string",
+      "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "执行该处置的目标 UTP Action 完整名称。"
+    },
+    "payload": {
+      "type": "object",
+      "description": "目标 Action 所需的处置专有载荷。",
+      "additionalProperties": true
+    }
+  },
+  "if": {
+    "properties": {
+      "instruction_type": {
+        "const": "refund",
+        "description": "退款指令需要同时提供标准 RefundInstruction。"
+      }
+    },
+    "required": ["instruction_type"]
+  },
+  "then": {
+    "required": ["refund_instruction"]
+  },
+  "additionalProperties": true
+}

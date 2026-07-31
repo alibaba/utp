@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_confirmation.json",
+  "version": "2026-07-31",
+  "title": "PaymentConfirmation",
+  "description": "支付处理方在渠道事实确认后签发的支付确认凭证。",
+  "type": "object",
+  "required": [
+    "payment_confirmation_id",
+    "payment_request_id",
+    "purchase_id",
+    "status",
+    "amount",
+    "instrument_type",
+    "channel_transaction_id",
+    "settled_at",
+    "evidence_ref"
+  ],
+  "properties": {
+    "payment_confirmation_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "支付确认凭证的唯一标识。"
+    },
+    "payment_request_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该确认对应的支付请求标识。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该确认关联的 Purchase 聚合标识。"
+    },
+    "status": {
+      "$ref": "payment_status.json",
+      "description": "渠道事实归一化后的支付确认状态。"
+    },
+    "amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "本次已确认的支付金额。"
+    },
+    "payment_term_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "多阶段付款中本次确认对应的付款阶段标识。"
+    },
+    "instrument_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "完成本次支付的工具类型。"
+    },
+    "channel_transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "支付渠道侧的最终交易流水号。"
+    },
+    "settled_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "渠道确认资金完成扣付、入账或入托管的 RFC 3339 时间。"
+    },
+    "escrow_status": {
+      "type": "string",
+      "enum": [
+        "funded",
+        "released",
+        "refunded"
+      ],
+      "description": "托管状态：funded 已入托管；released 已放款；refunded 已退款。"
+    },
+    "evidence_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "记录本次支付确认事实的证据或证据包标识。"
+    }
+  },
+  "additionalProperties": true
+}

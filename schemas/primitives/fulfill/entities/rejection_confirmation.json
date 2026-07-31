@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/rejection_confirmation.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/rejection_confirmation.json",
   "version": "2026-07-27",
   "title": "RejectionConfirmation",
   "description": "采购方拒收凭证。生成后激活 Resolve 原语，作为索赔证据链的一部分；被拒批次不再进入 RECEIVED 或 FULFILLED。",
@@ -40,26 +40,12 @@
       "type": "string",
       "description": "拒收原因详情，可选。"
     },
-    "rejected_quantity": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "本次拒收数量，可选。"
-    },
     "line_items": {
       "type": "array",
       "items": {
         "$ref": "partial_delivery.json#/$defs/partial_delivery_line_item"
       },
       "description": "本次拒收涉及的订单行项目与数量，可选。"
-    },
-    "evidence_refs": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
-      "minItems": 1,
-      "description": "证据引用列表，MUST 提供。"
     },
     "rejected_at": {
       "type": "string",
@@ -77,15 +63,6 @@
         "OTHER"
       ],
       "description": "采购方期望的后续处理方向，可选；实际争议处理仍由 Resolve 原语确定。"
-    },
-    "resolve_case_ref": {
-      "type": "string",
-      "minLength": 1,
-      "description": "已创建或建议创建的 Resolve 案件引用，可选。"
-    },
-    "signature": {
-      "$ref": "../../common/entities/signature.json",
-      "description": "Buyer ES256 签名。"
     }
   },
   "required": [

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/transport/message_envelope.json",
+  "version": "2026-07-31",
+  "title": "UTP Message Envelope",
+  "description": "跨进程或跨网络的 UTP 请求、响应、通知和错误的等价传输封装；不创建第二套业务请求或响应格式。",
+  "type": "object",
+  "properties": {
+    "message_id": { "type": "string", "minLength": 1 },
+    "message_type": { "type": "string", "enum": ["request", "response", "notification", "error"] },
+    "event_type": { "type": "string", "minLength": 1 },
+    "sent_at": { "type": "string", "format": "date-time" },
+    "sender": {
+      "type": "object",
+      "properties": {
+        "subject": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 }
+      },
+      "required": ["subject", "role"],
+      "additionalProperties": true
+    },
+    "correlation_id": { "type": "string", "minLength": 1 },
+    "mode_ref": { "type": "string", "minLength": 1 },
+    "topology_ref": { "type": "string", "minLength": 1 },
+    "payload": { "type": "object" }
+  },
+  "required": ["message_id", "message_type", "sent_at", "sender", "payload"],
+  "allOf": [
+    {
+      "if": { "properties": { "message_type": { "const": "request" } }, "required": ["message_type"] },
+      "then": { "properties": { "payload": { "$ref": "../primitives/common/action_request.json" } }, "not": { "required": ["event_type"] } }
+    },
+    {
+      "if": { "properties": { "message_type": { "const": "response" } }, "required": ["message_type"] },
+      "then": { "properties": { "payload": { "$ref": "../primitives/common/action_response.json" } }, "not": { "required": ["event_type"] } }
+    },
+    {
+      "if": { "properties": { "message_type": { "const": "error" } }, "required": ["message_type"] },
+      "then": { "properties": { "payload": { "$ref": "../primitives/common/error_response.json" } }, "not": { "required": ["event_type"] } }
+    },
+    {
+      "if": { "properties": { "message_type": { "const": "notification" } }, "required": ["message_type"] },
+      "then": {
+        "oneOf": [
+          {
+            "required": ["event_type"],
+            "properties": { "payload": { "type": "object" } }
+          },
+          {
+            "not": { "required": ["event_type"] },
+            "properties": { "payload": { "$ref": "../primitives/common/action_response.json" } }
+          }
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false
+}

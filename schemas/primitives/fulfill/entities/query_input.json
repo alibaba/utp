@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/query_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/query_input.json",
   "version": "2026-07-27",
   "title": "FulfillQueryInput",
   "description": "utp.fulfill.query 的业务输入。Buyer 按 order_id 查询单笔订单的履约事件、批次、物流、验货和凭证摘要；任意状态可执行，无状态影响。",

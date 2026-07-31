@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/list_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_output.json",
   "version": "2026-07-27",
   "title": "FulfillListOutput",
   "description": "utp.fulfill.list 的业务输出。返回订单摘要列表；空列表为正常结果，不使用错误响应。",
@@ -8,7 +8,7 @@
   "properties": {
     "orders": {
       "type": "array",
-      "items": {
+      "items": { // 避免items
         "type": "object",
         "properties": {
           "order_id": {
@@ -61,10 +61,11 @@
             "minLength": 1,
             "description": "供应商标识。"
           },
-          "summary": {
-            "type": "string",
-            "description": "订单摘要描述。"
-          },
+//          "summary": {
+//            "type": "string",
+//            "description": "订单摘要描述。"
+//          },
+          // 商品基本信息 引用
           "total_quantity": {
             "type": "integer",
             "minimum": 0,

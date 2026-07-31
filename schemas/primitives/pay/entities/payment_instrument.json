@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_instrument.json",
+  "version": "2026-07-31",
+  "title": "PaymentInstrument",
+  "description": "令牌化支付工具；不得包含明文卡号、密码或未令牌化账户信息。",
+  "type": "object",
+  "required": [
+    "type",
+    "tokenizer_ref",
+    "token",
+    "currency"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "alipay",
+        "wechat_pay",
+        "unionpay",
+        "e_cny",
+        "swift",
+        "sepa",
+        "letter_of_credit",
+        "custom"
+      ],
+      "description": "支付工具类型：alipay 支付宝；wechat_pay 微信支付；unionpay 银联；e_cny 数字人民币；swift SWIFT 汇款；sepa SEPA 转账；letter_of_credit 信用证；custom 自定义渠道。"
+    },
+    "tokenizer_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "签发支付令牌的 Tokenizer 或支付渠道标识。"
+    },
+    "token": {
+      "type": "string",
+      "minLength": 1,
+      "writeOnly": true,
+      "description": "仅在请求中传递的支付工具令牌，不得在响应或日志中回显。"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "该支付工具支持本次支付的 ISO 4217 币种代码。"
+    },
+    "binding_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "已协商支付绑定的标识；未使用绑定支付时省略。"
+    }
+  },
+  "additionalProperties": true
+}

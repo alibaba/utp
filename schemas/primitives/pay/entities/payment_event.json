@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_event.json",
+  "version": "2026-07-31",
+  "title": "PaymentEvent",
+  "description": "渠道回调、Escrow 操作和退款结果归一后的标准支付事件。",
+  "type": "object",
+  "required": [
+    "payment_event_id",
+    "event_type",
+    "occurred_at",
+    "evidence_ref"
+  ],
+  "properties": {
+    "payment_event_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "标准支付事件的唯一标识。"
+    },
+    "payment_request_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该事件关联的支付请求标识。"
+    },
+    "event_type": {
+      "$ref": "payment_event_type.json",
+      "description": "归一化后的事件类型。"
+    },
+    "amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "该事件实际影响的金额。"
+    },
+    "channel": {
+      "type": "string",
+      "minLength": 1,
+      "description": "产生原始支付事实的渠道标识。"
+    },
+    "channel_transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "渠道侧交易、退款或托管操作流水号。"
+    },
+    "source_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "产生该事件的原始回调、退款结果或托管操作引用。"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "渠道事实实际发生的 RFC 3339 时间。"
+    },
+    "evidence_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "保存原始事实、签名和映射结果的证据标识。"
+    }
+  },
+  "additionalProperties": true
+}

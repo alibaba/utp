@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/time_range.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/time_range.json",
   "version": "2026-07-29",
   "title": "TimeRange",
   "description": "一个生效、交付或有效时间区间。",

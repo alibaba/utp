@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/refund_instruction.json",
+  "version": "2026-07-31",
+  "title": "RefundInstruction",
+  "description": "由 Resolve、Saga 或授权资金服务生成并交给 utp.pay.refund 执行的退款指令。",
+  "type": "object",
+  "required": [
+    "source_instruction_ref",
+    "refund_amount",
+    "refund_reason"
+  ],
+  "properties": {
+    "payment_confirmation_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "需要退款的原支付确认凭证标识。"
+    },
+    "payment_request_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "无法直接定位确认凭证时使用的原支付请求标识。"
+    },
+    "source_instruction_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "产生本退款要求的 ResolutionOutcome、Saga 步骤或资金服务指令标识。"
+    },
+    "refund_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "本次申请退回的金额，不得超过原支付可退余额。"
+    },
+    "refund_reason": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]*$",
+      "description": "机器可处理的退款原因代码，例如 resolve.partial_quality_compensation。"
+    },
+    "scope_ref": {
+      "type": "object",
+      "description": "部分退款关联的付款阶段、订单、商品或履约批次范围。",
+      "additionalProperties": true
+    }
+  },
+  "anyOf": [
+    { "required": ["payment_confirmation_id"] },
+    { "required": ["payment_request_id"] }
+  ],
+  "additionalProperties": true
+}

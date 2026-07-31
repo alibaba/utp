@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/line_item.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/line_item.json",
   "version": "2026-07-30",
   "title": "LineItem",
   "description": "交易中的一项商品或服务明细。",

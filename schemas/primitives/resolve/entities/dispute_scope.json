@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/dispute_scope.json",
+  "version": "2026-07-31",
+  "title": "DisputeScope",
+  "description": "争议影响的具体支付、订单、履约批次、商品或金额范围；非 global 争议应尽量绑定具体资源。",
+  "type": "object",
+  "required": [
+    "scope_type"
+  ],
+  "properties": {
+    "scope_type": {
+      "$ref": "dispute_scope_type.json",
+      "description": "争议所属的原语或全局范围。"
+    },
+    "payment_request_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "受争议影响的支付请求标识。"
+    },
+    "payment_confirmation_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "受争议影响的支付确认凭证标识。"
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "受争议影响的订单标识。"
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "受争议影响的履约批次标识。"
+    },
+    "claimed_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "争议范围内被主张或需要锁定的金额。"
+    },
+    "item_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "受争议影响的商品行或服务项标识。"
+    }
+  },
+  "additionalProperties": true
+}
