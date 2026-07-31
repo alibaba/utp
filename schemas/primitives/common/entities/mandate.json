@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/primitives/common/entities/mandate.json",
+  "version": "2026-07-31",
+  "title": "Mandate",
+  "description": "UTP Action 请求和响应中携带的授权凭证上下文。响应回传本次操作签发、消费或更新的凭证。",
+  "type": "object",
+  "properties": {
+    "merchant_authorization": {
+      "type": "string",
+      "minLength": 1,
+      "description": "商家对最终 Checkout（不含 ap2 字段）的 JCS 规范化载荷所作的 JWS Detached Payload 签名。该字段随完整 Checkout 进入 Checkout Mandate，使用户授权绑定已签署的交易条款。"
+    },
+    "checkout": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Checkout Mandate 的完整 SD-JWT+kb 凭证令牌，证明买方用户对订单的确认授权。"
+    },
+    "payment": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Payment Mandate 的完整 SD-JWT+kb 凭证令牌，证明买方用户对订单付款的授权。"
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operation Mandate 的完整 SD-JWT+kb 凭证令牌，仅在本次操作消费或签发额外操作授权时携带。"
+    }
+  },
+  "additionalProperties": true
+}
