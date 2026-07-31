@@ -151,7 +151,7 @@ format: html
 <pre><code class="language-json">{
   "user_authorization": {
     "version": "2026-04-08",
-    "schema": "https://schemas.utp.example/common/user_authorization.json",
+    "schema": "https://ut-protocol.com/schemas/discovery/user_authorization.json",
     "supported_mechanisms": [
       {
         "type": "oauth2",

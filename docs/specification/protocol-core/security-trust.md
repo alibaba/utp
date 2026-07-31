@@ -828,7 +828,7 @@ format: html
   "agent_id": "cn-unified-social-credit-code-91440300MA5FGH2B",
   "agent_authentication": {
     "version": "2026-04-08",
-    "schema": "https://schemas.utp.example/common/agent_authentication.json",
+    "schema": "https://ut-protocol.com/schemas/discovery/agent_authentication.json",
     "supported_mechanisms": [
       {
         "type": "mtls",
@@ -864,7 +864,7 @@ format: html
   },
   "user_authorization": {
     "version": "2026-04-08",
-    "schema": "https://schemas.utp.example/common/user_authorization.json",
+    "schema": "https://ut-protocol.com/schemas/discovery/user_authorization.json",
     "supported_mechanisms": [
       {
         "type": "oauth2",
