@@ -1,10 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "binding_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/binding_input.json",
   "version": "2026-07-29",
   "title": "BindingInput",
-  "description": "utp.negotiate.binding 的业务输入。买家确认接受指定报价并选定交易安排。授权凭据通过 mandate_chain 携带（Operation Mandate，见规范 §6.4.2.4「接受报价或 counter-offer」场景），取代独立的买方签名字段；会话协商要求 Mandate 时 MUST 携带。",
+  "description": "utp.negotiate.binding 的业务输入。Buyer 确认接受指定报价并选定交易安排。授权凭证由统一请求信封的 mandate 字段承载（Operation Mandate 覆盖「接受报价或 counter-offer」场景），业务输入不重复携带凭证。",
   "type": "object",
+  "required": [
+    "inquiry_ref",
+    "quote_ref",
+    "terms_hash"
+  ],
   "properties": {
     "inquiry_ref": {
       "type": "string",
@@ -24,38 +29,7 @@
     "selected_trade_mode": {
       "$ref": "../../common/entities/trade_mode.json",
       "description": "买家从报价 available_trade_modes 中选定的交易安排。报价仅提供一种时可缺省，视为接受该种。"
-    },
-    "mandate_chain": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/mandate_reference" },
-      "description": "授权凭据链。会话协商锁定要求 Mandate 时 MUST 携带（如引用绑定本操作的 Operation Mandate 及其上游 Intent Mandate）；接收方无法解析引用时请求方必须提供完整凭证原文。"
     }
   },
-  "required": ["inquiry_ref", "quote_ref", "terms_hash"],
-  "additionalProperties": true,
-  "$defs": {
-    "mandate_reference": {
-      "type": "object",
-      "description": "一项 Mandate 凭据：可为可解析的 mandate_id 引用，或完整 JWS 凭证原文，至少提供其一。",
-      "properties": {
-        "mandate_type": {
-          "type": "string",
-          "description": "凭据类型，如 intent、cart、payment、operation。"
-        },
-        "mandate_id": {
-          "type": "string",
-          "description": "Mandate 唯一标识（UUID v4），接收方可从本地缓存、凭证仓库或 Evidence Bundle 解析。"
-        },
-        "mandate": {
-          "type": "string",
-          "description": "完整 Mandate 凭证（JWS Compact Serialization）。"
-        }
-      },
-      "anyOf": [
-        { "required": ["mandate_id"] },
-        { "required": ["mandate"] }
-      ],
-      "additionalProperties": true
-    }
-  }
+  "additionalProperties": true
 }

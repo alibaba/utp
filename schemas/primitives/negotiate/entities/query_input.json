@@ -1,10 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "query_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/query_input.json",
   "version": "2026-07-27",
   "title": "NegotiateQueryInput",
   "description": "utp.negotiate.query 的业务输入。REST 绑定下 inquiry_id 通过路径参数传递，本 Schema 同时约束其他绑定下的查询载荷。",
   "type": "object",
+  "required": [
+    "inquiry_id"
+  ],
   "properties": {
     "inquiry_id": {
       "type": "string",
@@ -17,8 +20,5 @@
       "description": "可选。按供应商过滤报价分支（L3 竞价场景）。"
     }
   },
-  "required": [
-    "inquiry_id"
-  ],
   "additionalProperties": true
 }
