@@ -101,7 +101,7 @@ B2C 标准采购使用基础支付和履约责任结构。Buyer 与 Payer 可以
 
 ### 场景描述
 
-B2B 标准采购不是一个固定的 Mode 六元组，而是一类满足企业采购最低要求的场景基线。标准 B2B 场景要求 Buyer 与 Seller 至少具备组织主体身份，交易过程形成可审计的固定价条款快照或 Binding Terms、Purchase Credential、企业主体或资质核验结果，并将 Purchase、Pay、Fulfill 和可能发生的 Resolve 绑定到同一个 `transaction_id`。
+B2B 标准采购是一类满足企业采购最低要求的场景基线。标准 B2B 场景要求 Buyer 与 Seller 至少具备组织主体身份，交易过程形成可审计的固定价条款快照或 Binding Terms、Purchase Credential、企业主体或资质核验结果，并将 Purchase、Pay、Fulfill 和可能发生的 Resolve 绑定到同一个 `transaction_id`。
 
 最低标准 B2B 采购可以是简单企业采购：企业向办公耗材供应商采购 100 箱 A4 复印纸，供应商给出固定企业价，买方按当前有效价格订购，使用企业账户一次性付款，卖方按约定地址直接发货，交易完成后开具企业发票。该交易的 B2B 属性来自组织主体、采购凭证、资质核验、发票与审计要求，而不是来自议价、账期或复杂履约。
 
