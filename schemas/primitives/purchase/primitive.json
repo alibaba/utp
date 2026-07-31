@@ -84,7 +84,7 @@
         }
       ]
     },
-    "contract_create": {
+    "contract-create": {
       "description": "Buyer 创建采购合同或框架协议草案，Seller 返回当前协议聚合。",
       "initiator_role": "Buyer",
       "handler_role": "Seller",
@@ -102,15 +102,15 @@
         },
         {
           "type": "mcp",
-          "tool": "utp.purchase.contract_create"
+          "tool": "utp.purchase.contract-create"
         },
         {
           "type": "a2a",
-          "action": "utp.purchase.contract_create"
+          "action": "utp.purchase.contract-create"
         }
       ]
     },
-    "contract_update": {
+    "contract-update": {
       "description": "Buyer 更新协议草案条款，Seller 返回重新计算后的协议聚合。",
       "initiator_role": "Buyer",
       "handler_role": "Seller",
@@ -128,15 +128,15 @@
         },
         {
           "type": "mcp",
-          "tool": "utp.purchase.contract_update"
+          "tool": "utp.purchase.contract-update"
         },
         {
           "type": "a2a",
-          "action": "utp.purchase.contract_update"
+          "action": "utp.purchase.contract-update"
         }
       ]
     },
-    "contract_complete": {
+    "contract-complete": {
       "description": "Buyer 确认完成协议，Seller 执行协议承诺处理。",
       "initiator_role": "Buyer",
       "handler_role": "Seller",
@@ -154,11 +154,11 @@
         },
         {
           "type": "mcp",
-          "tool": "utp.purchase.contract_complete"
+          "tool": "utp.purchase.contract-complete"
         },
         {
           "type": "a2a",
-          "action": "utp.purchase.contract_complete"
+          "action": "utp.purchase.contract-complete"
         }
       ]
     },
@@ -270,17 +270,17 @@
       },
       {
         "from": "INIT",
-        "action": "utp.purchase.contract_create",
+        "action": "utp.purchase.contract-create",
         "to": "AGREEMENT_DRAFT"
       },
       {
         "from": "AGREEMENT_DRAFT",
-        "action": "utp.purchase.contract_update",
+        "action": "utp.purchase.contract-update",
         "to": "AGREEMENT_DRAFT"
       },
       {
         "from": "AGREEMENT_DRAFT",
-        "action": "utp.purchase.contract_complete",
+        "action": "utp.purchase.contract-complete",
         "to": "AGREEMENT_SIGNING",
         "condition": "Mandate 准入通过"
       },

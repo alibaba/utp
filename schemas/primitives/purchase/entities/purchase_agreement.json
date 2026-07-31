@@ -8,7 +8,6 @@
   "required": [
     "purchase_id",
     "agreement_type",
-    "agreement_terms",
     "state"
   ],
   "properties": {
@@ -23,16 +22,44 @@
       "enum": [
         "purchase_contract",
         "framework_agreement"
-      ]
-    },
-    "agreement_terms": {
-      "$ref": "agreement_terms.json",
-      "description": "协议的结构化条款快照。"
+      ],
+      "utp_request": {
+        "contract-create": "required",
+        "contract-update": "omit",
+        "contract-complete": "omit"
+      }
     },
     "state": {
       "type": "string",
       "description": "协议聚合的持久化状态。",
       "readOnly": true
+    },
+    "binding_terms_ref": {
+      "type": "string",
+      "description": "已绑定询盘条款引用。",
+      "utp_request": {
+        "contract-create": "optional",
+        "contract-update": "optional",
+        "contract-complete": "omit"
+      }
+    },
+    "effective_period": {
+      "$ref": "../../common/entities/time_range.json",
+      "description": "协议的生效时间区间。",
+      "utp_request": {
+        "contract-create": "optional",
+        "contract-update": "optional",
+        "contract-complete": "omit"
+      }
+    },
+    "terms_document_ref": {
+      "$ref": "../../common/entities/document_reference.json",
+      "description": "可选的协议正文或附件引用。",
+      "utp_request": {
+        "contract-create": "optional",
+        "contract-update": "optional",
+        "contract-complete": "omit"
+      }
     }
   },
   "additionalProperties": true
