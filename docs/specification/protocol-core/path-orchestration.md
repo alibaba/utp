@@ -31,7 +31,7 @@ version: 2026-07-30
 | [发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html) | `relation_compatibilities`、已选 Primitive/扩展、`role_domain_bindings` 与 `service_catalogs` | 以兼容 Primitive/扩展确定路径可用范围，并向通信层提供逐请求投递所需的 `service_catalogs`。 |
 | [P0 原语通用框架](/documentation/specification/protocol-core/primitive-framework.html) | Action 的 `initiator_role`、`handler_role`、Schema、`execution_result` 与 `valid_next_actions` | 定义 Action 的业务契约；路径编排不解释原语内部业务事实。 |
 | [全局状态机](/documentation/specification/protocol-core/global-state-machine.html) | StateView、Action 守卫、迁移、补偿和超时结论 | 路径编排在规定时点调用状态机，不自行裁定状态迁移。 |
-| [人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html) | 生效控制等级、挂起与恢复语义 | 路径编排执行其控制门；不解释人工确认、授权或证据本身。 |
+| [人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html) | 生效控制等级、挂起与恢复语义 | Provider 在 Action 执行边界应用控制门；路径编排仅使用其业务结果更新行动空间，不解释或校验 HAI 语义。 |
 
 处理方在本域完成 Schema、业务资源、权限和幂等校验；状态机提交全局状态。路径编排以这些已定义的协议事实为基础形成和更新行动空间。
 
