@@ -3,24 +3,19 @@
   "$id": "https://ut-protocol.com/schemas/primitives/common/hai.json",
   "version": "2026-07-31",
   "title": "HumanAgentInteractionContext",
-  "description": "Action 响应中的人机协同控制信封，或 Principal 确认续跑请求携带的挂起凭证附件。",
+  "description": "Action 响应中的人机协同控制信封。Principal 确认续跑请求的 hai 附件由 ActionRequest 单独定义。",
   "type": "object",
   "properties": {
     "interaction_level": {
       "type": "string",
       "enum": ["AUTONOMOUS", "SUPERVISED", "CONFIRMED"],
       "readOnly": true,
-      "description": "当前 Action 生效的执行门等级。"
+      "description": "Surface 所服务目标 Action 生效的执行门等级；它不必等于产生该响应的前序 Action 等级。"
     },
     "suspend": {
       "type": "object",
       "readOnly": true,
-      "required": ["active"],
       "properties": {
-        "active": {
-          "type": "boolean",
-          "description": "当前是否存在阻止 Action 继续推进的活跃挂起。"
-        },
         "suspend_id": {
           "type": "string",
           "minLength": 1,
@@ -41,15 +36,25 @@
           "enum": ["ACTIVE", "RESUMED", "CANCELLED", "EXPIRED"],
           "description": "挂起记录当前状态。"
         },
+        "session_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "关联的 UTP 会话标识。"
+        },
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "适用时关联的交易标识。"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Suspend Record 的创建时间。"
+        },
         "timeout_ms": {
           "type": "integer",
           "minimum": 1,
           "description": "活跃挂起允许等待 Principal 决策的最长毫秒数。"
-        },
-        "timeout_action": {
-          "type": "string",
-          "enum": ["cancel", "reject", "expire"],
-          "description": "挂起超时后的安全处置。"
         },
         "surface_id": {
           "type": "string",
@@ -58,22 +63,6 @@
         }
       },
       "description": "Action 当前的挂起控制记录。",
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "active": {
-                "const": true,
-                "description": "活跃挂起必须绑定唯一挂起标识与业务 Action。"
-              }
-            },
-            "required": ["active"]
-          },
-          "then": {
-            "required": ["suspend_id", "suspended_action"]
-          }
-        }
-      ],
       "additionalProperties": true
     },
     "surface": {
@@ -99,11 +88,6 @@
           "type": "string",
           "enum": ["V0", "V1", "V2"],
           "description": "该 Surface 处理数据的最高可见性等级。"
-        },
-        "refresh_strategy": {
-          "type": "string",
-          "enum": ["strict", "on_expiry", "manual"],
-          "description": "存在权威数据源时的刷新和一致性校验策略。"
         }
       },
       "description": "供 Platform 或 Host 渲染和确认的 Action Surface。",
@@ -112,17 +96,32 @@
     "data_source": {
       "type": "object",
       "readOnly": true,
-      "required": ["operation_ref"],
+      "required": ["action_ref", "session_id"],
       "properties": {
-        "operation_ref": {
+        "action_ref": {
           "type": "string",
           "minLength": 1,
-          "description": "读取确认所需权威数据的操作引用。"
+          "description": "读取或取得权威数据所引用的既有完整 Action 名称。"
         },
-        "resource_ref": {
+        "session_id": {
           "type": "string",
           "minLength": 1,
-          "description": "权威业务资源的稳定引用。"
+          "description": "关联的 UTP 会话标识。"
+        },
+        "trade_context_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "适用时关联的交易上下文标识。"
+        },
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "适用时关联的交易标识。"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Action 的受控读取或展示初始化参数，例如搜索条件、筛选、分页或资源标识。",
+          "additionalProperties": true
         },
         "data_hash": {
           "type": "string",
@@ -133,6 +132,16 @@
           "type": "string",
           "format": "date-time",
           "description": "该权威数据快照失效的 RFC 3339 时间。"
+        },
+        "refresh_strategy": {
+          "type": "string",
+          "enum": ["strict", "on_expiry", "manual"],
+          "description": "适用完整性 Profile 时的刷新和一致性校验策略。"
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 1,
+          "description": "适用时的更高强度完整性证明。"
         }
       },
       "description": "Surface 展示与确认续跑前重读使用的权威数据源。",
@@ -142,98 +151,10 @@
       "type": "string",
       "readOnly": true,
       "description": "面向 Agent 的控制边界说明，不得包含 V2 敏感数据或 suspend_id。"
-    },
-    "suspend_id": {
-      "type": "string",
-      "minLength": 1,
-      "writeOnly": true,
-      "description": "Principal 确认续跑请求携带的挂起标识。"
-    },
-    "surface_id": {
-      "type": "string",
-      "minLength": 1,
-      "writeOnly": true,
-      "description": "Principal 实际确认的 Action Surface 标识。"
-    },
-    "integrity": {
-      "type": "object",
-      "writeOnly": true,
-      "required": ["data_hash"],
-      "properties": {
-        "data_hash": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Principal 所见权威业务数据的摘要。"
-        },
-        "surface_hash": {
-          "type": "string",
-          "minLength": 1,
-          "description": "参与所见即所签绑定时的 Surface 摘要。"
-        }
-      },
-      "description": "确认续跑请求的内容完整性证明。",
-      "additionalProperties": true
-    },
-    "evidence": {
-      "type": "object",
-      "writeOnly": true,
-      "required": ["principal_id", "session_binding"],
-      "properties": {
-        "principal_id": {
-          "type": "string",
-          "minLength": 1,
-          "description": "完成本次确认的 Principal 身份结果。"
-        },
-        "session_binding": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Principal 承载方与当前会话绑定的验证结果。"
-        },
-        "verification_refs": {
-          "type": "array",
-          "items": { "type": "string", "minLength": 1 },
-          "description": "满足更高认证或授权强度的验证结果引用。"
-        },
-        "mandate_ref": {
-          "type": "string",
-          "minLength": 1,
-          "description": "本次确认依赖的 Mandate 引用。"
-        },
-        "evidence_component_refs": {
-          "type": "array",
-          "items": { "type": "string", "minLength": 1 },
-          "description": "需要写入 Evidence Bundle 的确认组件引用。"
-        }
-      },
-      "description": "确认续跑请求的 Principal、会话和审计证据绑定。",
-      "additionalProperties": true
     }
   },
-  "anyOf": [
-    { "required": ["interaction_level"] },
-    { "required": ["suspend_id", "surface_id", "integrity", "evidence"] }
-  ],
+  "required": ["interaction_level"],
   "allOf": [
-    {
-      "if": {
-        "properties": {
-          "interaction_level": {
-            "const": "CONFIRMED",
-            "description": "CONFIRMED 执行门需要活跃挂起记录。"
-          }
-        },
-        "required": ["interaction_level"]
-      },
-      "then": {
-        "required": ["suspend"],
-        "properties": {
-          "suspend": {
-            "required": ["active"],
-            "description": "CONFIRMED 执行门的挂起记录；首次挂起为 active=true，确认完成后可返回 active=false。"
-          }
-        }
-      }
-    },
     {
       "if": {
         "properties": {
@@ -252,12 +173,7 @@
       },
       "then": {
         "required": ["data_source"],
-        "properties": {
-          "surface": {
-            "required": ["refresh_strategy"],
-            "description": "V2 Surface 必须声明权威数据的刷新策略。"
-          }
-        }
+        "description": "V2 Surface 必须使用 HAI 信封顶层的权威数据源。"
       }
     }
   ],
