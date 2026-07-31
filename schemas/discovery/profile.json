@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/discovery/profile.json",
+  "version": "2026-07-31",
+  "title": "UTP Profile",
+  "description": "业务域在 /.well-known/utp 发布的版本化 UTP 能力声明。",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string", "format": "uri" },
+    "utp": { "$ref": "#/$defs/utp_declaration" },
+    "signing_keys": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/signing_key" },
+      "uniqueItems": true
+    },
+    "supported_versions": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "format": "uri" },
+      "description": "当前 Profile 可选声明的协议版本到版本化 Profile URI 映射；版本化叶子 Profile 不声明此字段。"
+    }
+  },
+  "required": ["utp"],
+  "additionalProperties": true,
+  "$defs": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "mode_levels": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["L0", "L1", "L2", "L3"] },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "supported_mode_range": {
+      "type": "object",
+      "properties": {
+        "pricing_mode": { "$ref": "#/$defs/mode_levels" },
+        "decision_path": { "$ref": "#/$defs/mode_levels" },
+        "payment_structure": { "$ref": "#/$defs/mode_levels" },
+        "fulfillment_structure": { "$ref": "#/$defs/mode_levels" },
+        "relationship_mode": { "$ref": "#/$defs/mode_levels" },
+        "compliance_level": { "$ref": "#/$defs/mode_levels" }
+      },
+      "required": ["pricing_mode", "decision_path", "payment_structure", "fulfillment_structure", "relationship_mode", "compliance_level"],
+      "additionalProperties": false
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "transport": { "type": "string", "enum": ["rest", "mcp", "a2a", "embedded"] },
+        "endpoint": { "type": "string", "format": "uri", "pattern": "^https://" }
+      },
+      "required": ["id", "transport", "endpoint"],
+      "additionalProperties": true
+    },
+    "extension": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "$ref": "#/$defs/version" },
+        "schema": { "type": "string", "format": "uri" },
+        "spec": { "type": "string", "format": "uri" }
+      },
+      "required": ["name", "version", "schema"],
+      "additionalProperties": true
+    },
+    "primitive_declaration": {
+      "type": "object",
+      "properties": {
+        "version": { "$ref": "#/$defs/version" },
+        "spec": { "type": "string", "format": "uri" },
+        "schema": { "type": "string", "format": "uri" },
+        "extensions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/extension" }
+        },
+        "authorization": { "type": "object", "additionalProperties": true }
+      },
+      "required": ["version", "spec", "schema"],
+      "additionalProperties": true
+    },
+    "role_declaration": {
+      "type": "object",
+      "properties": {
+        "primitives": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^utp\\.[a-z0-9-]+$" },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["primitives"],
+      "additionalProperties": true
+    },
+    "utp_declaration": {
+      "type": "object",
+      "properties": {
+        "version": { "$ref": "#/$defs/version" },
+        "supported_mode_range": { "$ref": "#/$defs/supported_mode_range" },
+        "services": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/service" },
+          "minItems": 1
+        },
+        "primitives": {
+          "type": "object",
+          "patternProperties": {
+            "^utp\\.[a-z0-9-]+$": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/primitive_declaration" },
+              "minItems": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "roles": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/role_declaration" },
+          "minProperties": 1
+        }
+      },
+      "required": ["version", "supported_mode_range", "services", "primitives", "roles"],
+      "additionalProperties": true
+    },
+    "signing_key": {
+      "type": "object",
+      "properties": {
+        "kid": { "type": "string", "minLength": 1 },
+        "alg": { "type": "string", "minLength": 1 },
+        "public_key_jwk": { "type": "object", "minProperties": 1 },
+        "key_uri": { "type": "string", "format": "uri", "pattern": "^https://" }
+      },
+      "required": ["kid", "alg"],
+      "oneOf": [
+        { "required": ["public_key_jwk"] },
+        { "required": ["key_uri"] }
+      ],
+      "additionalProperties": true
+    }
+  }
+}

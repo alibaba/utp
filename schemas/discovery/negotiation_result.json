@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/discovery/negotiation_result.json",
+  "version": "2026-07-31",
+  "title": "UTP Negotiation Result",
+  "description": "Buyer 本地持有的确定性发现与协商结果。成功与失败结果互斥。",
+  "oneOf": [
+    { "$ref": "#/$defs/succeeded" },
+    { "$ref": "#/$defs/failed" }
+  ],
+  "$defs": {
+    "mode_range": {
+      "type": "object",
+      "properties": {
+        "pricing_mode": { "$ref": "#/$defs/mode_levels" },
+        "decision_path": { "$ref": "#/$defs/mode_levels" },
+        "payment_structure": { "$ref": "#/$defs/mode_levels" },
+        "fulfillment_structure": { "$ref": "#/$defs/mode_levels" },
+        "relationship_mode": { "$ref": "#/$defs/mode_levels" },
+        "compliance_level": { "$ref": "#/$defs/mode_levels" }
+      },
+      "required": ["pricing_mode", "decision_path", "payment_structure", "fulfillment_structure", "relationship_mode", "compliance_level"],
+      "additionalProperties": false
+    },
+    "mode_levels": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["L0", "L1", "L2", "L3"] },
+      "uniqueItems": true
+    },
+    "service_catalog": {
+      "type": "object",
+      "properties": {
+        "roles": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+        "services": { "type": "array", "items": { "$ref": "https://ut-protocol.com/discovery/profile.json#/$defs/service" }, "minItems": 1 }
+      },
+      "required": ["roles", "services"],
+      "additionalProperties": false
+    },
+    "extension": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "spec": { "type": "string", "format": "uri" },
+        "schema": { "type": "string", "format": "uri" }
+      },
+      "required": ["id", "version", "spec", "schema"],
+      "additionalProperties": false
+    },
+    "compatible_primitive": {
+      "type": "object",
+      "properties": {
+        "primitive": { "type": "string", "pattern": "^utp\\.[a-z0-9-]+$" },
+        "selected_version": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "negotiated_extensions": { "type": "array", "items": { "$ref": "#/$defs/extension" } }
+      },
+      "required": ["primitive", "selected_version", "negotiated_extensions"],
+      "additionalProperties": false
+    },
+    "relation_compatibility": {
+      "type": "object",
+      "properties": {
+        "roles": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 2, "maxItems": 2, "uniqueItems": true },
+        "common_mode_range": { "$ref": "#/$defs/mode_range" },
+        "compatible_primitives": { "type": "array", "items": { "$ref": "#/$defs/compatible_primitive" }, "minItems": 1 }
+      },
+      "required": ["roles", "common_mode_range", "compatible_primitives"],
+      "additionalProperties": false
+    },
+    "succeeded": {
+      "type": "object",
+      "properties": {
+        "status": { "const": "succeeded" },
+        "utp_version": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "role_domain_bindings": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 }, "minProperties": 2 },
+        "service_catalogs": { "type": "array", "items": { "$ref": "#/$defs/service_catalog" }, "minItems": 1 },
+        "relation_compatibilities": { "type": "array", "items": { "$ref": "#/$defs/relation_compatibility" }, "minItems": 1 }
+      },
+      "required": ["status", "utp_version", "role_domain_bindings", "service_catalogs", "relation_compatibilities"],
+      "additionalProperties": false
+    },
+    "failed": {
+      "type": "object",
+      "properties": {
+        "status": { "const": "failed" },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": { "type": "string", "enum": ["DISCOVERY_SCOPE_INVALID", "UTP_VERSION_UNSUPPORTED", "PROFILE_UNAVAILABLE", "PROFILE_MALFORMED", "ROLE_RELATION_INCOMPATIBLE"] },
+            "message": { "type": "string", "minLength": 1 }
+          },
+          "required": ["code", "message"],
+          "additionalProperties": true
+        }
+      },
+      "required": ["status", "error"],
+      "additionalProperties": false
+    }
+  }
+}
