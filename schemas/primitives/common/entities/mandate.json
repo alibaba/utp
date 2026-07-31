@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/mandate/mandate.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/mandate.json",
   "version": "2026-07-31",
   "title": "UTP Mandate",
-  "description": "UTP 授权凭证机制。定义商家授权、Checkout Mandate、Payment Mandate 和 Operation Mandate 的协议契约。Schema 仅校验凭证的传输外形；签名、JCS、Key Binding、disclosure、scope 和 Mandate Chain 由运行时验证。",
+  "description": "UTP 授权凭证机制。定义商家授权、Checkout Mandate、Payment Mandate 和 Operation Mandate 的协议契约。Schema 仅校验凭证的传输外形；签名、JCS、Key Binding、有效期、scope 和 Mandate Chain 由运行时验证。",
   "type": "object",
   "properties": {
     "merchant_authorization": {
@@ -33,7 +33,7 @@
     },
     "sd_jwt_kb": {
       "title": "SD-JWT+kb",
-      "description": "UTP Mandate 的 SD-JWT+kb Compact Serialization，可带 disclosure 段。消费前 MUST 完成签名、Key Binding、有效期、audience、nonce 和作用域验证。",
+      "description": "UTP Mandate 的 SD-JWT+kb Compact Serialization。消费前 MUST 完成签名、Key Binding、有效期、audience、nonce 和作用域验证。",
       "type": "string",
       "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]*\\.[A-Za-z0-9_-]+(~[A-Za-z0-9_-]+)*$"
     },
