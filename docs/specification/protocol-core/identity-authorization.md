@@ -6,21 +6,21 @@ status: drafting
 format: html
 ---
 
-<h1 id="s-6-identity">第 6 章：认证与授权（Identity and Authorization — L2）</h1>
+<h1 id="s-6-identity">认证与授权（Identity and Authorization — L2）</h1>
 
 <p>本章为 UTP 协议 Layer 2 的身份基础层，系统定义 Agent 身份认证（Agent Authentication）、用户授权委托（User Authorization）与操作级授权（Operation-Level Authorization）三类机制。通过将机器身份、人类委托与单笔交易授权解耦，本章为 UTP 交易构建一条从「谁发起请求」到「谁允许执行」再到「本次允许做什么」的可验证信任链。</p>
 
 <hr />
 
-<h2 id="s-61">6.1 概述与分层模型（Overview and Layered Model）</h2>
+<h2 id="s-61">概述与分层模型（Overview and Layered Model）</h2>
 
-<h3 id="s-611">6.1.1 背景与问题域</h3>
+<h3 id="s-611">背景与问题域</h3>
 
 <p>在 AI Agent 驱动的商业环境中，交易的发起方从单一人类用户演变为「人类委托 + Agent 代理 + 多方 workload」的分布式执行体。一个完整交易可能跨越买家 Agent 平台、商家服务、支付网络、物流系统与争议仲裁方，每一方都需要回答三个根本性问题：通信对端的 workload 是否可信、该 workload 是否获得用户授权、以及本次具体请求是否被允许执行。</p>
 
 <p>认证与授权层的设计目标，是在不预设具体传输协议、不绑定单一云平台、不强制统一信任根的前提下，为 UTP 交易提供可验证、可审计、可机器判定的信任基础。本章定义的机制覆盖从沙箱 POC 到金融级强合规场景的连续谱系，使低门槛接入与高安全保证能够在同一协议框架内共存。</p>
 
-<h3 id="s-612">6.1.2 三层身份授权模型</h3>
+<h3 id="s-612">三层身份授权模型</h3>
 
 <p>UTP 将认证与授权拆分为三个正交层级，分别对应不同的凭证类型、签发方与验证责任：</p>
 
@@ -63,7 +63,7 @@ format: html
 
 <p>三层模型遵循<strong>正交不可互替</strong>原则：Agent 拥有合法身份并不意味着用户已授权；用户完成 OAuth 授权也不意味着任意 workload 均可代表该用户；即便用户与 Agent 身份均成立，具体交易仍需操作层 Mandate 的逐笔确认。</p>
 
-<h3 id="s-613">6.1.3 设计原则与约束</h3>
+<h3 id="s-613">设计原则与约束</h3>
 
 <p>本章机制的设计遵循以下原则：</p>
 
@@ -76,7 +76,7 @@ format: html
 <li><strong>可审计性</strong>：所有身份验证、授权决策、密钥轮换与 Mandate 签发事件 MUST 进入 Evidence Bundle，确保事后可追溯、可举证。</li>
 </ul>
 
-<h2 id="s-62">6.2 身份认证机制（Agent Authentication）</h2>
+<h2 id="s-62">身份认证机制（Agent Authentication）</h2>
 
 <p>Agent 身份认证回答「哪个 Platform、Agent 或 workload 正在发起请求」。它证明机器身份和密钥控制权，不证明终端用户已授权，也不证明某笔交易已经获准：前者由 <a href="#s-63">6.3 User Authorization</a> 处理，后者由 <a href="#s-64">6.4 Mandate Chain</a> 处理。Business SHOULD 对调用其 API 的 Agent 进行认证，以降低冒充、重放和篡改风险。</p>
 
@@ -129,9 +129,9 @@ format: html
 <li>OAuth 客户端认证和 Access Token 属于用户授权流程，不作为 <code>agent_authentication</code> 的机制类型，也不得替代请求级签名或 PoP。</li>
 </ul>
 
-<h2 id="s-63">6.3 用户授权机制（User Authorization）</h2>
+<h2 id="s-63">用户授权机制（User Authorization）</h2>
 
-<h3 id="s-631">6.3.1 设计目标</h3>
+<h3 id="s-631">设计目标</h3>
 
 <p>用户授权回答「用户是否允许该 Agent 代表自己执行操作」。UTP 将 Agent 映射为 OAuth 2.0 / 2.1 Client，将用户映射为 Resource Owner，将商家（Seller/Business）映射为 Authorization Server 提供方。</p>
 
@@ -144,7 +144,7 @@ format: html
 <li>OAuth 只解决「用户是否委托了 Agent」，不解决单笔交易的操作边界；操作边界由 Mandate Chain 在 6.4 节定义。</li>
 </ul>
 
-<h3 id="s-632">6.3.2 Profile 声明（type = oauth2）</h3>
+<h3 id="s-632">Profile 声明（type = oauth2）</h3>
 
 <p>商家在 Profile 中通过 <code>user_authorization</code> 声明其授权能力。<a href="/documentation/specification/protocol-core/security-trust.html#s-523">第 5 章 5.2.3 节</a>采用 <code>UserAuthorizationConfig</code> / <code>UserAuthorizationMechanism</code> 两层结构；本节展示 <code>type = oauth2</code> 时的 Profile 声明与技术实现要点。Profile 只声明 Authorization Server 入口 <code>endpoint</code>；授权流程、scope 目录与 JWKS 等细节由该入口对应的 RFC 8414 metadata 提供。</p>
 
@@ -195,7 +195,7 @@ format: html
 <li>Profile 层 MUST NOT 在 <code>user_authorization</code> 中声明 scope、flow 或强制门槛；这些信息由 Authorization Server metadata、协议规范、原语定义、运行时授权挑战或本地策略表达。</li>
 </ol>
 
-<h3 id="s-633">6.3.3 Discovery</h3>
+<h3 id="s-633">Discovery</h3>
 
 <p>OAuth 2 授权流程开始前，Platform 买家 Agent MUST 从 Business UTPProfile 的 <code>user_authorization.supported_mechanisms[]</code> 中发现并校验 Authorization Server，具体步骤如下：</p>
 
@@ -217,7 +217,7 @@ format: html
 <li>协议引擎 MUST 缓存 metadata 与 JWKS，并支持合理的 TTL 与密钥轮换；缓存失效后 MUST 重新执行发现流程，不得在已知 issuer 已变更的情况下使用过期公钥验证 Access Token。</li>
 </ol>
 
-<h3 id="s-634">6.3.4 授权流程</h3>
+<h3 id="s-634">授权流程</h3>
 
 <p>采用 OAuth 2.0 / 2.1 Authorization Code 标准流程；是否启用 PKCE 由 Authorization Server metadata、客户端类型与双方配置决定，UTP 不将 PKCE 作为所有实现的强制要求：</p>
 
@@ -270,7 +270,7 @@ format: html
 <li><strong>密钥与 metadata 缓存</strong>：平台 MUST 缓存 JWKS 与 metadata 并设置 TTL；验证失败且因密钥轮换导致时，MUST 先刷新 JWKS 再重试一次，避免偶发拒真。</li>
 </ol>
 
-<h3 id="s-635">6.3.5 Scope 设计</h3>
+<h3 id="s-635">Scope 设计</h3>
 
 <p>UTP scope 命名遵循 <code>{primitive}:{action}</code> 格式，与 P1–P6 原语对齐。Profile 的 <code>user_authorization</code> 只声明 Authorization Server 入口，不列出 scope 清单；scope 的可用集合来自 Authorization Server metadata 的 <code>scopes_supported</code>，具体操作需要哪些 scope 由协议规范、原语定义、运行时授权挑战或本地策略表达。</p>
 
@@ -299,7 +299,7 @@ format: html
 <li>若 Access Token 中的 scope 不足以覆盖本次 Mandate Chain 所需的原语操作，Business MUST 拒绝请求并返回 <code>INSUFFICIENT_SCOPE</code>。</li>
 </ul>
 
-<h3 id="s-636">6.3.6 错误处理</h3>
+<h3 id="s-636">错误处理</h3>
 
 <p>当用户身份缺失或 scope 不足时，商家 MUST 返回标准 OAuth 挑战：</p>
 
@@ -333,7 +333,7 @@ Content-Type: application/json
 }
 </code></pre>
 
-<h3 id="s-637">6.3.7 局限</h3>
+<h3 id="s-637">局限</h3>
 
 <ul>
 <li><strong>商家基础设施依赖</strong>：OAuth 授权体验与安全性完全由商家 Authorization Server 实现决定，Agent 平台无法强制要求商家的 MFA、会话时长、token 格式等细节。</li>
@@ -342,8 +342,8 @@ Content-Type: application/json
 <li><strong>Refresh Token 生命周期长</strong>：长期 refresh token 增加了泄露后的潜在危害，需要配合吊销端点与客户级密钥保护。</li>
 </ul>
 
-<h2 id="s-64">6.4 操作级授权：Mandate Chain（Operation-Level Authorization）</h2>
-<h3 id="s-641">6.4.1 概述（Overview）</h3>
+<h2 id="s-64">操作级授权：Mandate Chain（Operation-Level Authorization）</h2>
+<h3 id="s-641">概述（Overview）</h3>
 
 <p>Mandate Chain 是 UTP 协议的操作级授权机制，以可验证数字凭证（Verifiable Digital Credential, VDC）的形式记录用户对特定商业操作的授权事实。每个 Mandate 采用 SD-JWT+kb（Selective Disclosure JWT with Key Binding）格式，具备防篡改、不可否认、跨系统可验证三项核心属性，使任何持有公钥的参与方均可独立验证凭证真实性。Mandate 与 Agent authentication、User authorization 共同构成操作准入的完整证据链——前两者分别证明"谁在执行"和"是否被委托"，Mandate 则证明"该具体操作是否被授权"。</p>
 
@@ -351,7 +351,7 @@ Content-Type: application/json
 
 <p>UTP v1.0 的 Mandate 版本范围与完整链路流程详见 <a href="#s-645">§6.4.5</a>。各类型凭证的定义与字段规范详见 <a href="#s-642">§6.4.2</a>，签名与规范化规则详见 <a href="#s-643">§6.4.3</a>，验证规则详见 <a href="#s-644">§6.4.4</a>，审计消费语义与 Evidence Bundle 规范详见 <a href="/documentation/specification/protocol-core/risk-audit.html#s-72-evidence-bundle">§7.2</a>。操作响应中 Mandate 凭证的回传格式详见 <a href="#s-646">§6.4.6</a>。</p>
 
-<h3 id="s-642">6.4.2 凭证分类</h3>
+<h3 id="s-642">凭证分类</h3>
 
 <p>UTP 将 Mandate 分为两类核心凭证与一类可选扩展：下单凭证（Checkout Mandate）与支付凭证（Payment Mandate）MUST 成对签发，通过同一哈希值（Checkout Mandate 的 <code>checkout_hash</code> 与 Payment Mandate 的 <code>transaction_id</code>）绑定，构成从「授权下单」到「授权支付」的凭证对；操作凭证（Operation Mandate）用于补充 Checkout Mandate 与 Payment Mandate 无法自然覆盖的具体操作授权，通过 <code>parent_mandate_refs</code> 链接上游 Mandate 或交易凭证锚点，形成可审计的 Mandate Chain。各类凭证的字段规范见本节；签发、传递与验证流程详见 §6.4.5。</p>
 
@@ -524,7 +524,7 @@ Content-Type: application/json
   "exp": 1753869600
 }</code></pre>
 
-<h3 id="s-643">6.4.3 签名与规范化（Signing and Canonicalization）</h3>
+<h3 id="s-643">签名与规范化（Signing and Canonicalization）</h3>
 
 <p>UTP 的 Checkout 授权按三个层次组织：商家先对 Checkout 条款作出签名承诺；用户或其受信签署方再签发 Mandate；两类签名都按相同的规范化规则重建载荷。三者共同将商家确认的条款、用户授权和后续支付关联起来。</p>
 
@@ -561,7 +561,7 @@ Content-Type: application/json
 
 <p>所有参与商家授权或 Mandate 签名的 JSON 载荷 MUST 按 RFC 8785 JSON Canonicalization Scheme（JCS）规范化。JCS 将逻辑等价的 JSON 转换为确定性字节序列，使签名在跨系统传递、重新序列化和长期存证后仍可重放验证。</p>
 
-<h3 id="s-644">6.4.4 验证规则</h3>
+<h3 id="s-644">验证规则</h3>
 
 <p>本小节定义 Mandate 验证的必要条件集合（策略层）与推荐的验证执行顺序，适用于所有验证场景。</p>
 
@@ -604,7 +604,7 @@ Content-Type: application/json
 
 <p>验证失败时，PSP MUST 拒绝支付并返回对应错误码（通常为 <code>MANDATE_INVALID_SIGNATURE</code> 或 <code>MANDATE_SCOPE_MISMATCH</code>）。完整的错误码定义详见 <a href="#s-647">§6.4.7</a>。</p>
 
-<h3 id="s-645">6.4.5 Mandate Chain 完整链路</h3>
+<h3 id="s-645">Mandate Chain 完整链路</h3>
 
 <p>Mandate Chain 不是一条独立业务流程，而是附着在 UTP 会话和原语请求上的授权证据链。其顺序为：能力激活后锁定；商家先签署最终交易条款；用户或其受信签署方再生成绑定该条款的 Mandate；业务方与支付方分别验证后才执行操作。该机制适用于 Purchase、Pay 及需要额外操作授权的原语。</p>
 
@@ -641,7 +641,7 @@ Content-Type: application/json
 
 <p>业务接收方验证商家签名、Checkout Mandate 及其与当前交易条款的一致性；PSP / Tokenizer 独立验证 Payment Mandate、支付工具和金额。Operation Mandate 仅由需要该额外授权的接收方消费。完整验证规则见 <a href="#s-644">§6.4.4</a>；任一验证失败时，接收方 MUST 在执行状态迁移或资金操作前拒绝请求、返回 <a href="#s-647">§6.4.7</a> 定义的错误，并将决策纳入 Evidence Bundle。</p>
 
-<h3 id="s-646">6.4.6 UTP 凭证携带（Credential Carriage）</h3>
+<h3 id="s-646">UTP 凭证携带（Credential Carriage）</h3>
 
 <p>前文（§6.4.2-§6.4.5）定义了 Mandate 的凭证结构、签名机制、验证规则与完整链路。本节规定这些凭证在 UTP 请求和响应消息中的物理携带位置——即凭证从签发方传递到消费方时，在协议消息信封中的具体嵌入方式。</p>
 
@@ -668,7 +668,7 @@ Content-Type: application/json
 
 <p><code>mandate</code> 与响应 <code>output</code> 职责分离：<code>output</code> 承载业务实体（如 PurchaseCredential、PaymentConfirmation），<code>mandate</code> 承载授权凭证上下文，两者通过 <code>transaction_id</code> 或凭证哈希关联。接收方 SHOULD 保存凭证原文、哈希、验证结果和使用操作，并纳入 Evidence Bundle。</p>
 
-<h3 id="s-647">6.4.7 错误处理（Error Handling）</h3>
+<h3 id="s-647">错误处理（Error Handling）</h3>
 
 <p>Mandate Chain 的生命周期（声明、传递、验证）中可能发生多类故障。本节集中汇总所有 Mandate 相关的错误码，覆盖权限缺失、密码学验证失败、时效性、作用域不匹配与委托链断裂等场景，为协议实现者提供统一的错误处理参考。</p>
 
@@ -690,9 +690,9 @@ Content-Type: application/json
 </tbody>
 </table>
 
-<h2 id="s-65">6.5 信任根基础设施（Trust Anchor Infrastructure）</h2>
+<h2 id="s-65">信任根基础设施（Trust Anchor Infrastructure）</h2>
 
-<h3 id="s-651">6.5.1 Trust Anchors</h3>
+<h3 id="s-651">Trust Anchors</h3>
 
 <p>Trust Anchor 是验证 Profile、WIT、OAuth AS 签名公钥的权威来源。UTP 支持以下类型：</p>
 
@@ -704,7 +704,7 @@ Content-Type: application/json
 <li><strong>OAuth AS JWKS</strong>：商家 Authorization Server 通过 RFC 8414 发布的公钥集合。</li>
 </ol>
 
-<h3 id="s-652">6.5.2 验证原则</h3>
+<h3 id="s-652">验证原则</h3>
 
 <ol>
 <li>每个签名 MUST 可追溯到明确的 Trust Anchor；</li>
@@ -714,7 +714,7 @@ Content-Type: application/json
 <li>本地信任锚不足以验证跨域凭证时，接收方 MAY 使用 6.5.1 定义的受背书信任锚作为附加 Trust Anchor；该过程 MUST NOT 弱化本节第 1-4 条的任何要求。接收方 SHOULD 保证所用信任锚的新鲜度，MUST NOT 使用已撤销或已过期的信任锚；新鲜度的实现机制由实现方与治理域约定，本规范不作约束。</li>
 </ol>
 
-<h2 id="s-66">6.6 Profile 声明汇总（Profile Declaration Summary）</h2>
+<h2 id="s-66">Profile 声明汇总（Profile Declaration Summary）</h2>
 
 <p>商家 Profile 中与本章相关的顶层字段如下：</p>
 
@@ -739,7 +739,7 @@ Content-Type: application/json
 </tbody>
 </table>
 
-<h2 id="s-67">6.7 实体定义（Entity Definitions）</h2>
+<h2 id="s-67">实体定义（Entity Definitions）</h2>
 
 <p>本章涉及的声明层实体由第 5 章定义，实现层实体由本章定义。完整实体列表如下：</p>
 
@@ -883,9 +883,9 @@ Content-Type: application/json
 <li>Trust Anchor 与 Evidence Bundle 要求见 <a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章</a>。</li>
 </ul>
 
-<h2 id="s-68">6.8 不变约束与反模式（Invariants and Anti-Patterns）</h2>
+<h2 id="s-68">不变约束与反模式（Invariants and Anti-Patterns）</h2>
 
-<h3 id="s-681">6.8.1 不变约束</h3>
+<h3 id="s-681">不变约束</h3>
 
 <ol>
 <li>Agent authentication 与 User authorization MUST 分别验证，不得混用；</li>
@@ -897,7 +897,7 @@ Content-Type: application/json
 <li>新增身份机制 MUST 作为 OPTIONAL 能力声明。</li>
 </ol>
 
-<h3 id="s-682">6.8.2 反模式</h3>
+<h3 id="s-682">反模式</h3>
 
 <ul>
 <li>❌ 用 API Key 执行支付、下单提交、变更收款/收货要素等需要强认证或授权证据的操作；</li>
@@ -907,7 +907,7 @@ Content-Type: application/json
 <li>❌ 将 OAuth scope 当作单笔交易授权边界（边界应由 Mandate Chain 定义）。</li>
 </ul>
 
-<h2 id="s-69">6.9 引用关系（References）</h2>
+<h2 id="s-69">引用关系（References）</h2>
 
 <table>
 <thead>
@@ -928,7 +928,7 @@ Content-Type: application/json
 </tbody>
 </table>
 
-<h2 id="s-610">6.10 结论（Conclusion）</h2>
+<h2 id="s-610">结论（Conclusion）</h2>
 
 <p>UTP 第 6 章通过<strong>三层分离</strong>的设计，将 Agent 身份认证、用户授权与操作级授权清晰解耦：</p>
 
