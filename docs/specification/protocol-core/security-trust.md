@@ -874,7 +874,7 @@ format: html
   },
   "mandates": {
     "version": "2026-04-08",
-    "schema": "https://schemas.utp.example/common/mandates.json",
+    "schema": "https://ut-protocol.com/schemas/primitives/common/entities/mandate.json",
     "supported_mandate_types": ["checkout", "payment", "operation"]
   },
   "trust_profile": {

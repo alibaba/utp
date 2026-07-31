@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/discovery/mandates.json",
+  "version": "2026-07-31",
+  "title": "UTP Mandates Discovery",
+  "description": "UTP Profile 中的 Mandate 能力发现配置。该配置声明 Mandate 凭证 schema 入口和响应方支持的 Mandate 类型；凭证 token 的具体结构、签名和运行时验证规则由 schema 指向的 Mandate 实体定义。",
+  "type": "object",
+  "required": [
+    "version",
+    "schema",
+    "supported_mandate_types"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Mandates discovery 配置格式版本。"
+    },
+    "schema": {
+      "const": "https://ut-protocol.com/schemas/primitives/common/entities/mandate.json",
+      "description": "当前 UTP Mandate 凭证实体 schema URI。"
+    },
+    "supported_mandate_types": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "checkout",
+          "payment",
+          "operation"
+        ]
+      },
+      "description": "响应方支持的 Mandate 类型列表。"
+    }
+  },
+  "additionalProperties": true
+}
