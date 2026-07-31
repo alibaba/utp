@@ -368,7 +368,7 @@ Content-Type: application/json
 <tbody>
 <tr>
 <td>下单凭证（Checkout Mandate）</td>
-<td>P3 Purchase <code>complete</code> / <code>contract_complete</code>；P4 Pay <code>initiate</code></td>
+<td>P3 Purchase <code>complete</code> / <code>contract-complete</code>；P4 Pay <code>initiate</code></td>
 <td>买方用户；由受信平台代理或用户钱包执行签名</td>
 <td>商家已签署 <code>checkout_jwt</code>（含最终订单条款），买方已在受信确认面审阅</td>
 <td>授权完成一笔具体 checkout（订单）。以 SD-JWT+kb 格式签发，内嵌商家签名的 <code>checkout_jwt</code> 并携带其 <code>checkout_hash</code>；Payment Mandate 通过同一 <code>checkout_hash</code> 绑定</td>

@@ -8,7 +8,7 @@ version: 2026-07-29
 
 # 履约原语 — REST 绑定
 
-## REST Binding {#s-15-8-1}
+## REST 绑定（REST Binding） {#s-15-8-1}
 所有操作均以 `POST` 提交，标识符（如 `purchase_id`、`order_id`、`batch_id`）与其余参数一律置于请求体（`application/json`），不作为路径参数。
 
 | 操作 | 方法 | 端点 |

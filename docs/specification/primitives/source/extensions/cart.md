@@ -8,11 +8,9 @@ version: 2026-07-29
 
 # 寻源原语 — 购物车扩展
 
-## Source Cart Extension（寻源购物车扩展） {#s-1111-source-cart-extension}
+## 寻源购物车扩展（Source Cart Extension） {#s-1111-source-cart-extension}
 
-Source Cart 是 Source 原语的可选扩展能力，按照[原语扩展规范](/documentation/specification/protocol-core/primitive-framework.html#s-105-extension-spec)挂载在 `utp.source` 命名空间下。该扩展用于在寻源阶段临时或持久保存采购候选项，便于采购方在多次 `search`（包括携带筛选条件的细化搜索）和 `lookup` 后统一比较和提交订购。
-
-Source Cart 不属于 Source 核心操作集合，但会按原语扩展机制向 Source 状态机追加扩展状态与迁移。该扩展不改变 Source 的初始状态、内部终态和既有核心迁移语义，不生成独立 `transaction_id`，也不定义脱离 Source 的独立终态。供应商 Profile 在 `utp.source` 的 `extensions` 中声明 `utp.source_cart` 后，才表示支持本节定义的扩展操作。
+Source Cart 是挂载于 `utp.source` 的可选扩展，按照[原语扩展规范](/documentation/specification/protocol-core/primitive-framework.html#s-105-extension-spec)为 Source 状态机增加购物车上下文及相关操作。该扩展用于在寻源阶段临时或持久保存采购候选项，便于采购方在多次 `search`（包括携带筛选条件的细化搜索）和 `lookup` 后统一比较和提交订购。购物车操作复用 Source 的全局阶段、交易上下文及核心状态边界。供应商通过在 Profile 的 `utp.source.extensions` 中声明 `utp.source_cart` 表示支持本扩展。
 
 ### 意图与范围 {#s-11111}
 
@@ -27,7 +25,7 @@ Source Cart 不属于 Source 核心操作集合，但会按原语扩展机制向
 
 该扩展挂载在 `utp.source` 下，扩展包名为 `utp.source_cart`，操作域为 `cart`。供应商 Profile 在 `utp.source` 的 `extensions` 中声明该扩展后，才表示支持本节定义的扩展操作。
 
-Source Cart 叠加在 `SOURCING` 阶段，只追加 Source 内部扩展状态与迁移，不新增全局状态，不生成独立 `transaction_id`，也不定义脱离 Source 的独立终态。
+Source Cart 运行于 `SOURCING` 阶段，扩展状态、操作结果和资源引用均归属当前 Source 上下文。
 
 ### 状态影响 {#s-11112}
 
@@ -43,8 +41,8 @@ Source Cart 会向 Source 内部状态机追加 `CART_ACTIVE` 扩展状态，并
 
 | Source 原状态 | 扩展启用后的影响 | 保持不变的约束 |
 | --- | --- | --- |
-| `INIT` | 额外允许 `utp.source_cart.query` 查看会话购物车或已授权持久购物车，并进入 `CART_ACTIVE`。 | 核心 `search`、`lookup` 仍按 Source 状态机规则执行；不能直接 `cart.add`。 |
-| `CANDIDATES_READY` | 不新增直接加购入口；采购方需先 `lookup` 获得详情快照。 | 候选集合仍只表示比较结果，不锁定库存、价格或交易条件。 |
+| `INIT` | 额外允许 `utp.source_cart.query` 查看会话购物车或已授权持久购物车，并进入 `CART_ACTIVE`。 | `cart.add` 仅在获得有效 `lookup` 详情快照后可用。 |
+| `CANDIDATES_READY` | 采购方通过 `lookup` 获得详情快照后可加入购物车。 | 候选集合仅表示比较结果，不锁定库存、价格或交易条件。 |
 | `DETAIL_VIEWING` | 在详情快照有效时额外允许 `utp.source_cart.add`；加购后采购方可继续 `cart.query` 进入 `CART_ACTIVE`。 | 采购方仍可跳过购物车，直接以候选项调用 `utp.negotiate.inquiry` 或 `utp.purchase.create`。 |
 | `RELEASED` | 不允许基于已释放快照执行 `cart.add`。 | 必须重新 `lookup` 获取有效详情快照后才能加购。 |
 
@@ -83,19 +81,24 @@ Source Cart 会向 Source 内部状态机追加 `CART_ACTIVE` 扩展状态，并
 
 服务端 MUST 仅返回与调用方身份关联的持久化购物车资源，并按自身访问策略处理商品、数量和用户资料等字段可见性。
 
-### 扩展错误码 {#s-11115}
+### 扩展错误码（Extension Error Codes） {#s-11115}
 
 | 错误码 | 严重级别 | HTTP 映射 | 描述 | 建议处理 |
 | --- | --- | --- | --- | --- |
 | `SOURCE.CART.UNSUPPORTED` | error | 404 | 供应商未声明 `cart` 扩展能力。 | 隐藏购物车相关动作，回退到核心 Source 流程。 |
 | `SOURCE.CART.ITEM_UNAVAILABLE` | warning | 409 | 候选项暂时不可加入购物车，或加入后已不可购买。 | 重新 `lookup` 或提示采购方选择其他候选。 |
-| `SOURCE.CART.ITEM_DUPLICATE` | info | 200 | 商品项已存在于购物车中，服务端已合并或返回既有项。 | 刷新购物车视图。 |
 | `SOURCE.CART.LIMIT_EXCEEDED` | error | 422 | 购物车商品数、单项数量或持久购物车容量超过限制。 | 调整数量或移除部分商品后重试。 |
-| `SOURCE.CART.PRICE_CHANGED` | warning | 200 | 购物车项对应的价格、库存或交易条件已变化。 | 展示最新条件，必要时重新 `lookup`。 |
 
-### 扩展传输绑定 {#s-11116}
+### 非错误结果（Non-error Results） {#s-source-cart-non-error-results}
 
-Source Cart 扩展遵循 Source 传输绑定规则。扩展操作名称按 `utp.source_cart.{action}` 映射到各传输协议，不改变消息信封、鉴权、幂等和错误响应格式。
+已存在的商品项被合并，或购物车项的价格、库存或交易条件发生变化，都属于可预期的业务结果，MUST NOT 编码为错误响应。服务端 MUST 返回正常 Action Response，将 `execution_result` 设为 `SUCCESS`，并通过 `output.status` 表达结果：
+
+- `ITEM_MERGED`：目标商品项已存在，服务端已合并数量或返回既有项。
+- `TERMS_CHANGED`：购物车项的价格、库存或交易条件已变化。响应 MUST 包含最新购物车项；必要时通过 `valid_next_actions` 引导重新执行 `utp.source.lookup`。
+
+### 扩展传输绑定（Extension Transport Bindings） {#s-11116}
+
+Source Cart 扩展遵循 Source 传输绑定规则。扩展操作名称按 `utp.source_cart.{action}` 映射到各传输协议，并复用 Source 的消息信封、鉴权、幂等和错误响应规则。
 
 | 绑定类型 | 映射规则 |
 | --- | --- |

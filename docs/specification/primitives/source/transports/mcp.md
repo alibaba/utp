@@ -8,7 +8,8 @@ version: 2026-07-29
 
 # 寻源原语 — MCP 绑定
 
-## MCP Binding {#s-11-8-2}
+## MCP 绑定（MCP Binding） {#s-11-8-2}
+
 | 操作 | MCP Tool Name | 说明 |
 | --- | --- | --- |
 | `utp.source.search` | `utp_source_search` | 输入为 SearchRequest 对象。 |

@@ -8,7 +8,8 @@ version: 2026-07-29
 
 # 寻源原语 — EMBEDDED 绑定
 
-## Embedded SDK Binding {#s-11-8-4}
+## Embedded SDK 绑定（Embedded SDK Binding） {#s-11-8-4}
+
 | 操作 | SDK 方法签名 | 说明 |
 | --- | --- | --- |
 | `utp.source.search` | `client.source.search(request: SearchRequest): Promise` | 返回候选集合。 |

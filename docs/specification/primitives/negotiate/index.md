@@ -6,9 +6,9 @@ status: drafting
 version: 2026-07-29
 ---
 
-# Negotiate 询盘原语 {#s-12-p2-negotiate}
+# 询盘原语（Negotiate） {#s-12-p2-negotiate}
 
-## 原语身份 {#s-negotiate-identity}
+## 原语身份（Primitive Identity） {#s-negotiate-identity}
 
 ```
 primitive_id:   utp.negotiate
@@ -22,7 +22,7 @@ precondition:   pricing_mode == L3
 
 ---
 
-## Overview（概述） {#s-121-overview}
+## 概述（Overview） {#s-121-overview}
 
 ### 意图 {#s-1211}
 
@@ -98,7 +98,7 @@ Negotiate 不覆盖商品、服务或供应商寻源（属于 Source 原语）�
 
 ---
 
-## Lifecycle / State Machine（生命周期 / 状态机） {#s-122-lifecycle-state-machine}
+## 生命周期与状态机（Lifecycle and State Machine） {#s-122-lifecycle-state-machine}
 
 ### Negotiate 原语内部状态机 {#s-1221-negotiate}
 
@@ -143,7 +143,7 @@ Negotiate 对应上下文级全局状态 `NEGOTIATING`。Binding Terms 生成（
 
 ---
 
-## Error Handling（错误处理） {#s-123-error-handling}
+## 错误处理（Error Handling） {#s-123-error-handling}
 
 ### 错误码定义 {#s-1231}
 
@@ -162,18 +162,18 @@ Negotiate 对应上下文级全局状态 `NEGOTIATING`。Binding Terms 生成（
 
 ## 角色与可见性约束 {#s-124-scopes}
 
-Negotiate 不定义固定的 OAuth scope。能力提供方是否要求用户授权，以及授权是否为预先条件，必须在 Profile 的原语声明中通过 `authorization` 表达。
+Negotiate 的授权要求由能力提供方在 Profile 的 `authorization` 中声明；该声明同时表达授权是否为原语执行的预先条件。
 
 **角色与可见性约束：**
 
 - Buyer MUST NOT 执行 `quote` 操作。
 - Seller MUST NOT 执行 `inquiry` 或 `counter-offer` 操作。
 - Seller MUST 在最终 `quote` 中提供覆盖报价条款哈希的有效签名；Buyer MUST 在报价有效期内执行 `binding` 并提供签名。任一签名缺失或条款哈希不一致时，绑定不成立。
-- `query` 不引入状态迁移；其返回字段 MUST 同时受调用方角色、能力提供方访问策略和 L3 竞争规则约束。
+- `query` 为只读操作，执行后协商状态保持不变；其返回字段 MUST 同时受调用方角色、能力提供方访问策略和 L3 竞争规则约束。
 
 ---
 
-## Guidelines（角色职责指引） {#s-125-guidelines}
+## 角色职责指引（Role Responsibility Guidelines） {#s-125-guidelines}
 
 ### Buyer 角色职责 {#s-1251-buyer}
 
@@ -199,7 +199,7 @@ Negotiate 不定义固定的 OAuth scope。能力提供方是否要求用户授�
 
 ---
 
-## Mode-Driven Behavior（模式驱动行为） {#s-126-mode-driven-behavior}
+## 模式驱动行为（Mode-Driven Behavior） {#s-126-mode-driven-behavior}
 
 ### pricing_mode 对 Negotiate 的影响 {#s-1261-pricing_mode-negotiate}
 
@@ -240,7 +240,7 @@ Negotiate 不定义固定的 OAuth scope。能力提供方是否要求用户授�
 
 ---
 
-## Actions（操作定义） {#s-127-operations}
+## 操作定义（Actions） {#s-127-operations}
 
 - **`utp.negotiate.inquiry`**
   - **角色绑定：** Buyer → Seller
@@ -272,7 +272,7 @@ Negotiate 不定义固定的 OAuth scope。能力提供方是否要求用户授�
   - **关键约束：** 只能选择一个 Seller 报价分支
 - **`utp.negotiate.query`**
   - **角色绑定：** Buyer → Seller
-  - **执行说明：** Buyer 查询询盘、报价分支和绑定结果；Seller 按访问策略返回 Buyer 可见的协商状态和报价信息，不改变协商状态。
+  - **执行说明：** Buyer 查询询盘、报价分支和绑定结果；Seller 按访问策略返回 Buyer 可见的协商状态和报价信息，协商状态保持不变。
   - **适用状态：** `INQUIRED`、`QUOTED`、`COUNTERED`、`BOUND` 或 `RELEASED`
   - **状态影响：** 无
   - **后续操作：** 保持当前状态下可执行的操作

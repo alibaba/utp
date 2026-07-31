@@ -8,15 +8,16 @@ version: 2026-07-29
 
 # 订购原语 — A2A 绑定
 
-## A2A Binding {#s-13-8-3}
+## A2A 绑定（A2A Binding） {#s-13-8-3}
+
 | 操作 | A2A Task Name | 说明 |
 | --- | --- | --- |
 | `utp.purchase.create` | `utp:purchase:create` | 同步任务，直接返回相应对象草案。 |
 | `utp.purchase.update` | `utp:purchase:update` | 同步任务，返回更新后的草案。 |
 | `utp.purchase.complete` | `utp:purchase:complete` | 异步任务。接收 Mandate 后状态为 `pending`，Mandate 准入、库存锁定和承诺处理完成后状态为 `completed`。 |
-| `utp.purchase.contract_create` | `utp:purchase:contract_create` | 同步任务，返回采购合同或框架协议草案。 |
-| `utp.purchase.contract_update` | `utp:purchase:contract_update` | 同步任务，返回更新后的合同草案。 |
-| `utp.purchase.contract_complete` | `utp:purchase:contract_complete` | 异步任务，完成 Mandate 准入和合同承诺处理。 |
+| `utp.purchase.contract-create` | `utp:purchase:contract-create` | 同步任务，返回采购合同或框架协议草案。 |
+| `utp.purchase.contract-update` | `utp:purchase:contract-update` | 同步任务，返回更新后的合同草案。 |
+| `utp.purchase.contract-complete` | `utp:purchase:contract-complete` | 异步任务，完成 Mandate 准入和合同承诺处理。 |
 | `utp.purchase.query` | `utp:purchase:query` | 同步只读任务。无业务请求体；以任务目标中的 `purchase_id` 或 `agreement_id` 定位，返回相应对象状态视图。 |
 | `utp.purchase.cancel` | `utp:purchase:cancel` | 同步任务。无业务请求体；以任务目标中的 `purchase_id` 或 `agreement_id` 定位，取消草案；订单同时释放临时库存资源。 |
 
