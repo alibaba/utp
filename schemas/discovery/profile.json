@@ -18,7 +18,7 @@
     },
     "mandates": {
       "$ref": "mandates.json",
-      "description": "Mandate 能力发现配置。"
+      "description": "Mandate 支持声明"
     },
     "signing_keys": {
       "type": "array",
