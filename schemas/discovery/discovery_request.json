@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/discovery/discovery_request.json",
+  "$id": "https://ut-protocol.com/schemas/discovery/discovery_request.json",
   "version": "2026-07-31",
   "title": "UTP Discovery Request",
   "description": "发现与协商的范围输入。Buyer 以本地 Profile 的 utp.version 作为唯一提出版本，本对象不重复声明版本。",

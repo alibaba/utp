@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/leadtime_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/leadtime_output.json",
   "version": "2026-07-27",
   "title": "FulfillLeadtimeOutput",
   "description": "utp.fulfill.leadtime 的业务输出。按阶段返回备货、运输、清关、验货或服务激活的预估时长与预估日期。",

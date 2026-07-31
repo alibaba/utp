@@ -1,15 +1,30 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/reject_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/rejection_confirmation.json",
   "version": "2026-07-27",
-  "title": "FulfillRejectInput",
-  "description": "utp.fulfill.reject 的业务输入。Buyer 对不符合约定的已交付批次提交结构化拒收理由与证据，MUST 携带 Buyer 签名；当前批次进入 REJECTED 终态，生成 RejectionConfirmation 并激活 Resolve。",
+  "title": "RejectionConfirmation",
+  "description": "采购方拒收凭证。生成后激活 Resolve 原语，作为索赔证据链的一部分；被拒批次不再进入 RECEIVED 或 FULFILLED。",
   "type": "object",
   "properties": {
+    "rejection_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "拒收凭证唯一标识。"
+    },
     "order_id": {
       "type": "string",
       "minLength": 1,
       "description": "订单标识。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单所属订购标识。"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "全局事务标识。"
     },
     "batch_id": {
       "type": "string",
@@ -30,12 +45,12 @@
       "items": {
         "$ref": "partial_delivery.json#/$defs/partial_delivery_line_item"
       },
-      "description": "本次拒收涉及的订单行项目与数量，可选。分批或部分拒收场景 SHOULD 提供。"
+      "description": "本次拒收涉及的订单行项目与数量，可选。"
     },
     "rejected_at": {
       "type": "string",
       "format": "date-time",
-      "description": "拒收时间，可选。"
+      "description": "拒收时间。"
     },
     "desired_resolution": {
       "type": "string",
@@ -51,9 +66,13 @@
     }
   },
   "required": [
+    "rejection_id",
     "order_id",
+    "purchase_id",
+    "transaction_id",
     "reason_code",
     "evidence_refs",
+    "rejected_at",
     "signature"
   ],
   "additionalProperties": true

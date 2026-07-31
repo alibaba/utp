@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/mandate.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/mandate.json",
   "version": "2026-07-31",
   "title": "Mandate",
   "description": "UTP Action 请求和响应中携带的授权凭证上下文。响应回传本次操作签发、消费或更新的凭证。",

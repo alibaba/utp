@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/receive_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receive_input.json",
   "version": "2026-07-27",
   "title": "FulfillReceiveInput",
   "description": "utp.fulfill.receive 的业务输入。Buyer 对已妥投且满足验货要求的订单/批次确认收货，MUST 携带 Buyer 签名；当前批次进入 RECEIVED，全部批次完成时进入 FULFILLED。",

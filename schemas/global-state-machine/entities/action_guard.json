@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/global-state-machine/entities/action_guard.json",
+  "$id": "https://ut-protocol.com/schemas/global-state-machine/entities/action_guard.json",
   "version": "2026-07-29",
   "title": "UTP Action Guard",
   "description": "某个 Action 在指定前置状态和 Mode 条件下是否可以被尝试执行的声明",
@@ -14,14 +14,14 @@
     "from_states": {
       "type": "array",
       "items": {
-        "$ref": "https://ut-protocol.com/global-state-machine/entities/state.json"
+        "$ref": "state.json"
       },
       "minItems": 1,
       "uniqueItems": true,
       "description": "允许尝试执行该 Action 的前置状态集合"
     },
     "mode": {
-      "$ref": "https://ut-protocol.com/global-state-machine/entities/mode_condition.json"
+      "$ref": "mode_condition.json"
     }
   },
   "required": [

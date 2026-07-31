@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/discovery/profile.json",
+  "$id": "https://ut-protocol.com/schemas/discovery/profile.json",
   "version": "2026-07-31",
   "title": "UTP Profile",
   "description": "业务域在 /.well-known/utp 发布的版本化 UTP 能力声明。",

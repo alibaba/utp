@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/contact_info.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/contact_info.json",
   "version": "2026-07-30",
   "title": "ContactInfo",
   "description": "自然人或组织的联系信息。",

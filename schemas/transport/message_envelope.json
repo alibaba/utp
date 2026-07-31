@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/transport/message_envelope.json",
+  "$id": "https://ut-protocol.com/schemas/transport/message_envelope.json",
   "version": "2026-07-31",
   "title": "UTP Message Envelope",
   "description": "跨进程或跨网络的 UTP 请求、响应、通知和错误的等价传输封装；不创建第二套业务请求或响应格式。",

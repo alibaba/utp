@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/purchase/primitive.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/purchase/primitive.json",
   "name": "utp.purchase",
   "version": "2026-07-29",
   "title": "P3 Purchase 原语定义",

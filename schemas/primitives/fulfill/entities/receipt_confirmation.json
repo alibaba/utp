@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receive_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receipt_confirmation.json",
   "version": "2026-07-27",
-  "title": "FulfillReceiveOutput",
-  "description": "utp.fulfill.receive 的业务输出。返回收货确认凭证；幂等——批次已确认收货时返回既有凭证（FULFILL.ALREADY_RECEIVED 语义）。",
+  "title": "ReceiptConfirmation",
+  "description": "采购方收货确认凭证。receive 的产出；重复 receive 幂等返回既有凭证。receive 完成可按 TradeMethod 触发 Escrow 释放。",
   "type": "object",
   "properties": {
     "receipt_id": {
@@ -50,9 +50,31 @@
   "required": [
     "receipt_id",
     "order_id",
+    "purchase_id",
+    "transaction_id",
     "result",
     "received_quantity",
-    "received_at"
+    "received_at",
+    "signature"
   ],
-  "additionalProperties": true
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "const": "CONDITIONAL"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason_code"
+        ]
+      }
+    }
+  ]
 }

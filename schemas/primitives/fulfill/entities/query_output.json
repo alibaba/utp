@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/query_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/query_output.json",
   "version": "2026-07-27",
   "title": "FulfillQueryOutput",
   "description": "utp.fulfill.query 的业务输出。返回单笔订单的当前状态、承诺交期、履约事件、履约收据与凭证摘要；回调不可达时 Buyer 通过本操作轮询兜底。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/trade_mode.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/trade_mode.json",
   "version": "2026-07-30",
   "title": "TradeMode",
   "description": "商家提供的业务交易方式，描述付款形态及可选的分阶段安排。",
