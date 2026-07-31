@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_add_output.json",
+  "version": "2026-07-29",
+  "title": "CartAddOutput",
+  "description": "utp.source_cart.add 的业务输出。",
+  "type": "object",
+  "properties": {
+    "cart_ref": {
+      "$ref": "./cart_ref.json",
+      "readOnly": true,
+      "description": "本次操作对应的购物车引用。"
+    },
+    "cart_item": {
+      "$ref": "./cart_item.json",
+      "readOnly": true,
+      "description": "本次新增或合并后的购物车项。"
+    },
+    "cart_summary": {
+      "$ref": "./cart_summary.json",
+      "readOnly": true,
+      "description": "本次操作后的购物车摘要。"
+    },
+    "cart_version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "更新后的购物车版本。",
+      "readOnly": true
+    },
+    "merged": {
+      "type": "boolean",
+      "description": "是否与同一购物车中的已有等价商品项合并。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "cart_ref",
+    "cart_item",
+    "cart_summary",
+    "cart_version",
+    "merged"
+  ],
+  "additionalProperties": true
+}

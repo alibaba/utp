@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_update_output.json",
+  "version": "2026-07-29",
+  "title": "CartUpdateOutput",
+  "description": "utp.source_cart.update 的业务输出。",
+  "type": "object",
+  "properties": {
+    "cart_item": {
+      "$ref": "./cart_item.json",
+      "readOnly": true,
+      "description": "修改后的购物车项。"
+    },
+    "cart_summary": {
+      "$ref": "./cart_summary.json",
+      "readOnly": true,
+      "description": "修改商品项后的购物车摘要。"
+    },
+    "cart_version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "更新后的购物车版本。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "cart_item",
+    "cart_summary",
+    "cart_version"
+  ],
+  "additionalProperties": true
+}

@@ -30,7 +30,7 @@
     "updated_at": {
       "type": "string",
       "format": "date-time",
-      "description": "本次时效预估更新时间，可选。"
+      "description": "本次时效预估更新时间，可选。采用 RFC 3339 date-time 格式。"
     },
     "delay_reason": {
       "type": "string",

@@ -1,10 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "binding_terms.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/binding_terms.json",
   "version": "2026-07-29",
   "title": "BindingTerms",
   "description": "条款绑定实体。双方确认生效的条款快照，是 Negotiate 的最终产出，被 utp.purchase.create 引用；授权凭据以 mandate_refs 记录，不再内嵌双方签名。",
   "type": "object",
+  "required": [
+    "binding_id",
+    "terms_snapshot",
+    "terms_hash",
+    "inquiry_ref",
+    "quote_ref",
+    "expiry",
+    "created_at"
+  ],
   "properties": {
     "binding_id": {
       "type": "string",
@@ -22,7 +31,10 @@
     },
     "mandate_refs": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
       "description": "本次绑定所依据的授权凭据 mandate_id 列表（可审计材料，纳入 Evidence Bundle）。"
     },
     "inquiry_ref": {
@@ -37,29 +49,23 @@
     },
     "counter_offer_refs": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
       "description": "关联的反报价 ID 列表（按轮次排列）。"
     },
     "expiry": {
       "type": "string",
       "format": "date-time",
-      "description": "绑定有效期。必须晚于当前时间；过期后必须重新协商。"
+      "description": "绑定有效期。必须晚于当前时间；过期后必须重新协商。采用 RFC 3339 date-time 格式。"
     },
     "created_at": {
       "type": "string",
       "format": "date-time",
-      "description": "绑定创建时间。"
+      "description": "绑定创建时间。采用 RFC 3339 date-time 格式。"
     }
   },
-  "required": [
-    "binding_id",
-    "terms_snapshot",
-    "terms_hash",
-    "inquiry_ref",
-    "quote_ref",
-    "expiry",
-    "created_at"
-  ],
   "additionalProperties": true,
   "$defs": {
     "terms_snapshot": {
@@ -68,13 +74,17 @@
       "properties": {
         "line_items": {
           "type": "array",
-          "items": { "$ref": "../../common/entities/line_item.json" },
+          "items": {
+            "$ref": "../../common/entities/line_item.json"
+          },
           "minItems": 1,
           "description": "商品明细。"
         },
         "prices": {
           "type": "array",
-          "items": { "$ref": "../../common/entities/price.json" },
+          "items": {
+            "$ref": "../../common/entities/price.json"
+          },
           "minItems": 1,
           "description": "金额构成，必须包含 type 为 total 的最终金额。"
         },
@@ -82,7 +92,7 @@
           "$ref": "../../common/entities/trade_mode.json",
           "description": "选定的交易安排（单项）。"
         },
-        "fulfillment_selection": {
+        "delivery": {
           "$ref": "../../common/entities/delivery.json",
           "description": "交付安排（可选）。绑定阶段交货信息未必能确定。"
         },
@@ -94,16 +104,22 @@
         "estimated_delivery": {
           "type": "string",
           "format": "date",
-          "description": "预计到货日期（可选，非承诺）。"
+          "description": "预计到货日期（可选，非承诺）。采用 RFC 3339 full-date 格式。"
         },
-        "warranty": { "type": "string", "description": "保修条款。" },
+        "warranty": {
+          "type": "string",
+          "description": "保修条款。"
+        },
         "custom_terms": {
           "type": "object",
           "description": "自定义条款（键值对格式）。",
           "additionalProperties": true
         }
       },
-      "required": ["line_items", "prices"],
+      "required": [
+        "line_items",
+        "prices"
+      ],
       "additionalProperties": true
     }
   }

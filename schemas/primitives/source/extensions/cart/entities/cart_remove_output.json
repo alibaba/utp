@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_remove_output.json",
+  "version": "2026-07-29",
+  "title": "CartRemoveOutput",
+  "description": "utp.source_cart.remove 的业务输出。",
+  "type": "object",
+  "properties": {
+    "removed_cart_item_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "已删除的购物车项标识。",
+      "readOnly": true
+    },
+    "cart_summary": {
+      "$ref": "./cart_summary.json",
+      "readOnly": true,
+      "description": "删除商品项后的购物车摘要。"
+    },
+    "cart_version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "删除后的购物车版本。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "removed_cart_item_id",
+    "cart_summary",
+    "cart_version"
+  ],
+  "additionalProperties": true
+}

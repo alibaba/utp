@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_summary.json",
+  "version": "2026-07-29",
+  "title": "CartSummary",
+  "description": "购物车数量和可用性摘要。购物车可能跨供应商、跨币种，核心摘要不计算单一总价。",
+  "type": "object",
+  "properties": {
+    "item_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "购物车项数量。",
+      "readOnly": true
+    },
+    "selected_item_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "已选中的购物车项数量。",
+      "readOnly": true
+    },
+    "total_quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "全部购物车项的数量总和。",
+      "readOnly": true
+    },
+    "has_price_changes": {
+      "type": "boolean",
+      "description": "是否存在价格已变化的购物车项。",
+      "readOnly": true
+    },
+    "has_unavailable_items": {
+      "type": "boolean",
+      "description": "是否存在不可用购物车项。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "item_count",
+    "selected_item_count",
+    "total_quantity",
+    "has_price_changes",
+    "has_unavailable_items"
+  ],
+  "additionalProperties": true
+}

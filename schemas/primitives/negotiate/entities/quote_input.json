@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "quote_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/quote_input.json",
   "version": "2026-07-27",
   "title": "QuoteInput",
   "description": "utp.negotiate.quote 的业务输入（方向 Seller → Buyer 的异步回调）。载荷即完整的已签名报价实体。",

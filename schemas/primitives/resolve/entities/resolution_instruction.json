@@ -27,7 +27,7 @@
     },
     "target_action": {
       "type": "string",
-      "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$",
       "description": "执行该处置的目标 UTP Action 完整名称。"
     },
     "payload": {

@@ -1,10 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "query_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/query_output.json",
   "version": "2026-07-27",
   "title": "NegotiateQueryOutput",
   "description": "utp.negotiate.query 的业务输出。返回本方可见的协商状态与数据；可见范围受角色、能力提供方访问策略和 L3 竞争规则限制。轮询获取的报价与回调交付的报价具有同等效力，不改变签名、有效期或协商状态。",
   "type": "object",
+  "required": [
+    "inquiry_id",
+    "negotiation_status"
+  ],
   "properties": {
     "inquiry_id": {
       "type": "string",
@@ -46,9 +50,5 @@
       "readOnly": true
     }
   },
-  "required": [
-    "inquiry_id",
-    "negotiation_status"
-  ],
   "additionalProperties": true
 }

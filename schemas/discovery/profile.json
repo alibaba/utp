@@ -16,6 +16,10 @@
       "$ref": "agent_authentication.json",
       "description": "Agent 身份认证能力声明"
     },
+    "mandates": {
+      "$ref": "mandates.json",
+      "description": "Mandate 支持声明"
+    },
     "signing_keys": {
       "type": "array",
       "items": { "$ref": "#/$defs/signing_key" },

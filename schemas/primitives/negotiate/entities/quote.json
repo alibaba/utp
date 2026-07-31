@@ -1,15 +1,24 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "quote.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/quote.json",
   "version": "2026-07-29",
   "title": "Quote",
   "description": "供应商报价实体。消息真实性与完整性由传输层消息签名（RFC 9421，见规范 §4.4）保证；卖家侧业务承诺机制待与身份域对齐。注：quote_id 为 Schema 补充字段（规范 §12.9.2 缺失但被 quote_ref 引用）。",
   "type": "object",
+  "required": [
+    "quote_id",
+    "inquiry_ref",
+    "supplier_id",
+    "line_items",
+    "prices",
+    "available_trade_modes",
+    "terms_hash"
+  ],
   "properties": {
     "quote_id": {
       "type": "string",
       "minLength": 1,
-      "description": "报价唯一标识。被 counter_offer 与 binding 的 quote_ref 引用。"
+      "description": "报价唯一标识。被 counter-offer 与 binding 的 quote_ref 引用。"
     },
     "inquiry_ref": {
       "type": "string",
@@ -28,13 +37,17 @@
     },
     "line_items": {
       "type": "array",
-      "items": { "$ref": "../../common/entities/line_item.json" },
+      "items": {
+        "$ref": "../../common/entities/line_item.json"
+      },
       "minItems": 1,
       "description": "报价商品明细，复用通用订购行实体；unit_price 与 prices 由卖家填写。"
     },
     "prices": {
       "type": "array",
-      "items": { "$ref": "../../common/entities/price.json" },
+      "items": {
+        "$ref": "../../common/entities/price.json"
+      },
       "minItems": 1,
       "description": "报价金额构成（如 item/shipping/tax/discount），必须包含 type 为 total 的最终金额。"
     },
@@ -60,20 +73,24 @@
         "estimated_delivery": {
           "type": "string",
           "format": "date",
-          "description": "预计到货日期（可选，非承诺）。"
+          "description": "预计到货日期（可选，非承诺）。采用 RFC 3339 full-date 格式。"
         }
       },
       "additionalProperties": true
     },
     "available_trade_modes": {
       "type": "array",
-      "items": { "$ref": "../../common/entities/trade_mode.json" },
+      "items": {
+        "$ref": "../../common/entities/trade_mode.json"
+      },
       "minItems": 1,
       "description": "卖家提供的可选业务交易方式列表，包含付款形态及分阶段安排；买家在 binding 时从中选定一项。"
     },
     "answers": {
       "type": "array",
-      "items": { "$ref": "#/$defs/question_answer" },
+      "items": {
+        "$ref": "#/$defs/question_answer"
+      },
       "description": "对询盘中问题的回复，与 questions 顺序对应。"
     },
     "validity": {
@@ -90,24 +107,24 @@
       "description": "报价条款快照哈希。计算范围与业务含义待细化（见待对齐问题清单）。"
     }
   },
-  "required": [
-    "quote_id",
-    "inquiry_ref",
-    "supplier_id",
-    "line_items",
-    "prices",
-    "available_trade_modes",
-    "terms_hash"
-  ],
   "additionalProperties": true,
   "$defs": {
     "question_answer": {
       "type": "object",
       "properties": {
-        "question": { "type": "string", "description": "询盘问题。" },
-        "answer": { "type": "string", "description": "供应商回答。" }
+        "question": {
+          "type": "string",
+          "description": "询盘问题。"
+        },
+        "answer": {
+          "type": "string",
+          "description": "供应商回答。"
+        }
       },
-      "required": ["question", "answer"],
+      "required": [
+        "question",
+        "answer"
+      ],
       "additionalProperties": true
     }
   }

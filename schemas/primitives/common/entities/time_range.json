@@ -9,12 +9,12 @@
     "start_at": {
       "type": "string",
       "format": "date-time",
-      "description": "区间开始时间。"
+      "description": "区间开始时间。采用 RFC 3339 date-time 格式。"
     },
     "end_at": {
       "type": "string",
       "format": "date-time",
-      "description": "区间结束时间。"
+      "description": "区间结束时间。采用 RFC 3339 date-time 格式。"
     }
   },
   "additionalProperties": true

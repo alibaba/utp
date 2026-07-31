@@ -46,12 +46,12 @@
     "delivered_at": {
       "type": "string",
       "format": "date-time",
-      "description": "该批次实际全部妥投时间。"
+      "description": "该批次实际全部妥投时间。采用 RFC 3339 date-time 格式。"
     },
     "received_at": {
       "type": "string",
       "format": "date-time",
-      "description": "买家对该批次实际确认收货的时间。"
+      "description": "买家对该批次实际确认收货的时间。采用 RFC 3339 date-time 格式。"
     },
     "inspection": {
       "$ref": "#/$defs/inspection_summary",
@@ -83,7 +83,7 @@
         "inspected_at": {
           "type": "string",
           "format": "date-time",
-          "description": "验货完成时间，可选。"
+          "description": "验货完成时间，可选。采用 RFC 3339 date-time 格式。"
         }
       },
       "additionalProperties": true

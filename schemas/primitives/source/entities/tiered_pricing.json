@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/tiered_pricing.json",
+  "version": "2026-07-29",
+  "title": "TieredPricing",
+  "description": "B2B 阶梯定价及订购数量约束。tiers 的排序、区间不重叠、最小起订量和最小递增量组合约束由业务校验层执行。",
+  "type": "object",
+  "$defs": {
+    "price_tier": {
+      "type": "object",
+      "properties": {
+        "min_quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "本阶梯最小数量，包含边界。",
+          "readOnly": true
+        },
+        "max_quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "本阶梯最大数量，包含边界；省略表示无上限。",
+          "readOnly": true
+        },
+        "unit_price": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,4})?$",
+          "description": "本阶梯单价的 decimal 字符串，币种继承外层 currency。",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "min_quantity",
+        "unit_price"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "properties": {
+    "min_order_quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Minimum Order Quantity，最小起订量。",
+      "readOnly": true
+    },
+    "min_order_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "Minimum Order Amount，最低起订金额。订单总价低于该金额时不可下单。",
+      "readOnly": true
+    },
+    "min_order_increment": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Minimum Order Increment，订购数量增量步长。",
+      "readOnly": true
+    },
+    "max_order_frequency": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum Order Frequency，约定周期内最大订购次数；周期语义由供应商附加字段说明。",
+      "readOnly": true
+    },
+    "standard_pack_quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Standard Pack Quantity，兼容既有 UCP-B 的可选标准包装量。",
+      "readOnly": true
+    },
+    "tiers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/price_tier"
+      },
+      "minItems": 1,
+      "description": "按 min_quantity 升序排列的阶梯价格表。",
+      "readOnly": true
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "tiers 内所有单价使用的 ISO 4217 货币代码。",
+      "readOnly": true
+    },
+    "negotiable": {
+      "type": "boolean",
+      "description": "是否支持进入 Negotiate 原语协商价格。",
+      "readOnly": true
+    },
+    "price_validity": {
+      "type": "string",
+      "format": "date-time",
+      "description": "参考价格有效期；省略表示供应商不保证价格时效性。采用 RFC 3339 date-time 格式。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "min_order_quantity",
+    "tiers",
+    "currency",
+    "negotiable"
+  ],
+  "additionalProperties": true
+}

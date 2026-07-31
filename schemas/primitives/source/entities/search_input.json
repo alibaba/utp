@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/search_input.json",
+  "version": "2026-07-29",
+  "title": "SearchInput",
+  "description": "utp.source.search 的业务输入。Search 同时执行召回、硬性筛选、偏好评分和排序；调整筛选条件时提交完整输入重新调用 Search。",
+  "type": "object",
+  "$defs": {
+    "query_object": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "keyword",
+            "image",
+            "link"
+          ],
+          "description": "查询类型。",
+          "writeOnly": true
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "description": "关键词、图片 URL/Base64 内容或商品页面 URL。",
+          "writeOnly": true
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "additionalProperties": true
+    },
+    "mode_hint": {
+      "type": "object",
+      "description": "期望的 Transaction Mode 提示，不替代会话中已协商的权威 Mode。",
+      "properties": {
+        "pricing_mode": {
+          "type": "string",
+          "enum": [
+            "L0",
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "writeOnly": true,
+          "description": "期望的定价模式等级。"
+        },
+        "decision_path": {
+          "type": "string",
+          "enum": [
+            "L0",
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "writeOnly": true,
+          "description": "期望的决策路径等级。"
+        },
+        "payment_structure": {
+          "type": "string",
+          "enum": [
+            "L0",
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "writeOnly": true,
+          "description": "期望的付款结构等级。"
+        }
+      },
+      "additionalProperties": true
+    },
+    "topology_request": {
+      "type": "object",
+      "properties": {
+        "require_escrow": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否要求资金托管方参与。",
+          "writeOnly": true
+        },
+        "require_inspector": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否要求检验方参与。",
+          "writeOnly": true
+        },
+        "additional_roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "来自角色注册表的其他参与角色。",
+          "writeOnly": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "properties": {
+    "query": {
+      "$ref": "#/$defs/query_object",
+      "writeOnly": true,
+      "description": "本次寻源使用的查询内容。"
+    },
+    "filters": {
+      "$ref": "./search_filters.json",
+      "writeOnly": true,
+      "description": "本次寻源使用的筛选条件。"
+    },
+    "mode_hint": {
+      "$ref": "#/$defs/mode_hint",
+      "writeOnly": true,
+      "description": "期望的交易模式提示。"
+    },
+    "topology_request": {
+      "$ref": "#/$defs/topology_request",
+      "writeOnly": true,
+      "description": "期望参与本次交易链路的附加角色。"
+    },
+    "sort_by": {
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "match_score_descending",
+        "price_ascending",
+        "min_order_quantity_ascending",
+        "lead_time_ascending"
+      ],
+      "description": "排序表达式；默认由服务端按匹配度排序。",
+      "writeOnly": true
+    },
+    "pagination": {
+      "$ref": "../../common/pagination.json#/$defs/request",
+      "writeOnly": true,
+      "description": "候选集合分页请求参数。"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "additionalProperties": true
+}

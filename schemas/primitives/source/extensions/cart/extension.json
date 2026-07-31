@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/extension.json",
+  "name": "utp.source_cart",
+  "version": "2026-07-29",
+  "title": "Source Cart 扩展包定义",
+  "description": "Source 的可选购物车扩展。Profile 声明本扩展包后一次性启用 add、query、update、remove 四个 Action；扩展不改变 Source 核心 Action 或核心状态迁移。",
+  "actions": {
+    "add": {
+      "description": "将有效 Lookup 快照加入会话或持久购物车；等价商品项可以幂等合并。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/cart_add_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/cart_add_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/source/cart/items"
+        }
+      ]
+    },
+    "query": {
+      "description": "查询当前会话购物车或已授权的持久购物车，并返回后续修改所需的 query_token。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/cart_query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/cart_query_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/v1/source/cart"
+        }
+      ]
+    },
+    "update": {
+      "description": "修改最近一次 Cart Query 可见的商品项数量或选中状态。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/cart_update_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/cart_update_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "PATCH",
+          "path": "/utp/v1/source/cart/items/{cart_item_id}"
+        }
+      ]
+    },
+    "remove": {
+      "description": "删除最近一次 Cart Query 可见的购物车项。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/cart_remove_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/cart_remove_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "DELETE",
+          "path": "/utp/v1/source/cart/items/{cart_item_id}"
+        }
+      ]
+    }
+  },
+  "state_machine": {
+    "added_states": {
+      "CART_ACTIVE": {
+        "description": "调用方处于有效购物车上下文；购物车可以为空。"
+      }
+    },
+    "transitions": [
+      {
+        "from": "DETAIL_VIEWING",
+        "action": "utp.source_cart.add",
+        "execution_result": "SUCCESS",
+        "to": "DETAIL_VIEWING"
+      },
+      {
+        "from": "INIT",
+        "action": "utp.source_cart.query",
+        "execution_result": "SUCCESS",
+        "to": "CART_ACTIVE"
+      },
+      {
+        "from": "SEARCHING",
+        "action": "utp.source_cart.query",
+        "execution_result": "SUCCESS",
+        "to": "CART_ACTIVE"
+      },
+      {
+        "from": "CANDIDATES_READY",
+        "action": "utp.source_cart.query",
+        "execution_result": "SUCCESS",
+        "to": "CART_ACTIVE"
+      },
+      {
+        "from": "DETAIL_VIEWING",
+        "action": "utp.source_cart.query",
+        "execution_result": "SUCCESS",
+        "to": "CART_ACTIVE"
+      },
+      {
+        "from": "CART_ACTIVE",
+        "action": "utp.source_cart.query",
+        "execution_result": "SUCCESS",
+        "to": "CART_ACTIVE"
+      },
+      {
+        "from": "CART_ACTIVE",
+        "action": "utp.source_cart.update",
+        "execution_result": "SUCCESS",
+        "to": "CART_ACTIVE"
+      },
+      {
+        "from": "CART_ACTIVE",
+        "action": "utp.source_cart.remove",
+        "execution_result": "SUCCESS",
+        "to": "CART_ACTIVE"
+      },
+      {
+        "from": "CART_ACTIVE",
+        "action": "utp.source.lookup",
+        "execution_result": "SUCCESS",
+        "to": "DETAIL_VIEWING"
+      }
+    ],
+    "constraints": {
+      "notes": [
+        "Cart Update 和 Remove 只能作用于 query_token 对应的最近一次 Cart Query 已返回的 cart_item_id。",
+        "expected_version 与当前版本不一致时拒绝修改并返回 SOURCE.CART.VERSION_CONFLICT。",
+        "删除最后一个商品项后仍保持 CART_ACTIVE。",
+        "Add 所引用的 Lookup 快照必须有效且与 item_id、supplier_id 一致。"
+      ]
+    }
+  },
+  "constraints": {
+    "transaction_id": "Source Cart 位于交易前阶段，请求和响应必须省略 transaction_id。",
+    "idempotency": [
+      "utp.source_cart.add、update、remove 必须在统一请求信封中提供 idempotency_key。",
+      "utp.source_cart.query 为只读操作，可以省略 idempotency_key。"
+    ],
+    "errors": [
+      "SOURCE.CART.UNSUPPORTED",
+      "SOURCE.CART.ITEM_UNAVAILABLE",
+      "SOURCE.CART.ITEM_DUPLICATE",
+      "SOURCE.CART.LIMIT_EXCEEDED",
+      "SOURCE.CART.PRICE_CHANGED",
+      "SOURCE.CART.STALE_QUERY",
+      "SOURCE.CART.VERSION_CONFLICT"
+    ]
+  },
+  "extends": "utp.source"
+}

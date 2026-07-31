@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_item.json",
+  "version": "2026-07-29",
+  "title": "CartItem",
+  "description": "Source 购物车项。candidate、unit_price_snapshot 和 latest_unit_price 仅用于展示与变更提示，不构成锁价或库存承诺。",
+  "type": "object",
+  "properties": {
+    "cart_item_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "购物车项唯一标识。",
+      "readOnly": true
+    },
+    "item_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "商品或服务标识。",
+      "readOnly": true
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "供应商 agent_id。",
+      "readOnly": true
+    },
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "加购时引用的 Lookup 详情快照。",
+      "readOnly": true
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "购物数量。",
+      "readOnly": true
+    },
+    "selected": {
+      "type": "boolean",
+      "description": "是否选中用于后续询盘或采购。",
+      "readOnly": true
+    },
+    "candidate": {
+      "$ref": "../../../entities/candidate.json",
+      "description": "加购商品的展示快照，延续既有 UCP Cart Item 的标题、图片和价格展示能力。",
+      "readOnly": true
+    },
+    "unit_price_snapshot": {
+      "$ref": "../../../../common/entities/money.json",
+      "description": "加购时单价快照。",
+      "readOnly": true
+    },
+    "availability": {
+      "type": "string",
+      "enum": [
+        "available",
+        "price_changed",
+        "unavailable"
+      ],
+      "description": "当前商品可用性。",
+      "readOnly": true
+    },
+    "latest_unit_price": {
+      "$ref": "../../../../common/entities/money.json",
+      "description": "价格变化时返回的最新参考单价。",
+      "readOnly": true
+    },
+    "added_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "首次加入购物车的时间。采用 RFC 3339 date-time 格式。",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "购物车项最后更新时间。采用 RFC 3339 date-time 格式。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "cart_item_id",
+    "item_id",
+    "supplier_id",
+    "snapshot_id",
+    "quantity",
+    "selected",
+    "candidate",
+    "availability",
+    "added_at",
+    "updated_at"
+  ],
+  "additionalProperties": true
+}
