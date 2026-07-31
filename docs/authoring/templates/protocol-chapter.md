@@ -36,7 +36,7 @@ version: 2026-07-29
     无法区分；附录编号同理（H.5 → {#s-h-5}）。
 -->
 
-# 第 X 章：章节标题（English Title） {#s-chapter-title}
+# 章节标题（English Title） {#s-chapter-title}
 
 引言段紧随 h1，概述本章定位与边界。关键术语使用 **加粗** 强调，协议字段与取值使用 `行内代码` 表达（如 `interaction_level`）。规范性关键词 MUST / SHOULD / MAY 遵循 RFC 2119/8174。
 
