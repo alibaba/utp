@@ -88,7 +88,7 @@
     "price_validity": {
       "type": "string",
       "format": "date-time",
-      "description": "参考价格有效期；省略表示供应商不保证价格时效性。",
+      "description": "参考价格有效期；省略表示供应商不保证价格时效性。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     }
   },

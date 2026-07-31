@@ -52,7 +52,7 @@
     "response_deadline": {
       "type": "string",
       "format": "date-time",
-      "description": "期望供应商回复的截止时间。"
+      "description": "期望供应商回复的截止时间。采用 RFC 3339 date-time 格式。"
     }
   },
   "additionalProperties": true

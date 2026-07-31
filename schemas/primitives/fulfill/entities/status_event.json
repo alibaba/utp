@@ -18,7 +18,7 @@
     "occurred_at": {
       "type": "string",
       "format": "date-time",
-      "description": "该状态变化实际发生的时间。"
+      "description": "该状态变化实际发生的时间。采用 RFC 3339 date-time 格式。"
     },
     "description": {
       "type": "string",

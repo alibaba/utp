@@ -34,7 +34,7 @@
     "expires_at": {
       "type": "string",
       "format": "date-time",
-      "description": "详情快照失效时间。",
+      "description": "详情快照失效时间。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     },
     "etag": {

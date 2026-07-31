@@ -30,7 +30,7 @@
     "occurred_at": {
       "type": "string",
       "format": "date-time",
-      "description": "事件实际发生时间。"
+      "description": "事件实际发生时间。采用 RFC 3339 date-time 格式。"
     },
     "type": {
       "type": "string",

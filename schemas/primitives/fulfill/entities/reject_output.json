@@ -50,7 +50,7 @@
     "rejected_at": {
       "type": "string",
       "format": "date-time",
-      "description": "拒收时间。"
+      "description": "拒收时间。采用 RFC 3339 date-time 格式。"
     },
     "desired_resolution": {
       "type": "string",

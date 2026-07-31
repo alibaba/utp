@@ -9,7 +9,7 @@
     "message_id": { "type": "string", "minLength": 1 },
     "message_type": { "type": "string", "enum": ["request", "response", "notification", "error"] },
     "event_type": { "type": "string", "minLength": 1 },
-    "sent_at": { "type": "string", "format": "date-time" },
+    "sent_at": { "type": "string", "format": "date-time", "description": "消息发送时间。采用 RFC 3339 date-time 格式。" },
     "sender": {
       "type": "object",
       "properties": {

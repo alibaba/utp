@@ -25,7 +25,7 @@
     "received_at": {
       "type": "string",
       "format": "date-time",
-      "description": "采购方接收报价的时间。",
+      "description": "采购方接收报价的时间。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     }
   },

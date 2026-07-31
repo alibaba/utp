@@ -116,19 +116,19 @@
     "created_at": {
       "type": "string",
       "format": "date-time",
-      "description": "购物车创建时间。",
+      "description": "购物车创建时间。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     },
     "updated_at": {
       "type": "string",
       "format": "date-time",
-      "description": "购物车最后更新时间。",
+      "description": "购物车最后更新时间。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     },
     "expires_at": {
       "type": "string",
       "format": "date-time",
-      "description": "会话购物车或临时购物车失效时间。",
+      "description": "会话购物车或临时购物车失效时间。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     }
   },

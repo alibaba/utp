@@ -73,7 +73,7 @@
         "estimated_delivery": {
           "type": "string",
           "format": "date",
-          "description": "预计到货日期（可选，非承诺）。"
+          "description": "预计到货日期（可选，非承诺）。采用 RFC 3339 full-date 格式。"
         }
       },
       "additionalProperties": true

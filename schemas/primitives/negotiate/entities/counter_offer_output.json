@@ -32,7 +32,7 @@
     "received_at": {
       "type": "string",
       "format": "date-time",
-      "description": "供应商接收反报价的时间。",
+      "description": "供应商接收反报价的时间。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     },
     "remaining_rounds": {

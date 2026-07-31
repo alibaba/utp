@@ -44,7 +44,7 @@
     "received_at": {
       "type": "string",
       "format": "date-time",
-      "description": "确认收货时间。"
+      "description": "确认收货时间。采用 RFC 3339 date-time 格式。"
     }
   },
   "required": [

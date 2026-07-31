@@ -50,7 +50,7 @@
     "timestamp": {
       "type": "string",
       "format": "date-time",
-      "description": "错误发生时间，使用 ISO 8601 UTC 表示。"
+      "description": "错误发生时间。采用 RFC 3339 date-time 格式。"
     }
   },
   "required": [
