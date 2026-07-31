@@ -70,8 +70,8 @@
       "description": "数据可见性"
     },
     "mandate": {
-      "type": "object",
-      "description": ""
+      "$ref": "entities/mandate.json",
+      "description": "当前 Action 产出或消费的 Mandate 凭证上下文。"
     }
   },
   "required": [

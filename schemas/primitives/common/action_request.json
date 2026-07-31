@@ -31,6 +31,10 @@
       "minLength": 1,
       "description": "调用方提供的幂等键，用于关联同一副作用请求的重试。"
     },
+    "mandate": {
+      "$ref": "entities/mandate.json",
+      "description": "执行当前 Action 所携带的 Mandate 凭证。会话或操作准入要求对应凭证时 MUST 提供。"
+    },
     "input": {
       "type": "object",
       "description": "可选的操作特有输入；仅在对应操作声明 input_schema 时传递并由该 Schema 校验。",
