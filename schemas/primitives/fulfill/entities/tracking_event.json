@@ -23,17 +23,6 @@
       ],
       "description": "事件类型，可选。用于区分协议履约节点、物流扫描节点、清关、验货、服务激活和异常事实。"
     },
-    "source_role": {
-      "type": "string",
-      "enum": [
-        "SELLER",
-        "SHIPPER",
-        "INSPECTOR",
-        "CUSTOMS",
-        "PLATFORM"
-      ],
-      "description": "事实来源角色，可选。notify 仍由 Seller 负责推送。"
-    },
     "order_id": {
       "type": "string",
       "minLength": 1,
@@ -52,7 +41,7 @@
     "shipment_id": {
       "type": "string",
       "minLength": 1,
-      "description": "可选，货运批次标识。"
+      "description": "可选，履约单标识。"
     },
     "batch_id": {
       "type": "string",
@@ -126,15 +115,6 @@
       },
       "description": "本事件涉及的订单行项目与数量，可选。"
     },
-    "inspection_result": {
-      "type": "string",
-      "enum": [
-        "PASSED",
-        "FAILED",
-        "CONDITIONAL"
-      ],
-      "description": "验货结论，可选。status=INSPECTED 时通常为 PASSED；验货不合格可用 FAILED 并通过 reject 进入 Resolve。"
-    },
     "document_refs": {
       "type": "array",
       "items": {
@@ -142,14 +122,6 @@
         "minLength": 1
       },
       "description": "清关单证、验货报告或其他履约文档引用，可选。"
-    },
-    "evidence_refs": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
-      "description": "证据引用，可选。"
     }
   },
   "required": [
@@ -157,5 +129,6 @@
     "timestamp",
     "status"
   ],
+  // 减少 推送状态
   "additionalProperties": true
 }
