@@ -44,9 +44,10 @@ version: 2026-07-30
 1. `selected_mode`：采购模式已确定的全部维度取值；未启用的 Primitive、Action 或行为变体不得进入路径。
 2. `commerce_topology`：Role 节点、角色关系及其不可变引用；它只描述业务责任结构。
 3. `NegotiationResult.relation_compatibilities`：每个关系对可共同使用的 Primitive、版本和扩展；未共同协商的 Primitive、扩展或 Action 不得进入路径。
-4. 原语与扩展的规范定义：用于取得 Action 的唯一 `initiator_role`、唯一 `handler_role`、输入输出 Schema、状态影响和 Mode 约束。
+4. `NegotiationResult.service_catalogs`：本次协商完成时冻结的服务目录快照。
+5. 原语与扩展的规范定义：用于取得 Action 的唯一 `initiator_role`、唯一 `handler_role`、输入输出 Schema、状态影响和 Mode 约束。
 
-`role_domain_bindings` 证明运行时 Role 已由经过发现的业务域承担；它不使路径编排取得投递地址。`service_catalogs` 也不是 DAG 输入：它只由通信层在每次请求前读取。
+`role_domain_bindings` 证明运行时 Role 已由经过发现的业务域承担；它不使路径编排取得投递地址。路径编排 MUST 将唯一的 `NegotiationResult.service_catalogs` 原样复制到 DAG，以便后续节点透传该数据；不得在编排阶段筛选、排序、合并、替换或选择其中的 Service、Endpoint 或传输绑定。
 
 **`execution_dag`。**
 
@@ -58,6 +59,9 @@ execution_dag
 ├─ selected_mode_ref
 ├─ topology_ref
 ├─ negotiation_ref
+├─ service_catalogs[]
+│  ├─ roles[]
+│  └─ services[]
 ├─ nodes[]
 │  ├─ node_id
 │  ├─ primitive
@@ -70,9 +74,110 @@ execution_dag
 └─ entry_node_ids[]
 ```
 
-每个节点代表一个 Primitive 的已允许 Action 范围和唯一的角色方向。节点中的 `initiator_role` 与 `handler_role` MUST 与 Action 定义一致，并且必须能在锁定拓扑及已协商关系中验证。DAG 保存节点、依赖边、角色方向与 Action 范围。
+每个节点代表一个 Primitive 的已允许 Action 范围和唯一的角色方向。节点中的 `initiator_role` 与 `handler_role` MUST 与 Action 定义一致，并且必须能在锁定拓扑及已协商关系中验证。DAG 保存节点、依赖边、角色方向、Action 范围及服务目录快照。
 
-生成时，路径编排 MUST 先按 Mode 和原语组合规则形成节点及结构边，再以拓扑验证各节点所需的角色关系，最后以 `relation_compatibilities` 过滤未协商的 Primitive、版本和扩展。边只表达原语节点之间的结构性衔接；节点不得编码状态条件、业务条件或传输条件。Resolve 等横切原语只有在 Mode、拓扑和协商结果均允许时才能作为可从适用节点激活的节点加入。
+| 字段 | 说明 |
+| --- | --- |
+| `dag_id` | 此次编排生成的 DAG 标识。 |
+| `selected_mode_ref`、`topology_ref`、`negotiation_ref` | 生成该图所依据的已协商模式、拓扑和协商结果。 |
+| `service_catalogs` | 从唯一的 `NegotiationResult.service_catalogs` 原样复制的完整目录快照。它可以携带服务的端点声明，但仅作为透传数据，不表示节点已选定某项服务或端点。 |
+| `nodes` | 由原语、Action 及发起方、处理方角色组成的执行节点。节点不得保存 `selected_service_id`、`endpoint` 或具体传输绑定。 |
+| `edges`、`entry_node_ids` | 节点依赖关系与可开始执行的入口节点。 |
+
+### 核心骨架（`primitive_dag_skeleton`）
+
+生成器以原语依赖定义的核心骨架为起点：
+
+```text
+Source → Negotiate → Purchase → Pay → Fulfill
+```
+
+- 当所选模式不包含 `Negotiate` 时，`Negotiate` 节点被压缩，主路径为 `Source → Purchase → Pay → Fulfill`。
+- `Purchase → Pay` 和 `Pay → Fulfill` 是强前置依赖；只有前置节点成功推进后，后续节点才可执行。
+- `Resolve` 仅在模式、关系兼容性和原语定义允许的异常条件下加入，并与其对应的争议或补偿节点建立依赖边。
+- 图不得包含绕过强前置依赖的边、与主路径相反的边，或会形成环的边。
+
+### 生成算法
+
+1. 校验协商已成功完成，并锁定所选 `mode`、`topology`、`NegotiationResult` 与适用的原语定义。
+2. 依据模式、原语定义和 `relation_compatibilities` 确定可参与编排的原语及其角色方向。
+3. 按 `primitive_dag_skeleton` 创建主路径节点和依赖边；按模式压缩可选节点，并在满足条件时加入 `Resolve` 等异常节点。
+4. 校验每个节点的角色方向与拓扑一致、每条边满足原语前置依赖、图中不存在禁止边或环。
+5. 将 `NegotiationResult.service_catalogs` 原样复制到 `execution_dag.service_catalogs`；不得选择具体的 Service、Endpoint 或传输绑定。
+6. 返回不可变的 `execution_dag`，供状态机和通信层共同引用。
+
+### 运行期执行 DAG 示例
+
+以下示例中的 `service_catalogs` 是一个 `NegotiationResult` 的唯一目录快照。节点只表达业务原语及角色，实际通信服务由通信层在请求时解析。
+
+```json
+{
+  "dag_id": "dag-20260731-001",
+  "selected_mode_ref": "selected_mode:mode-001",
+  "topology_ref": "commerce_topology:topology-001",
+  "negotiation_ref": "NegotiationResult:negotiation-001",
+  "service_catalogs": [
+    {
+      "roles": ["Seller"],
+      "services": [
+        {
+          "id": "seller-rest",
+          "transport": "rest",
+          "endpoint": "https://seller.example.com/utp"
+        }
+      ]
+    },
+    {
+      "roles": ["PaymentProcessor"],
+      "services": [
+        {
+          "id": "payment-rest",
+          "transport": "rest",
+          "endpoint": "https://payment.example.com/utp"
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "P1",
+      "primitive": "utp.source",
+      "actions": ["utp.source.search"],
+      "initiator_role": "Buyer",
+      "handler_role": "Seller"
+    },
+    {
+      "node_id": "P2",
+      "primitive": "utp.purchase",
+      "actions": ["utp.purchase.create"],
+      "initiator_role": "Buyer",
+      "handler_role": "Seller"
+    },
+    {
+      "node_id": "P3",
+      "primitive": "utp.pay",
+      "actions": ["utp.pay.initiate"],
+      "initiator_role": "Buyer",
+      "handler_role": "PaymentProcessor"
+    },
+    {
+      "node_id": "P4",
+      "primitive": "utp.fulfill",
+      "actions": ["utp.fulfill.receive"],
+      "initiator_role": "Seller",
+      "handler_role": "Buyer"
+    }
+  ],
+  "edges": [
+    { "from": "P1", "to": "P2" },
+    { "from": "P2", "to": "P3" },
+    { "from": "P3", "to": "P4" }
+  ],
+  "entry_node_ids": ["P1"]
+}
+```
+
+通信层应使用 `execution_dag.service_catalogs`、节点的 `handler_role` 与目标 Action 的传输绑定，在每一次请求时确定可用的 Service、Endpoint 和传输方式。该决定不回写 DAG，也不改变其冻结的服务目录快照。
 
 ## 状态机初始化 {#s-184}
 
@@ -92,7 +197,7 @@ dag_id + execution_dag + StateView + available_actions
 
 | 输出 | 含义 | 使用边界 |
 | --- | --- | --- |
-| `execution_dag` | 本次上下文中的节点、结构依赖、角色方向与允许的 Action 范围。 | 是执行结构快照，不是网络实体，也不包含投递地址或传输绑定。 |
+| `execution_dag` | 本次上下文中的节点、结构依赖、角色方向、允许的 Action 范围及冻结的 `service_catalogs`。 | 是执行结构快照，不是网络实体；目录可透传端点声明，但不包含已选定的服务、端点或传输绑定。 |
 | `StateView` | 状态机提交的当前协议阶段、标识与版本。 | 是下一次状态校验与路径更新的输入；路径编排不得自行改写。 |
 | `available_actions` | 当前 DAG 中依赖已满足、已通过 Mode、拓扑、协商与状态守卫过滤的候选 Action。 | 调用方只能从此集合提交下一次 Action，且每次执行前仍须完成全部前置校验。 |
 | 控制或恢复结论 | 前置校验的阻止/挂起结果，或状态机给出的补偿、超时结论。 | 决定保持当前路径、激活既有补偿 Action，或等待恢复；不得伪造 ActionResponse。 |
@@ -136,7 +241,7 @@ dag_id + execution_dag + StateView + available_actions
 
 ## 请求发起 {#s-187}
 
-所有前置校验通过后，路径编排将完整 P0 ActionRequest、`handler_role`、`dag_id` 及不可变 Mode/拓扑引用交给通信层。通信层 MUST 在每次请求前确认本次可用的 Service、Endpoint 和传输绑定。前置校验拒绝或挂起时，调用链停在本地并保持当前 StateView。
+所有前置校验通过后，路径编排将完整 P0 ActionRequest、`handler_role`、`dag_id`、不可变 Mode/拓扑引用及 `execution_dag.service_catalogs` 交给通信层。通信层 MUST 在每次请求前依据目录快照和目标 Action 的传输绑定，确认本次可用的 Service、Endpoint 和传输方式。前置校验拒绝或挂起时，调用链停在本地并保持当前 StateView。
 
 请求发起的核心输出是一次可由通信层投递的 ActionRequest；它保留调用方提供的 `session_id`、适用的 `idempotency_key` 与 `input`，并关联当前唯一的 `handler_role`。
 
