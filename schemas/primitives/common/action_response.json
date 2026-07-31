@@ -71,7 +71,7 @@
       "description": "数据可见性"
     },
     "mandate": {
-      "$ref": "../../mandate/mandate.json",
+      "$ref": "../common/entities/mandate.json",
       "description": "当前 Action 产出或消费的 Mandate 凭证上下文。"
     }
   },

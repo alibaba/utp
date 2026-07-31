@@ -32,7 +32,7 @@
       "description": "调用方提供的幂等键，用于关联同一副作用请求的重试。"
     },
     "mandate": {
-      "$ref": "../../mandate/mandate.json",
+      "$ref": "../common/entities/mandate.json",
       "description": "执行当前 Action 所携带的 Mandate 凭证。会话或操作准入要求对应凭证时 MUST 提供。"
     },
     "hai": {
