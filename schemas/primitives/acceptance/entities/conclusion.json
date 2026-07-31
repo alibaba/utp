@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "conclusion.json",
+  "version": "2026-07-01",
+  "title": "Conclusion",
+  "description": "受理终局结论（M6.10.1）。同一 purchase_id 至多一个终局结论。",
+  "enum": [
+    "ACCEPTED",
+    "REJECTED",
+    "LEADTIME_AMENDED"
+  ]
+}

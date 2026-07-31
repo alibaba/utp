@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_input.json",
+  "version": "2026-07-01",
+  "title": "QueryInput",
+  "description": "utp.listing.query：单查（listing_id）、列表查询（filters + 分页）或批量任务结果轮询（batch_id，M3.7.2）。",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "按批量任务轮询逐条结果（与其他过滤条件互斥，响应为 batch_publish_response 结构）。"
+    },
+    "status": {
+      "$ref": "listing_status.json"
+    },
+    "category": {
+      "type": "string"
+    },
+    "updated_from": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "pagination": {
+      "$ref": "../../common/pagination.json#/$defs/request"
+    }
+  },
+  "additionalProperties": true
+}

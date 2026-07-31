@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reason_code.json",
+  "version": "2026-07-01",
+  "title": "ReasonCode",
+  "description": "协议外库存变化的调整原因（M4.9.2）。协议内订单扣减由 lock/consume 自动完成，MUST NOT 经 adjust 重复下调（M9.5）。",
+  "enum": [
+    "restock",
+    "offline_sale",
+    "damage",
+    "correction",
+    "channel_sync"
+  ]
+}

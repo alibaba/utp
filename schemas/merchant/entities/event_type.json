@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "event_type.json",
+  "version": "2026-07-30",
+  "title": "EventType",
+  "enum": [
+    "utp.listing.review_result",
+    "utp.inventory.hold_created",
+    "utp.inventory.hold_released",
+    "utp.acceptance.order_routed",
+    "utp.acceptance.expired",
+    "utp.negotiate.inquiry_routed",
+    "utp.resolve.dispute_routed",
+    "utp.shipment.delivery_receipt",
+    "utp.settlement.statement_issued"
+  ]
+}

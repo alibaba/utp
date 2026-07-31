@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fulfillment_terms.json",
+  "version": "2026-07-01",
+  "title": "FulfillmentTerms",
+  "description": "FulfillmentTerms（M3.9.4）。",
+  "type": "object",
+  "required": [
+    "ships_from",
+    "leadtime_days",
+    "shipping_fee_policy",
+    "return_policy"
+  ],
+  "properties": {
+    "ships_from": {
+      "type": "string",
+      "minLength": 1,
+      "description": "发货地。"
+    },
+    "leadtime_days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "标准备货交期（自然日）；MP4 amend_leadtime 的变更基准。"
+    },
+    "shipping_fee_policy": {
+      "$ref": "shipping_fee_policy.json"
+    },
+    "return_policy": {
+      "type": "string",
+      "minLength": 1,
+      "description": "退换货政策声明。"
+    },
+    "splittable": {
+      "type": "boolean",
+      "default": false,
+      "description": "是否支持分批发货（MP5 split 的前提）。"
+    },
+    "moq": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "最小起订量；P3 校验数量不满足 MOQ 的依据。"
+    }
+  },
+  "additionalProperties": true
+}

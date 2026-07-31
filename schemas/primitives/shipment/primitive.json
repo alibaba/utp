@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/shipment/primitive.json",
+  "name": "utp.shipment",
+  "version": "2026-07-01",
+  "status": "release-candidate",
+  "title": "MP5 Shipment Primitive Definition",
+  "description": "发货执行原语定义文件（UTP-M M7）。声明操作、角色绑定、传输绑定与 Shipment 资源状态机（分批交付时每个批次独立走本状态机）。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/shipment.json。",
+  "service": "dev.utp.merchant",
+  "actions": {
+    "prepare": {
+      "description": "∅ → PREPARING；prepare(completed) → READY。可选动作：仅申报备货进度供 leadtime 参考，MUST NOT 触发买方可观测状态迁移",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/prepare_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/ship_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/shipments/preparations"
+        }
+      ]
+    },
+    "split": {
+      "description": "登记分批计划（batch_id 集合）；是否允许分批由已锁定交易条款决定",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/split_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/ship_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/shipments/split-plans"
+        }
+      ]
+    },
+    "ship": {
+      "description": "∅ | PREPARING | READY → SHIPPED（运单校验通过；平台转换为买方侧 fulfill.notify → SHIPPED；对已 SHIPPED 批次 MUST 幂等返回既有凭证）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/ship_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/ship_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/shipments"
+        }
+      ]
+    },
+    "update": {
+      "description": "type=delay|exception → EXCEPTION（发货前延迟映射买方侧 DELAYED；MUST 附 new_eta）；更正/重发 → SHIPPED；fulfillment=L3 时事件类型扩展 customs/document",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/update_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/ship_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/shipments/{shipment_id}/events"
+        }
+      ]
+    },
+    "query": {
+      "description": "无（与买方 fulfill.query 呈现同一 shipment_id/tracking_number 的两个投影）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/query_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/shipments"
+        }
+      ]
+    }
+  },
+  "state_machine": {
+    "scope": "resource",
+    "resource_key": "shipment_id",
+    "description": "DELIVERED/CLOSED 由物流回执与买方 P5 动作驱动，供应商 MUST NOT 直接声明（主规范 17.0.2）。分批交付时每个 batch_id 独立实例化本状态机，订单级视图是全部批次的聚合。",
+    "initial_state": "PREPARING",
+    "states": {
+      "PREPARING": {
+        "description": "备货中（内部状态最小外露，不迁移买方状态）"
+      },
+      "READY": {
+        "description": "备货完成待交运"
+      },
+      "SHIPPED": {
+        "description": "已交运（运单凭证已生成）→ 买方侧 fulfill.notify SHIPPED"
+      },
+      "EXCEPTION": {
+        "description": "履约异常（延迟/破损/丢件）→ 买方侧 DELAYED 或异常 TrackingEvent"
+      },
+      "DELIVERED": {
+        "description": "已妥投（物流回执镜像，供应商只读）"
+      },
+      "CLOSED": {
+        "description": "批次履约事实闭合",
+        "terminal": true
+      }
+    },
+    "transitions": [
+      {
+        "from": null,
+        "action": "utp.shipment.prepare",
+        "to": "PREPARING",
+        "by": "Seller"
+      },
+      {
+        "from": "PREPARING",
+        "event": "prepare_completed",
+        "to": "READY",
+        "by": "Seller"
+      },
+      {
+        "from": null,
+        "action": "utp.shipment.ship",
+        "to": "SHIPPED",
+        "by": "Seller",
+        "condition": "跳过备货申报直接发货"
+      },
+      {
+        "from": "PREPARING",
+        "action": "utp.shipment.ship",
+        "to": "SHIPPED",
+        "by": "Seller"
+      },
+      {
+        "from": "READY",
+        "action": "utp.shipment.ship",
+        "to": "SHIPPED",
+        "by": "Seller"
+      },
+      {
+        "from": "SHIPPED",
+        "action": "utp.shipment.update",
+        "to": "EXCEPTION",
+        "by": "Seller",
+        "condition": "type = delay | exception"
+      },
+      {
+        "from": "EXCEPTION",
+        "action": "utp.shipment.update",
+        "to": "SHIPPED",
+        "by": "Seller",
+        "condition": "更正 / 重发"
+      },
+      {
+        "from": "SHIPPED",
+        "event": "carrier_delivery_receipt",
+        "to": "DELIVERED",
+        "by": "Marketplace",
+        "condition": "承运商妥投回执经 Marketplace 确认"
+      },
+      {
+        "from": "DELIVERED",
+        "event": "buyer_receive_or_resolved",
+        "to": "CLOSED",
+        "by": "protocol_engine",
+        "condition": "买方 receive；或 reject 进入 P6 Resolve 后裁决完毕"
+      }
+    ]
+  }
+}

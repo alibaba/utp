@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reject_reason.json",
+  "version": "2026-07-01",
+  "title": "RejectReason",
+  "description": "RejectReason（M6.10.2）。code=other 时 MUST 附 detail。",
+  "type": "object",
+  "required": [
+    "code"
+  ],
+  "properties": {
+    "code": {
+      "enum": [
+        "inventory_insufficient",
+        "price_stale",
+        "region_restricted",
+        "trade_method_unavailable",
+        "quota_exceeded",
+        "compliance_unable",
+        "risk_control",
+        "other"
+      ]
+    },
+    "detail": {
+      "type": "string",
+      "description": "补充说明；SHOULD 附替代建议（可供替代 SKU、预计到货时间）。"
+    }
+  },
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "code": {
+        "const": "other"
+      }
+    },
+    "required": [
+      "code"
+    ]
+  },
+  "then": {
+    "required": [
+      "detail"
+    ]
+  }
+}

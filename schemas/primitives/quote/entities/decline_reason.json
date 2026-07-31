@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decline_reason.json",
+  "version": "2026-07-30",
+  "title": "DeclineReason",
+  "description": "DeclineReason（M5.10.2）。code=other 时 MUST 附 detail。",
+  "type": "object",
+  "required": [
+    "code"
+  ],
+  "properties": {
+    "code": {
+      "enum": [
+        "moq_not_met",
+        "capacity_full",
+        "region_unserved",
+        "spec_unsupported",
+        "compliance_unable",
+        "rounds_exhausted",
+        "risk_control",
+        "other"
+      ]
+    },
+    "detail": {
+      "type": "string",
+      "description": "补充说明；SHOULD 附替代建议。"
+    }
+  },
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "code": {
+        "const": "other"
+      }
+    },
+    "required": [
+      "code"
+    ]
+  },
+  "then": {
+    "required": [
+      "detail"
+    ]
+  }
+}

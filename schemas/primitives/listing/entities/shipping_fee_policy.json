@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "shipping_fee_policy.json",
+  "version": "2026-07-01",
+  "title": "ShippingFeePolicy",
+  "type": "object",
+  "required": [
+    "type"
+  ],
+  "properties": {
+    "type": {
+      "enum": [
+        "free",
+        "flat",
+        "threshold_free"
+      ]
+    },
+    "amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "type=flat 时的固定运费。"
+    },
+    "threshold": {
+      "$ref": "../../common/entities/money.json",
+      "description": "type=threshold_free 时的免邮门槛。"
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "flat"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "required": [
+          "amount"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "threshold_free"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "required": [
+          "threshold"
+        ]
+      }
+    }
+  ]
+}

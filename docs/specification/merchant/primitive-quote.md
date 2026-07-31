@@ -42,7 +42,7 @@ service:        dev.utp.merchant
     <p>Quote 是 UTP-M 第五个供应商原语（MP3），其意图是让供应商对买方发起的询盘给出<strong>显式、签名、可审计的报价与应答</strong>。主规范 <a href="/documentation/specification/primitives/negotiate/index.html">P2 询盘原语</a>定义了买方视角的询盘—报价—议价—条款绑定流程；平台托管拓扑下，卖方侧的应答此前只能经 M10.2 的 <code>delegation_policy</code> 透传实现，没有标准化的协议动作。MP3 将其定义为独立原语：<strong>与 P2 共享同一协商上下文与条款绑定语义，但 Action 集按卖家视角独立命名与定义</strong>（B/M 原语对偶、不复用命名——两侧各自声明、互不混淆）。</p>
     <h3 id="s-m512">M5.1.2 关键设计原则</h3>
     <ul>
-      <li><strong>MP3 不替代 P2，而是喂给 P2。</strong>协商的权威状态机在 P2（询盘/报价/议价/条款绑定）；MP3 <code>quote</code> 的产出（卖方 ES256 签名，覆盖 <code>quote_hash</code>）是 P2 卖方侧报价事实的可审计证据，条款绑定（Binding Terms）仍由 P2 完成并产出 <code>terms_hash</code> 进入 P3。</li>
+      <li><strong>MP3 不替代 P2，而是喂给 P2。</strong>协商的权威状态机在 P2（询盘/报价/议价/条款绑定）；MP3 <code>quote</code> 的产出（卖方 ES256 签名，覆盖主规范 <code>Quote.terms_hash</code>）是 P2 卖方侧报价事实的可审计证据，条款绑定（Binding Terms）仍由 P2 完成并产出 <code>terms_hash</code> 进入 P3。</li>
       <li><strong>报价是有时效的承诺。</strong><code>quote</code> 在 <code>valid_until</code> 内对供应商有约束力（买方在时效内接受即绑定）；到期自动失效，不产生义务。</li>
       <li><strong>应答超时必有确定性处置。</strong>每条路由询盘 MUST 关联应答时限；超时按 <code>quote_policy.on_timeout</code> 自动谢绝（询盘不同于订单，超时缺省为 <code>auto_decline</code>，不存在 auto_accept）。</li>
       <li><strong>可选能力。</strong>MP3 为 MAY 级能力：仅服务一口价直购（pricing_mode = L0）的供应商可不声明本原语，不影响 MP1/MP2/MP4/MP5 闭环（M1.8 Mode 接触点不新增）。</li>
@@ -72,7 +72,7 @@ service:        dev.utp.merchant
   "postconditions": [
     "quote.record_id != null",
     "conclusion ∈ {QUOTED, BOUND, DECLINED, EXPIRED}",
-    "conclusion == 'QUOTED' → seller_signature 覆盖 quote_hash 且 valid_until > decided_at",
+    "status == 'QUOTED' → seller_signature 覆盖 quote.terms_hash 且 quote.validity.end_at > decided_at",
     "conclusion == 'BOUND' → P2 条款绑定完成，terms_hash 生成（进入 P3）",
     "quote_record ∈ evidence_bundle"
   ],
@@ -119,7 +119,7 @@ service:        dev.utp.merchant
         <tr><td><code>QUOTE.NOT_FOUND</code></td><td>error</td><td>404</td><td>应答任务不存在或不属于调用方。</td><td>以 <code>list</code> 核对待应答队列。</td></tr>
         <tr><td><code>QUOTE.EXPIRED</code></td><td>error</td><td>410</td><td>应答时限已过或报价已失效。</td><td><code>query</code> 查看终局状态。</td></tr>
         <tr><td><code>QUOTE.STATE_CONFLICT</code></td><td>warning</td><td>409</td><td>应答任务已达终态。</td><td>幂等返回既有结论。</td></tr>
-        <tr><td><code>QUOTE.SIGNATURE_INVALID</code></td><td>error</td><td>400</td><td><code>quote</code>/<code>bid</code> 携带的卖方签名无效或未覆盖 <code>quote_hash</code>。</td><td>用正确密钥按 M1.10 统一规则重签。</td></tr>
+        <tr><td><code>QUOTE.SIGNATURE_INVALID</code></td><td>error</td><td>400</td><td><code>quote</code>/<code>bid</code> 携带的卖方签名无效或未覆盖 <code>quote.terms_hash</code>。</td><td>用正确密钥按 M1.10 统一规则重签。</td></tr>
         <tr><td><code>QUOTE.PRICE_OUT_OF_POLICY</code></td><td>error</td><td>422</td><td>报价超出平台价格治理边界（如低于成本预警线、超出类目波动阈值）。</td><td>调整报价或走人工审核通道。</td></tr>
         <tr><td><code>QUOTE.BID.WINDOW_CLOSED</code></td><td>error</td><td>410</td><td>投标窗口已关闭。</td><td>不可恢复；等待下一次招标。</td></tr>
         <tr><td><code>QUOTE.DECLINE.REASON_REQUIRED</code></td><td>error</td><td>400</td><td><code>decline</code> 缺少结构化原因码。</td><td>按 M5.10.2 原因码枚举补充。</td></tr>
@@ -168,8 +168,8 @@ service:        dev.utp.merchant
     <h2 id="s-m56">M5.6 与 P2 询盘原语的对偶衔接（Interlock with P2）</h2>
     <ol>
       <li>买方经 P2 发起询盘（inquiry）后，平台托管拓扑下协议引擎 MUST 生成应答任务并路由给供应商（M5.7）；P2 与 MP3 通过 <code>negotiation_id</code> 共享同一协商上下文。</li>
-      <li>MP3 <code>quote</code> 请求 MUST 携带卖方 ES256 签名（JWS），签名内容 MUST 覆盖 <code>quote_hash</code>（报价结构化内容的 SHA-256，JCS 规范化，M1.10 统一规则）。P2 买方侧看到的报价即此签名事实的投影。</li>
-      <li>买方在 <code>valid_until</code> 内接受报价 → P2 执行条款绑定核查，产出 <code>terms_hash</code> 与 NegotiationResult（主规范 3.7）→ 进入 P3 订购 → 订单路由触发 MP4 受理（M6）。<strong>报价绑定后，MP4 <code>accept</code> 不得偏离已绑定条款</strong>——两次签名（quote_hash / terms_hash）构成价格链的完整证据。</li>
+      <li>MP3 <code>quote</code> 请求 MUST 携带卖方 ES256 签名（JWS），签名内容 MUST 覆盖主规范 <code>Quote.terms_hash</code>（计算规则见 M5.10.1.1——本规范补充主规范该字段的留白）。P2 买方侧看到的报价即此签名事实的投影。</li>
+      <li>买方在 <code>quote.validity</code> 内接受报价 → P2 执行条款绑定核查，产出 <code>terms_hash</code> 与 NegotiationResult（主规范 3.7）→ 进入 P3 订购 → 订单路由触发 MP4 受理（M6）。<strong>报价绑定后，MP4 <code>accept</code> 不得偏离已绑定条款</strong>——两次签名（quote_hash / terms_hash）构成价格链的完整证据。</li>
       <li>买方还价 → 推送 <code>buyer_countered</code>，任务回到可应答态，<code>round_no</code> 递增；多轮议价的轮次与超时治理由 P2 会话 Mode 配置约束。</li>
       <li>自托管拓扑（M1.4.2）下 MP3 不出现在跨方拓扑中：供应商 Endpoint 直接作为 P2 handler 应答买方，本原语是其内部实现的参考模型。</li>
     </ol>
@@ -213,7 +213,7 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>操作</th><th>适用状态</th><th>状态影响</th><th><code>valid_next_actions</code></th><th>关键约束</th></tr></thead>
       <tbody>
-        <tr><td><code>utp.quote.quote</code></td><td><code>INQUIRY_PENDING</code>, <code>BUYER_COUNTERED</code></td><td>进入 <code>QUOTED</code></td><td><code>revise</code>, <code>decline</code>, <code>query</code></td><td>Seller；签名 MUST 覆盖 <code>quote_hash</code>；MUST 声明 <code>valid_until</code>。</td></tr>
+        <tr><td><code>utp.quote.quote</code></td><td><code>INQUIRY_PENDING</code>, <code>BUYER_COUNTERED</code></td><td>进入 <code>QUOTED</code></td><td><code>revise</code>, <code>decline</code>, <code>query</code></td><td>Seller；签名 MUST 覆盖 <code>quote.terms_hash</code>；SHOULD 声明 <code>quote.validity</code>（缺省时平台按默认有效期补全）。</td></tr>
         <tr><td><code>utp.quote.revise</code></td><td><code>QUOTED</code></td><td>停留 <code>QUOTED</code>（新版本，旧版本失效并保留）</td><td><code>revise</code>, <code>decline</code>, <code>query</code></td><td>Seller；新版本 MUST 重新签名；<code>version</code> 递增。</td></tr>
         <tr><td><code>utp.quote.bid</code></td><td><code>INQUIRY_PENDING</code>（<code>inquiry_type=rfq_bid</code>）</td><td>进入 <code>QUOTED</code>（密封）</td><td><code>query</code></td><td>Seller；投标窗口内；窗口关闭前平台 MUST NOT 披露。</td></tr>
         <tr><td><code>utp.quote.decline</code></td><td><code>INQUIRY_PENDING</code>, <code>QUOTED</code>, <code>BUYER_COUNTERED</code></td><td>进入 <code>DECLINED</code> 终态</td><td><code>query</code></td><td>Seller；MUST 携带结构化原因码。</td></tr>
@@ -230,7 +230,7 @@ service:        dev.utp.merchant
         <tr><td><code>bid</code></td><td><code>POST /utp/m/v1/quotes/{inquiry_id}/bid</code></td><td><code>utp_quote_bid</code></td><td><code>utp:quote:bid</code></td></tr>
         <tr><td><code>decline</code></td><td><code>POST /utp/m/v1/quotes/{inquiry_id}/decline</code></td><td><code>utp_quote_decline</code></td><td><code>utp:quote:decline</code></td></tr>
         <tr><td><code>query</code></td><td><code>GET /utp/m/v1/quotes/{inquiry_id}</code></td><td><code>utp_quote_query</code></td><td><code>utp:quote:query</code></td></tr>
-        <tr><td><code>list</code></td><td><code>GET /utp/m/v1/quotes?status=&amp;from=&amp;page=</code></td><td><code>utp_quote_list</code></td><td><code>utp:quote:list</code></td></tr>
+        <tr><td><code>list</code></td><td><code>GET /utp/m/v1/quotes?status=&amp;from=&amp;cursor=&amp;limit=</code></td><td><code>utp_quote_list</code></td><td><code>utp:quote:list</code></td></tr>
       </tbody>
     </table>
     <p>REST Binding 为 MUST（基线）；MCP / A2A 为 MAY（M1.10）。全部写操作 MUST 携带 <code>idempotency_key</code>；响应 MUST 包含 <code>X-UTP-Quote-Status</code> 头部。</p>
@@ -238,23 +238,33 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m510">M5.10 Entities（实体定义）</h2>
     <h3 id="s-m5101">M5.10.1 QuoteRecord</h3>
+    <p><strong>报价内容复用主规范权威实体。</strong>本原语 MUST NOT 重复定义报价结构：报价以主规范 P2 的 <code>Quote</code> 实体承载（<code>primitives/negotiate/entities/quote.json</code>，字段 <code>quote_id</code>/<code>inquiry_ref</code>/<code>supplier_id</code>/<code>round</code>/<code>line_items</code>/<code>prices</code>/<code>lead_time</code>/<code>available_trade_modes</code>/<code>answers</code>/<code>validity</code>/<code>stock_guaranteed</code>/<code>terms_hash</code>）。QuoteRecord 只增加供应商侧的任务状态、版本与审计维度：</p>
     <table>
       <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
       <tbody>
         <tr><td><code>record_id</code></td><td>string</td><td>是</td><td>应答记录唯一标识。</td></tr>
-        <tr><td><code>inquiry_id</code> / <code>negotiation_id</code></td><td>string</td><td>是</td><td>关联询盘路由与 P2 协商上下文。</td></tr>
+        <tr><td><code>inquiry_id</code></td><td>string</td><td>是</td><td>询盘路由标识（本原语状态机的资源键）。</td></tr>
+        <tr><td><code>negotiation_id</code></td><td>string</td><td>是</td><td>P2 协商上下文标识（跨买卖双侧共享，M5.6）。</td></tr>
+        <tr><td><code>trade_context_id</code></td><td>string</td><td>否</td><td>交易上下文标识；询盘阶段尚无 <code>transaction_id</code>。</td></tr>
         <tr><td><code>status</code></td><td>enum</td><td>是</td><td><code>INQUIRY_PENDING</code> / <code>QUOTED</code> / <code>BUYER_COUNTERED</code> / <code>BOUND</code> / <code>DECLINED</code> / <code>EXPIRED</code>。</td></tr>
-        <tr><td><code>round_no</code> / <code>version</code></td><td>integer</td><td>是</td><td>议价轮次 / 本轮报价版本（revise 递增）。</td></tr>
-        <tr><td><code>line_quotes</code></td><td>array</td><td>条件</td><td>逐商品项报价：<code>unit_price</code>（Money，主规范 25.2）、数量分档、MOQ、<code>leadtime_days</code>。QUOTED 时必填。</td></tr>
-        <tr><td><code>valid_until</code></td><td>ISO-8601</td><td>条件</td><td>报价有效期。QUOTED 时必填；到期未接受 → EXPIRED。</td></tr>
-        <tr><td><code>quote_hash</code></td><td>string</td><td>条件</td><td>报价结构化内容的 SHA-256（JCS 规范化，M1.10）。</td></tr>
-        <tr><td><code>seller_signature</code></td><td>string</td><td>条件</td><td>Seller ES256 签名（JWS），覆盖 <code>quote_hash</code>。QUOTED 时必填。</td></tr>
+        <tr><td><code>round_no</code></td><td>integer</td><td>是</td><td>议价轮次（对应主规范 <code>Quote.round</code>）；买方还价事件递增。</td></tr>
+        <tr><td><code>version</code></td><td>integer</td><td>是</td><td>本轮报价版本；<code>revise</code> 递增，旧版本失效并保留可溯。</td></tr>
+        <tr><td><code>quote</code></td><td>Quote</td><td>条件</td><td>报价内容（主规范权威实体，见上）。<code>status == QUOTED</code> 时必填。</td></tr>
+        <tr><td><code>seller_signature</code></td><td>Signature</td><td>条件</td><td>Seller 业务签名（<code>primitives/common/entities/signature.json</code>，<code>algorithm</code> MUST 为 <code>ES256</code>），覆盖 <code>quote.terms_hash</code>。<code>status == QUOTED</code> 时必填。</td></tr>
         <tr><td><code>decline_reason</code></td><td>DeclineReason</td><td>条件</td><td><code>status == DECLINED</code> 时必填（M5.10.2）。</td></tr>
         <tr><td><code>quote_note</code></td><td>string</td><td>否</td><td>补充说明（贸易术语、单证费用归属、替代建议等）。</td></tr>
         <tr><td><code>decided_by</code></td><td>enum</td><td>是</td><td><code>human</code> / <code>agent</code> / <code>policy_auto</code>（审计维度，M10.5）。</td></tr>
         <tr><td><code>decided_at</code></td><td>ISO-8601</td><td>是</td><td>应答时间。</td></tr>
       </tbody>
     </table>
+    <h4 id="s-m5101a">M5.10.1.1 terms_hash 计算规则（补充主规范留白）</h4>
+    <p>主规范 <code>Quote.terms_hash</code> 的计算范围此前未定义。本规范给出规范化规则，供应商与 Marketplace MUST 一致执行：</p>
+    <ul>
+      <li>取 <code>Quote</code> 实体，<strong>移除</strong> <code>terms_hash</code> 自身与任何签名字段；</li>
+      <li>按 RFC 8785（JCS）规范化序列化，计算 SHA-256；</li>
+      <li>格式为 <code>sha256:&lt;64 位小写十六进制&gt;</code>（与主规范 <code>Quote.terms_hash</code> 的 pattern 一致）；</li>
+      <li><code>seller_signature</code> 的 JWS payload MUST 为该哈希串（M1.10 业务签名统一规则）；实现方 MUST NOT 自行选择签名覆盖范围。</li>
+    </ul>
     <h3 id="s-m5102">M5.10.2 DeclineReason 原因码枚举</h3>
     <table>
       <thead><tr><th>原因码</th><th>含义</th><th>建议买方处理</th></tr></thead>
@@ -288,17 +298,27 @@ service:        dev.utp.merchant
   "round_no": 1
 }
 
-// 2. Seller 报价（策略核验通过，Agent 代签）
+// 2. Seller 报价（策略核验通过，Agent 代签）——报价体为主规范 Quote 实体
 POST /utp/m/v1/quotes/inq-20260730-0812/quote
 {
   "idempotency_key": "idem-quo-20260730-003",
-  "line_quotes": [ { "sku_id": "sku-X3-BLK",
-                     "tiers": [ { "min_quantity": 500, "unit_price": { "amount": "262.00", "currency": "CNY" } },
-                                { "min_quantity": 800, "unit_price": { "amount": "258.00", "currency": "CNY" } } ],
-                     "moq": 500, "leadtime_days": 10 } ],
-  "valid_until": "2026-08-03T10:00:00Z",
-  "quote_hash": "sha256:7c9e2b4a1f08...",
-  "seller_signature": "eyJhbGciOiJFUzI1NiJ9...",
+  "quote": {
+    "quote_id": "q-20260730-0812-1",
+    "inquiry_ref": "inq-20260730-0812",
+    "supplier_id": "did:web:supplier.example.com",
+    "round": 1,
+    "line_items": [ { "item_id": "item-BT-NC-001", "sku_id": "sku-X3-BLK",
+                      "quantity": 800,
+                      "unit_price": { "amount": "258.00", "currency": "CNY" } } ],
+    "prices": [ { "type": "total", "amount": { "amount": "206400.00", "currency": "CNY" } } ],
+    "lead_time": { "preparation_days": 7, "shipping_days": 3, "total_days": 10 },
+    "available_trade_modes": [ { "mode_id": "tm-fullpay-alipay", "type": "full_payment" } ],
+    "validity": { "start_at": "2026-07-30T10:00:00Z", "end_at": "2026-08-03T10:00:00Z" },
+    "stock_guaranteed": true,
+    "terms_hash": "sha256:7c9e2b4a1f08d3c5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9"
+  },
+  "seller_signature": { "algorithm": "ES256", "key_id": "supplier-key-1",
+                        "value": "eyJhbGciOiJFUzI1NiJ9..." },
   "decided_by": "agent"
 }
 

@@ -31,7 +31,7 @@ format: html
     </ul>
     <p><strong>供应商 Profile 示例（仅示 UTP-M 增量部分，结构遵循主规范 3.3.2）：</strong></p>
 <pre class="highlight"><code class="language-json">{
-  "$schema": "https://schemas.utp.dev/profile/2026-07-01.json",
+  "$schema": "https://ut-protocol.com/schemas/discovery/profile.json",
   "display_name": "上海示例供应链有限公司",
   "utp": {
     "version": "2026-07-01",
@@ -51,16 +51,16 @@ format: html
           "spec": "https://utp.dev/2026-07-01/services/merchant_callback",
           "transport": "rest",
           "endpoint": "https://supplier.example.com/utp-m/callback",
-          "schema": "https://schemas.utp.dev/services/merchant_callback/2026-07-01/rest.openapi.json"
+          "schema": "https://ut-protocol.com/schemas/services/merchant_callback/2026-07-01/rest.openapi.json"
         }
       ]
     },
     "primitives": {
-      "utp.listing":    [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/listing", "schema": "https://schemas.utp.dev/primitives/listing/2026-07-01.json", "authorization": { "scope": "listing", "required": true } } ],
-      "utp.inventory":  [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/inventory", "schema": "https://schemas.utp.dev/primitives/inventory/2026-07-01.json", "authorization": { "scope": "inventory", "required": true } } ],
-      "utp.acceptance": [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/acceptance", "schema": "https://schemas.utp.dev/primitives/acceptance/2026-07-01.json", "authorization": { "scope": "acceptance", "required": true } } ],
-      "utp.shipment":   [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/shipment", "schema": "https://schemas.utp.dev/primitives/shipment/2026-07-01.json", "authorization": { "scope": "shipment", "required": true } } ],
-      "utp.quote":      [ { "version": "2026-07-30", "spec": "https://utp.dev/2026-07-30/primitives/quote", "schema": "https://schemas.utp.dev/primitives/quote/2026-07-30.json", "authorization": { "scope": "quote", "required": true } } ]
+      "utp.listing":    [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/listing", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
+      "utp.inventory":  [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/inventory", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
+      "utp.acceptance": [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/acceptance", "schema": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json", "authorization": { "scope": "acceptance", "required": true } } ],
+      "utp.shipment":   [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/shipment", "schema": "https://ut-protocol.com/schemas/primitives/shipment/primitive.json", "authorization": { "scope": "shipment", "required": true } } ],
+      "utp.quote":      [ { "version": "2026-07-30", "spec": "https://utp.dev/2026-07-30/primitives/quote", "schema": "https://ut-protocol.com/schemas/primitives/quote/primitive.json", "authorization": { "scope": "quote", "required": true } } ]
     },
     "roles": {
       "seller": {
@@ -81,7 +81,7 @@ format: html
     <p>对应地，Marketplace 的 Profile MUST 在 <code>utp.supported_mode_range</code> 中声明其适用于全部 Role 与 Primitive 的 Mode 范围（处理方向由原语定义文件的 <code>handler_role=Marketplace</code> 固定），并在 <code>utp.services</code> 中声明承载 MP 原语的 <code>dev.utp.merchant</code> Service。供应商在建立会话前 MUST 按主规范 <a href="/documentation/specification/protocol-core/discovery-negotiation.html#s-34">3.4</a>—3.7 完成协议版本解析、Profile 验证与角色对协商，Mode 范围交集的计算规则见 3.6.2。</p>
     <p><strong>Marketplace（平台）Profile 示例（仅示与 UTP-M 相关部分；平台同时声明买方侧 <code>dev.utp.trade</code> Service 与 P1—P6，结构同主规范 3.3.3）：</strong></p>
 <pre class="highlight"><code class="language-json">{
-  "$schema": "https://schemas.utp.dev/profile/2026-07-01.json",
+  "$schema": "https://ut-protocol.com/schemas/discovery/profile.json",
   "display_name": "1688 Marketplace",
   "utp": {
     "version": "2026-07-01",
@@ -101,7 +101,7 @@ format: html
           "spec": "https://utp.dev/2026-07-01/services/merchant",
           "transport": "rest",
           "endpoint": "https://marketplace.example.com/utp/m",
-          "schema": "https://schemas.utp.dev/services/merchant/2026-07-01/rest.openapi.json"
+          "schema": "https://ut-protocol.com/schemas/services/merchant/2026-07-01/rest.openapi.json"
         }
       ],
       "dev.utp.trade": [
@@ -111,16 +111,16 @@ format: html
           "spec": "https://utp.dev/2026-07-01/services/trade",
           "transport": "rest",
           "endpoint": "https://marketplace.example.com/utp",
-          "schema": "https://schemas.utp.dev/services/trade/2026-07-01/rest.openapi.json"
+          "schema": "https://ut-protocol.com/schemas/services/trade/2026-07-01/rest.openapi.json"
         }
       ]
     },
     "primitives": {
-      "utp.listing":    [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/listing", "schema": "https://schemas.utp.dev/primitives/listing/2026-07-01.json", "authorization": { "scope": "listing", "required": true } } ],
-      "utp.inventory":  [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/inventory", "schema": "https://schemas.utp.dev/primitives/inventory/2026-07-01.json", "authorization": { "scope": "inventory", "required": true } } ],
-      "utp.acceptance": [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/acceptance", "schema": "https://schemas.utp.dev/primitives/acceptance/2026-07-01.json", "authorization": { "scope": "acceptance", "required": true } } ],
-      "utp.shipment":   [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/shipment", "schema": "https://schemas.utp.dev/primitives/shipment/2026-07-01.json", "authorization": { "scope": "shipment", "required": true } } ],
-      "utp.quote":      [ { "version": "2026-07-30", "spec": "https://utp.dev/2026-07-30/primitives/quote", "schema": "https://schemas.utp.dev/primitives/quote/2026-07-30.json", "authorization": { "scope": "quote", "required": true } } ]
+      "utp.listing":    [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/listing", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
+      "utp.inventory":  [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/inventory", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
+      "utp.acceptance": [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/acceptance", "schema": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json", "authorization": { "scope": "acceptance", "required": true } } ],
+      "utp.shipment":   [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/shipment", "schema": "https://ut-protocol.com/schemas/primitives/shipment/primitive.json", "authorization": { "scope": "shipment", "required": true } } ],
+      "utp.quote":      [ { "version": "2026-07-30", "spec": "https://utp.dev/2026-07-30/primitives/quote", "schema": "https://ut-protocol.com/schemas/primitives/quote/primitive.json", "authorization": { "scope": "quote", "required": true } } ]
     },
     "roles": {
       "marketplace": {

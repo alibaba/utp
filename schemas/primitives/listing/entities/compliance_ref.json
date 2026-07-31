@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "compliance_ref.json",
+  "version": "2026-07-01",
+  "title": "ComplianceRef",
+  "type": "object",
+  "required": [
+    "credential_id"
+  ],
+  "properties": {
+    "credential_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "SupplierCredentials 条目引用（M2.5）。"
+    },
+    "type": {
+      "type": "string",
+      "description": "资质类型标识（清单由平台按类目公示）。"
+    }
+  },
+  "additionalProperties": true
+}

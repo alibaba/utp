@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quote_record.json",
+  "version": "2026-07-30",
+  "title": "QuoteRecord",
+  "description": "MP3 应答记录（utp-m M5.10.1）。报价内容以主线权威 Quote 实体承载，本实体只增加供应商侧任务状态、轮次/版本与审计维度；纳入协商 Evidence Bundle 供 P6 举证。",
+  "type": "object",
+  "required": ["record_id", "inquiry_id", "negotiation_id", "status", "round_no", "version", "decided_by", "decided_at"],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "应答记录唯一标识。"
+    },
+    "inquiry_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "询盘路由标识（本原语状态机的资源键）。"
+    },
+    "negotiation_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "P2 协商上下文标识（跨买卖双侧共享，M5.6）。"
+    },
+    "trade_context_id": {
+      "type": "string",
+      "description": "交易上下文标识；询盘阶段尚无 transaction_id。"
+    },
+    "status": {
+      "$ref": "quote_status.json"
+    },
+    "round_no": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "议价轮次；买方还价事件递增。对应主线 Quote.round。"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "本轮报价版本；revise 递增，旧版本失效并保留可溯。"
+    },
+    "quote": {
+      "$ref": "../../negotiate/entities/quote.json",
+      "description": "本记录承载的报价（主线权威实体）。status == QUOTED 时必填。"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json",
+      "description": "覆盖 quote.terms_hash 的 Seller 业务签名。status == QUOTED 时必填。"
+    },
+    "decline_reason": {
+      "$ref": "decline_reason.json",
+      "description": "status == DECLINED 时必填。"
+    },
+    "quote_note": {
+      "type": "string"
+    },
+    "decided_by": {
+      "enum": ["human", "agent", "policy_auto"],
+      "description": "决策来源审计维度（M10.5）。"
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "应答时间。"
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "QUOTED" } } },
+      "then": { "required": ["quote", "seller_signature"] }
+    },
+    {
+      "if": { "properties": { "status": { "const": "DECLINED" } } },
+      "then": { "required": ["decline_reason"] }
+    }
+  ],
+  "additionalProperties": true
+}

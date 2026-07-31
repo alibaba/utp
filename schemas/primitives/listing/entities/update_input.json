@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "update_input.json",
+  "version": "2026-07-01",
+  "title": "UpdateInput",
+  "description": "utp.listing.update 请求。changes 为 listing_core 的部分字段；乐观锁 expected_version 必填（M3.7.1）。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "listing_id",
+    "expected_version",
+    "changes",
+    "seller_signature"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "expected_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "changes": {
+      "allOf": [
+        {
+          "$ref": "listing_core.json"
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "properties": {
+            "listing_id": false,
+            "merchant_id": false,
+            "status": false,
+            "version": false,
+            "version_hash": false
+          }
+        }
+      ]
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json"
+    }
+  },
+  "additionalProperties": true
+}

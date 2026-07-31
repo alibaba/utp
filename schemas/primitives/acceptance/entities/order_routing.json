@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_routing.json",
+  "version": "2026-07-01",
+  "title": "OrderRouting",
+  "description": "OrderRouting 事件载荷（M6.7.1）：Marketplace → Seller 路由的待受理订单。",
+  "type": "object",
+  "required": [
+    "routing_id",
+    "purchase_id",
+    "transaction_id",
+    "terms_hash",
+    "order_summary",
+    "buyer_ref",
+    "deadline",
+    "timeout_policy"
+  ],
+  "properties": {
+    "routing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "terms_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "accept 签名 MUST 覆盖此值。"
+    },
+    "order_summary": {
+      "$ref": "order_summary.json"
+    },
+    "buyer_ref": {
+      "type": "object",
+      "description": "买方脱敏信息；PII 按权限裁剪。",
+      "required": [
+        "agent_id"
+      ],
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": true
+    },
+    "framework_agreement_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "框架协议引用（relationship_mode ≥ L2）。"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "受理截止时间；挂起不延长（M6.2.2）。"
+    },
+    "timeout_policy": {
+      "$ref": "timeout_policy.json"
+    }
+  },
+  "additionalProperties": true
+}

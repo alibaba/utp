@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pricing.json",
+  "version": "2026-07-01",
+  "title": "Pricing",
+  "description": "ListingPricing（M3.9.3）。条件必填以 if/then 表达：L0→unit_price；L1/L2/L3→pricing_tiers；L3→竞价字段。",
+  "type": "object",
+  "required": [
+    "pricing_mode",
+    "currency"
+  ],
+  "properties": {
+    "pricing_mode": {
+      "enum": [
+        "L0",
+        "L1",
+        "L2",
+        "L3"
+      ]
+    },
+    "unit_price": {
+      "$ref": "../../common/entities/money.json"
+    },
+    "pricing_tiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "pricing_tier.json"
+      },
+      "description": "MOQ 阶梯价，与主规范 PricingTiers 同构。"
+    },
+    "negotiable": {
+      "type": "boolean",
+      "description": "是否可议价（pricing_mode ≥ L2）。"
+    },
+    "bid_starting_price": {
+      "$ref": "../../common/entities/money.json"
+    },
+    "bid_deadline": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "商品内全部价格 MUST 同币种。"
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "pricing_mode": {
+            "const": "L0"
+          }
+        },
+        "required": [
+          "pricing_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "unit_price"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "pricing_mode": {
+            "enum": [
+              "L1",
+              "L2",
+              "L3"
+            ]
+          }
+        },
+        "required": [
+          "pricing_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "pricing_tiers"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "pricing_mode": {
+            "const": "L3"
+          }
+        },
+        "required": [
+          "pricing_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "bid_starting_price",
+          "bid_deadline"
+        ]
+      }
+    }
+  ]
+}

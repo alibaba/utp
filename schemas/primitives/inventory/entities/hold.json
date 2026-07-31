@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hold.json",
+  "version": "2026-07-01",
+  "title": "Hold",
+  "description": "InventoryHold（M4.9.3）：交易性占用记录（P3 触发，Seller 只读）。HELD 态 MUST 有 expires_at。",
+  "type": "object",
+  "required": [
+    "hold_id",
+    "listing_id",
+    "sku_id",
+    "transaction_id",
+    "purchase_id",
+    "quantity",
+    "status",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "hold_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sku_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "$ref": "hold_status.json"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "TTL 到期时间；HELD 状态必填。"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "status": {
+        "const": "HELD"
+      }
+    },
+    "required": [
+      "status"
+    ]
+  },
+  "then": {
+    "required": [
+      "expires_at"
+    ]
+  }
+}

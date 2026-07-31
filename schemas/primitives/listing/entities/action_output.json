@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "action_output.json",
+  "version": "2026-07-01",
+  "title": "ActionOutput",
+  "description": "update/list/delist/archive 的通用响应。",
+  "type": "object",
+  "required": [
+    "listing_id",
+    "status",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "status": {
+      "$ref": "listing_status.json"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "version_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "effective_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "状态迁移生效时刻（delist 原子生效基准，M3.2.3）。"
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

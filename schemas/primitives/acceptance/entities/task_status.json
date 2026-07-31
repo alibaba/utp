@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "task_status.json",
+  "version": "2026-07-01",
+  "title": "TaskStatus",
+  "description": "受理任务状态机（M6.2.2）。",
+  "enum": [
+    "PENDING_ACCEPT",
+    "ON_HOLD",
+    "AMEND_PROPOSED",
+    "ACCEPTED",
+    "REJECTED"
+  ]
+}

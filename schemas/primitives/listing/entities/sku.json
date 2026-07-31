@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sku.json",
+  "version": "2026-07-01",
+  "title": "Sku",
+  "description": "ListingSku（M3.9.2）。买方侧 P1/P3 的 sku_id 与此同值。",
+  "type": "object",
+  "required": [
+    "sku_id",
+    "spec",
+    "status"
+  ],
+  "properties": {
+    "sku_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "spec": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "规格键值对（如 {\"color\": \"黑色\"}）。"
+    },
+    "price_offset": {
+      "$ref": "../../common/entities/money.json",
+      "description": "相对 pricing.unit_price 的差价；缺省为零差价。"
+    },
+    "barcode": {
+      "type": "string",
+      "description": "商品条码（EAN/UPC）。"
+    },
+    "external_ref": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "供应商内部编码（ERP 物料号，M9.3 ID 映射）；平台 MUST 原样保存并在订单路由中回传。"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "description": "SKU 级停售开关，不影响其它 SKU。"
+    },
+    "available": false,
+    "stock": false,
+    "inventory": false,
+    "quantity": false
+  },
+  "additionalProperties": true
+}

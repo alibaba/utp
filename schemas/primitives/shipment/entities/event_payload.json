@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "event_payload.json",
+  "version": "2026-07-01",
+  "title": "EventPayload",
+  "description": "事件业务载荷（不含服务端生成的 event_id 与路径中的 shipment_id）。",
+  "type": "object",
+  "required": [
+    "type",
+    "reason_code",
+    "occurred_at",
+    "seller_signature"
+  ],
+  "properties": {
+    "type": {
+      "$ref": "event_type.json"
+    },
+    "reason_code": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "结构化原因码（如 stockout_delay、carrier_lost、customs_inspection）。"
+    },
+    "detail": {
+      "type": "string"
+    },
+    "new_eta": {
+      "type": "string",
+      "format": "date-time",
+      "description": "type=delay 时必填。"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../../common/entities/evidence_reference.json"
+      }
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json"
+    }
+  },
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "type": {
+        "const": "delay"
+      }
+    },
+    "required": [
+      "type"
+    ]
+  },
+  "then": {
+    "required": [
+      "new_eta"
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "listing.json",
+  "version": "2026-07-01",
+  "title": "Listing",
+  "description": "Listing 完整实体（M3.9.1，服务端权威态）。",
+  "allOf": [
+    {
+      "$ref": "listing_core.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "listing_id",
+        "merchant_id",
+        "status",
+        "version",
+        "version_hash",
+        "type",
+        "title",
+        "category",
+        "skus",
+        "pricing",
+        "fulfillment_terms",
+        "trade_methods",
+        "seller_signature",
+        "created_at",
+        "updated_at"
+      ],
+      "properties": {
+        "listing_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "merchant_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "status": {
+          "$ref": "listing_status.json"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "version_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "seller_signature": {
+          "$ref": "../../common/entities/signature.json",
+          "description": "覆盖 version_hash（= 对 listing 按 RFC 8785/JCS 规范化后的 SHA-256 十六进制小写串，统一签名规则见 M1.10）。"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  ]
+}

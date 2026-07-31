@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source_materials.json",
+  "version": "2026-07-01",
+  "title": "SourceMaterials",
+  "description": "SourceMaterials（M3.9.7，仅请求侧）：AI 辅助录入素材，MUST NOT 作为商品语义存储。三字段至少其一。",
+  "type": "object",
+  "properties": {
+    "image_urls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "product_urls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "spreadsheet_url": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "additionalProperties": false,
+  "anyOf": [
+    {
+      "required": [
+        "image_urls"
+      ]
+    },
+    {
+      "required": [
+        "product_urls"
+      ]
+    },
+    {
+      "required": [
+        "spreadsheet_url"
+      ]
+    }
+  ]
+}

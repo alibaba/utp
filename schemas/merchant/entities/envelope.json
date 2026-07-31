@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "envelope.json",
+  "version": "2026-07-30",
+  "title": "Envelope",
+  "description": "回调事件统一信封。event → payload 结构强绑定；未知 event 类型接收方 MUST 忽略并 2xx 确认（向前兼容）。",
+  "type": "object",
+  "required": [
+    "event",
+    "event_id",
+    "occurred_at",
+    "payload"
+  ],
+  "properties": {
+    "event": {
+      "$ref": "event_type.json"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "事件唯一标识；接收方按此幂等去重。"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.listing.review_result"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "review_result_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "enum": [
+              "utp.inventory.hold_created",
+              "utp.inventory.hold_released"
+            ]
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "../../primitives/inventory/entities/hold.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.acceptance.order_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "../../primitives/acceptance/entities/order_routing.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.acceptance.expired"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "acceptance_expired_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.negotiate.inquiry_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "inquiry_routed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.resolve.dispute_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "dispute_routed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.shipment.delivery_receipt"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "delivery_receipt_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.settlement.statement_issued"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "statement_issued_payload.json"
+          }
+        }
+      }
+    }
+  ]
+}

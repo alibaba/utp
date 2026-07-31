@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/primitive.json",
+  "name": "utp.listing",
+  "version": "2026-07-01",
+  "status": "release-candidate",
+  "title": "MP1 Listing Primitive Definition",
+  "description": "商品管理原语定义文件（UTP-M M3）。声明操作、角色绑定、传输绑定与 Listing 资源状态机。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/listing.json。",
+  "service": "dev.utp.merchant",
+  "actions": {
+    "publish": {
+      "description": "∅ → PENDING_REVIEW",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/publish_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/publish_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/listings"
+        }
+      ]
+    },
+    "update": {
+      "description": "minor：状态不变（新版本快照）；major：新版本进入 PENDING_REVIEW，旧版本继续可售（M3.2.4）；REJECTED 下 update 自动重新进入 PENDING_REVIEW",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/update_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/action_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "PATCH",
+          "path": "/utp/m/v1/listings/{listing_id}"
+        }
+      ]
+    },
+    "list": {
+      "description": "PUBLISHED | DELISTED → LISTED",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/state_change_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/action_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/listings/{listing_id}/list"
+        }
+      ]
+    },
+    "delist": {
+      "description": "LISTED → DELISTED（原子生效，M3.2.3）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/state_change_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/action_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/listings/{listing_id}/delist"
+        }
+      ]
+    },
+    "query": {
+      "description": "无",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/query_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/listings/{listing_id}"
+        },
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/listings"
+        }
+      ]
+    },
+    "archive": {
+      "description": "PUBLISHED | DELISTED | REJECTED → ARCHIVED（存在未完结订单时 MUST 拒绝）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/state_change_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/action_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/listings/{listing_id}/archive"
+        }
+      ]
+    },
+    "batch": {
+      "description": "同 publish/update，逐条独立成败（单批 ≤ 500 条，M3.7.2）；MAY 异步执行返回 batch_id",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/batch_publish_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/batch_publish_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/listings/batch"
+        }
+      ]
+    }
+  },
+  "state_machine": {
+    "scope": "resource",
+    "resource_key": "listing_id",
+    "initial_state": "PENDING_REVIEW",
+    "states": {
+      "PENDING_REVIEW": {
+        "description": "已提交，平台审核中"
+      },
+      "REJECTED": {
+        "description": "审核驳回（附原因码）"
+      },
+      "PUBLISHED": {
+        "description": "审核通过，未上架"
+      },
+      "LISTED": {
+        "description": "已上架，进入 P1 Source 可搜索范围"
+      },
+      "DELISTED": {
+        "description": "已下架，不可搜索不可订购"
+      },
+      "SUSPENDED_BY_PLATFORM": {
+        "description": "平台强制下架（治理动作）"
+      },
+      "ARCHIVED": {
+        "description": "永久退出",
+        "terminal": true
+      }
+    },
+    "transitions": [
+      {
+        "from": null,
+        "action": "utp.listing.publish",
+        "to": "PENDING_REVIEW",
+        "by": "Seller"
+      },
+      {
+        "from": "PENDING_REVIEW",
+        "event": "review_pass",
+        "to": "PUBLISHED",
+        "by": "Marketplace"
+      },
+      {
+        "from": "PENDING_REVIEW",
+        "event": "review_pass",
+        "to": "LISTED",
+        "by": "Marketplace",
+        "condition": "publish 请求声明 auto_list: true"
+      },
+      {
+        "from": "PENDING_REVIEW",
+        "event": "review_reject",
+        "to": "REJECTED",
+        "by": "Marketplace"
+      },
+      {
+        "from": "PENDING_REVIEW",
+        "action": "utp.listing.archive",
+        "to": "ARCHIVED",
+        "by": "Seller",
+        "condition": "供应商撤回"
+      },
+      {
+        "from": "REJECTED",
+        "action": "utp.listing.update",
+        "to": "PENDING_REVIEW",
+        "by": "Seller"
+      },
+      {
+        "from": "REJECTED",
+        "action": "utp.listing.archive",
+        "to": "ARCHIVED",
+        "by": "Seller"
+      },
+      {
+        "from": "PUBLISHED",
+        "action": "utp.listing.list",
+        "to": "LISTED",
+        "by": "Seller"
+      },
+      {
+        "from": "PUBLISHED",
+        "action": "utp.listing.archive",
+        "to": "ARCHIVED",
+        "by": "Seller"
+      },
+      {
+        "from": "LISTED",
+        "action": "utp.listing.delist",
+        "to": "DELISTED",
+        "by": "Seller"
+      },
+      {
+        "from": "LISTED",
+        "event": "update_major",
+        "to": "PENDING_REVIEW",
+        "by": "Seller",
+        "condition": "重大变更走新版本送审，旧版本保持 LISTED 继续可售（M3.2.4）"
+      },
+      {
+        "from": "LISTED",
+        "event": "platform_suspend",
+        "to": "SUSPENDED_BY_PLATFORM",
+        "by": "Marketplace",
+        "condition": "资质过期、违规、风控触发"
+      },
+      {
+        "from": "SUSPENDED_BY_PLATFORM",
+        "event": "platform_reinstate",
+        "to": "PUBLISHED",
+        "by": "Marketplace",
+        "condition": "整改通过"
+      },
+      {
+        "from": "DELISTED",
+        "action": "utp.listing.list",
+        "to": "LISTED",
+        "by": "Seller"
+      },
+      {
+        "from": "DELISTED",
+        "action": "utp.listing.archive",
+        "to": "ARCHIVED",
+        "by": "Seller"
+      }
+    ]
+  }
+}

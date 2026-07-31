@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "arrived_via.json",
+  "version": "2026-07-01",
+  "title": "ArrivedVia",
+  "description": "结论到达方式：显式操作 / 超时自动处置 / 交期变更被买方确认。",
+  "enum": [
+    "explicit",
+    "timeout_auto",
+    "buyer_confirm"
+  ]
+}

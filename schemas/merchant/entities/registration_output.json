@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "registration_output.json",
+  "version": "2026-07-30",
+  "title": "RegistrationOutput",
+  "description": "注册响应（M2.4.2）。merchant_id 是平台域内标识，协议消息身份主体始终是 agent_id。重复注册幂等返回既有 merchant_id。",
+  "type": "object",
+  "required": [
+    "merchant_id",
+    "status",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "merchant_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "status": {
+      "$ref": "merchant_status.json"
+    },
+    "valid_next_actions": {
+      "$ref": "../../primitives/common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

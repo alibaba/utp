@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "statement_status.json",
+  "version": "2026-07-01",
+  "title": "StatementStatus",
+  "description": "账单状态（M8.6.1）。",
+  "enum": [
+    "ISSUED",
+    "CONFIRMED",
+    "IN_DISPUTE",
+    "PAID_OUT"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prepare_input.json",
+  "version": "2026-07-01",
+  "title": "PrepareInput",
+  "description": "utp.shipment.prepare：备货申报（可选动作；不触发买方可观测状态迁移，M7.1.2）。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "transaction_id",
+    "stage"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "stage": {
+      "enum": [
+        "started",
+        "completed"
+      ],
+      "description": "completed 时批次进入 READY。"
+    },
+    "estimated_ship_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

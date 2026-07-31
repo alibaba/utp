@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adjust_input.json",
+  "version": "2026-07-01",
+  "title": "AdjustInput",
+  "description": "utp.inventory.adjust：增量调整。",
+  "allOf": [
+    {
+      "$ref": "adjust_payload.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "idempotency_key"
+      ],
+      "properties": {
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    }
+  ]
+}

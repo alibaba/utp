@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "inventory_record.json",
+  "version": "2026-07-01",
+  "title": "InventoryRecord",
+  "description": "InventoryRecord（M4.9.1）：sellable = available − held − locked（派生只读）。",
+  "type": "object",
+  "required": [
+    "listing_id",
+    "sku_id",
+    "available",
+    "held",
+    "locked",
+    "sellable",
+    "revision",
+    "updated_at"
+  ],
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sku_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "warehouse_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "仓库维度；缺省为单仓合并视图。"
+    },
+    "available": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "可售总量（Seller 权威值）。"
+    },
+    "held": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "临时占用合计（派生）。"
+    },
+    "locked": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "最终锁定合计（派生）。"
+    },
+    "sellable": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "可下单量（派生）。"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "版本号，单调递增；并发控制与对账基线。"
+    },
+    "low_stock_threshold": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

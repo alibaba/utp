@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_line.json",
+  "version": "2026-07-01",
+  "title": "OrderLine",
+  "type": "object",
+  "required": [
+    "listing_id",
+    "sku_id",
+    "quantity",
+    "unit_price"
+  ],
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sku_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "external_ref": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "发布时登记的 ERP 物料号回传（M9.3）。"
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "unit_price": {
+      "$ref": "../../common/entities/money.json"
+    }
+  },
+  "additionalProperties": true
+}

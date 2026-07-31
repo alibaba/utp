@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "discrepancy_submit_input.json",
+  "version": "2026-07-01",
+  "title": "DiscrepancySubmitInput",
+  "description": "utp.pay.settlement.discrepancy.submit：登记账单异议（唯一写操作；资金后果走 P4/P6）。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "entry_id",
+    "type",
+    "expected",
+    "actual",
+    "evidence_refs",
+    "seller_signature"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "entry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "type": {
+      "$ref": "discrepancy_type.json"
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "actual": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      }
+    },
+    "seller_signature": {
+      "$ref": "../../primitives/common/entities/signature.json"
+    }
+  },
+  "additionalProperties": true
+}

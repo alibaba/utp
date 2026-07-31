@@ -146,7 +146,7 @@ format: html
       <li>MP5 <code>ship</code> 产出的 Shipment == 买方侧 <code>fulfill.notify</code>/<code>track</code> 呈现的同一 <code>shipment_id</code> 与运单（M7.7）。</li>
       <li>MP1 <code>delist</code> 生效后，<code>source.lookup</code> MUST 返回 <code>SOURCE.LOOKUP.ITEM_NOT_FOUND</code>，<code>purchase.create</code> MUST 返回 <code>PURCHASE.CREATE.INVALID_ITEMS</code>（主规范既有错误码的触发源在此闭合）。</li>
       <li>Mode 能力过滤：商品的有效 Mode 范围（商户 Profile 范围 ∩ 商品级 <code>mode_constraints</code>）不包含会话 <code>ModeConfiguration</code> 时，该商品 MUST NOT 出现在 <code>source.search</code> 结果中——“能被搜到即可被履约”（M3.6）。</li>
-      <li>P2 询盘的卖方侧报价事实 == MP3 <code>quote</code> 提交的签名报价（覆盖同一 <code>quote_hash</code>）；条款绑定后 MP4 <code>accept</code> MUST NOT 偏离已绑定条款（M5.6，仅适用于声明 <code>utp.quote</code> 的商户）。</li>
+      <li>P2 询盘的卖方侧报价事实 == MP3 <code>quote</code> 提交的签名报价（承载同一份主规范 <code>Quote</code> 实体，签名覆盖同一 <code>terms_hash</code>）；条款绑定后 MP4 <code>accept</code> MUST NOT 偏离已绑定条款（M5.6，仅适用于声明 <code>utp.quote</code> 的商户）。</li>
     </ol>
 
     <h2 id="s-m17">M1.7 与主规范 P1—P6 的衔接矩阵（Interlock Matrix）</h2>
@@ -188,10 +188,10 @@ format: html
     <p>MP 原语 MUST 完整继承主规范 P0 原语通用框架（<a href="/documentation/specification/protocol-core/primitive-framework.html">Ch.10</a>）：</p>
     <ul>
       <li><strong>消息信封：</strong>使用 MessageEnvelope（<a href="/documentation/specification/protocol-core/transport-communication.html#s-411">4.1.1</a>），<code>primitive</code> 字段取值扩展为含 <code>utp.listing</code>、<code>utp.inventory</code>、<code>utp.acceptance</code>、<code>utp.shipment</code>（主规范信封 Schema 的 <code>primitive</code> 枚举扩展为发布协调事项，登记于附录 ME 第 4 项；枚举扩展生效前，处理 MP 原语的实现方 MUST 按本分册声明接受上述取值）。</li>
-      <li><strong>签名：</strong>全部写操作 MUST 携带 RFC 9421 请求签名；<code>publish</code>/<code>accept</code>/<code>ship</code> 等产生凭证的操作 MUST 附 Seller ES256 业务签名（JWS）。<strong>业务签名统一规则：</strong>JWS payload MUST 是单一 SHA-256 哈希的十六进制小写串；哈希输入由各操作显式定义（accept → 订单路由提供的 <code>terms_hash</code>；publish → <code>version_hash</code>，M3.2.4；ship/split → <code>shipment_hash</code>/<code>plan_hash</code>，M7.9.1；quote/bid → <code>quote_hash</code>，M5.10.1）；对象哈希的 JSON 规范化 MUST 使用 RFC 8785（JCS）。实现方 MUST NOT 自行选择签名覆盖范围。</li>
+      <li><strong>签名：</strong>全部写操作 MUST 携带 RFC 9421 请求签名；<code>publish</code>/<code>accept</code>/<code>ship</code> 等产生凭证的操作 MUST 附 Seller ES256 业务签名（JWS）。<strong>业务签名统一规则：</strong>JWS payload MUST 是单一 SHA-256 哈希的十六进制小写串；哈希输入由各操作显式定义（accept → 订单路由提供的 <code>terms_hash</code>；publish → <code>version_hash</code>，M3.2.4；ship/split → <code>shipment_hash</code>/<code>plan_hash</code>，M7.9.1；quote/bid → 主规范 <code>Quote.terms_hash</code>，M5.10.1.1）；对象哈希的 JSON 规范化 MUST 使用 RFC 8785（JCS）。实现方 MUST NOT 自行选择签名覆盖范围。</li>
       <li><strong>操作准入：</strong>Marketplace 处理 MP 写操作前 MUST 按主规范<a href="/documentation/specification/protocol-core/security-trust.html#s-5-trust-profile">第 5 章</a> 5.1 节完成操作准入判定，判定顺序与失败语义同主规范；认证与授权失败 MUST 使用全局错误码（<code>UTP.AUTH_UNAUTHORIZED</code> / <code>UTP.AUTH_FORBIDDEN</code>，10.4.2）。Merchant Agent 代理操作时的 Mandate 要求见 M10.4。</li>
       <li><strong>幂等：</strong>全部写操作 MUST 携带 <code>idempotency_key</code>；重复请求 MUST 返回首次执行的缓存结果。幂等键 MUST 保留不短于 24 小时；同一键携带不同请求体 MUST 返回冲突错误（HTTP 409，不执行）。</li>
       <li><strong>错误响应：</strong>使用主规范 10.4.3 标准错误响应格式；本规范错误码统一登记在<a href="appendices.html#s-mb">附录 MB</a>。</li>
-      <li><strong>响应自描述：</strong>响应 MUST 携带 <code>valid_next_actions</code>，相对动作名按所属原语解析。</li>
+      <li><strong>响应自描述：</strong>响应 MUST 携带 <code>valid_next_actions</code>，元素 MUST 为全限定 Action 名（如 <code>utp.acceptance.query</code>；Schema 约束见 <code>primitives/common/valid_next_actions.json</code>）。列表操作的分页 MUST 使用游标语义（<code>cursor</code>/<code>limit</code>，<code>primitives/common/pagination.json</code>）。</li>
       <li><strong>传输绑定支持要求：</strong>MP 原语的 REST Binding 为 MUST（基线，所有 Marketplace 必须提供）；MCP / A2A Binding 为 MAY（面向 Agent 原生接入）；Embedded SDK Binding 不适用于供应商侧（无对应场景，不定义）。供应商只需实现 REST 客户端 + 回调接收端即可完整接入。</li>
     </ul>

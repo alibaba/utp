@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_input.json",
+  "version": "2026-07-01",
+  "title": "QueryInput",
+  "description": "utp.inventory.query：按 listing_id（必填）与可选 sku_id 批量查询数量视图。",
+  "type": "object",
+  "required": [
+    "listing_id"
+  ],
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sku_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "warehouse_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    }
+  },
+  "additionalProperties": true
+}

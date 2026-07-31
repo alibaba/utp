@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hold_input.json",
+  "version": "2026-07-01",
+  "title": "HoldInput",
+  "description": "utp.acceptance.hold：挂起待内部审批。每单至多一次；不延长 deadline。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "expected_reply_at"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "expected_reply_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "预计答复时间；MUST 早于 deadline。"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

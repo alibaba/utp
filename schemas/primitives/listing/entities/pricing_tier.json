@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pricing_tier.json",
+  "version": "2026-07-01",
+  "title": "PricingTier",
+  "type": "object",
+  "required": [
+    "min_quantity",
+    "unit_price"
+  ],
+  "properties": {
+    "min_quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "本档起订量。"
+    },
+    "unit_price": {
+      "$ref": "../../common/entities/money.json"
+    }
+  },
+  "additionalProperties": false
+}

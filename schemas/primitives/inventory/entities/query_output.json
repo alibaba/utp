@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_output.json",
+  "version": "2026-07-01",
+  "title": "QueryOutput",
+  "type": "object",
+  "required": [
+    "records"
+  ],
+  "properties": {
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "inventory_record.json"
+      }
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

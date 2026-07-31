@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "listing_status.json",
+  "version": "2026-07-01",
+  "title": "ListingStatus",
+  "description": "商品资源状态机（M3.2.2）。",
+  "enum": [
+    "PENDING_REVIEW",
+    "REJECTED",
+    "PUBLISHED",
+    "LISTED",
+    "DELISTED",
+    "SUSPENDED_BY_PLATFORM",
+    "ARCHIVED"
+  ]
+}

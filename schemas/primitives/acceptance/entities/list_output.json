@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "list_output.json",
+  "version": "2026-07-01",
+  "title": "ListOutput",
+  "type": "object",
+  "required": [
+    "tasks"
+  ],
+  "properties": {
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "routing",
+          "task_status"
+        ],
+        "properties": {
+          "routing": {
+            "$ref": "order_routing.json"
+          },
+          "task_status": {
+            "$ref": "task_status.json"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "pagination": {
+      "$ref": "../../common/pagination.json#/$defs/response"
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

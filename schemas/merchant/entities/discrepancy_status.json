@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "discrepancy_status.json",
+  "version": "2026-07-01",
+  "title": "DiscrepancyStatus",
+  "description": "差异申报处理状态（M8.6.3）。",
+  "enum": [
+    "SUBMITTED",
+    "ACCEPTED",
+    "MAINTAINED",
+    "ESCALATED"
+  ]
+}

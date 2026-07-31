@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "split_plan.json",
+  "version": "2026-07-01",
+  "title": "SplitPlan",
+  "description": "SplitPlan（M7.9.4）：分批交付计划。批次数量合计 MUST 等于订单数量（业务规则，由 Marketplace 校验）；计划变更以新版本追加。",
+  "type": "object",
+  "required": [
+    "plan_id",
+    "transaction_id",
+    "batches",
+    "seller_signature"
+  ],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "batches": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "batch_id",
+          "items",
+          "planned_ship_at"
+        ],
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "listing_id",
+                "sku_id",
+                "quantity"
+              ],
+              "properties": {
+                "listing_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "sku_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "planned_ship_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json"
+    }
+  },
+  "additionalProperties": true
+}

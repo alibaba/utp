@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "publish_input.json",
+  "version": "2026-07-01",
+  "title": "PublishInput",
+  "description": "utp.listing.publish 请求（M3.7.1）。listing 为草稿：不含服务端生成字段（listing_id/status/version/version_hash）。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "listing",
+    "seller_signature"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "listing": {
+      "allOf": [
+        {
+          "$ref": "listing_core.json"
+        },
+        {
+          "required": [
+            "type",
+            "title",
+            "category",
+            "skus",
+            "pricing",
+            "fulfillment_terms",
+            "trade_methods"
+          ],
+          "properties": {
+            "listing_id": false,
+            "status": false,
+            "version": false,
+            "version_hash": false
+          }
+        }
+      ]
+    },
+    "source_materials": {
+      "$ref": "source_materials.json"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reject_input.json",
+  "version": "2026-07-01",
+  "title": "RejectInput",
+  "description": "utp.acceptance.reject：拒绝订单，触发 P3 补偿链。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "reject_reason",
+    "decided_by"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "reject_reason": {
+      "$ref": "reject_reason.json"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "amend_input.json",
+  "version": "2026-07-01",
+  "title": "AmendInput",
+  "description": "utp.acceptance.amend_leadtime：申报交期变更，进入 AMEND_PROPOSED 等待买方确认。相对/绝对交期至少其一。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "decided_by"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "amended_leadtime_days": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "promised_ship_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ]
+    }
+  },
+  "additionalProperties": true,
+  "anyOf": [
+    {
+      "required": [
+        "amended_leadtime_days"
+      ]
+    },
+    {
+      "required": [
+        "promised_ship_at"
+      ]
+    }
+  ]
+}

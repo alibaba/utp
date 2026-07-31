@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision_output.json",
+  "version": "2026-07-01",
+  "title": "DecisionOutput",
+  "description": "accept/reject/hold/amend 的响应：返回受理记录与（accept 时）P3 推进结果。",
+  "type": "object",
+  "required": [
+    "record",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "record": {
+      "$ref": "acceptance_record.json"
+    },
+    "task_status": {
+      "$ref": "task_status.json"
+    },
+    "purchase_status": {
+      "type": "string",
+      "description": "P3 侧订购状态回显（如 PURCHASED；accept 成功且原子迁移完成时返回）。"
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

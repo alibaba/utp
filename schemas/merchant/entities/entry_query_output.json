@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "entry_query_output.json",
+  "version": "2026-07-01",
+  "title": "EntryQueryOutput",
+  "type": "object",
+  "required": [
+    "entries"
+  ],
+  "properties": {
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "entry.json"
+      }
+    },
+    "valid_next_actions": {
+      "$ref": "../../primitives/common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

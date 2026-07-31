@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "listing_snapshot.json",
+  "version": "2026-07-01",
+  "title": "ListingSnapshot",
+  "description": "ListingSnapshot（M3.9.5）：生效版本存档，可按 listing_id + version_hash 检索并纳入 Evidence Bundle。",
+  "type": "object",
+  "required": [
+    "listing_id",
+    "version",
+    "version_hash",
+    "listing",
+    "effective_from",
+    "seller_signature"
+  ],
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "version_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "listing": {
+      "$ref": "listing.json"
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "effective_to": {
+      "type": "string",
+      "format": "date-time",
+      "description": "缺省表示当前仍生效。"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json"
+    }
+  },
+  "additionalProperties": true
+}

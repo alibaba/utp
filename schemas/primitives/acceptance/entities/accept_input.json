@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "accept_input.json",
+  "version": "2026-07-01",
+  "title": "AcceptInput",
+  "description": "utp.acceptance.accept（M6.9.1）：接受订单并提交卖方签名。terms_hash MUST 与路由载荷一致。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "terms_hash",
+    "seller_signature",
+    "decided_by"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "terms_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ]
+    },
+    "acceptance_note": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

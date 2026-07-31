@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "shipment_status.json",
+  "version": "2026-07-01",
+  "title": "ShipmentStatus",
+  "description": "发货单资源状态机（M7.2.2）。DELIVERED/CLOSED 由回执与买方动作驱动，供应商 MUST NOT 直接声明。",
+  "enum": [
+    "PREPARING",
+    "READY",
+    "SHIPPED",
+    "EXCEPTION",
+    "DELIVERED",
+    "CLOSED"
+  ]
+}

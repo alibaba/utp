@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "split_input.json",
+  "version": "2026-07-01",
+  "title": "SplitInput",
+  "description": "utp.shipment.split：登记分批计划（需 listing 声明 splittable 且 fulfillment_structure ≥ L2）。plan_id 由服务端生成。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "plan"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "plan": {
+      "type": "object",
+      "required": [
+        "transaction_id",
+        "batches",
+        "seller_signature"
+      ],
+      "properties": {
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "batches": {
+          "$ref": "#/$defs/split_plan/properties/batches"
+        },
+        "seller_signature": {
+          "$ref": "../../common/entities/signature.json"
+        },
+        "plan_id": false
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

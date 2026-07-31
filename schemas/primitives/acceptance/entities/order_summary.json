@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_summary.json",
+  "version": "2026-07-01",
+  "title": "OrderSummary",
+  "description": "路由订单摘要（M6.7.1 order_summary）。",
+  "type": "object",
+  "required": [
+    "items",
+    "total_amount",
+    "trade_method"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "order_line.json"
+      }
+    },
+    "total_amount": {
+      "$ref": "../../common/entities/money.json"
+    },
+    "shipping_address": {
+      "$ref": "../../common/entities/address.json"
+    },
+    "trade_method": {
+      "$ref": "../../common/entities/trade_mode.json"
+    },
+    "invoice": {
+      "type": "object",
+      "description": "发票要求（结构以主规范 Purchase 章节为准）。",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

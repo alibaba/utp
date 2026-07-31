@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hold_query_output.json",
+  "version": "2026-07-01",
+  "title": "HoldQueryOutput",
+  "type": "object",
+  "required": [
+    "holds"
+  ],
+  "properties": {
+    "holds": {
+      "type": "array",
+      "items": {
+        "$ref": "hold.json"
+      }
+    },
+    "pagination": {
+      "$ref": "../../common/pagination.json#/$defs/response"
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "inquiry_routed_payload.json",
+  "version": "2026-07-30",
+  "title": "InquiryRoutedPayload",
+  "description": "询盘透传路由（M1.4.4 passthrough）。询盘完整实体属 P2 域，本载荷只承载路由要素；商家 MUST 在 deadline 前回传，否则按 delegation_policy.on_timeout 兜底。",
+  "type": "object",
+  "required": [
+    "inquiry_id",
+    "deadline"
+  ],
+  "properties": {
+    "inquiry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "trade_context_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "subject": {
+      "type": "string",
+      "description": "询盘主题。"
+    },
+    "listing_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "listing_id"
+        ],
+        "properties": {
+          "listing_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "sku_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

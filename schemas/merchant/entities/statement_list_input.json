@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "statement_list_input.json",
+  "version": "2026-07-01",
+  "title": "StatementListInput",
+  "description": "utp.pay.settlement.statement.list：按周期/状态筛选账单。",
+  "type": "object",
+  "properties": {
+    "status": {
+      "$ref": "statement_status.json"
+    },
+    "period_from": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "period_to": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "pagination": {
+      "$ref": "../../primitives/common/pagination.json#/$defs/request"
+    }
+  },
+  "additionalProperties": true
+}

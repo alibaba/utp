@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decline_input.json",
+  "version": "2026-07-30",
+  "title": "DeclineInput",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "decline_reason"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string"
+    },
+    "decline_reason": {
+      "$ref": "decline_reason.json"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ship_output.json",
+  "version": "2026-07-01",
+  "title": "ShipOutput",
+  "type": "object",
+  "required": [
+    "shipment",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "shipment": {
+      "$ref": "shipment.json"
+    },
+    "inventory_effect": {
+      "type": "object",
+      "description": "库存核销回显：sku_id → 本次 LOCKED→CONSUMED 数量（M4.7 第 5 条）。",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

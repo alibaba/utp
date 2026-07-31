@@ -74,44 +74,19 @@ format: html
     <p>全部 Scope 仅作用于调用方本方资源；Merchant Agent 持有的授权 MUST 显式枚举 Scope 并声明金额上限与时效（M10.4）。</p>
 
     <h2 id="s-md">附录 MD：Schema 索引（Schema Index）</h2>
-    <p>UTP-M 的机器可读 Schema 已在本仓库 <code>source/schemas/</code> 目录落地（JSON Schema draft 2020-12），采用<strong>容器模式</strong>：每个原语一个自描述文件（内嵌 <code>name</code> + <code>version</code>），实体与各操作的请求/响应 shape 以 <code>$defs</code> 条目承载；<code>$id</code>（<code>https://schemas.utp.dev/merchant/{file}.json</code>）是对外发布的权威地址。正式发布时迁入 UTP Schema 仓库（utp-b-schema，与买方原语 Schema 同仓）：目录按该仓库 Schema 标准展开为 <code>schemas/primitives/{listing|inventory|acceptance|shipment|quote}/entities/</code> 的单实体文件，<code>$id</code> 保持不变或一次性重定向；发布规则遵循主规范第 25 章（四元数据、只增不删、废弃标注）与该仓库 <code>docs/standards/schema-standard.md</code>。</p>
+    <p>UTP-M 的机器可读 Schema 与买方侧原语 Schema <strong>同仓同标准</strong>（JSON Schema draft 2020-12）：每个原语一个目录，<code>primitive.json</code> 承载 Action 定义与内部状态机，<code>entities/</code> 下每个实体与每个操作的输入/输出各一个文件；<code>$id</code> 权威地址前缀为 <code>https://ut-protocol.com/schemas/</code>。通用类型（Money、LineItem、Price、TradeMode、Signature、EvidenceReference、Address 等）MUST 复用 <code>primitives/common/entities/</code>，MUST NOT 在商家侧重复定义；分页 MUST 复用 <code>primitives/common/pagination.json</code>（游标语义），响应导航 MUST 复用 <code>primitives/common/valid_next_actions.json</code>（全限定 Action 名）。</p>
     <table>
-      <thead><tr><th>实体</th><th>Schema 位置（source/schemas/）</th><th>定义章节</th></tr></thead>
+      <thead><tr><th>范围</th><th>Schema 位置（<code>schemas/</code>）</th><th>说明</th></tr></thead>
       <tbody>
-        <tr><td>MerchantRegistration</td><td><code>merchant/registration.json#/$defs/merchant_registration</code></td><td>M2.4.1</td></tr>
-        <tr><td>DelegationPolicy</td><td><code>merchant/registration.json#/$defs/delegation_policy</code></td><td>M2.4.1 / M1.4.4</td></tr>
-        <tr><td>AcceptancePolicy</td><td><code>merchant/registration.json#/$defs/acceptance_policy</code></td><td>M10.3.1</td></tr>
-        <tr><td>Listing</td><td><code>merchant/listing.json#/$defs/listing</code></td><td>M3.9.1</td></tr>
-        <tr><td>ListingSku</td><td><code>merchant/listing.json#/$defs/sku</code></td><td>M3.9.2</td></tr>
-        <tr><td>ListingPricing</td><td><code>merchant/listing.json#/$defs/pricing</code></td><td>M3.9.3</td></tr>
-        <tr><td>FulfillmentTerms</td><td><code>merchant/listing.json#/$defs/fulfillment_terms</code></td><td>M3.9.4</td></tr>
-        <tr><td>ListingSnapshot</td><td><code>merchant/listing.json#/$defs/listing_snapshot</code></td><td>M3.9.5</td></tr>
-        <tr><td>SourceMaterials</td><td><code>merchant/listing.json#/$defs/source_materials</code></td><td>M3.9.7</td></tr>
-        <tr><td>InventoryRecord</td><td><code>merchant/inventory.json#/$defs/inventory_record</code></td><td>M4.9.1</td></tr>
-        <tr><td>InventoryAdjustment</td><td><code>merchant/inventory.json#/$defs/adjustment</code></td><td>M4.9.2</td></tr>
-        <tr><td>InventoryHold</td><td><code>merchant/inventory.json#/$defs/hold</code></td><td>M4.9.3</td></tr>
-        <tr><td>OrderRouting</td><td><code>merchant/acceptance.json#/$defs/order_routing</code></td><td>M6.7.1</td></tr>
-        <tr><td>AcceptanceRecord</td><td><code>merchant/acceptance.json#/$defs/acceptance_record</code></td><td>M6.10.1</td></tr>
-        <tr><td>RejectReason</td><td><code>merchant/acceptance.json#/$defs/reject_reason</code></td><td>M6.10.2</td></tr>
-        <tr><td>Shipment</td><td><code>merchant/shipment.json#/$defs/shipment</code></td><td>M7.9.1（与主规范既有 <code>primitives/fulfill/shipment.schema.json</code> 的合并见 ME 第 7 项）</td></tr>
-        <tr><td>QuoteRecord（草案）</td><td><code>merchant/quote.json#/$defs/quote_record</code></td><td>M5.10.1</td></tr>
-        <tr><td>Package</td><td><code>merchant/shipment.json#/$defs/package</code></td><td>M7.9.2</td></tr>
-        <tr><td>ShipmentEvent</td><td><code>merchant/shipment.json#/$defs/event</code></td><td>M7.9.3</td></tr>
-        <tr><td>SplitPlan</td><td><code>merchant/shipment.json#/$defs/split_plan</code></td><td>M7.9.4</td></tr>
-        <tr><td>SettlementStatement</td><td><code>merchant/settlement.json#/$defs/statement</code></td><td>M8.6.1</td></tr>
-        <tr><td>SettlementEntry</td><td><code>merchant/settlement.json#/$defs/entry</code></td><td>M8.6.2</td></tr>
-        <tr><td>SettlementDiscrepancy</td><td><code>merchant/settlement.json#/$defs/discrepancy</code></td><td>M8.6.3</td></tr>
-        <tr><td>回调事件（9 类事件 / 8 类载荷，<code>hold_created</code>/<code>hold_released</code> 共用 hold 载荷）</td><td><code>merchant/events.json#/$defs/*</code></td><td>M2.6.1</td></tr>
-        <tr><td><strong>原语定义文件（含状态机）</strong></td><td><code>merchant/primitives/{listing | inventory | acceptance | shipment}.json</code>（<code>$id</code> 按主规范 10.2.7 官方规则 <code>https://schemas.utp.dev/primitives/{name}/2026-07-01.json</code>；内含 actions 角色绑定、传输绑定、input/output Schema URL 与机读资源状态机）</td><td>M3—M7 各章；状态机迁移与 M3.2/M4.7/M6.2/M7.2 逐条一致</td></tr>
-        <tr><td>共享基础类型</td><td><code>common/types/</code>（money / mode_range / trade_method / postal_address / error）与 <code>utp.json</code> 元类型</td><td>主规范 25.2 / 本规范各章</td></tr>
+        <tr><td>MP1 商品管理</td><td><code>primitives/listing/primitive.json</code> + <code>primitives/listing/entities/</code></td><td>Listing、Sku、Pricing、FulfillmentTerms、ListingSnapshot、SourceMaterials 与各操作 <code>*_input</code>/<code>*_output</code>（M3）</td></tr>
+        <tr><td>MP2 库存管理</td><td><code>primitives/inventory/primitive.json</code> + <code>entities/</code></td><td>InventoryRecord、Adjustment、Hold 与 set/adjust/query/batch 输入输出（M4）</td></tr>
+        <tr><td>MP3 询盘响应（草案）</td><td><code>primitives/quote/primitive.json</code> + <code>entities/</code></td><td>QuoteRecord、DeclineReason 与 quote/decline 输入输出；<strong>报价体复用 <code>primitives/negotiate/entities/quote.json</code>（主规范权威 Quote 实体）</strong>（M5）</td></tr>
+        <tr><td>MP4 订单受理</td><td><code>primitives/acceptance/primitive.json</code> + <code>entities/</code></td><td>OrderRouting、AcceptanceRecord、RejectReason 与 accept/reject/hold/amend 输入输出（M6）</td></tr>
+        <tr><td>MP5 发货执行</td><td><code>primitives/shipment/primitive.json</code> + <code>entities/</code></td><td>Shipment、Package、SplitPlan、Event 与 prepare/ship/split/update 输入输出（M7；与主规范 Fulfill 侧 Shipment 的合并见 ME 第 7 项）</td></tr>
+        <tr><td>入驻与回调、结算（非原语）</td><td><code>merchant/entities/</code></td><td>MerchantRegistration、DelegationPolicy、AcceptancePolicy、回调 Envelope 与各事件载荷（M2.6）、SettlementStatement/Entry/Discrepancy（M8）——非原语能力，与 <code>discovery/</code>、<code>transport/</code> 同级安置</td></tr>
       </tbody>
     </table>
-    <p><strong>命名空间治理（Namespace Governance）：</strong></p>
-    <ul>
-      <li>协议核心 Schema 的 <code>name</code> MUST 使用 <code>utp.*</code> 命名空间（与原语 ID 同值，如 <code>utp.listing</code>），由协议治理方独占；厂商扩展 MUST 使用 reverse-domain 命名（如 <code>com.1688.listing.quality</code>）。</li>
-      <li>Schema URL 的 origin 与 <code>name</code> 的域归属 MUST 一致（namespace authority binding）：消费方 MUST 拒绝声称 <code>utp.*</code> 但托管在非协议官方 origin 的 Schema，防止恶意 Schema 注入。</li>
-      <li>每个 Schema MUST 自描述（内嵌 <code>name</code> + <code>version</code>，日期格式）；版本化发布 URL 不可变，变更即发新日期版本。</li>
-    </ul>
+    <p>状态机的机器可读定义内嵌于各 <code>primitive.json</code> 的 <code>state_machine</code>（<code>scope: resource</code>，以 <code>listing_id</code>/<code>inquiry_id</code>/<code>routing_id</code>/<code>shipment_id</code> 为资源键），与正文各章状态机表逐条一致；Action 迁移以全限定名（<code>utp.acceptance.accept</code>）表达，外部与系统事件以 <code>event</code> 字段表达。</p>
 
     <h2 id="s-me">附录 ME：与主规范的章节对应与整合路线（Integration Map，资料性）</h2>
     <p>本附录为<strong>资料性（Informative）</strong>：给出商家侧分册各章与主规范章节体系的对应位置，以及 MP 原语升入主规范正式章节序列（需 RFC 治理流程）时的联动修改清单。对应关系的落地与否不影响本分册条款的规范效力；若执行整合，MUST 遵循主规范 README 第 3 节新增章节流程与第 4 节全局一致性检查。</p>
@@ -122,7 +97,7 @@ format: html
         <tr><td>2</td><td>Marketplace 角色（M1.3.1）</td><td>主规范 9.2.2 R2 标准角色表（走 RFC 治理流程；过渡期 R3 <code>marketplace.Marketplace</code>，9.2.5）</td><td>topology.html 角色表、加入规则表、RoleDefinition 示例；<code>registries/roles.registry.json</code></td></tr>
         <tr><td>3</td><td>M2 入驻与能力声明</td><td>新章节（建议插在 Ch.3 发现与协商之后，作为"商户接入"章）</td><td>全部 26 个页面 sidebar + 编号 +1 联动；discovery.html 3.3 Profile 增补 <code>dev.utp.merchant_callback</code> Service 说明</td></tr>
         <tr><td>4</td><td>M3 MP1 / M4 MP2 / M5 MP3 / M6 MP4 / M7 MP5 五个原语章</td><td>交易原语组新增五章（P0 通用框架之后、或独立"供应商原语"分组）</td><td>index.html 目录表与统计；治理侧发布四个 <code>PrimitiveDefinition</code>；MessageEnvelope <code>primitive</code> 枚举扩展（transport.html 4.1.1 + schemas.html 24.4 两处）</td></tr>
-        <tr><td>4a</td><td>MP3 与 P2 对偶（M5.6）</td><td>primitive-negotiate.html 增补"卖方侧应答经 utp.quote 完成"的规范通道说明（平台托管拓扑）</td><td>negotiation_id 上下文共享与 quote_hash→terms_hash 证据链的双向交叉引用</td></tr>
+        <tr><td>4a</td><td>MP3 与 P2 对偶（M5.6）</td><td>primitive-negotiate.html 增补"卖方侧应答经 utp.quote 完成"的规范通道说明（平台托管拓扑）</td><td>negotiation_id 上下文共享、Quote 实体复用与 terms_hash 计算规则（M5.10.1.1）的双向交叉引用</td></tr>
         <tr><td>5</td><td>MP4 与 P3 衔接（M6.6）</td><td>primitive-purchase.html 13.5.2 / 13.8.1 增补"卖方承诺处理经 utp.acceptance 完成"的规范通道说明</td><td>13.6.2 自动承诺处理脚注指向 AcceptancePolicy</td></tr>
         <tr><td>6</td><td>MP2 与 P3 库存契约（M4.7）</td><td>primitive-purchase.html 13.5.2（锁定库存职责）与 state-machine.html required_evidence 说明处增加交叉引用</td><td>inventory_receipt / inventory_release_receipt 的生成来源注明 InventoryHold</td></tr>
         <tr><td>7</td><td>MP5 与 P5 事实传导（M7.7）</td><td>primitive-fulfill.html 15.7.1（notify 的事实来源）增加交叉引用。<strong>历史不一致已修复</strong>：主规范早期版本中 topology/scenarios 引用的未定义操作 <code>fulfill.ship</code> 已全部清除，发货事实的唯一产生通道即 <code>utp.shipment.ship</code>（MP5），Ch.15 保持纯买方视角</td><td>fulfill/shipment 两个 Shipment Schema 合并为单一权威定义</td></tr>

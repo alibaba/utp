@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hold_status.json",
+  "version": "2026-07-01",
+  "title": "HoldStatus",
+  "description": "占用记录生命周期（M4.2）：HELD→LOCKED→CONSUMED 或 →RELEASED，全部由交易事件驱动。",
+  "enum": [
+    "HELD",
+    "LOCKED",
+    "CONSUMED",
+    "RELEASED"
+  ]
+}

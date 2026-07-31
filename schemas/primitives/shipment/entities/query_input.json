@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_input.json",
+  "version": "2026-07-01",
+  "title": "QueryInput",
+  "description": "utp.shipment.query：按交易/发货单/批次检索，含回执与买方验收结论镜像。",
+  "type": "object",
+  "properties": {
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "shipment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "pagination": {
+      "$ref": "../../common/pagination.json#/$defs/request"
+    }
+  },
+  "additionalProperties": true,
+  "anyOf": [
+    {
+      "required": [
+        "transaction_id"
+      ]
+    },
+    {
+      "required": [
+        "shipment_id"
+      ]
+    }
+  ]
+}

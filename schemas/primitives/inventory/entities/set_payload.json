@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "set_payload.json",
+  "version": "2026-07-01",
+  "title": "SetPayload",
+  "description": "set 操作业务载荷（不含幂等键；供单条请求与批量条目复用）。",
+  "type": "object",
+  "required": [
+    "listing_id",
+    "sku_id",
+    "available",
+    "expected_revision"
+  ],
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sku_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "warehouse_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "available": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "expected_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "low_stock_threshold": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adjustment.json",
+  "version": "2026-07-01",
+  "title": "Adjustment",
+  "description": "InventoryAdjustment（M4.9.2）：增量调整记录。delta 非零。",
+  "type": "object",
+  "required": [
+    "adjustment_id",
+    "listing_id",
+    "sku_id",
+    "delta",
+    "reason_code",
+    "adjusted_at"
+  ],
+  "properties": {
+    "adjustment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sku_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "warehouse_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "delta": {
+      "type": "integer",
+      "not": {
+        "const": 0
+      },
+      "description": "调整量（正为补货，负为核减）。"
+    },
+    "reason_code": {
+      "$ref": "reason_code.json"
+    },
+    "expected_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_ref": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "来源单据引用（ERP 出入库单号，M9 对账）。"
+    },
+    "adjusted_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "merchant_registration.json",
+  "version": "2026-07-30",
+  "title": "MerchantRegistration",
+  "description": "MerchantRegistration（M2.4.1）：注册请求载荷。注册 MUST 由商家主体自行完成，MUST NOT 委托 Agent（M2.4.3）。",
+  "type": "object",
+  "required": [
+    "agent_id",
+    "utp_endpoint",
+    "legal_name",
+    "contact",
+    "categories",
+    "settlement_account"
+  ],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "MUST 与供应商 Profile 的 agent_id 一致（Marketplace 据此拉取并验签 Profile）。"
+    },
+    "utp_endpoint": {
+      "type": "string",
+      "format": "uri"
+    },
+    "legal_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "法人名称，MUST 与资质文件一致。"
+    },
+    "contact": {
+      "$ref": "contact.json"
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "申请经营的类目标识列表。"
+    },
+    "settlement_account": {
+      "$ref": "settlement_account.json"
+    },
+    "erp_integration_mode": {
+      "$ref": "erp_integration_mode.json"
+    },
+    "delegation_policy": {
+      "$ref": "delegation_policy.json"
+    }
+  },
+  "additionalProperties": true
+}

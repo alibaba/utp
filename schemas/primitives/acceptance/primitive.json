@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json",
+  "name": "utp.acceptance",
+  "version": "2026-07-01",
+  "status": "release-candidate",
+  "title": "MP4 Acceptance Primitive Definition",
+  "description": "订单受理原语定义文件（UTP-M M6）。声明操作、角色绑定、传输绑定与受理任务状态机。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/acceptance.json。",
+  "service": "dev.utp.merchant",
+  "actions": {
+    "accept": {
+      "description": "PENDING_ACCEPT | ON_HOLD → ACCEPTED（MUST 附覆盖 terms_hash 的卖方 ES256 签名；作为主规范 13.2.3 \"卖方承诺处理\"的完成证据参与 SIGNING → PURCHASED 原子迁移）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/accept_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/acceptances/{routing_id}/accept"
+        }
+      ]
+    },
+    "reject": {
+      "description": "PENDING_ACCEPT | ON_HOLD → REJECTED（MUST 附结构化原因码）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/reject_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/acceptances/{routing_id}/reject"
+        }
+      ]
+    },
+    "hold": {
+      "description": "PENDING_ACCEPT → ON_HOLD（内部审批挂起；deadline 不因挂起延长）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/hold_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/acceptances/{routing_id}/hold"
+        }
+      ]
+    },
+    "amend_leadtime": {
+      "description": "PENDING_ACCEPT | ON_HOLD → AMEND_PROPOSED（提议 promised_ship_at 变更，待买方确认）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/amend_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/acceptances/{routing_id}/amendments"
+        }
+      ]
+    },
+    "query": {
+      "description": "无",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": null,
+      "output_schema": {
+        "$ref": "entities/query_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/acceptances/{routing_id}"
+        }
+      ]
+    },
+    "list": {
+      "description": "无（游标分页；status=PENDING_ACCEPT 轮询是回调丢失的兜底通道）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/list_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/list_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/acceptances"
+        }
+      ]
+    }
+  },
+  "state_machine": {
+    "scope": "resource",
+    "resource_key": "routing_id",
+    "description": "终态到达后任何写操作 MUST 返回 ACCEPTANCE.STATE_CONFLICT（幂等重放同一 idempotency_key 除外）。deadline 由订单路由时的 Mode 超时配置决定（主规范 4.2.4）。EXPIRED 不是独立状态；超时自动处置在终态记录上以 arrived_via = timeout_auto 标记（错误码 ACCEPTANCE.EXPIRED 用于时限后的写操作拒绝）。",
+    "initial_state": "PENDING_ACCEPT",
+    "states": {
+      "PENDING_ACCEPT": {
+        "description": "待受理（订单路由送达后开始计时）"
+      },
+      "ON_HOLD": {
+        "description": "供应商挂起（内部审批中，时限不延长）"
+      },
+      "AMEND_PROPOSED": {
+        "description": "交期变更待买方确认"
+      },
+      "ACCEPTED": {
+        "description": "已接受（卖方签名事实不可回滚）",
+        "terminal": true
+      },
+      "REJECTED": {
+        "description": "已拒绝（附原因码）",
+        "terminal": true
+      }
+    },
+    "transitions": [
+      {
+        "from": null,
+        "event": "order_routed",
+        "to": "PENDING_ACCEPT",
+        "by": "Marketplace"
+      },
+      {
+        "from": "PENDING_ACCEPT",
+        "action": "utp.acceptance.accept",
+        "to": "ACCEPTED",
+        "by": "Seller",
+        "condition": "卖方签名验证通过"
+      },
+      {
+        "from": "PENDING_ACCEPT",
+        "action": "utp.acceptance.reject",
+        "to": "REJECTED",
+        "by": "Seller"
+      },
+      {
+        "from": "PENDING_ACCEPT",
+        "action": "utp.acceptance.hold",
+        "to": "ON_HOLD",
+        "by": "Seller"
+      },
+      {
+        "from": "PENDING_ACCEPT",
+        "action": "utp.acceptance.amend_leadtime",
+        "to": "AMEND_PROPOSED",
+        "by": "Seller"
+      },
+      {
+        "from": "ON_HOLD",
+        "action": "utp.acceptance.accept",
+        "to": "ACCEPTED",
+        "by": "Seller",
+        "condition": "deadline 内"
+      },
+      {
+        "from": "ON_HOLD",
+        "action": "utp.acceptance.reject",
+        "to": "REJECTED",
+        "by": "Seller",
+        "condition": "deadline 内"
+      },
+      {
+        "from": "ON_HOLD",
+        "action": "utp.acceptance.amend_leadtime",
+        "to": "AMEND_PROPOSED",
+        "by": "Seller",
+        "condition": "deadline 内"
+      },
+      {
+        "from": "AMEND_PROPOSED",
+        "event": "buyer_confirm_amendment",
+        "to": "ACCEPTED",
+        "by": "Buyer"
+      },
+      {
+        "from": "AMEND_PROPOSED",
+        "event": "buyer_reject_amendment",
+        "to": "REJECTED",
+        "by": "Buyer"
+      },
+      {
+        "from": "PENDING_ACCEPT",
+        "event": "deadline_expired",
+        "to": "ACCEPTED",
+        "by": "Marketplace",
+        "condition": "timeout_policy = auto_accept（arrived_via = timeout_auto）"
+      },
+      {
+        "from": "PENDING_ACCEPT",
+        "event": "deadline_expired",
+        "to": "REJECTED",
+        "by": "Marketplace",
+        "condition": "timeout_policy = auto_reject（arrived_via = timeout_auto）"
+      },
+      {
+        "from": "ON_HOLD",
+        "event": "deadline_expired",
+        "to": "ACCEPTED",
+        "by": "Marketplace",
+        "condition": "timeout_policy = auto_accept（arrived_via = timeout_auto）"
+      },
+      {
+        "from": "ON_HOLD",
+        "event": "deadline_expired",
+        "to": "REJECTED",
+        "by": "Marketplace",
+        "condition": "timeout_policy = auto_reject（arrived_via = timeout_auto）"
+      },
+      {
+        "from": "AMEND_PROPOSED",
+        "event": "deadline_expired",
+        "to": "REJECTED",
+        "by": "Marketplace",
+        "condition": "买方确认超时按拒绝收敛（arrived_via = timeout_auto）"
+      }
+    ]
+  }
+}

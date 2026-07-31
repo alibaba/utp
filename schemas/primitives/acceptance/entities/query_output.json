@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_output.json",
+  "version": "2026-07-01",
+  "title": "QueryOutput",
+  "description": "utp.acceptance.query：单个受理任务全貌。",
+  "type": "object",
+  "required": [
+    "routing",
+    "task_status"
+  ],
+  "properties": {
+    "routing": {
+      "$ref": "order_routing.json"
+    },
+    "task_status": {
+      "$ref": "task_status.json"
+    },
+    "record": {
+      "$ref": "acceptance_record.json"
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

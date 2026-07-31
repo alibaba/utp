@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "delivery_receipt_payload.json",
+  "version": "2026-07-30",
+  "title": "DeliveryReceiptPayload",
+  "description": "物流妥投/买方验收结论（M7.7）。receipt 结论来自 P5（FulfillmentReceipt/RejectionConfirmation 的镜像要素）。",
+  "type": "object",
+  "required": [
+    "shipment_id",
+    "transaction_id",
+    "kind"
+  ],
+  "properties": {
+    "shipment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "kind": {
+      "enum": [
+        "carrier_delivered",
+        "buyer_received",
+        "buyer_rejected"
+      ],
+      "description": "回执种类：承运商妥投 / 买方确认收货 / 买方拒收。"
+    },
+    "received_quantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reason_code": {
+      "type": "string",
+      "description": "拒收原因码（kind=buyer_rejected 时必填）。"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../../primitives/common/entities/evidence_reference.json"
+      }
+    }
+  },
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "kind": {
+        "const": "buyer_rejected"
+      }
+    },
+    "required": [
+      "kind"
+    ]
+  },
+  "then": {
+    "required": [
+      "reason_code"
+    ]
+  }
+}

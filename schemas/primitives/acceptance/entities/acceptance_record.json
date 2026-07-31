@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "acceptance_record.json",
+  "version": "2026-07-01",
+  "title": "AcceptanceRecord",
+  "description": "AcceptanceRecord（M6.10.1）：签名的受理结论，MUST 纳入 Evidence Bundle。条件必填以 if/then 表达。",
+  "type": "object",
+  "required": [
+    "record_id",
+    "routing_id",
+    "purchase_id",
+    "transaction_id",
+    "conclusion",
+    "arrived_via",
+    "terms_hash",
+    "decided_by",
+    "decided_at"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "routing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "conclusion": {
+      "$ref": "conclusion.json"
+    },
+    "arrived_via": {
+      "$ref": "arrived_via.json"
+    },
+    "terms_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json",
+      "description": "conclusion=ACCEPTED 时必填；覆盖 terms_hash。"
+    },
+    "reject_reason": {
+      "$ref": "reject_reason.json"
+    },
+    "amended_leadtime_days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "交期变更申报值（相对交期，自然日）。"
+    },
+    "promised_ship_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "承诺发货时间（绝对时间）；与 amended_leadtime_days 同时存在时 MUST 语义一致。"
+    },
+    "acceptance_note": {
+      "type": "string"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ]
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "conclusion": {
+            "const": "ACCEPTED"
+          }
+        },
+        "required": [
+          "conclusion"
+        ]
+      },
+      "then": {
+        "required": [
+          "seller_signature"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "conclusion": {
+            "const": "REJECTED"
+          }
+        },
+        "required": [
+          "conclusion"
+        ]
+      },
+      "then": {
+        "required": [
+          "reject_reason"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "conclusion": {
+            "const": "LEADTIME_AMENDED"
+          }
+        },
+        "required": [
+          "conclusion"
+        ]
+      },
+      "then": {
+        "anyOf": [
+          {
+            "required": [
+              "amended_leadtime_days"
+            ]
+          },
+          {
+            "required": [
+              "promised_ship_at"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

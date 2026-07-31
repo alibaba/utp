@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_output.json",
+  "version": "2026-07-01",
+  "title": "QueryOutput",
+  "type": "object",
+  "required": [
+    "shipments"
+  ],
+  "properties": {
+    "shipments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "shipment"
+        ],
+        "properties": {
+          "shipment": {
+            "$ref": "shipment.json"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "event.json"
+            }
+          },
+          "delivery_receipt": {
+            "type": "object",
+            "description": "买方收货/拒收结论镜像（P5 产出，只读；结构见 events.json#/$defs/delivery_receipt_payload）。",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "pagination": {
+      "$ref": "../../common/pagination.json#/$defs/response"
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

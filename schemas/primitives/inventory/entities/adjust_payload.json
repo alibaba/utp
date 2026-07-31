@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adjust_payload.json",
+  "version": "2026-07-01",
+  "title": "AdjustPayload",
+  "description": "adjust 操作业务载荷（不含幂等键）。MUST 携带 expected_revision 或声明 commutative=true。",
+  "type": "object",
+  "required": [
+    "listing_id",
+    "sku_id",
+    "delta",
+    "reason_code"
+  ],
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "sku_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "warehouse_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "delta": {
+      "type": "integer",
+      "not": {
+        "const": 0
+      }
+    },
+    "reason_code": {
+      "$ref": "reason_code.json"
+    },
+    "expected_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "commutative": {
+      "type": "boolean",
+      "description": "true 时跳过版本检查（增量满足交换律）。"
+    },
+    "source_ref": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "additionalProperties": true,
+  "anyOf": [
+    {
+      "required": [
+        "expected_revision"
+      ]
+    },
+    {
+      "properties": {
+        "commutative": {
+          "const": true
+        }
+      },
+      "required": [
+        "commutative"
+      ]
+    }
+  ]
+}

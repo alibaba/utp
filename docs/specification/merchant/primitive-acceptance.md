@@ -229,7 +229,7 @@ service:        dev.utp.merchant
         <tr><td><code>hold</code></td><td><code>POST /utp/m/v1/acceptances/{routing_id}/hold</code></td><td><code>utp_acceptance_hold</code></td><td><code>utp:acceptance:hold</code></td></tr>
         <tr><td><code>amend_leadtime</code></td><td><code>POST /utp/m/v1/acceptances/{routing_id}/amendments</code></td><td><code>utp_acceptance_amend</code></td><td><code>utp:acceptance:amend</code></td></tr>
         <tr><td><code>query</code></td><td><code>GET /utp/m/v1/acceptances/{routing_id}</code></td><td><code>utp_acceptance_query</code></td><td><code>utp:acceptance:query</code></td></tr>
-        <tr><td><code>list</code></td><td><code>GET /utp/m/v1/acceptances?status=&amp;from=&amp;page=</code></td><td><code>utp_acceptance_list</code></td><td><code>utp:acceptance:list</code></td></tr>
+        <tr><td><code>list</code></td><td><code>GET /utp/m/v1/acceptances?status=&amp;from=&amp;cursor=&amp;limit=</code></td><td><code>utp_acceptance_list</code></td><td><code>utp:acceptance:list</code></td></tr>
       </tbody>
     </table>
     <p>全部写操作 MUST 携带 <code>idempotency_key</code>；响应 MUST 包含 <code>X-UTP-Acceptance-Status</code> 头部。</p>

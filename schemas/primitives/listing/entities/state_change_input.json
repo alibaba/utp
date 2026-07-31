@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "state_change_input.json",
+  "version": "2026-07-01",
+  "title": "StateChangeInput",
+  "description": "utp.listing.list / delist / archive 请求（幂等状态迁移）。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "listing_id"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "package.json",
+  "version": "2026-07-01",
+  "title": "Package",
+  "description": "Package（M7.9.2）：装箱明细，与订单行对齐。",
+  "type": "object",
+  "required": [
+    "package_no",
+    "items"
+  ],
+  "properties": {
+    "package_no": {
+      "type": "string",
+      "minLength": 1,
+      "description": "包裹编号（发货单内唯一）。"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "listing_id",
+          "sku_id",
+          "quantity"
+        ],
+        "properties": {
+          "listing_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "sku_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "external_ref": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "weight_kg": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "dimensions_cm": {
+      "type": "object",
+      "required": [
+        "length",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "length": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

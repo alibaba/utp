@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "batch_write_output.json",
+  "version": "2026-07-01",
+  "title": "BatchWriteOutput",
+  "type": "object",
+  "required": [
+    "results"
+  ],
+  "properties": {
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "异步执行时返回，用于轮询。"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "index"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "record": {
+            "$ref": "inventory_record.json"
+          },
+          "error": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "（原引用 error.json，本仓由 discovery/profile 或 primitives/common 承载）"
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "record"
+            ]
+          },
+          {
+            "required": [
+              "error"
+            ]
+          }
+        ],
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

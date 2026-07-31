@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json",
+  "name": "utp.inventory",
+  "version": "2026-07-01",
+  "status": "release-candidate",
+  "title": "MP2 Inventory Primitive Definition",
+  "description": "库存管理原语定义文件（UTP-M M4）。声明操作、角色绑定、传输绑定与 InventoryHold 状态机投影。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/inventory.json。",
+  "service": "dev.utp.merchant",
+  "actions": {
+    "set": {
+      "description": "无资源状态迁移（available 绝对值覆盖；MUST 携带 expected_revision，结果不得低于当前占用量）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/set_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/write_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "PUT",
+          "path": "/utp/m/v1/inventory/{listing_id}/{sku_id}"
+        }
+      ]
+    },
+    "adjust": {
+      "description": "无资源状态迁移（±delta 增量；expected_revision 或 commutative: true 二选一，结果非负）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/adjust_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/write_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/inventory/{listing_id}/{sku_id}/adjustments"
+        }
+      ]
+    },
+    "query": {
+      "description": "无",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/query_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/inventory"
+        }
+      ]
+    },
+    "hold.query": {
+      "description": "无（只读核验交易性占用明细）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/hold_query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/hold_query_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/inventory/holds"
+        }
+      ]
+    },
+    "batch": {
+      "description": "同 set/adjust，逐条独立成败（单批 ≤ 500 条，规则同 M3.7.2）；MAY 异步执行",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/batch_write_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/batch_write_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/inventory/batch"
+        }
+      ]
+    }
+  },
+  "state_machine": {
+    "scope": "resource",
+    "resource_key": "hold_id",
+    "description": "Inventory 数量记录本身无状态机（available 为带版本的数值账本）。本状态机是交易性占用（InventoryHold）的投影：迁移全部由主规范 P3 Purchase 及其补偿链驱动（M4.7 同源契约），MP2 操作不驱动任何迁移，供应商仅通过 hold.query 只读核验。",
+    "initial_state": "HELD",
+    "states": {
+      "HELD": {
+        "description": "临时占用（purchase.create 触发，MUST 带 TTL，到期自动释放）"
+      },
+      "LOCKED": {
+        "description": "最终锁定（purchase.complete 原子迁移条件之一）"
+      },
+      "CONSUMED": {
+        "description": "已核销（发货扣减）",
+        "terminal": true
+      },
+      "RELEASED": {
+        "description": "已释放（TTL 到期 / P3 补偿链 / 交易取消）",
+        "terminal": true
+      }
+    },
+    "transitions": [
+      {
+        "from": null,
+        "event": "purchase.create",
+        "to": "HELD",
+        "by": "protocol_engine"
+      },
+      {
+        "from": null,
+        "event": "purchase.complete",
+        "to": "LOCKED",
+        "by": "protocol_engine",
+        "condition": "无先行 hold 时直接创建 LOCKED 记录"
+      },
+      {
+        "from": "HELD",
+        "event": "purchase.complete",
+        "to": "LOCKED",
+        "by": "protocol_engine"
+      },
+      {
+        "from": "HELD",
+        "event": "ttl_expired | compensation",
+        "to": "RELEASED",
+        "by": "protocol_engine",
+        "condition": "释放后 MUST 推送 hold_released 回调"
+      },
+      {
+        "from": "LOCKED",
+        "event": "shipment.ship 核销",
+        "to": "CONSUMED",
+        "by": "protocol_engine"
+      },
+      {
+        "from": "LOCKED",
+        "event": "compensation",
+        "to": "RELEASED",
+        "by": "protocol_engine",
+        "condition": "P3 补偿链『释放已锁库存』（13.3.2）"
+      }
+    ]
+  }
+}

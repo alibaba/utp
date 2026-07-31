@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "write_output.json",
+  "version": "2026-07-01",
+  "title": "WriteOutput",
+  "description": "set/adjust 的响应：返回最新数量视图。",
+  "type": "object",
+  "required": [
+    "record",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "record": {
+      "$ref": "inventory_record.json"
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}

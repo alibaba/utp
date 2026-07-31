@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fee.json",
+  "version": "2026-07-01",
+  "title": "Fee",
+  "description": "扣减项：每笔 MUST 有费率依据引用（M8.2.2 不变式 2）。",
+  "type": "object",
+  "required": [
+    "type",
+    "amount",
+    "basis_ref"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "费用类型（如 platform_commission、channel_fee、service_fee）。"
+    },
+    "amount": {
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "basis_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "商户协议条款引用（如 agmt-fee-3.2）。"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/quote/primitive.json",
+  "name": "utp.quote",
+  "version": "2026-07-30",
+  "status": "draft",
+  "title": "MP3 Quote — 询盘响应原语定义（utp-m M5）",
+  "description": "供应商对路由到达的买方 P2 询盘给出可核验的报价/应答（平台托管拓扑）。与主线 P2 utp.negotiate 的关系：报价内容复用其权威 Quote 实体（negotiate/entities/quote.json），MP3 不重复定义报价结构；utp.negotiate.quote 是 Seller → Buyer 直连回调（自托管拓扑），utp.quote.quote 是 Seller → Marketplace 提交通道（平台托管拓扑），两者承载同一份报价事实。本原语补充主线 Quote.terms_hash 的计算规则（JCS + SHA-256，见 entities/quote_input.json）。MAY 级能力：pricing_mode = L0 的供应商可不声明。",
+  "service": "dev.utp.merchant",
+  "actions": {
+    "quote": {
+      "description": "INQUIRY_PENDING | BUYER_COUNTERED → QUOTED（MUST 附覆盖 quote_hash 的卖方 ES256 签名；MUST 声明 valid_until）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/quote_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/quotes/{inquiry_id}/quote"
+        }
+      ]
+    },
+    "revise": {
+      "description": "QUOTED → QUOTED（version 递增；新版本 MUST 重新签名，旧版本失效并保留可溯）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/quote_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/quotes/{inquiry_id}/revisions"
+        }
+      ]
+    },
+    "bid": {
+      "description": "INQUIRY_PENDING → QUOTED（inquiry_type = rfq_bid；投标窗口内；窗口关闭前 Marketplace MUST NOT 披露投标内容）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/quote_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/quotes/{inquiry_id}/bid"
+        }
+      ]
+    },
+    "decline": {
+      "description": "INQUIRY_PENDING | QUOTED | BUYER_COUNTERED → DECLINED（MUST 携带结构化原因码，M5.10.2）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": {
+        "$ref": "entities/decline_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/quotes/{inquiry_id}/decline"
+        }
+      ]
+    },
+    "query": {
+      "description": "无（只读；响应携带 valid_next_actions）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": null,
+      "output_schema": {
+        "$ref": "entities/quote_record.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/quotes/{inquiry_id}"
+        }
+      ]
+    },
+    "list": {
+      "description": "无（只读；分页；推送不可达时的轮询降级通道，M5.7）",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
+      "input_schema": null,
+      "output_schema": {
+        "$ref": "entities/quote_record.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/quotes"
+        }
+      ]
+    }
+  },
+  "state_machine": {
+    "scope": "resource",
+    "resource_key": "inquiry_id",
+    "description": "应答任务状态机（M5.2）。多轮议价 = QUOTED ⇄ BUYER_COUNTERED 循环，round_no 单调递增，超限收敛 DECLINED（rounds_exhausted）。超时缺省 auto_decline（不存在 auto_accept）。终态后写操作 MUST 返回 QUOTE.STATE_CONFLICT。",
+    "initial_state": "INQUIRY_PENDING",
+    "states": {
+      "INQUIRY_PENDING": {
+        "description": "待应答（询盘路由送达，deadline 计时开始）"
+      },
+      "QUOTED": {
+        "description": "已报价（买方决策窗口；revise 产生新版本停留本态）"
+      },
+      "BUYER_COUNTERED": {
+        "description": "买方还价（回到可应答，round_no 递增）"
+      },
+      "BOUND": {
+        "description": "条款绑定（买方时效内接受，P2 产出 terms_hash 进入 P3；MP4 accept MUST NOT 偏离已绑定条款）",
+        "terminal": true
+      },
+      "DECLINED": {
+        "description": "已谢绝（显式 decline / 超时 auto_decline / 轮次超限）",
+        "terminal": true
+      },
+      "EXPIRED": {
+        "description": "报价失效（valid_until 到期未接受 / 询盘撤回）",
+        "terminal": true
+      }
+    },
+    "transitions": [
+      {
+        "from": null,
+        "event": "inquiry_routed",
+        "to": "INQUIRY_PENDING",
+        "by": "Marketplace"
+      },
+      {
+        "from": "INQUIRY_PENDING",
+        "action": "utp.quote.quote",
+        "to": "QUOTED",
+        "by": "Seller",
+        "condition": "签名覆盖 quote_hash 且 valid_until > now()"
+      },
+      {
+        "from": "INQUIRY_PENDING",
+        "action": "utp.quote.bid",
+        "to": "QUOTED",
+        "by": "Seller",
+        "condition": "inquiry_type = rfq_bid 且投标窗口内"
+      },
+      {
+        "from": "INQUIRY_PENDING",
+        "action": "utp.quote.decline",
+        "to": "DECLINED",
+        "by": "Seller"
+      },
+      {
+        "from": "INQUIRY_PENDING",
+        "event": "timeout",
+        "to": "DECLINED",
+        "by": "system",
+        "condition": "deadline 到期，quote_policy.on_timeout = auto_decline（decided_by = policy_auto）"
+      },
+      {
+        "from": "QUOTED",
+        "action": "utp.quote.revise",
+        "to": "QUOTED",
+        "by": "Seller",
+        "condition": "version 递增并重新签名"
+      },
+      {
+        "from": "QUOTED",
+        "event": "buyer_countered",
+        "to": "BUYER_COUNTERED",
+        "by": "Buyer(P2)",
+        "condition": "round_no 递增"
+      },
+      {
+        "from": "QUOTED",
+        "event": "buyer_accepted",
+        "to": "BOUND",
+        "by": "Buyer(P2)",
+        "condition": "valid_until 内接受且 P2 绑定核查通过"
+      },
+      {
+        "from": "QUOTED",
+        "action": "utp.quote.decline",
+        "to": "DECLINED",
+        "by": "Seller"
+      },
+      {
+        "from": "QUOTED",
+        "event": "quote_expired",
+        "to": "EXPIRED",
+        "by": "system",
+        "condition": "valid_until 到期未接受"
+      },
+      {
+        "from": "BUYER_COUNTERED",
+        "action": "utp.quote.quote",
+        "to": "QUOTED",
+        "by": "Seller",
+        "condition": "新一轮报价，重新签名"
+      },
+      {
+        "from": "BUYER_COUNTERED",
+        "action": "utp.quote.decline",
+        "to": "DECLINED",
+        "by": "Seller"
+      },
+      {
+        "from": "BUYER_COUNTERED",
+        "event": "rounds_exhausted",
+        "to": "DECLINED",
+        "by": "system",
+        "condition": "超过会话 Mode 配置的最大轮次"
+      },
+      {
+        "from": "INQUIRY_PENDING",
+        "event": "inquiry_withdrawn",
+        "to": "EXPIRED",
+        "by": "Buyer(P2)",
+        "condition": "询盘撤回，在途报价作废"
+      },
+      {
+        "from": "QUOTED",
+        "event": "inquiry_withdrawn",
+        "to": "EXPIRED",
+        "by": "Buyer(P2)"
+      }
+    ]
+  }
+}

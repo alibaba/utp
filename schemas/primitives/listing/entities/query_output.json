@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_output.json",
+  "version": "2026-07-01",
+  "title": "QueryOutput",
+  "type": "object",
+  "required": [
+    "listings"
+  ],
+  "properties": {
+    "listings": {
+      "type": "array",
+      "items": {
+        "$ref": "listing.json"
+      }
+    },
+    "pagination": {
+      "$ref": "../../common/pagination.json#/$defs/response"
+    },
+    "valid_next_actions": {
+      "$ref": "../../common/valid_next_actions.json"
+    }
+  },
+  "additionalProperties": true
+}
