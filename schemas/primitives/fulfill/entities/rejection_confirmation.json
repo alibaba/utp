@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/rejection_confirmation.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/rejection_confirmation.json",
   "version": "2026-07-27",
   "title": "RejectionConfirmation",
   "description": "采购方拒收凭证。生成后激活 Resolve 原语，作为索赔证据链的一部分；被拒批次不再进入 RECEIVED 或 FULFILLED。",

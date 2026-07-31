@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/evidence_reference.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/evidence_reference.json",
   "version": "2026-07-29",
   "title": "EvidenceReference",
   "description": "可审计证据包或不可变证据的引用。",

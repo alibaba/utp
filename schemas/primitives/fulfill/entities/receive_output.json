@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/receive_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receive_output.json",
   "version": "2026-07-27",
   "title": "FulfillReceiveOutput",
   "description": "utp.fulfill.receive 的业务输出。返回收货确认凭证；幂等——批次已确认收货时返回既有凭证（FULFILL.ALREADY_RECEIVED 语义）。",

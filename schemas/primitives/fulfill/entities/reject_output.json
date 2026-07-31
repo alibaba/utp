@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/reject_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/reject_output.json",
   "version": "2026-07-27",
   "title": "FulfillRejectOutput",
   "description": "utp.fulfill.reject 的业务输出。返回拒收凭证；生成后激活 Resolve（后续可执行 utp.resolve.raise）；幂等——批次已拒收时返回既有凭证（FULFILL.ALREADY_REJECTED 语义）。",

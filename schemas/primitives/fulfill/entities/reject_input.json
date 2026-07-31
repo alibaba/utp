@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/reject_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/reject_input.json",
   "version": "2026-07-27",
   "title": "FulfillRejectInput",
   "description": "utp.fulfill.reject 的业务输入。Buyer 对不符合约定的已交付批次提交结构化拒收理由与证据，MUST 携带 Buyer 签名；当前批次进入 REJECTED 终态，生成 RejectionConfirmation 并激活 Resolve。",

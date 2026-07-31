@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/document_reference.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/document_reference.json",
   "version": "2026-07-29",
   "title": "DocumentReference",
   "description": "可获取并可校验的受控文档引用。digest 是内容摘要，不涉及加密或密钥。",

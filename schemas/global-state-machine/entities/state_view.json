@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/global-state-machine/entities/state_view.json",
+  "$id": "https://ut-protocol.com/schemas/global-state-machine/entities/state_view.json",
   "version": "2026-07-29",
   "title": "UTP StateView",
   "description": "某个商业意图上下文或独立交易当前的 UTP 全局状态视图",
@@ -17,7 +17,7 @@
       "description": "交易全生命周期标识。仅交易级 StateView 携带"
     },
     "state": {
-      "$ref": "https://ut-protocol.com/global-state-machine/entities/state.json"
+      "$ref": "state.json"
     },
     "state_version": {
       "type": "integer",

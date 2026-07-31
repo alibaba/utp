@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/partial_delivery.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/partial_delivery.json",
   "version": "2026-07-30",
   "title": "PartialDelivery",
   "description": "订单分批交付记录。记录单个批次的商品明细、物流关联、交付/验收数量、批次状态与凭证引用。",

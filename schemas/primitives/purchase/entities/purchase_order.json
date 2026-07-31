@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/purchase/entities/purchase_order.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/purchase/entities/purchase_order.json",
   "version": "2026-07-30",
   "title": "PurchaseOrder",
   "description": "买方提交并确认的订购聚合。",

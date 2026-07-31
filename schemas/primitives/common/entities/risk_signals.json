@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/risk_signals.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/risk_signals.json",
   "version": "2026-07-29",
   "title": "Risk Signals",
   "description": "风控信号。用于支持交易风险分析的环境数据，由平台基于直接观察或第三方可独立验证的证明提供，而非买方自行声明的主观声称。",

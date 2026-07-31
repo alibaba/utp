@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/list_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_input.json",
   "version": "2026-07-27",
   "title": "FulfillListInput",
   "description": "utp.fulfill.list 的业务输入。Buyer 检索与自身关联的订单摘要，支持结构化筛选、排序与分页；所有筛选条件均可选。",

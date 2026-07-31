@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/receipt_confirmation.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receipt_confirmation.json",
   "version": "2026-07-27",
   "title": "ReceiptConfirmation",
   "description": "采购方收货确认凭证。receive 的产出；重复 receive 幂等返回既有凭证。receive 完成可按 TradeMethod 触发 Escrow 释放。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/trade_step.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/trade_step.json",
   "version": "2026-07-30",
   "title": "TradeStep",
   "description": "分阶段付款中的一个付款阶段。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/discovery/negotiation_result.json",
+  "$id": "https://ut-protocol.com/schemas/discovery/negotiation_result.json",
   "version": "2026-07-31",
   "title": "UTP Negotiation Result",
   "description": "Buyer 本地持有的确定性发现与协商结果。成功与失败结果互斥。",
@@ -31,7 +31,7 @@
       "type": "object",
       "properties": {
         "roles": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
-        "services": { "type": "array", "items": { "$ref": "https://ut-protocol.com/discovery/profile.json#/$defs/service" }, "minItems": 1 }
+        "services": { "type": "array", "items": { "$ref": "https://ut-protocol.com/schemas/discovery/profile.json#/$defs/service" }, "minItems": 1 }
       },
       "required": ["roles", "services"],
       "additionalProperties": false

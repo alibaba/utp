@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/global-state-machine/state_machine.json",
+  "$id": "https://ut-protocol.com/schemas/global-state-machine/state_machine.json",
   "version": "2026-07-29",
   "title": "UTP Global State Machine",
   "description": "UTP 全局状态机基础迁移定义，包含 states、action_guards、transitions 和 branches",
@@ -9,7 +9,7 @@
     "states": {
       "type": "array",
       "items": {
-        "$ref": "https://ut-protocol.com/global-state-machine/entities/state_definition.json"
+        "$ref": "entities/state_definition.json"
       },
       "minItems": 1,
       "description": "状态声明集合"
@@ -17,21 +17,21 @@
     "action_guards": {
       "type": "array",
       "items": {
-        "$ref": "https://ut-protocol.com/global-state-machine/entities/action_guard.json"
+        "$ref": "entities/action_guard.json"
       },
       "description": "Action 执行前状态与 Mode 条件声明"
     },
     "transitions": {
       "type": "array",
       "items": {
-        "$ref": "https://ut-protocol.com/global-state-machine/entities/state_transition.json"
+        "$ref": "entities/state_transition.json"
       },
       "description": "不依赖 Mode 的状态结果声明"
     },
     "branches": {
       "type": "array",
       "items": {
-        "$ref": "https://ut-protocol.com/global-state-machine/entities/state_branch.json"
+        "$ref": "entities/state_branch.json"
       },
       "description": "依赖 Mode 的状态结果声明"
     }

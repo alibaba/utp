@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/address.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/address.json",
   "version": "2026-07-30",
   "title": "Address",
   "description": "结构化物理地址及其可选收件联系信息。",

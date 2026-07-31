@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/fulfillment_receipt.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/fulfillment_receipt.json",
   "version": "2026-07-27",
   "title": "FulfillmentReceipt",
   "description": "订单履约收据，P5 后置条件的核心产出物，汇总累计已交付、已收、拒收数量、分批记录、总体结论与证据包引用。",

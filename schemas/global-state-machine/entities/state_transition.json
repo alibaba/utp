@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/global-state-machine/entities/state_transition.json",
+  "$id": "https://ut-protocol.com/schemas/global-state-machine/entities/state_transition.json",
   "version": "2026-07-29",
   "title": "UTP State Transition",
   "description": "Action Response 在指定前置状态下对应的状态结果声明",
@@ -12,7 +12,7 @@
       "description": "状态迁移项标识"
     },
     "from_state": {
-      "$ref": "https://ut-protocol.com/global-state-machine/entities/state.json"
+      "$ref": "state.json"
     },
     "action": {
       "type": "string",
@@ -20,13 +20,13 @@
       "description": "完整 UTP Action 标识"
     },
     "execution_result": {
-      "$ref": "https://ut-protocol.com/primitives/common/action_response.json#/properties/execution_result"
+      "$ref": "../../primitives/common/action_response.json#/properties/execution_result"
     },
     "result_type": {
-      "$ref": "https://ut-protocol.com/global-state-machine/entities/state_result_type.json"
+      "$ref": "state_result_type.json"
     },
     "to_state": {
-      "$ref": "https://ut-protocol.com/global-state-machine/entities/state.json"
+      "$ref": "state.json"
     }
   },
   "required": [

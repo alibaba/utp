@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/price.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/price.json",
   "version": "2026-07-29",
   "title": "Price",
   "description": "订单、协议或支付条款中的一项金额构成。",

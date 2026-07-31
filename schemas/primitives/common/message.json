@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/message.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/message.json",
   "version": "2026-07-30",
   "title": "Message",
   "description": "Action 执行过程中产生的业务错误、警告或提示信息。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/error_detail.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/error_detail.json",
   "version": "2026-07-27",
   "title": "UTP Error Detail",
   "description": "UTP 标准错误响应中的结构化错误内容。",

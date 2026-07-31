@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/common/entities/option.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/option.json",
   "version": "2026-07-29",
   "title": "Option",
   "description": "商品或服务的一项已选规格、选配或定制属性。",

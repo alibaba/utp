@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/fulfill/entities/tracking_event.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/tracking_event.json",
   "version": "2026-07-27",
   "title": "TrackingEvent",
   "description": "订单履约事件，Seller 经 notify 推送。order_id 为直接履约锚点；物流单、包裹、运单号和外部报告为可选关联资源，不作为履约锚点。",

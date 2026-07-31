@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/primitives/negotiate/state_machine.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/negotiate/state_machine.json",
   "version": "2026-07-29",
   "title": "Negotiate 原语状态机定义",
   "description": "询盘原语内部状态机。对应 UTP 规范第 12 章 §12.2。pricing_mode == L0 时整个原语跳过（SKIPPED）。轮次约束仅在会话锁定的特殊场景（如改价审批、竞标）生效，普通协商场景不做轮次限制。",
