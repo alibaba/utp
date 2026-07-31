@@ -400,7 +400,7 @@ format: html
 
 <p>在 OAuth 2 授权流程开始前，请求方 Agent MUST 先从资源提供方的 UTPProfile 中发现并验证其 Authorization Server。发现流程包括：从 Profile 端点获取 UTPProfile、读取 <code>user_authorization.supported_mechanisms</code>、校验 <code>endpoint</code> 的 HTTPS 与 trust domain 约束、按第 6 章 6.3.3 节获取 RFC 8414 metadata 并验证 issuer 匹配。</p>
 
-<p>本章只声明发现入口与验证要求，详细的 RFC 8414 metadata 请求、响应字段、错误处理与 Access Token 验证流程见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-633">第 6 章 6.3.3 节</a>；OAuth 2.1 Authorization Code + PKCE 授权流程详见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-63">第 6 章 6.3 节</a>。</p>
+<p>本章只声明发现入口与验证要求，详细的 RFC 8414 metadata 请求、响应字段、错误处理与 Access Token 验证流程见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-633">第 6 章 6.3.3 节</a>；OAuth 2.0 / 2.1 Authorization Code 授权流程详见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-63">第 6 章 6.3 节</a>。PKCE 是否启用由 Authorization Server 与客户端配置决定。</p>
 
 <h3 id="s-527">5.2.7 与操作准入语义的协同</h3>
 

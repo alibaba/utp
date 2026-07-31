@@ -8,6 +8,14 @@
   "properties": {
     "$schema": { "type": "string", "format": "uri" },
     "utp": { "$ref": "#/$defs/utp_declaration" },
+    "user_authorization": {
+      "$ref": "user_authorization.json",
+      "description": "用户授权能力声明"
+    },
+    "agent_authentication": {
+      "$ref": "agent_authentication.json",
+      "description": "Agent 身份认证能力声明"
+    },
     "signing_keys": {
       "type": "array",
       "items": { "$ref": "#/$defs/signing_key" },
