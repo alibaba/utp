@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/resolution_result.json",
+  "version": "2026-07-31",
+  "title": "ResolutionResult",
+  "description": "争议处置对交易后续执行的标准结论。",
+  "type": "string",
+  "oneOf": [
+    { "const": "continue", "description": "解除相关锁定并继续原交易义务。" },
+    { "const": "partial_compensation", "description": "执行部分补偿，未争议义务继续。" },
+    { "const": "terminate_with_refund", "description": "退款并终止受影响交易义务。" },
+    { "const": "dismissed", "description": "驳回争议，不执行补偿。" },
+    { "const": "escalated", "description": "当前层级无法结案，升级至下一处置层级。" }
+  ]
+}

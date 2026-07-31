@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/term_input.json",
+  "version": "2026-07-31",
+  "title": "PayTermInput",
+  "description": "执行单个付款阶段所需的业务输入。",
+  "type": "object",
+  "required": [
+    "purchase_id",
+    "payment_term_id",
+    "payment_instrument",
+    "fulfillment_trigger",
+    "amount"
+  ],
+  "properties": {
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "付款阶段所属的 Purchase 聚合标识。"
+    },
+    "payment_term_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "本次执行的付款阶段标识。"
+    },
+    "payment_instrument": {
+      "$ref": "payment_instrument.json",
+      "writeOnly": true,
+      "description": "用于本阶段扣付的令牌化支付工具。"
+    },
+    "fulfillment_trigger": {
+      "$ref": "fulfillment_trigger.json",
+      "description": "证明本阶段已满足履约前置条件的结构化引用。"
+    },
+    "amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "本付款阶段应扣付的金额。"
+    }
+  },
+  "additionalProperties": true
+}

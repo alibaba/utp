@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/query_input.json",
+  "version": "2026-07-31",
+  "title": "PayQueryInput",
+  "description": "按支付请求或 Purchase 聚合查询支付状态的业务条件。",
+  "type": "object",
+  "properties": {
+    "payment_request_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "要查询的单笔支付请求标识。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "要查询全部付款阶段的 Purchase 聚合标识。"
+    },
+    "include_terms": {
+      "type": "boolean",
+      "default": false,
+      "description": "是否在结果中包含各付款阶段的状态明细。"
+    }
+  },
+  "anyOf": [
+    { "required": ["payment_request_id"] },
+    { "required": ["purchase_id"] }
+  ],
+  "additionalProperties": true
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/next_global_state_hint.json",
+  "version": "2026-07-31",
+  "title": "NextGlobalStateHint",
+  "description": "Resolve 结果提供给全局状态机的建议；最终迁移仍由全局状态机规则裁定。",
+  "type": "string",
+  "oneOf": [
+    { "const": "prior_state", "description": "恢复争议发生前的非终态。" },
+    { "const": "PAYING", "description": "恢复或重新进入支付阶段。" },
+    { "const": "FULFILLING", "description": "继续未受影响的履约义务。" },
+    { "const": "FAILED", "description": "因不可恢复失败终止交易。" },
+    { "const": "CANCELLED", "description": "按处置结果取消交易。" }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/compensation_action.json",
+  "version": "2026-07-31",
+  "title": "CompensationAction",
+  "description": "退货、补发、物流逆向或其他非资金补偿动作。",
+  "type": "object",
+  "required": [
+    "action_type"
+  ],
+  "properties": {
+    "action_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "补偿动作类型，例如 return_shipping、replacement 或 release_resource。"
+    },
+    "target_action": {
+      "type": "string",
+      "pattern": "^utp\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "可执行该补偿动作的目标 UTP Action 完整名称。"
+    },
+    "payload": {
+      "type": "object",
+      "description": "执行目标 Action 所需的业务载荷。",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

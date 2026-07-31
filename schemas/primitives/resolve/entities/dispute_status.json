@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/dispute_status.json",
+  "version": "2026-07-31",
+  "title": "DisputeStatus",
+  "description": "争议档案在 Resolve 内部生命周期中的状态。",
+  "type": "string",
+  "oneOf": [
+    { "const": "raised", "description": "争议已登记并完成范围锁定。" },
+    { "const": "mediating", "description": "争议正在调解。" },
+    { "const": "arbitrating", "description": "争议正在仲裁。" },
+    { "const": "resolved", "description": "争议已形成可执行处置结果。" },
+    { "const": "compensated", "description": "处置结果要求的补偿已执行。" },
+    { "const": "dismissed", "description": "争议主张被驳回，交易可按规则继续。" },
+    { "const": "escalated", "description": "当前处置路径失败或超时，已升级到更高级别。" }
+  ]
+}

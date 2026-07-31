@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/dispute_type.json",
+  "version": "2026-07-31",
+  "title": "DisputeType",
+  "description": "争议事实的标准分类。",
+  "type": "string",
+  "oneOf": [
+    { "const": "quality_dispute", "description": "商品、服务或验收结果不符合约定。" },
+    { "const": "delivery_dispute", "description": "发货、运输、妥投或交接事实存在争议。" },
+    { "const": "payment_dispute", "description": "扣款、到账、托管、退款或支付渠道事实存在争议。" },
+    { "const": "contract_breach", "description": "一方未履行 Purchase 或协议约定的合同义务。" },
+    { "const": "agent_behavior", "description": "Agent 行为超出 Mandate、错误执行或产生责任争议。" },
+    { "const": "other", "description": "无法归入既有标准分类的其他争议。" }
+  ]
+}

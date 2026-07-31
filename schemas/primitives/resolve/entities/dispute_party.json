@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/dispute_party.json",
+  "version": "2026-07-31",
+  "title": "DisputeParty",
+  "description": "争议流程中的主张方、答辩方或其他责任参与方。",
+  "type": "object",
+  "required": [
+    "agent_id",
+    "role"
+  ],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "参与争议的 Agent、组织或业务主体标识。"
+    },
+    "role": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该参与方在当前交易拓扑中的职责角色。"
+    }
+  },
+  "additionalProperties": true
+}

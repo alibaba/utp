@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/compensate_output.json",
+  "version": "2026-07-31",
+  "title": "ResolveCompensateOutput",
+  "description": "补偿执行后的争议档案和可选资金退款结果。",
+  "type": "object",
+  "required": [
+    "dispute_record"
+  ],
+  "properties": {
+    "dispute_record": {
+      "$ref": "dispute_record.json",
+      "description": "包含补偿执行结果和最新状态的争议权威档案。"
+    },
+    "refund_result": {
+      "$ref": "../../pay/entities/refund_result.json",
+      "description": "补偿包含资金退款时由 utp.pay.refund 返回的标准结果。"
+    }
+  },
+  "additionalProperties": true
+}

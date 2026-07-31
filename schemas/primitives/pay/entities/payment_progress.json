@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_progress.json",
+  "version": "2026-07-31",
+  "title": "PaymentProgress",
+  "description": "多阶段付款的累计进度和下一付款阶段。",
+  "type": "object",
+  "required": [
+    "total_amount",
+    "paid_amount",
+    "remaining_amount",
+    "completed_terms"
+  ],
+  "properties": {
+    "total_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "当前 Purchase 下全部付款义务的总金额。"
+    },
+    "paid_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "截至当前已确认支付的累计金额。"
+    },
+    "remaining_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "尚未确认支付的剩余金额。"
+    },
+    "completed_terms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "已经完成的付款阶段标识列表。"
+    },
+    "next_term": {
+      "type": "object",
+      "required": [
+        "payment_term_id",
+        "amount",
+        "trigger_condition"
+      ],
+      "properties": {
+        "payment_term_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "下一付款阶段标识。"
+        },
+        "amount": {
+          "$ref": "../../common/entities/money.json",
+          "description": "下一付款阶段的应付金额。"
+        },
+        "trigger_condition": {
+          "type": "string",
+          "minLength": 1,
+          "description": "下一付款阶段可执行的可读条件表达。"
+        }
+      },
+      "description": "仍有未付款项时返回的下一阶段信息。",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

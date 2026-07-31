@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/arbitrate_input.json",
+  "version": "2026-07-31",
+  "title": "ResolveArbitrateInput",
+  "description": "将争议直接提交或升级至仲裁所需的业务输入。",
+  "type": "object",
+  "required": [
+    "dispute_id"
+  ],
+  "properties": {
+    "dispute_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "需要进入仲裁的争议档案标识。"
+    },
+    "arbitration_institution": {
+      "type": "string",
+      "minLength": 1,
+      "description": "受理争议的仲裁机构名称或登记标识。"
+    },
+    "arbitration_request": {
+      "type": "object",
+      "description": "仲裁条款、管辖地、适用法律、请求金额和证据导出要求。",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

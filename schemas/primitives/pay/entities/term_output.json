@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/term_output.json",
+  "version": "2026-07-31",
+  "title": "PayTermOutput",
+  "description": "单个付款阶段执行后的确认凭证、累计进度和标准事件。",
+  "type": "object",
+  "required": [
+    "payment_confirmation",
+    "payment_progress"
+  ],
+  "properties": {
+    "payment_confirmation": {
+      "$ref": "payment_confirmation.json",
+      "description": "本付款阶段的支付确认凭证。"
+    },
+    "payment_progress": {
+      "$ref": "payment_progress.json",
+      "description": "包含本阶段结果的累计付款进度。"
+    },
+    "payment_event": {
+      "$ref": "payment_event.json",
+      "description": "本阶段执行产生的标准支付事件。"
+    }
+  },
+  "additionalProperties": true
+}

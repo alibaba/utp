@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_event_type.json",
+  "version": "2026-07-31",
+  "title": "PaymentEventType",
+  "description": "支付渠道事实归一化后的标准事件类型。",
+  "type": "string",
+  "oneOf": [
+    { "const": "PAYMENT_AUTHORIZED", "description": "支付工具授权或资金预冻结成功。" },
+    { "const": "PAYMENT_CAPTURED", "description": "渠道确认扣款、入账或入托管成功。" },
+    { "const": "PAYMENT_FAILED", "description": "支付被拒绝、授权失效或最终处理失败。" },
+    { "const": "PAYMENT_REFUNDED", "description": "退款或支付授权解除已完成。" }
+  ]
+}
