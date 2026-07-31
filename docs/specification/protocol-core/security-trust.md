@@ -445,7 +445,7 @@ format: html
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>
   <figcaption style="margin-top: 10px; color: #6b7280; font-size: 13px; text-align: center;">
-    图 5-1　陌生 Agent 交互的信任准入时序图（易读版；发现与协商主流程见第 3 章；可在图内滚动查看完整链路；<a href="diagrams/agent-trust-handshake-sequence.puml">PlantUML 源文件</a>）
+    图 5-1　陌生 Agent 交互的信任准入时序图（易读版；发现与协商主流程见第 3 章；可在图内滚动查看完整链路）
   </figcaption>
 </figure>
 

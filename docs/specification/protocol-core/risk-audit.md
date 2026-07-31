@@ -218,7 +218,7 @@ format: html
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>
   <figcaption style="margin-top: 10px; color: #6b7280; font-size: 13px; text-align: center;">
-    图 7-1 Evidence Bundle 审计架构与责任边界（可在图内滚动查看完整架构；<a href="diagrams/png2x/evidence-bundle-audit-architecture.png">PNG 大图</a> | <a href="diagrams/evidence-bundle-audit-architecture.puml">PlantUML 源文件</a>）
+    图 7-1 Evidence Bundle 审计架构与责任边界（可在图内滚动查看完整架构；<a href="diagrams/png2x/evidence-bundle-audit-architecture.png">PNG 大图</a>）
   </figcaption>
 </figure>
 
