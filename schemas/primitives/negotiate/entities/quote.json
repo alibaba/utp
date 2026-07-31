@@ -18,7 +18,7 @@
     "quote_id": {
       "type": "string",
       "minLength": 1,
-      "description": "报价唯一标识。被 counter_offer 与 binding 的 quote_ref 引用。"
+      "description": "报价唯一标识。被 counter-offer 与 binding 的 quote_ref 引用。"
     },
     "inquiry_ref": {
       "type": "string",

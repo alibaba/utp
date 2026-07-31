@@ -3,7 +3,7 @@
   "$id": "https://ut-protocol.com/schemas/primitives/negotiate/entities/counter_offer_output.json",
   "version": "2026-07-29",
   "title": "CounterOfferOutput",
-  "description": "utp.negotiate.counter_offer 的业务输出（供应商侧接收回执）。counter_offer_id 由供应商生成，将出现在最终 BindingTerms 的 counter_offer_refs 中。供应商的实质回应通过新一轮 quote 回调交付。",
+  "description": "utp.negotiate.counter-offer 的业务输出（供应商侧接收回执）。counter_offer_id 由供应商生成，将出现在最终 BindingTerms 的 counter_offer_refs 中。供应商的实质回应通过新一轮 quote 回调交付。",
   "type": "object",
   "required": [
     "counter_offer_id",

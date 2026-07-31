@@ -54,7 +54,7 @@
         }
       ]
     },
-    "counter_offer": {
+    "counter-offer": {
       "description": "Buyer 基于报价提出还价，提交调整后的完整报价行结构（含数量与期望价格）供 Seller 逐项确认。Seller 的实质回应通过新一轮 quote 交付。轮次上限仅在会话锁定轮次约束的特殊场景（如改价审批、竞标）生效，普通场景不做轮次限制。",
       "initiator_role": "Buyer",
       "handler_role": "Seller",
@@ -72,11 +72,11 @@
         },
         {
           "type": "mcp",
-          "tool": "utp.negotiate.counter_offer"
+          "tool": "utp.negotiate.counter-offer"
         },
         {
           "type": "a2a",
-          "action": "utp.negotiate.counter_offer"
+          "action": "utp.negotiate.counter-offer"
         }
       ]
     },
@@ -171,7 +171,7 @@
       },
       {
         "from": "QUOTED",
-        "action": "utp.negotiate.counter_offer",
+        "action": "utp.negotiate.counter-offer",
         "to": "COUNTERED",
         "condition": "会话启用轮次约束时不得超过上限"
       },
@@ -207,7 +207,7 @@
       }
     ],
     "constraints": {
-      "round_limit_policy": "轮次限制不是普通场景的默认行为。仅当会话锁定的 Mode 明确要求（如 decision_path L1 改价审批 1 轮、L3 竞标场景约定上限）时，协议引擎才拒绝超限的 counter_offer 并返回 NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS。",
+      "round_limit_policy": "轮次限制不是普通场景的默认行为。仅当会话锁定的 Mode 明确要求（如 decision_path L1 改价审批 1 轮、L3 竞标场景约定上限）时，协议引擎才拒绝超限的 counter-offer 并返回 NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS。",
       "query_availability": "utp.negotiate.query 在 INQUIRED、QUOTED、COUNTERED、BOUND、RELEASED 状态均可执行，无状态影响。RELEASED 后此前已收集的报价与协商数据仍可通过 query 获取。",
       "competitive_branch": "L3 竞价场景下各供应商报价分支相互独立，binding 只能选择其中一个分支。"
     }
