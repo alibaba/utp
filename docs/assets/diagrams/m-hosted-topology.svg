@@ -11,14 +11,14 @@
 <rect x="30" y="90" width="170" height="90" rx="8" fill="#ffe6cc" stroke="#d79b00"/>
 <text x="115" y="118" text-anchor="middle" font-size="13" font-weight="bold">Seller</text>
 <text x="115" y="136" text-anchor="middle" font-size="10">ERP / Bridge / Merchant Agent</text>
-<text x="115" y="152" text-anchor="middle" font-size="10">initiator：MP1—MP4</text>
+<text x="115" y="152" text-anchor="middle" font-size="10">initiator：MP1—MP5</text>
 <text x="115" y="168" text-anchor="middle" font-size="10">部署 dev.utp.merchant_callback</text>
 
 <!-- Marketplace -->
 <rect x="300" y="80" width="180" height="110" rx="8" fill="#fff2cc" stroke="#d6b656"/>
 <text x="390" y="106" text-anchor="middle" font-size="13" font-weight="bold">Marketplace</text>
 <text x="390" y="124" text-anchor="middle" font-size="10">UTP Server</text>
-<text x="390" y="140" text-anchor="middle" font-size="10">handler：MP1—MP4（dev.utp.merchant）</text>
+<text x="390" y="140" text-anchor="middle" font-size="10">handler：MP1—MP5（dev.utp.merchant）</text>
 <text x="390" y="156" text-anchor="middle" font-size="10">handler：P1—P6（dev.utp.trade）</text>
 <text x="390" y="172" text-anchor="middle" font-size="10">审核 · 路由 · 代收代付</text>
 
@@ -30,7 +30,7 @@
 
 <!-- Seller -> Marketplace (MP) -->
 <path d="M 200 112 L 296 112" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mTopArrow)"/>
-<g font-size="10" text-anchor="middle"><rect x="200" y="94" width="96" height="14" fill="#fff"/><text x="248" y="105">MP1—MP4 请求</text></g>
+<g font-size="10" text-anchor="middle"><rect x="200" y="94" width="96" height="14" fill="#fff"/><text x="248" y="105">MP1—MP5 请求</text></g>
 
 <!-- Marketplace -> Seller (callback) -->
 <path d="M 296 156 L 204 156" fill="none" stroke="#d79b00" marker-end="url(#mTopArrowO)"/>

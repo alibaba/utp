@@ -3,7 +3,7 @@ title: M3 MP1 商品管理原语
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-29
+version: 2026-07-30
 format: html
 ---
 
@@ -51,7 +51,7 @@ service:        dev.utp.merchant
       <li><strong>查询（Query）</strong>：查询商品档案、状态与审核结论。</li>
       <li><strong>归档（Archive）</strong>：商品永久退出经营（终态）。</li>
     </ul>
-    <p>Listing 不覆盖：库存数量（MP2）、订单处理（MP3）、类目体系治理（平台运营域）、搜索排序与推荐（平台实现域）。</p>
+    <p>Listing 不覆盖：库存数量（MP2）、订单处理（MP4）、类目体系治理（平台运营域）、搜索排序与推荐（平台实现域）。</p>
     <h3 id="s-m314">M3.1.4 前置条件</h3>
     <table>
       <thead><tr><th>条件</th><th>必需？</th><th>说明</th></tr></thead>
@@ -193,7 +193,7 @@ service:        dev.utp.merchant
       <tbody>
         <tr><td>信息真实准确</td><td>MUST</td><td>商品标题、属性、资质 MUST 真实；虚假信息导致的争议中 ListingSnapshot 将作为对供应商不利的证据。</td></tr>
         <tr><td>结构化发布</td><td>MUST</td><td>MUST 按 Listing Schema 提供结构化字段，MUST NOT 把关键交易条件（价格、交期）只写在描述富文本中。</td></tr>
-        <tr><td>价格一致性</td><td>MUST</td><td><code>pricing</code> MUST 与其在 P2 Negotiate 中的报价口径一致；<code>pricing_mode ≥ L1</code> 时 MUST 提供 <code>pricing_tiers</code>。</td></tr>
+        <tr><td>价格一致性</td><td>MUST</td><td><code>pricing</code> MUST 与其经 MP3 应答 P2 询盘的报价口径一致（M5.5.1）；<code>pricing_mode ≥ L1</code> 时 MUST 提供 <code>pricing_tiers</code>。</td></tr>
         <tr><td>及时下架</td><td>MUST</td><td>停售、断货长期无法补货、资质失效时 MUST 及时 <code>delist</code>，减少 <code>PURCHASE.CREATE.INVALID_ITEMS</code> 对买方体验的冲击。</td></tr>
         <tr><td>版本自洽</td><td>SHOULD</td><td>重大变更 SHOULD 避开销售高峰；利用 M3.2.4 的"旧版本可售 + 新版本审核"机制平滑切换。</td></tr>
         <tr><td>媒体合规</td><td>SHOULD</td><td>图片/视频资源 SHOULD 使用持久 URI，MUST 拥有合法版权。</td></tr>
@@ -244,7 +244,7 @@ service:        dev.utp.merchant
       </tbody>
     </table>
     <h3 id="s-m372">M3.7.2 批量模式（Batch Mode）</h3>
-    <p>面向 ERP 全量/增量同步场景（<a href="erp-bridge.html#s-m84">M8.4</a>），<code>publish</code> 与 <code>update</code> MUST 支持批量提交：</p>
+    <p>面向 ERP 全量/增量同步场景（<a href="erp-bridge.html#s-m94">M9.4</a>），<code>publish</code> 与 <code>update</code> MUST 支持批量提交：</p>
     <ul>
       <li>批量请求为条目数组（单批 MUST ≤ 500 条），整批共享一个 <code>idempotency_key</code>，逐条独立校验、独立成败。</li>
       <li>响应 MUST 逐条返回 <code>{index, listing_id | error}</code>；部分失败不影响其余条目（部分成功语义）。</li>
@@ -320,7 +320,7 @@ service:        dev.utp.merchant
         <tr><td><code>spec</code></td><td>object</td><td>是</td><td>规格键值对（如 <code>{"color": "黑色", "size": "L"}</code>）。</td></tr>
         <tr><td><code>price_offset</code></td><td>Money</td><td>否</td><td>相对 <code>pricing.unit_price</code> 的差价；缺省为零差价。</td></tr>
         <tr><td><code>barcode</code></td><td>string</td><td>否</td><td>商品条码（EAN/UPC）。</td></tr>
-        <tr><td><code>external_ref</code></td><td>string</td><td>否</td><td>供应商内部编码（ERP 物料号），用于 M8 ID 映射；平台 MUST 原样保存并在订单路由中回传。</td></tr>
+        <tr><td><code>external_ref</code></td><td>string</td><td>否</td><td>供应商内部编码（ERP 物料号），用于 M9 ID 映射；平台 MUST 原样保存并在订单路由中回传。</td></tr>
         <tr><td><code>status</code></td><td>enum</td><td>是</td><td><code>active</code> / <code>inactive</code>（SKU 级停售，不影响其它 SKU）。</td></tr>
       </tbody>
     </table>
@@ -341,10 +341,10 @@ service:        dev.utp.merchant
       <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
       <tbody>
         <tr><td><code>ships_from</code></td><td>string</td><td>是</td><td>发货地。</td></tr>
-        <tr><td><code>leadtime_days</code></td><td>integer</td><td>是</td><td>标准备货交期（自然日）。MP3 <code>amend_leadtime</code> 的变更基准。</td></tr>
+        <tr><td><code>leadtime_days</code></td><td>integer</td><td>是</td><td>标准备货交期（自然日）。MP4 <code>amend_leadtime</code> 的变更基准。</td></tr>
         <tr><td><code>shipping_fee_policy</code></td><td>object</td><td>是</td><td>运费策略（<code>type</code>: <code>free</code>/<code>flat</code>/<code>threshold_free</code>，及金额参数）。</td></tr>
         <tr><td><code>return_policy</code></td><td>string</td><td>是</td><td>退换货政策声明。</td></tr>
-        <tr><td><code>splittable</code></td><td>boolean</td><td>否</td><td>是否支持分批发货，默认 <code>false</code>；MP4 <code>split</code> 的前提。</td></tr>
+        <tr><td><code>splittable</code></td><td>boolean</td><td>否</td><td>是否支持分批发货，默认 <code>false</code>；MP5 <code>split</code> 的前提。</td></tr>
         <tr><td><code>moq</code></td><td>integer</td><td>否</td><td>最小起订量；P3 校验 <code>PURCHASE.CREATE.INVALID_ITEMS</code>（数量不满足 MOQ）的依据。</td></tr>
       </tbody>
     </table>
@@ -373,7 +373,7 @@ service:        dev.utp.merchant
         <tr><td><code>spreadsheet_url</code></td><td>string</td><td>否</td><td>供应商自维护的货品信息表格 URI（Excel/CSV）。</td></tr>
       </tbody>
     </table>
-    <p>约束：三个字段 MUST 至少提供其一；解析产出与请求中显式提交的字段冲突时，显式字段 MUST 优先；解析置信度信息 SHOULD 随响应返回供供应商/Agent 复核（对应 M9.5 控制点：价格类解析结果 SHOULD 经确认后生效）。</p>
+    <p>约束：三个字段 MUST 至少提供其一；解析产出与请求中显式提交的字段冲突时，显式字段 MUST 优先；解析置信度信息 SHOULD 随响应返回供供应商/Agent 复核（对应 M10.5 控制点：价格类解析结果 SHOULD 经确认后生效）。</p>
 
     <hr />
     <h2 id="s-m310">M3.10 Use Case Walkthroughs（用例演练）</h2>
@@ -438,5 +438,5 @@ POST /utp/m/v1/listings
 <pre class="highlight"><code>1. Seller: POST /utp/m/v1/listings/item-BT-NC-001/delist  → status = DELISTED
 2. Buyer:  GET  /utp/v1/source/items/item-BT-NC-001       → 404 SOURCE.LOOKUP.ITEM_NOT_FOUND
 3. Buyer:  POST /utp/purchase/create（含该 item）          → 400 PURCHASE.CREATE.INVALID_ITEMS
-4. 既有订单（下架前 PURCHASED）：MP3/MP4 义务不变，继续履行
+4. 既有订单（下架前 PURCHASED）：MP4/MP5 义务不变，继续履行
 </code></pre>

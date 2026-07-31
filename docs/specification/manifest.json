@@ -249,6 +249,72 @@
           ]
         }
       ]
+    },
+    {
+      "title": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "children": [
+        {
+          "title": "总览",
+          "path": "merchant/index.html"
+        },
+        {
+          "title": "接入快速开始",
+          "path": "merchant/quickstart.html"
+        },
+        {
+          "title": "M1 架构总览",
+          "path": "merchant/overview.html"
+        },
+        {
+          "title": "M2 入驻与能力声明",
+          "path": "merchant/onboarding.html"
+        },
+        {
+          "title": "M8 结算与对账",
+          "path": "merchant/settlement.html"
+        },
+        {
+          "title": "M9 ERP 集成与 Bridge",
+          "path": "merchant/erp-bridge.html"
+        },
+        {
+          "title": "M10 供应商 Agent 与人机协同",
+          "path": "merchant/merchant-agent.html"
+        },
+        {
+          "title": "M11 全链路演练",
+          "path": "merchant/walkthrough.html"
+        },
+        {
+          "title": "附录 MA—MF",
+          "path": "merchant/appendices.html"
+        }
+      ]
+    },
+    {
+      "title": "商家侧 UTP-M · 原语",
+      "children": [
+        {
+          "title": "MP1 商品管理",
+          "path": "merchant/primitive-listing.html"
+        },
+        {
+          "title": "MP2 库存管理",
+          "path": "merchant/primitive-inventory.html"
+        },
+        {
+          "title": "MP3 询盘响应（草案）",
+          "path": "merchant/primitive-quote.html"
+        },
+        {
+          "title": "MP4 订单受理",
+          "path": "merchant/primitive-acceptance.html"
+        },
+        {
+          "title": "MP5 发货执行",
+          "path": "merchant/primitive-shipment.html"
+        }
+      ]
     }
   ],
   "pages": [
@@ -500,6 +566,76 @@
       "parent": "传输方式",
       "title": "Embedded",
       "path": "primitives/resolve/transports/embedded.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "UTP-M 供应商侧规范 · 目录总览",
+      "path": "merchant/index.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "供应商接入快速开始",
+      "path": "merchant/quickstart.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "M1 供应商侧架构总览",
+      "path": "merchant/overview.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "M2 入驻与能力声明",
+      "path": "merchant/onboarding.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 原语",
+      "title": "M3 MP1 商品管理原语",
+      "path": "merchant/primitive-listing.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 原语",
+      "title": "M4 MP2 库存管理原语",
+      "path": "merchant/primitive-inventory.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 原语",
+      "title": "M5 MP3 询盘响应原语",
+      "path": "merchant/primitive-quote.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 原语",
+      "title": "M6 MP4 订单受理原语",
+      "path": "merchant/primitive-acceptance.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 原语",
+      "title": "M7 MP5 发货执行原语",
+      "path": "merchant/primitive-shipment.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "M8 结算与对账",
+      "path": "merchant/settlement.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "M9 ERP 集成与 Bridge",
+      "path": "merchant/erp-bridge.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "M10 供应商 Agent 与人机协同",
+      "path": "merchant/merchant-agent.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "M11 供应商全链路演练",
+      "path": "merchant/walkthrough.html"
+    },
+    {
+      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "UTP-M 附录（MA—MF）",
+      "path": "merchant/appendices.html"
     }
   ]
 }

@@ -3,7 +3,7 @@ title: 供应商接入快速开始
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-29
+version: 2026-07-30
 format: html
 ---
 
@@ -13,7 +13,7 @@ format: html
     <h2 id="s-mqs1">1. 接入前提：你只需要实现两个东西</h2>
 <div class="diagram"><img src="/documentation/assets/diagrams/m-quickstart-phases.svg" alt="供应商接入三阶段：一次入驻（M2 五步至 ACTIVE）、一次批量铺货（LISTED）、持续事件驱动循环" style="max-width: 100%; height: auto;"></div>
     <p>UTP-M 的最简实现面（M1.10 传输绑定支持要求）：</p>
-<pre class="highlight"><code>① 一个 REST 客户端     → 调用 Marketplace 的 dev.utp.merchant Service（MP1—MP4）
+<pre class="highlight"><code>① 一个 REST 客户端     → 调用 Marketplace 的 dev.utp.merchant Service（MP1—MP5）
 ② 一个 Webhook 端点    → 接收 dev.utp.merchant_callback 回调（订单路由、审核结论、账单）
 
 不需要：MCP/A2A（可选）、Merchant Agent（可选）、ERP Bridge（有 ERP 才需要）
@@ -39,7 +39,7 @@ POST /utp/m/v1/listings/batch   → batch_id → 轮询/回调取逐条结果   
 POST /utp/m/v1/inventory/batch  → 初始库存 set                      （M4.8.2）
 
 商品数据来源三选一：
-  ERP 导出映射（M8.4） / AI 辅助录入 source_materials，确认后生效（M3.9.7） / 人工录入
+  ERP 导出映射（M9.4） / AI 辅助录入 source_materials，确认后生效（M3.9.7） / 人工录入
 </code></pre>
     <p>商品经 <code>DRAFT → PENDING_REVIEW → LISTED</code>（M3.3）后自动进入平台 P1 Source 可搜索范围；审核结论走 <code>review_result</code> 回调推送，无需轮询。</p>
 
@@ -50,21 +50,22 @@ POST /utp/m/v1/inventory/batch  → 初始库存 set                      （M4.
   发货       → shipment.ship（运单号；平台转为买方侧 fulfill.notify）
 
 下行（平台 → 你的 Webhook）：
-  order_routed      → 在 deadline 内 accept（附卖方签名）/ reject / hold    （M5）
+  order_routed      → 在 deadline 内 accept（附卖方签名）/ reject / hold    （M6）
+inquiry_routed    → （可选，声明 utp.quote 后）在 deadline 内 quote / decline （M5）
   hold_created/…    → 核对库存占用                                        （M4.7）
-  statement_issued  → 对账，异议走 discrepancy.submit                      （M7）
+  statement_issued  → 对账，异议走 discrepancy.submit                      （M8）
 
 兜底铁律：所有回调丢失均可通过 query/list 游标轮询补齐（M2.6.1）；
-接单超时平台按预设策略处置，订单永不悬挂（M5.3）。
+接单超时平台按预设策略处置，订单永不悬挂（M6.3）。
 </code></pre>
 
     <h2 id="s-mqs5">5. 什么时候才需要 Agent 和 Bridge</h2>
     <table>
       <thead><tr><th>你的情况</th><th>需要的组件</th><th>参考</th></tr></thead>
       <tbody>
-        <tr><td>有 ERP，希望全自动</td><td>Merchant Bridge（单据映射 + 增量同步）+ AcceptancePolicy 自动接单</td><td>M8、M5.8</td></tr>
-        <tr><td>无 ERP、数据不规范</td><td>AI 辅助录入 + Merchant Agent 代办日常运营（授权与边界见 M9）</td><td>M3.9.7、M9</td></tr>
+        <tr><td>有 ERP，希望全自动</td><td>Merchant Bridge（单据映射 + 增量同步）+ AcceptancePolicy 自动接单</td><td>M9、M6.8</td></tr>
+        <tr><td>无 ERP、数据不规范</td><td>AI 辅助录入 + Merchant Agent 代办日常运营（授权与边界见 M10）</td><td>M3.9.7、M10</td></tr>
         <tr><td>只想最小接入</td><td>REST 客户端 + Webhook + 人工后台，全部组件皆可后补</td><td>本页第 1 节</td></tr>
       </tbody>
     </table>
-    <p>接入完成的判定标准即 M2.6.2 沙箱验收清单；端到端报文序列与行为对照见 <a href="walkthrough.html">M10 全链路演练</a>；机读契约（JSON Schema 与原语定义文件）索引见<a href="appendices.html#s-md">附录 MD</a>。</p>
+    <p>接入完成的判定标准即 M2.6.2 沙箱验收清单；端到端报文序列与行为对照见 <a href="walkthrough.html">M11 全链路演练</a>；机读契约（JSON Schema 与原语定义文件）索引见<a href="appendices.html#s-md">附录 MD</a>。</p>

@@ -30,7 +30,7 @@
 <!-- RESTRICTED -->
 <rect x="290" y="170" width="200" height="52" rx="6" fill="#ffe6cc" stroke="#d79b00"/>
 <text x="390" y="190" text-anchor="middle" font-size="11" font-weight="bold">RESTRICTED</text>
-<text x="390" y="205" text-anchor="middle" font-size="9.5">仅 query + 既有订单 MP3/MP4 履行</text>
+<text x="390" y="205" text-anchor="middle" font-size="9.5">仅 query + 既有订单 MP4/MP5 履行</text>
 <text x="390" y="217" text-anchor="middle" font-size="9.5" fill="#b85450">MUST NOT publish / list</text>
 
 <!-- TERMINATED -->

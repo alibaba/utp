@@ -43,7 +43,7 @@
 <!-- Seller box -->
 <rect x="480" y="310" width="210 " height="50" rx="6" fill="#ffe6cc" stroke="#d79b00"/>
 <text x="585" y="332" text-anchor="middle" font-size="12" font-weight="bold">商家系统 / Merchant Agent</text>
-<text x="585" y="349" text-anchor="middle" font-size="10">按报价策略生成 quote · 答辩草案（M9）</text>
+<text x="585" y="349" text-anchor="middle" font-size="10">按报价策略生成 quote · 答辩草案（M10）</text>
 
 <path d="M 560 270 L 560 306" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mDlgArrow)"/>
 <g font-size="10" text-anchor="middle"><rect x="462" y="280" width="92" height="14" fill="#fff"/><text x="508" y="291">回调（4.3.1 信封）</text></g>

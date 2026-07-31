@@ -13,7 +13,7 @@
 <text x="180" y="90" text-anchor="middle" font-size="10">supplier.example.com</text>
 <rect x="60" y="102" width="240" height="64" rx="4" fill="#ffffff" stroke="#d79b00"/>
 <text x="180" y="120" text-anchor="middle" font-size="10" font-weight="bold">/.well-known/utp（供应商 Profile）</text>
-<text x="180" y="136" text-anchor="middle" font-size="9">utp.primitives: MP1—MP4 · roles.seller</text>
+<text x="180" y="136" text-anchor="middle" font-size="9">utp.primitives: MP1—MP5 · roles.seller</text>
 <text x="180" y="150" text-anchor="middle" font-size="9">services: dev.utp.merchant_callback</text>
 <text x="180" y="162" text-anchor="middle" font-size="9">signing_keys（验商家业务签名的公钥）</text>
 
