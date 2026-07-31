@@ -10,6 +10,10 @@
       "path": "concepts/index.html"
     },
     {
+      "title": "快速开始",
+      "path": "quickstart/index.html"
+    },
+    {
       "title": "协议核心",
       "children": [
         {
@@ -249,6 +253,63 @@
           ]
         }
       ]
+    },
+    {
+      "title": "商家侧规范 UTP-M（RC1）",
+      "children": [
+        {
+          "title": "总览",
+          "path": "merchant/index.html"
+        },
+        {
+          "title": "接入快速开始",
+          "path": "merchant/quickstart.html"
+        },
+        {
+          "title": "M1 架构总览",
+          "path": "merchant/overview.html"
+        },
+        {
+          "title": "M2 入驻与能力声明",
+          "path": "merchant/onboarding.html"
+        },
+        {
+          "title": "MP1 商品管理",
+          "path": "merchant/primitive-listing.html"
+        },
+        {
+          "title": "MP2 库存管理",
+          "path": "merchant/primitive-inventory.html"
+        },
+        {
+          "title": "MP3 订单受理",
+          "path": "merchant/primitive-acceptance.html"
+        },
+        {
+          "title": "MP4 发货执行",
+          "path": "merchant/primitive-shipment.html"
+        },
+        {
+          "title": "M7 结算与对账",
+          "path": "merchant/settlement.html"
+        },
+        {
+          "title": "M8 ERP 集成与 Bridge",
+          "path": "merchant/erp-bridge.html"
+        },
+        {
+          "title": "M9 供应商 Agent 与人机协同",
+          "path": "merchant/merchant-agent.html"
+        },
+        {
+          "title": "M10 全链路演练",
+          "path": "merchant/walkthrough.html"
+        },
+        {
+          "title": "附录 MA—MF",
+          "path": "merchant/appendices.html"
+        }
+      ]
     }
   ],
   "pages": [
@@ -256,6 +317,11 @@
       "group": "协议概览",
       "title": "协议概览",
       "path": "concepts/index.html"
+    },
+    {
+      "group": "快速开始",
+      "title": "快速开始",
+      "path": "quickstart/index.html"
     },
     {
       "group": "协议核心",
@@ -500,6 +566,71 @@
       "parent": "传输方式",
       "title": "Embedded",
       "path": "primitives/resolve/transports/embedded.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "总览",
+      "path": "merchant/index.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "接入快速开始",
+      "path": "merchant/quickstart.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "M1 架构总览",
+      "path": "merchant/overview.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "M2 入驻与能力声明",
+      "path": "merchant/onboarding.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "MP1 商品管理",
+      "path": "merchant/primitive-listing.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "MP2 库存管理",
+      "path": "merchant/primitive-inventory.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "MP3 订单受理",
+      "path": "merchant/primitive-acceptance.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "MP4 发货执行",
+      "path": "merchant/primitive-shipment.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "M7 结算与对账",
+      "path": "merchant/settlement.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "M8 ERP 集成与 Bridge",
+      "path": "merchant/erp-bridge.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "M9 供应商 Agent 与人机协同",
+      "path": "merchant/merchant-agent.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "M10 全链路演练",
+      "path": "merchant/walkthrough.html"
+    },
+    {
+      "group": "商家侧规范 UTP-M（RC1）",
+      "title": "附录 MA—MF",
+      "path": "merchant/appendices.html"
     }
   ]
 }
