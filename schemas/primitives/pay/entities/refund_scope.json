@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/refund_scope.json",
+  "version": "2026-07-31",
+  "title": "RefundScope",
+  "description": "部分退款所对应的付款阶段、订单、履约批次或商品范围。",
+  "type": "object",
+  "properties": {
+    "payment_term_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "部分退款对应的付款阶段标识。"
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "部分退款对应的订单标识。"
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "部分退款对应的履约批次标识。"
+    },
+    "item_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "部分退款对应的商品行或服务项标识。"
+    }
+  },
+  "anyOf": [
+    { "required": ["payment_term_id"] },
+    { "required": ["order_id"] },
+    { "required": ["batch_id"] },
+    { "required": ["item_refs"] }
+  ],
+  "additionalProperties": true
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/positive_money.json",
+  "version": "2026-07-31",
+  "title": "PositiveMoney",
+  "description": "金额严格大于零的货币值；用于实际扣付、退款、分账和赔偿等资金动作。",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "type": "string",
+      "pattern": "^(?=.*[1-9])(?:0|[1-9]\\d*)(?:\\.\\d{1,4})?$",
+      "description": "严格大于零的 decimal 字符串，不允许负号、全零值或无意义的前导零。"
+    }
+  },
+  "allOf": [
+    { "$ref": "money.json" }
+  ],
+  "additionalProperties": true
+}

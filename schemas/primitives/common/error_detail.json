@@ -17,7 +17,8 @@
         "error",
         "warning",
         "info"
-      ]
+      ],
+      "description": "错误严重度：error 表示失败；warning 表示可继续但需关注；info 表示提示。"
     },
     "message": {
       "type": "string",

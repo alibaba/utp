@@ -1,8 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/query_output.json",
-  "version": "2026-07-31",
-  "title": "FulfillQueryOutput",
-  "description": "utp.fulfill.query 的业务输出，直接返回单个完整订单对象。订单中的 fulfillment 包含履约状态、交付预期、物流轨迹和履约事件。",
-  "$ref": "../../common/entities/order.json"
-}

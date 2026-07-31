@@ -13,15 +13,15 @@
   ],
   "properties": {
     "total_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "当前 Purchase 下全部付款义务的总金额。"
     },
     "paid_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/non_negative_money.json",
       "description": "截至当前已确认支付的累计金额。"
     },
     "remaining_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/non_negative_money.json",
       "description": "尚未确认支付的剩余金额。"
     },
     "completed_terms": {
@@ -38,7 +38,7 @@
       "required": [
         "payment_term_id",
         "amount",
-        "trigger_condition"
+        "fulfillment_trigger"
       ],
       "properties": {
         "payment_term_id": {
@@ -47,13 +47,18 @@
           "description": "下一付款阶段标识。"
         },
         "amount": {
-          "$ref": "../../common/entities/money.json",
+          "$ref": "../../common/entities/positive_money.json",
           "description": "下一付款阶段的应付金额。"
+        },
+        "fulfillment_trigger": {
+          "$ref": "fulfillment_condition.json",
+          "description": "下一付款阶段尚待满足的结构化履约前置条件。"
         },
         "trigger_condition": {
           "type": "string",
           "minLength": 1,
-          "description": "下一付款阶段可执行的可读条件表达。"
+          "deprecated": true,
+          "description": "下一付款阶段的可读条件说明；仅用于展示，执行判断必须使用 fulfillment_trigger。"
         }
       },
       "description": "仍有未付款项时返回的下一阶段信息。",

@@ -6,9 +6,9 @@ status: drafting
 version: 2026-07-29
 ---
 
-# Source 寻源原语 {#s-10-p1-source}
+# 寻源原语（Source） {#s-10-p1-source}
 
-## 原语身份 {#s-source-identity}
+## 原语身份（Primitive Identity） {#s-source-identity}
 
 ```
 primitive_id:  utp.source
@@ -21,7 +21,7 @@ compensation:  失效候选快照
 
 ---
 
-## Overview（概述） {#s-111-overview}
+## 概述（Overview） {#s-111-overview}
 
 ### 意图 {#s-1111}
 
@@ -87,7 +87,7 @@ Source 不覆盖参与方身份发现（属于 Layer 0 Discovery Infrastructure�
 
 ---
 
-## Lifecycle / State Machine（生命周期 / 状态机） {#s-112-lifecycle-state-machine}
+## 生命周期与状态机（Lifecycle and State Machine） {#s-112-lifecycle-state-machine}
 
 ### Source 原语内部状态机 {#s-1121-source}
 
@@ -105,7 +105,7 @@ Source 不覆盖参与方身份发现（属于 Layer 0 Discovery Infrastructure�
 
 ### 与全局状态机的关系 {#s-1123}
 
-Source 对应全局状态 `SOURCING`。Source 本身不定义显式的 `select` 操作，也不产生独立的候选选择中间态。采购方在详情展示后 MAY 直接以候选项作为输入调用 `utp.negotiate.inquiry` 或 `utp.purchase.create`：前者触发全局状态迁移至 `NEGOTIATING`，后者触发全局状态迁移至 `PURCHASING`。
+Source 对应全局状态 `SOURCING`。采购方完成详情查看后 MAY 直接将候选项传递给 `utp.negotiate.inquiry` 或 `utp.purchase.create`：前者触发全局状态迁移至 `NEGOTIATING`，后者触发全局状态迁移至 `PURCHASING`。
 
 **协议标识符行为：** Source 属于 `trade_context_id` 作用域，不产生或携带 `transaction_id`；`request_id` 只负责单次请求—响应关联，不能替代交易上下文标识。一次 Source 可以返回多个供应商候选，候选进入 Negotiate 时仍共享当前 `trade_context_id`；后续 `purchase.create` 的成功结果被 `evaluate_result` 接受后，才按 P3 确认的独立交易边界生成一个或多个 `transaction_id`。
 
@@ -113,7 +113,7 @@ Source 对应全局状态 `SOURCING`。Source 本身不定义显式的 `select` 
 
 ---
 
-## Error Handling（错误处理） {#s-113-error-handling}
+## 错误处理（Error Handling） {#s-113-error-handling}
 
 Source 错误响应 MUST 使用原语通用框架定义的[标准错误响应格式](/documentation/specification/protocol-core/primitive-framework.html#s-1043-standard-error-response)。本节仅定义 Source 原语特有错误码。
 
@@ -136,13 +136,13 @@ Source 错误响应 MUST 使用原语通用框架定义的[标准错误响应格
 
 ## 访问与角色约束 {#s-114-scopes}
 
-Source 核心操作不要求用户授权。能力提供方 MAY 依据自身策略实施 Agent 认证、频控或字段脱敏，但不得将其表达为 UTP 固定的授权标识。
+Source 的授权要求由能力提供方在 Profile 的 `authorization` 中声明。能力提供方 MAY 依据自身策略实施 Agent 认证、频控或字段脱敏；字段可见性由能力提供方的访问策略控制。
 
-`search` 与 `lookup` 均由采购方发起。`lookup` 返回的资质材料、认证证书或审计摘要的可见范围由能力提供方按照调用方身份、角色、资源归属和合规策略决定；这类字段控制不产生独立操作，也不改变 Source 状态机。
+`search` 与 `lookup` 均由采购方发起。`lookup` 返回的资质材料、认证证书或审计摘要的可见范围由能力提供方按照调用方身份、角色、资源归属和合规策略决定；字段可见性处理沿用当前 Action 和 Source 状态。
 
 ---
 
-## Guidelines（角色职责指引） {#s-115-guidelines}
+## 角色职责指引（Role Responsibility Guidelines） {#s-115-guidelines}
 
 ### Buyer 角色职责 {#s-1151-buyer}
 
@@ -167,9 +167,9 @@ Source 核心操作不要求用户授权。能力提供方 MAY 依据自身策�
 
 ---
 
-## Mode-Driven Behavior（模式驱动行为） {#s-116-mode-driven-behavior}
+## 模式驱动行为（Mode-Driven Behavior） {#s-116-mode-driven-behavior}
 
-Source 仅受 `pricing_mode` 和 `compliance_level` 直接影响。其他 Mode 维度不改变 Source 的 Action、校验规则或结构化输出；相关能力由 Profile 与 Mode 能力协商表达。
+Source 的 Action、校验规则和结构化输出由 `pricing_mode` 与 `compliance_level` 决定；其他 Mode 维度由 Profile、商业拓扑或后续原语处理。
 
 ### pricing_mode 对 Source 的影响 {#s-1161-pricing_mode-source}
 
@@ -195,7 +195,7 @@ Source 仅受 `pricing_mode` 和 `compliance_level` 直接影响。其他 Mode �
 
 ---
 
-## Actions（操作定义） {#s-117-operations}
+## 操作定义（Actions） {#s-117-operations}
 
 - **`utp.source.search`**
   - **角色绑定：** Buyer → Seller

@@ -42,7 +42,7 @@
       "description": "分账费用类型：goods 货款；commission 佣金；service_fee 服务费；logistics 物流费；tax 税费；custom 自定义费用。"
     },
     "amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "分配给该收款方的金额。"
     },
     "note": {

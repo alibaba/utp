@@ -8,7 +8,8 @@ version: 2026-07-29
 
 # 询盘原语 — MCP 绑定
 
-## MCP Binding {#s-12-8-2}
+## MCP 绑定（MCP Binding） {#s-12-8-2}
+
 | 操作 | Buyer 侧绑定 | 说明 |
 | --- | --- | --- |
 | `utp.negotiate.inquiry` | `utp_negotiate_inquiry` | 输入为 InquiryRequest 对象。 |
@@ -20,4 +21,4 @@ version: 2026-07-29
 
 - MCP Server MUST 在 Tool Description 中声明 `precondition: "session.mode.pricing_mode == L3"`。当 `pricing_mode ∈ {L0, L1, L2}` 时，Agent Client SHOULD 不调用任何 Negotiate Tool。
 - MCP Resources 接口 MUST 暴露当前协商状态（`negotiation_status`）及本方可见报价，供 Buyer 轮询或订阅。
-- Seller 生成 `quote` 的本地业务接口不属于 Buyer MCP Tool surface；其交付结果以 Resource 更新通知表达。
+- Seller 通过 Resource 更新通知向 Buyer 交付 `quote`；Buyer 从对应协商 Resource 读取报价结果。

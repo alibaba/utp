@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/order_fulfillment.json",
+  "version": "2026-07-31",
+  "title": "OrderFulfillment",
+  "description": "订单及其当前履约信息，供履约详情和列表查询复用。",
+  "type": "object",
+  "required": [
+    "order_id",
+    "purchase_id",
+    "transaction_id",
+    "line_items",
+    "status",
+    "fulfillment"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单标识。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "创建该订单的订购标识。"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该订单所属的交易会话标识。"
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "履行该订单的供应商标识。"
+    },
+    "line_items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "订单包含的商品或服务明细。",
+      "items": {
+        "$ref": "../../common/entities/line_item.json"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "INIT",
+        "SHIPPED",
+        "DELAYED",
+        "DELIVERED",
+        "INSPECTED",
+        "RECEIVED",
+        "PARTIAL_DELIVERED",
+        "FULFILLED",
+        "REJECTED"
+      ],
+      "description": "订单当前的履约状态。"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "订单创建时间。"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "订单信息或履约状态的最近更新时间。"
+    },
+    "fulfillment": {
+      "$ref": "#/$defs/fulfillment",
+      "description": "订单的交付预期、实际交付批次、物流轨迹和履约事件。"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "fulfillment": {
+      "type": "object",
+      "properties": {
+        "expectations": {
+          "type": "array",
+          "description": "订单当前确认的交付安排。",
+          "items": {
+            "$ref": "../../common/entities/delivery.json"
+          }
+        },
+        "batches": {
+          "type": "array",
+          "description": "订单的实际分批交付记录。",
+          "items": {
+            "$ref": "partial_delivery.json"
+          }
+        },
+        "trace_info": {
+          "type": "array",
+          "description": "按物流包裹或运单组织的物流轨迹。",
+          "items": {
+            "$ref": "trace_info.json"
+          }
+        },
+        "events": {
+          "type": "array",
+          "description": "订单履约过程中产生的事件记录。",
+          "items": {
+            "$ref": "tracking_event.json"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

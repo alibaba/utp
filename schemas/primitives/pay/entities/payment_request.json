@@ -36,7 +36,7 @@
       "additionalProperties": true
     },
     "amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "本次请求授权或扣付的金额。"
     },
     "amount_breakdown": {
@@ -58,8 +58,8 @@
       "description": "是否使用 Escrow 托管；为 true 时 settlement_type 必须为 escrow。"
     },
     "fulfillment_trigger": {
-      "$ref": "fulfillment_trigger.json",
-      "description": "本付款阶段关联的履约触发条件。"
+      "$ref": "fulfillment_condition.json",
+      "description": "本付款阶段关联的结构化履约条件；条件满足后的执行证明由 PayTermInput.fulfillment_trigger 提交。"
     },
     "payment_binding_ref": {
       "type": "string",
@@ -137,6 +137,32 @@
             "required": ["settlement_type"]
           }
         }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "settlement": {
+            "properties": {
+              "settlement_type": {
+                "const": "escrow",
+                "description": "结算指令选择 Escrow 时应用反向一致性约束。"
+              }
+            },
+            "required": ["settlement_type"],
+            "description": "显式选择 Escrow 的结算指令。"
+          }
+        },
+        "required": ["settlement"]
+      },
+      "then": {
+        "properties": {
+          "escrow_mode": {
+            "const": true,
+            "description": "settlement_type 为 escrow 时 escrow_mode 必须为 true。"
+          }
+        },
+        "required": ["escrow_mode"]
       }
     }
   ],

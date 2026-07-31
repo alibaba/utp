@@ -8,7 +8,8 @@ version: 2026-07-29
 
 # 询盘原语 — A2A 绑定
 
-## A2A Binding {#s-12-8-3}
+## A2A 绑定（A2A Binding） {#s-12-8-3}
+
 | 操作 | A2A Task / Event | 说明 |
 | --- | --- | --- |
 | `utp.negotiate.inquiry` | `utp:negotiate:inquiry` | 异步任务。供应商确认后通过 A2A Push Notification 通知。 |

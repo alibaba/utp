@@ -6,22 +6,22 @@ status: drafting
 version: 2026-07-29
 ---
 
-# Purchase 订购原语 {#s-13-p3-purchase}
+# 订购原语（Purchase） {#s-13-p3-purchase}
 
-## 原语身份 {#s-purchase-identity}
+## 原语身份（Primitive Identity） {#s-purchase-identity}
 
 ```
 primitive_id:   utp.purchase
 version:        2026-07-01
 intent:         双方对交易条款做出具有法律约束力的承诺
 state_delta:    source current_price_terms / binding_terms → purchase_credential | contract_credential
-actions:        create, update, complete, contract_create, contract_update, contract_complete, query, cancel
+actions:        create, update, complete, contract-create, contract-update, contract-complete, query, cancel
 compensation:   释放库存 + 取消订购
 ```
 
 ---
 
-## Overview（概述） {#s-131-overview}
+## 概述（Overview） {#s-131-overview}
 
 ### 意图 {#s-1311}
 
@@ -31,7 +31,7 @@ Purchase 是交易从"协商"走向"执行"的关键转折点。在 Purchase 之
 
 ### 关键设计原则 {#s-1312}
 
-**订单与合同使用不同的创建操作。** `utp.purchase.create`、`update` 和 `complete` 只处理订单；`utp.purchase.contract_create`、`contract_update` 和 `contract_complete` 只处理采购合同或框架协议。`query` 与 `cancel` 不依赖请求体，可按对象标识复用。协议不得以订单凭证替代采购合同或框架协议凭证。
+**订单与合同使用独立操作。** `utp.purchase.create`、`update` 和 `complete` 处理订单；`utp.purchase.contract-create`、`contract-update` 和 `contract-complete` 处理采购合同或框架协议。`query` 与 `cancel` 按对象标识复用。订单操作负责库存锁定并衔接 Pay；合同操作形成可供后续订单引用的协议凭证。
 
 ### 范围 {#s-1313}
 
@@ -58,7 +58,7 @@ Purchase 覆盖以下场景：
 | `purchase.status == 'purchased'` 或 `agreement.status == 'agreement_active'` | 相应承诺凭证已成立；只有订单进入 `PURCHASED`。 |
 | `purchase.purchase_id != null` 或 `contract.agreement_id != null` | 承诺凭证已生成唯一标识；订单为 `purchase_id`，协议为 `agreement_id`。 |
 | `purchase.terms_snapshot` 被 SHA256 哈希锁定 | 条款快照不可篡改。 |
-| `complete` 或 `contract_complete` 的 Mandate 准入已满足 | 完成操作已按[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)通过 Mandate 准入。 |
+| `complete` 或 `contract-complete` 的 Mandate 准入已满足 | 完成操作已按[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)通过 Mandate 准入。 |
 | `purchase.complete → inventory.locked(purchase.line_items) == true` | 仅订单在完成时锁定对应库存；协议不锁定某一笔订单库存。 |
 | `purchase.complete → session.state == 'PAYING'` | 仅订单完成后进入支付阶段；合同和框架协议生效后可创建后续订单。 |
 | `evidence_bundle.contains(['mandate', 'authorization_decision', 'terms_hash'])` | 证据包已生成。 |
@@ -79,7 +79,7 @@ Purchase 覆盖以下场景：
     "purchase.status == 'purchased' OR agreement.status == 'agreement_active'",
     "purchase.purchase_id != null OR contract.agreement_id != null",
     "purchase.terms_snapshot == 最终条款（SHA256 哈希锁定，不可篡改）",
-    "complete 或 contract_complete 已满足第 5 章 Mandate 准入",
+    "complete 或 contract-complete 已满足第 5 章 Mandate 准入",
     "IF action == purchase.complete → inventory.locked(purchase.line_items) == true",
     "IF action == purchase.complete → session.state == 'PAYING'",
     "evidence_bundle.contains(['mandate', 'authorization_decision', 'terms_hash'])"
@@ -101,7 +101,7 @@ Purchase 覆盖以下场景：
 
 ---
 
-## Lifecycle / State Machine（生命周期 / 状态机） {#s-132-lifecycle-state-machine}
+## 生命周期与状态机（Lifecycle and State Machine） {#s-132-lifecycle-state-machine}
 
 ### Purchase 原语内部状态机 {#s-1321-purchase}
 
@@ -113,18 +113,18 @@ Purchase 使用一张内部状态机描述订单与协议的衔接。订单由 `
 
 | 状态 | 含义 | 进入条件 | 允许的操作 |
 | --- | --- | --- | --- |
-| `INIT` | 尚未创建订单或合同草案 | 开始创建订单或合同 | `purchase.create` 或 `purchase.contract_create` |
+| `INIT` | 尚未创建订单或合同草案 | 开始创建订单或合同 | `purchase.create` 或 `purchase.contract-create` |
 | `DRAFT` | 订单草案已创建 | `purchase.create` 成功执行 | `purchase.update`, `purchase.complete`, `purchase.query`, `purchase.cancel` |
 | `SIGNING` | 订单正在完成承诺处理 | 订单 `purchase.complete` 已通过第 5 章 Mandate 准入，正在执行最终库存锁定与卖方承诺处理 | 等待库存锁定和承诺处理结果 |
 | `PURCHASED` | 订购已成立（不可撤销） | 最终库存锁定和卖方承诺处理成功 | `purchase.query`；进入 Pay 原语；或发起 Resolve |
-| `AGREEMENT_DRAFT` / `AGREEMENT_SIGNING` | 采购合同或框架协议草案 / 正在完成承诺处理 | `purchase.contract_create` / `purchase.contract_complete`；具体形态由 `contract_type` 区分 | 草案可 `contract_update`、`contract_complete`、`query`、`cancel`；承诺处理中仅可 `query` |
+| `AGREEMENT_DRAFT` / `AGREEMENT_SIGNING` | 采购合同或框架协议草案 / 正在完成承诺处理 | `purchase.contract-create` / `purchase.contract-complete`；具体形态由 `contract_type` 区分 | 草案可 `contract-update`、`contract-complete`、`query`、`cancel`；承诺处理中仅可 `query` |
 | `AGREEMENT_ACTIVE` | 采购合同或框架协议已生效 | 协议承诺处理完成 | `purchase.query`；在协议有效范围内反复创建引用该协议的独立订单 |
 | `CANCELLED` | 无有效协议引用的订单，或合同 / 协议草案与承诺处理流程已取消 | 采购方取消草案，或库存锁定失败、承诺处理失败、超时导致取消；Mandate 准入失败不进入业务状态机。引用有效协议的订单不进入此状态，而是返回 `AGREEMENT_ACTIVE` | `purchase.query`（只读） |
 | `COMPENSATED` | 补偿完成 | 补偿链执行完毕 | 当前 `transaction_id` 收敛结束；如需继续，应基于同一 `trade_context_id` 创建新的交易分支 |
 
 ### 状态迁移的原子性 {#s-1323}
 
-`complete` 与 `contract_complete` 必须先通过[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)定义的 Mandate 准入，方可进入 `*_SIGNING`。所有 `*_SIGNING → *` 的状态迁移 MUST 是原子操作；订单额外保证最终库存锁定成功：
+`complete` 与 `contract-complete` 必须先通过[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)定义的 Mandate 准入，方可进入 `*_SIGNING`。所有 `*_SIGNING → *` 的状态迁移 MUST 是原子操作；订单额外保证最终库存锁定成功：
 
 1. 卖方完成自身承诺处理
 2. 当动作是 `purchase.complete` 时，最终库存锁定成功
@@ -138,7 +138,7 @@ Purchase 使用一张内部状态机描述订单与协议的衔接。订单由 `
 Purchase 通用操作结构：
 
   订单：create → [update] → complete
-  合同：contract_create → [contract_update] → contract_complete
+  合同：contract-create → [contract-update] → contract-complete
 
   relationship=L0：order → PURCHASED → Pay
   relationship=L1：purchase_contract → AGREEMENT_ACTIVE → order → PURCHASED → Pay
@@ -159,7 +159,7 @@ Purchase 通用操作结构：
 
 ---
 
-## Error Handling（错误处理） {#s-133-error-handling}
+## 错误处理（Error Handling） {#s-133-error-handling}
 
 ### 错误码定义 {#s-1331}
 
@@ -196,18 +196,18 @@ Purchase 通用操作结构：
 
 ## 角色与访问约束 {#s-134-scopes}
 
-Purchase 不定义固定的 OAuth scope。能力提供方必须在 Profile 的 `utp.purchase` 声明中决定是否配置 `authorization`；角色、组织、资源归属、证据包和收货信息的可见性由能力提供方策略控制。
+Purchase 的授权要求由能力提供方在 Profile 的 `utp.purchase.authorization` 中声明；角色、组织、资源归属、证据包和收货信息的可见性由能力提供方的访问策略控制。
 
 **角色约束：**
 
 - Seller MUST NOT 执行 `create` 或 `update` 操作 —— 订购的发起方始终是 Buyer。
-- `complete` 与 `contract_complete` 均由 Buyer 发起、Seller 处理；两者在进入业务处理前 MUST 满足[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)定义的 Mandate 准入要求。准入失败时，Seller MUST NOT 创建或迁移 Purchase 业务状态。
+- `complete` 与 `contract-complete` 均由 Buyer 发起、Seller 处理；两者在进入业务处理前 MUST 满足[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)定义的 Mandate 准入要求。准入失败时，Seller MUST NOT 创建或迁移 Purchase 业务状态。
 - `query` 为只读操作，MUST NOT 改变 Purchase 内部状态或全局状态。
 - `cancel` 仅在 `DRAFT` 状态下允许。一旦进入 `SIGNING` 或 `PURCHASED` 状态，取消 MUST 通过 Resolve 原语或 Saga 补偿处理。
 
 ---
 
-## Guidelines（角色职责指引） {#s-135-guidelines}
+## 角色职责指引（Role Responsibility Guidelines） {#s-135-guidelines}
 
 ### Buyer 角色职责 {#s-1351-buyer}
 
@@ -217,7 +217,7 @@ Purchase 不定义固定的 OAuth scope。能力提供方必须在 Profile 的 `
 | 提供收货地址 | SHOULD | 在 `create` 或 `update` 中提供 `shipping_address`。若未提供，供应商 MAY 在 `complete` 前要求补充。 |
 | 提供发票信息 | SHOULD（当 `compliance_level >= L1`） | 需要增值税发票时 MUST 提供 `invoice_info`。专票需要额外的银行信息。 |
 | 选择 Trade Method | SHOULD | 从供应商提供的 Trade Method 列表中选择一种。若未选择，默认使用 `"prepay"`。 |
-| 提交 Mandate | MUST | 在 `purchase.complete` 或 `contract_complete` 中提供满足操作准入要求的 Mandate。 |
+| 提交 Mandate | MUST | 在 `purchase.complete` 或 `contract-complete` 中提供满足操作准入要求的 Mandate。 |
 | 及时完成 | SHOULD | 草案创建后 SHOULD 在有效期内完成 `complete`。超时草案将自动过期并释放资源。 |
 
 ### Seller 角色职责 {#s-1352-seller}
@@ -226,14 +226,14 @@ Purchase 不定义固定的 OAuth scope。能力提供方必须在 Profile 的 `
 | --- | --- | --- |
 | 锁定订单库存 | MUST | 收到 `purchase.create` 请求后，MUST 校验 `line_items` 中的库存可用性，并 MAY 创建有有效期的临时库存 hold；最终库存锁定只能在订单 `purchase.complete` 成功时成立。 |
 | 确认可行性 | MUST | 在 `purchase.complete` 之前，MUST 确认所有条款可执行（库存充足、交期可行、Trade Method 可用）。 |
-| 执行 Mandate 准入 | MUST | 在处理 `purchase.complete` 或 `contract_complete` 前，按操作准入要求完成 Mandate 校验；失败时不得进入业务状态机。 |
+| 执行 Mandate 准入 | MUST | 在处理 `purchase.complete` 或 `contract-complete` 前，按操作准入要求完成 Mandate 校验；失败时不得进入业务状态机。 |
 | 生成承诺凭证 | MUST（实现层） | 完成后，MUST 在业务层生成对应的订单、采购合同或框架协议记录；订单将 `order_id` 映射到 `purchase_id`，协议使用 `agreement_id`。 |
 | 发送确认通知 | MUST | 承诺成立后 MUST 向采购方发送确认通知；订单包含 `order_id`、预计交期和付款指引，协议包含 `agreement_id`、有效期和适用范围。 |
 | 维护证据包 | MUST | 订购的 Mandate、Authorization Decision、哈希和条款快照 MUST 存入证据包（Evidence Bundle），保存期限不低于争议时效期。 |
 
 ---
 
-## Mode-Driven Behavior（模式驱动行为） {#s-136-mode-driven-behavior}
+## 模式驱动行为（Mode-Driven Behavior） {#s-136-mode-driven-behavior}
 
 ### Mode 驱动行为矩阵 {#s-1361-mode}
 
@@ -243,7 +243,7 @@ Purchase 不定义固定的 OAuth scope。能力提供方必须在 Profile 的 `
 | L1 复购合约 | `purchase_contract` | 先创建采购合同；合同生效后创建引用该合同的订单。 | 协议进入 `AGREEMENT_ACTIVE`；每笔订单独立进入 Pay 与 Fulfill。 |
 | L2 框架协议 | `framework_agreement` | 先创建框架协议；在协议范围内循环创建订单。 | 协议进入 `AGREEMENT_ACTIVE`；每笔订单独立进入 Pay 与 Fulfill。 |
 | L3 战略合作 | `purchase_contract` 或 `framework_agreement` | 双方在锁定 Mode 时选择一种合同形态；合同生效后创建引用该合同的订单。 | 合同生效后保持独立；每笔订单独立进入 Pay 与 Fulfill。 |
-| 任意关系模式 | 由该模式允许的一种合同类型 | `contract_update` 仅在相应 `*_DRAFT` 状态可用；`contract_complete` 使合同进入其完成态。 | 仅订单操作需要库存锁定并在完成后进入 Pay。 |
+| 任意关系模式 | 由该模式允许的一种合同类型 | `contract-update` 仅在相应 `*_DRAFT` 状态可用；`contract-complete` 使合同进入其完成态。 | 仅订单操作需要库存锁定并在完成后进入 Pay。 |
 
 ### B2C 退化行为详解 {#s-1362-b2c}
 
@@ -251,7 +251,7 @@ Purchase 不定义固定的 OAuth scope。能力提供方必须在 Profile 的 `
 
 1. **`create` 直接生成**：采购方显式传入商品项、数量和必要的收货信息；协议引擎基于 Source 返回的 `current_price_terms` 填充或校验价格信息，不再需要通过 Negotiate 产出 Binding Terms。
 2. **`update` 可选**：B2C 并不禁止修改地址、物流等可变履约信息；若这些信息已在 `create` 或 `complete` 时一次性提交，则可以不出现独立的 `update` 步骤。
-3. **`complete` 一键确认**：采购方一键确认并提交满足操作准入要求的 Mandate 后，供应商自动完成承诺处理（无需人工参与），库存锁定和订购成立在同一操作中完成。
+3. **`complete` 一键确认**：采购方一键确认并提交满足操作准入要求的 Mandate 后，供应商自动完成承诺处理，库存锁定和订购成立在同一操作中完成。
 
 **B2C 等效流程：**
 
@@ -295,7 +295,7 @@ purchase.create (基于传入商品项生成)
 
 ---
 
-## Actions（操作定义） {#s-137-operations}
+## 操作定义（Actions） {#s-137-operations}
 
 - **`utp.purchase.create`**
   - **角色绑定：** Buyer → Seller
@@ -317,21 +317,21 @@ purchase.create (基于传入商品项生成)
   - **状态影响：** 进入 `SIGNING`，成功后进入 `PURCHASED` 并全局迁移至 Pay
   - **后续操作：** `query`、`utp.pay.initiate`
   - **关键约束：** Mandate 要求以操作准入规则为准
-- **`utp.purchase.contract_create`**
+- **`utp.purchase.contract-create`**
   - **角色绑定：** Buyer → Seller
   - **执行说明：** Buyer 在允许的关系模式下创建采购合同或框架协议草案；Seller 校验合同类型与交易关系后生成协议条款快照。
   - **适用状态：** `INIT`
   - **状态影响：** 按 `contract_type` 创建 `AGREEMENT_DRAFT`
-  - **后续操作：** `contract_update`、`contract_complete`、`query`、`cancel`
+  - **后续操作：** `contract-update`、`contract-complete`、`query`、`cancel`
   - **关键约束：** 仅在 `relationship_mode ∈ {L1, L2, L3}` 时可用；L1 仅允许 `purchase_contract`，L2 仅允许 `framework_agreement`，L3 必须显式选择其中一种
-- **`utp.purchase.contract_update`**
+- **`utp.purchase.contract-update`**
   - **角色绑定：** Buyer → Seller
   - **执行说明：** Buyer 修改未完成承诺的协议草案；Seller 重新校验条款并刷新协议条款快照。
   - **适用状态：** `AGREEMENT_DRAFT`
   - **状态影响：** 保持 `AGREEMENT_DRAFT`
-  - **后续操作：** `contract_update`、`contract_complete`、`query`、`cancel`
+  - **后续操作：** `contract-update`、`contract-complete`、`query`、`cancel`
   - **关键约束：** 已生效协议不得通过此 Action 修改
-- **`utp.purchase.contract_complete`**
+- **`utp.purchase.contract-complete`**
   - **角色绑定：** Buyer → Seller
   - **执行说明：** Buyer 对协议条款提交 Mandate；Seller 按操作准入要求完成 Mandate 准入和协议承诺处理，生成可供后续订单引用的协议凭证。
   - **适用状态：** `AGREEMENT_DRAFT`
@@ -340,7 +340,7 @@ purchase.create (基于传入商品项生成)
   - **关键约束：** Mandate 要求以操作准入规则为准；合同完成不锁定具体订单库存，也不进入 Pay
 - **`utp.purchase.query`**
   - **角色绑定：** Buyer → Seller
-  - **执行说明：** Buyer 按订单或协议标识读取当前状态、条款摘要、凭证和证据引用；Seller 按访问策略返回可见信息，不改变状态。
+  - **执行说明：** Buyer 按订单或协议标识读取当前状态、条款摘要、凭证和证据引用；Seller 按访问策略返回可见信息，对象状态保持不变。
   - **适用状态：** `DRAFT`、`SIGNING`、`PURCHASED`、`AGREEMENT_*`、`CANCELLED`、`COMPENSATED`
   - **状态影响：** 无
   - **后续操作：** 保持当前状态下可执行的操作

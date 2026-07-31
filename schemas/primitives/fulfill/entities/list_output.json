@@ -1,25 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_output.json",
-  "version": "2026-07-27",
+  "version": "2026-07-31",
   "title": "FulfillListOutput",
-  "description": "utp.fulfill.list 的业务输出。返回订单摘要列表；空列表为正常结果，不使用错误响应。",
+  "description": "符合查询条件的订单履约列表及分页信息。空列表表示没有匹配订单。",
   "type": "object",
-  "properties": {
-    "orders": {
-      "type": "array",
-      "items": {
-        "$ref": "../../common/entities/order.json"
-      },
-      "description": "订单摘要列表。"
-    },
-    "pagination": {
-      "$ref": "../../common/pagination.json#/$defs/response",
-      "description": "游标分页信息，可选。"
-    }
-  },
   "required": [
     "orders"
   ],
+  "properties": {
+    "orders": {
+      "type": "array",
+      "description": "订单及其当前履约信息列表。",
+      "items": {
+        "$ref": "order_fulfillment.json"
+      }
+    },
+    "pagination": {
+      "$ref": "../../../common/pagination.json#/$defs/response",
+      "description": "游标分页信息。"
+    }
+  },
   "additionalProperties": true
 }

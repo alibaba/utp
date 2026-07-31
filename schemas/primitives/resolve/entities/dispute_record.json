@@ -92,19 +92,16 @@
       "description": "答辩方提交回应与证据的 RFC 3339 截止时间。"
     },
     "mediation_result": {
-      "type": "object",
-      "description": "调解方签发的结构化调解结果。",
-      "additionalProperties": true
+      "$ref": "mediation_result.json",
+      "description": "调解方签发的结构化调解结果。"
     },
     "arbitration_decision": {
-      "type": "object",
-      "description": "仲裁机构签发的结构化裁定。",
-      "additionalProperties": true
+      "$ref": "arbitration_decision.json",
+      "description": "仲裁机构签发的结构化裁定。"
     },
     "compensation_result": {
-      "type": "object",
-      "description": "补偿动作的执行结果、失败原因和完成时间。",
-      "additionalProperties": true
+      "$ref": "compensation_result.json",
+      "description": "补偿动作的执行结果、失败原因和完成时间。"
     },
     "resolution_outcome": {
       "$ref": "resolution_outcome.json",
@@ -126,5 +123,128 @@
       "description": "争议形成终局处置结果的 RFC 3339 时间。"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dispute_scope": {
+            "enum": ["source", "negotiate", "purchase", "pay", "fulfill"],
+            "description": "非全局争议必须保留具体范围。"
+          }
+        },
+        "required": ["dispute_scope"]
+      },
+      "then": {
+        "required": ["dispute_scope_detail"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "mediating", "description": "争议正在 L2 调解。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "resolution_level": { "const": "L2", "description": "调解状态必须使用 L2。" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "arbitrating", "description": "争议正在 L3 仲裁。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "resolution_level": { "const": "L3", "description": "仲裁状态必须使用 L3。" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "resolved", "description": "争议已形成可执行结果。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["resolution_outcome", "resolved_at"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "compensated", "description": "处置结果要求的补偿已全部完成。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["resolution_outcome", "compensation_result", "resolved_at"],
+        "properties": {
+          "resolution_outcome": {
+            "description": "已完成补偿所依据的处置结果。",
+            "properties": {
+              "result": {
+                "enum": ["partial_compensation", "terminate_with_refund"],
+                "description": "COMPENSATED 只能来源于需要执行补偿的处置结果。"
+              }
+            },
+            "required": ["result"]
+          },
+          "compensation_result": {
+            "description": "与 compensated 档案状态一致的补偿汇总结果。",
+            "properties": {
+              "status": { "const": "compensated", "description": "争议补偿完成时汇总结果也必须完成。" }
+            },
+            "required": ["status"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "dismissed", "description": "争议主张已被驳回。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["resolution_outcome", "resolved_at"],
+        "properties": {
+          "resolution_outcome": {
+            "description": "驳回争议对应的处置结果。",
+            "properties": {
+              "result": { "const": "dismissed", "description": "驳回状态必须对应 dismissed 结果。" }
+            },
+            "required": ["result"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "escalated", "description": "当前层级未结案并等待升级。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["resolution_outcome"],
+        "properties": {
+          "resolution_outcome": {
+            "description": "当前处置层级升级对应的结果。",
+            "properties": {
+              "result": { "const": "escalated", "description": "升级状态必须对应 escalated 结果。" }
+            },
+            "required": ["result"]
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": true
 }

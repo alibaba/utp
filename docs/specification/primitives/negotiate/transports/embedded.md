@@ -8,7 +8,8 @@ version: 2026-07-29
 
 # 询盘原语 — EMBEDDED 绑定
 
-## Embedded SDK Binding {#s-12-8-4}
+## Embedded SDK 绑定（Embedded SDK Binding） {#s-12-8-4}
+
 | 操作 | SDK 方法签名 | 说明 |
 | --- | --- | --- |
 | `utp.negotiate.inquiry` | `client.negotiate.inquiry(request: InquiryRequest): Promise` | 提交询盘。 |
