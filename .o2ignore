@@ -1,0 +1,7 @@
+design-assets/
+*.puml
+*.bak
+**/*.puml
+**/*.bak
+.DS_Store
+.idea/
