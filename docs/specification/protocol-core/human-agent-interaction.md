@@ -245,22 +245,6 @@ Action Surface 表达 UI 承接语义，本身 MUST NOT 触发状态迁移或产
 }
 ```
 
-同一 HAI 信封中的 `data_source` 可表达为：
-
-```json
-{
-  "action_ref": "utp.purchase.get_details",
-  "session_id": "utp-session-abc123",
-  "trade_context_id": "utp-ctx-xyz789",
-  "transaction_id": "utp-txn-xyz789",
-  "parameters": {
-    "purchase_id": "pur-001",
-    "view": "confirmation"
-  },
-  "refresh_strategy": "strict"
-}
-```
-
 ### UI 表达要素（Informative） {#s-19-4-3}
 
 > **以下内容为信息性要求**，不构成跨实现 MUST 互通的字段契约；不影响 Agent 调用、续跑校验或 `data_hash` 计算。
