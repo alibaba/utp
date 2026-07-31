@@ -1,66 +1,22 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_input.json",
-  "version": "2026-07-27",
+  "version": "2026-07-31",
   "title": "FulfillListInput",
-  "description": "utp.fulfill.list 的业务输入。Buyer 检索与自身关联的订单摘要，支持结构化筛选、排序与分页；所有筛选条件均可选。",
+  "description": "订单履约列表的筛选、排序与分页条件。多个筛选条件之间采用 AND 逻辑。",
   "type": "object",
   "properties": {
-    // 过滤条件 ==》 ucp
     "filters": {
-      "type": "object",
-      "properties": {
-        "order_ids": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "description": "可选。按订单 ID 集合筛选。"
-        },
-        "purchase_id": {
-          "type": "string",
-          "minLength": 1,
-          "description": "可选。按订购标识筛选。"
-        },
-        "transaction_id": {
-          "type": "string",
-          "minLength": 1,
-          "description": "可选。按全局事务标识筛选。"
-        },
-        "status": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-            // 订单的状态， 不是原语里的动作状态
-            ]
-          },
-         // "description": "可选。按履约状态筛选。"
-        },
-        "supplier_id": {
-          "type": "string",
-          "minLength": 1,
-          "description": "可选。按供应商筛选。"
-        },
-        "time_range": {
-          "$ref": "#/$defs/time_range",
-          "description": "可选。按最近创建订单时间范围筛选。"
-        },
-        "keyword": {
-          "type": "string",
-          "description": "按购买关键词筛选，模糊匹配订单中任一行项目的商品名称。"
-        }
-      },
-      "additionalProperties": true,
-      "description": "结构化筛选条件。"
+      "$ref": "#/$defs/filters",
+      "description": "订单履约列表的筛选条件。"
     },
     "sort_by": {
       "type": "string",
       "enum": [
-        "created_at"
+        "created_at",
+        "amount"
       ],
-      "description": "排序字段。默认 created_at。"
+      "description": "排序字段。"
     },
     "sort_order": {
       "type": "string",
@@ -68,7 +24,8 @@
         "asc",
         "desc"
       ],
-      "description": "排序方向。默认 desc。"
+      "default": "desc",
+      "description": "排序方向，默认为 desc。"
     },
     "pagination": {
       "$ref": "../../../common/pagination.json#/$defs/request",
@@ -77,35 +34,61 @@
   },
   "additionalProperties": true,
   "$defs": {
-    "time_range": {
+    "filters": {
       "type": "object",
+      "description": "订单履约筛选条件。status 数组内部采用 OR 逻辑，其余条件之间采用 AND 逻辑。",
       "properties": {
-        "from": {
-          // RFC 339 ==> 标准化
+        "order_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "按订单标识精确筛选。"
+        },
+        "purchase_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "按订购标识筛选其关联的订单。"
+        },
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "按交易会话标识筛选其关联的订单。"
+        },
+        "supplier_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "按履行订单的供应商筛选。"
+        },
+        "status": {
+          "type": "array",
+          "description": "按一个或多个履约状态筛选。",
+          "items": {
+            "type": "string",
+            "enum": [
+              "INIT",
+              "SHIPPED",
+              "DELAYED",
+              "DELIVERED",
+              "INSPECTED",
+              "RECEIVED",
+              "PARTIAL_DELIVERED",
+              "FULFILLED",
+              "REJECTED"
+            ]
+          }
+        },
+        "keyword": {
+          "type": "string",
+          "description": "按订单中商品或服务的展示名称进行模糊筛选。"
+        },
+        "created_after": {
           "type": "string",
           "format": "date-time",
-          "description": "起始时间（含）。"
+          "description": "筛选在该时间之后创建的订单。"
         },
-        "to": {
+        "created_before": {
           "type": "string",
           "format": "date-time",
-          "description": "结束时间（含）。"
-        }
-      },
-      "additionalProperties": true
-    },
-    "date_range": {
-      "type": "object",
-      "properties": {
-        "from": {
-          "type": "string",
-          "format": "date",
-          "description": "起始日期（含）。"
-        },
-        "to": {
-          "type": "string",
-          "format": "date",
-          "description": "结束日期（含）。"
+          "description": "筛选在该时间之前创建的订单。"
         }
       },
       "additionalProperties": true

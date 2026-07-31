@@ -129,6 +129,5 @@
     "timestamp",
     "status"
   ],
-  // 减少 推送状态
   "additionalProperties": true
 }
