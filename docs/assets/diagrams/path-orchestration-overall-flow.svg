@@ -39,12 +39,12 @@
   <!-- 编排准备 -->
   <rect class="node" x="250" y="35" width="420" height="88" fill="#e8f1ff" stroke="#3b82f6"/>
   <text class="label" x="460" y="71">编排输入</text>
-  <text class="sub" x="460" y="97">SelectedMode · CommerceTopology</text>
+  <text class="sub" x="460" y="97">CommerceTopology</text>
   <text class="sub" x="460" y="116">NegotiationResult</text>
 
   <rect class="node" x="250" y="155" width="420" height="88" fill="#f2ecf8" stroke="#8b5ca7"/>
   <text class="label" x="460" y="191">DAG 生成</text>
-  <text class="sub" x="460" y="217">execution_dag：结构与角色快照</text>
+  <text class="sub" x="460" y="217">选择 mode · 生成 execution_dag</text>
 
   <rect class="node" x="250" y="275" width="420" height="88" fill="#f2ecf8" stroke="#8b5ca7"/>
   <text class="label" x="460" y="311">状态机初始化</text>
