@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/compensation_result.json",
+  "version": "2026-07-31",
+  "title": "CompensationResult",
+  "description": "ResolutionOutcome 中各补偿指令的汇总执行结果。",
+  "type": "object",
+  "required": [
+    "status",
+    "executed_actions"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["processing", "compensated", "failed"],
+      "description": "补偿汇总状态：执行中、全部完成或存在最终失败。"
+    },
+    "executed_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "action_type",
+          "target_action",
+          "status"
+        ],
+        "properties": {
+          "action_type": {
+            "type": "string",
+            "minLength": 1,
+            "description": "已执行或正在执行的补偿动作类型。"
+          },
+          "target_action": {
+            "type": "string",
+            "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$",
+            "description": "承接该补偿动作的完整 UTP Action 名称。"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "completed", "failed"],
+            "description": "单个补偿动作的执行状态。"
+          },
+          "result_ref": {
+            "type": "string",
+            "minLength": 1,
+            "description": "目标 Action 返回结果或证据的稳定引用。"
+          },
+          "amount": {
+            "$ref": "../../common/entities/positive_money.json",
+            "description": "该补偿动作实际影响的金额。"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "该补偿动作成功完成或最终失败的 RFC 3339 结束时间。"
+          },
+          "failure_reason": {
+            "type": "string",
+            "description": "补偿动作最终失败时的机器可读或可审计原因。"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": { "const": "completed", "description": "单个补偿动作成功完成。" }
+              },
+              "required": ["status"]
+            },
+            "then": {
+              "required": ["result_ref", "completed_at"],
+              "not": { "required": ["failure_reason"] }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": { "const": "failed", "description": "单个补偿动作最终失败。" }
+              },
+              "required": ["status"]
+            },
+            "then": {
+              "required": ["failure_reason", "completed_at"]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": { "const": "pending", "description": "单个补偿动作尚未结束。" }
+              },
+              "required": ["status"]
+            },
+            "then": {
+              "not": {
+                "anyOf": [
+                  { "required": ["completed_at"] },
+                  { "required": ["failure_reason"] }
+                ]
+              }
+            }
+          }
+        ],
+        "additionalProperties": true
+      },
+      "description": "按 ResolutionOutcome 指令顺序记录的执行结果。"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "补偿汇总成功完成或最终失败的 RFC 3339 结束时间。"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "processing", "description": "至少一个补偿动作仍在执行。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "executed_actions": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "status": { "const": "pending", "description": "仍待完成的补偿动作。" }
+              },
+              "required": ["status"]
+            },
+            "description": "processing 汇总必须至少包含一个 pending 子动作。"
+          }
+        },
+        "not": { "required": ["completed_at"] }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "compensated",
+            "description": "补偿全部完成时必须记录完成时间。"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["completed_at"],
+        "properties": {
+          "executed_actions": {
+            "items": {
+              "properties": {
+                "status": { "const": "completed", "description": "补偿完成时所有子动作均必须完成。" }
+              },
+              "required": ["status"]
+            },
+            "description": "compensated 汇总不得包含 pending 或 failed 子动作。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "failed", "description": "至少一个补偿动作最终失败。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["completed_at"],
+        "properties": {
+          "executed_actions": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "status": { "const": "failed", "description": "导致汇总失败的补偿动作。" }
+              },
+              "required": ["status"]
+            },
+            "description": "failed 汇总必须至少包含一个 failed 子动作。"
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

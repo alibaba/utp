@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/common/valid_next_actions.json",
-  "version": "2026-07-27",
+  "version": "2026-07-31",
   "title": "Valid Next Actions",
   "description": "当前响应可继续执行的后续操作完整 Action 名称列表；空数组表示没有可暴露的后续操作。",
   "type": "array",
   "items": {
     "type": "string",
-    "minLength": 1
+    "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$"
   },
   "uniqueItems": true
 }

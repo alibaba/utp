@@ -33,11 +33,11 @@
       "description": "该确认关联的 Purchase 聚合标识。"
     },
     "status": {
-      "$ref": "payment_status.json",
-      "description": "渠道事实归一化后的支付确认状态。"
+      "const": "confirmed",
+      "description": "支付确认凭证只在渠道事实确认成功后生成，状态固定为 confirmed。"
     },
     "amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "本次已确认的支付金额。"
     },
     "payment_term_id": {

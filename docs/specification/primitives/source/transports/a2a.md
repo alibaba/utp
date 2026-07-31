@@ -8,7 +8,8 @@ version: 2026-07-29
 
 # 寻源原语 — A2A 绑定
 
-## A2A Binding {#s-11-8-3}
+## A2A 绑定（A2A Binding） {#s-11-8-3}
+
 | 操作 | A2A Task Name | 说明 |
 | --- | --- | --- |
 | `utp.source.search` | `utp:source:search` | 异步任务，通过 A2A Artifact 返回候选集合。 |

@@ -2,30 +2,55 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/common/entities/mandate.json",
   "version": "2026-07-31",
-  "title": "Mandate",
-  "description": "UTP Action 请求和响应中携带的授权凭证上下文。响应回传本次操作签发、消费或更新的凭证。",
+  "title": "UTP Mandate",
+  "description": "UTP 授权凭证机制。定义商家授权、Checkout Mandate、Payment Mandate 和 Operation Mandate 的协议契约。Schema 仅校验凭证的传输外形；签名、JCS、Key Binding、有效期、scope 和 Mandate Chain 由运行时验证。",
   "type": "object",
   "properties": {
     "merchant_authorization": {
-      "type": "string",
-      "minLength": 1,
-      "description": "商家对最终 Checkout（不含 ap2 字段）的 JCS 规范化载荷所作的 JWS Detached Payload 签名。该字段随完整 Checkout 进入 Checkout Mandate，使用户授权绑定已签署的交易条款。"
+      "$ref": "#/$defs/merchant_authorization",
+      "description": "商家对完整 Checkout 业务载荷生成的 Detached JWS 签名。"
     },
     "checkout": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Checkout Mandate 的完整 SD-JWT+kb 凭证令牌，证明买方用户对订单的确认授权。"
+      "$ref": "#/$defs/checkout_mandate",
+      "description": "证明买方或受信签署方接受商家已签署 Checkout 的 SD-JWT+kb 凭证。"
     },
     "payment": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Payment Mandate 的完整 SD-JWT+kb 凭证令牌，证明买方用户对订单付款的授权。"
+      "$ref": "#/$defs/payment_mandate",
+      "description": "证明支付授权并绑定已接受 Checkout 的 SD-JWT+kb 凭证。"
     },
     "operation": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Operation Mandate 的完整 SD-JWT+kb 凭证令牌，仅在本次操作消费或签发额外操作授权时携带。"
+      "$ref": "#/$defs/operation_mandate",
+      "description": "UTP 对具体 primitive action 的附加操作授权凭证。"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false,
+  "$defs": {
+    "merchant_authorization": {
+      "title": "Merchant Authorization",
+      "description": "JWS Detached Payload（RFC 7515 Appendix F）。签名覆盖完整 Checkout 的 JCS 规范化载荷，不包含本字段自身。格式为 base64url(protected-header)..base64url(signature)。Protected Header MUST 包含 alg 和 kid，允许的算法与验证公钥由 UTP Profile 决定。",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+\\.\\.[A-Za-z0-9_-]+$"
+    },
+    "sd_jwt_kb": {
+      "title": "SD-JWT+kb",
+      "description": "UTP Mandate 的 SD-JWT+kb Compact Serialization。消费前 MUST 完成签名、Key Binding、有效期、audience、nonce 和作用域验证。",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]*\\.[A-Za-z0-9_-]+(~[A-Za-z0-9_-]+)*$"
+    },
+    "checkout_mandate": {
+      "title": "Checkout Mandate",
+      "description": "UTP Checkout Mandate 凭证令牌。经验证后，其逻辑 claims MUST 能关联包含 merchant_authorization 的完整 Checkout 以及对应 checkout_hash。",
+      "$ref": "#/$defs/sd_jwt_kb"
+    },
+    "payment_mandate": {
+      "title": "Payment Mandate",
+      "description": "UTP Payment Mandate 凭证令牌。经验证后，其交易绑定 MUST 与 Checkout Mandate.checkout_hash 一致，并匹配当前收款方、金额和支付工具。",
+      "$ref": "#/$defs/sd_jwt_kb"
+    },
+    "operation_mandate": {
+      "title": "Operation Mandate",
+      "description": "UTP Operation Mandate 凭证令牌。经验证后的 claims 包含 operation、subject_ref、parent_mandate_refs 和 constraints；约束只能收窄其上游授权边界。",
+      "$ref": "#/$defs/sd_jwt_kb"
+    }
+  }
 }

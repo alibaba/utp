@@ -8,7 +8,7 @@
   "properties": {
     "action": {
       "type": "string",
-      "minLength": 1,
+      "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$",
       "description": "完整操作标识。"
     },
     "session_id": {
@@ -35,6 +35,19 @@
       "$ref": "entities/mandate.json",
       "description": "执行当前 Action 所携带的 Mandate 凭证。会话或操作准入要求对应凭证时 MUST 提供。"
     },
+    "hai": {
+      "type": "object",
+      "description": "Principal 确认续跑时携带的 HAI 附件；普通 Agent 调用省略。",
+      "required": ["suspend_id"],
+      "properties": {
+        "suspend_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "关联的活跃 Suspend Record 标识。"
+        }
+      },
+      "additionalProperties": false
+    },
     "input": {
       "type": "object",
       "description": "可选的操作特有输入；仅在对应操作声明 input_schema 时传递并由该 Schema 校验。",
@@ -44,6 +57,16 @@
   "required": [
     "action",
     "session_id"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": ["hai"]
+      },
+      "then": {
+        "required": ["idempotency_key"]
+      }
+    }
   ],
   "additionalProperties": true
 }

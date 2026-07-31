@@ -70,6 +70,12 @@
         }
       },
       "additionalProperties": true
+    },
+    "continue_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL for checkout handoff and session recovery. MUST be provided when status is requires_escalation. See specification for format and availability requirements.",
+      "readOnly": true
     }
   },
   "not": {

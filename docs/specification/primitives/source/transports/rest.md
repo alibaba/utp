@@ -8,7 +8,8 @@ version: 2026-07-29
 
 # 寻源原语 — REST 绑定
 
-## REST Binding {#s-11-8-1}
+## REST 绑定（REST Binding） {#s-11-8-1}
+
 | 操作 | HTTP 方法 | 端点 | Content-Type |
 | --- | --- | --- | --- |
 | `utp.source.search` | `POST` | `/utp/v1/source/search` | `application/json` |

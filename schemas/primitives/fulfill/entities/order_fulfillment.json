@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/order_fulfillment.json",
+  "version": "2026-07-31",
+  "title": "OrderFulfillment",
+  "description": "订单及其当前履约信息，供履约详情和列表查询复用。",
+  "type": "object",
+  "required": [
+    "order_id",
+    "line_items",
+    "status",
+    "prices",
+    "created_at",
+    "fulfillment"
+  ],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单标识。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "创建该订单的订购标识。"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该订单所属的交易会话标识。"
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "履行该订单的供应商标识。"
+    },
+    "permalink_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "商家提供的订单详情地址。"
+    },
+    "line_items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "订单包含的商品或服务明细。",
+      "items": {
+        "$ref": "../../common/entities/line_item.json"
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "商家订单系统提供的当前业务状态。"
+    },
+    "status_events": {
+      "type": "array",
+      "description": "商家订单业务状态的变化记录。",
+      "items": {
+        "$ref": "status_event.json"
+      }
+    },
+    "prices": {
+      "type": "array",
+      "description": "订单的金额构成及总额。",
+      "items": {
+        "$ref": "../../common/entities/price.json"
+      }
+    },
+    "note": {
+      "type": "string",
+      "description": "买方为该订单提交的备注。"
+    },
+    "invoice_profile": {
+      "$ref": "../../common/entities/invoice_profile.json",
+      "description": "该订单使用的开票资料。"
+    },
+    "trade_mode": {
+      "$ref": "../../common/entities/trade_mode.json",
+      "description": "该订单最终采用的业务交易方式。"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "订单创建时间。采用 RFC 3339 date-time 格式。"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "订单信息或履约状态的最近更新时间。采用 RFC 3339 date-time 格式。"
+    },
+    "fulfillment": {
+      "$ref": "#/$defs/fulfillment",
+      "description": "订单的分批交付摘要、物流轨迹和履约事件。"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "fulfillment": {
+      "type": "object",
+      "required": [
+        "expectations"
+      ],
+      "properties": {
+        "expectations": {
+          "type": "array",
+          "description": "订单当前确认的交付安排。",
+          "items": {
+            "$ref": "../../common/entities/delivery.json"
+          }
+        },
+        "batches": {
+          "type": "array",
+          "description": "订单的实际分批交付记录。",
+          "items": {
+            "$ref": "partial_delivery.json"
+          }
+        },
+        "trace_info": {
+          "type": "array",
+          "description": "按物流包裹或运单组织的物流轨迹。",
+          "items": {
+            "$ref": "trace_info.json"
+          }
+        },
+        "events": {
+          "type": "array",
+          "description": "订单履约过程中产生的事件记录。",
+          "items": {
+            "$ref": "fulfillment_event.json"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

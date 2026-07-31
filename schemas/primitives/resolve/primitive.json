@@ -10,6 +10,7 @@
       "description": "Buyer 代表交易参与方提交争议事实、范围和初始证据，Arbiter 登记争议、评估 L1 规则并返回权威争议档案。",
       "initiator_role": "Buyer",
       "handler_role": "Arbiter",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/dispute_request.json"
       },
@@ -26,6 +27,7 @@
       "description": "Buyer 提交调解请求或补充材料，Arbiter 组织调解并在形成结论后返回包含 ResolutionOutcome 的争议档案。",
       "initiator_role": "Buyer",
       "handler_role": "Arbiter",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/mediate_input.json"
       },
@@ -42,6 +44,7 @@
       "description": "Buyer 将争议直接提交或从调解升级至仲裁，Arbiter 返回具有约束力的裁定和可执行处置结果。",
       "initiator_role": "Buyer",
       "handler_role": "Arbiter",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/arbitrate_input.json"
       },
@@ -55,9 +58,10 @@
       ]
     },
     "compensate": {
-      "description": "Arbiter 根据已生效的调解、仲裁或 L1 结果触发补偿，PaymentProcessor 执行资金退款并回传更新后的争议档案和退款结果。",
+      "description": "Arbiter 按权威 ResolutionOutcome 与 CompensationOrder 标识编排资金及非资金补偿；资金退款通过 utp.pay.refund 委托 PaymentProcessor 执行。",
       "initiator_role": "Arbiter",
-      "handler_role": "PaymentProcessor",
+      "handler_role": "Arbiter",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/compensate_input.json"
       },
@@ -87,6 +91,7 @@
       { "from": "INIT", "action": "utp.resolve.raise", "to": "RAISED" },
       { "from": "RAISED", "event": "l1_resolution_succeeded", "to": "RESOLVED" },
       { "from": "RAISED", "action": "utp.resolve.mediate", "to": "MEDIATING" },
+      { "from": "MEDIATING", "action": "utp.resolve.mediate", "to": "MEDIATING", "condition": "补充调解材料且尚未形成终局结果" },
       { "from": "RAISED", "action": "utp.resolve.arbitrate", "to": "ARBITRATING", "condition": "允许直接进入 L3 仲裁" },
       { "from": "MEDIATING", "event": "mediation_resolved", "to": "RESOLVED" },
       { "from": "MEDIATING", "event": "mediation_dismissed", "to": "DISMISSED" },
@@ -95,14 +100,22 @@
       { "from": "ESCALATED", "action": "utp.resolve.arbitrate", "to": "ARBITRATING", "condition": "从 L2 升级至 L3" },
       { "from": "ARBITRATING", "event": "arbitration_resolved", "to": "RESOLVED" },
       { "from": "ARBITRATING", "event": "arbitration_dismissed", "to": "DISMISSED" },
-      { "from": "RESOLVED", "action": "utp.resolve.compensate", "to": "COMPENSATED", "condition": "ResolutionOutcome 包含待执行补偿指令" }
+      { "from": "RESOLVED", "action": "utp.resolve.compensate", "to": "RESOLVED", "condition": "至少一个补偿动作仍在 processing 或已 failed" },
+      { "from": "RESOLVED", "action": "utp.resolve.compensate", "to": "COMPENSATED", "condition": "ResolutionOutcome 的全部补偿动作均已 completed" }
     ],
     "constraints": {
       "notes": [
         "Resolve 激活时全局状态进入 DISPUTED，并保存争议前状态。",
+        "所有 Resolve Action 必须在统一请求信封中携带 transaction_id 与 idempotency_key。",
+        "raise 的 initiator_role 表示核心 Buyer 发起路径；运行时可以授权其他交易拓扑参与方发起，但 claimant 必须与已认证角色和交易参与关系一致。",
         "锁定范围不得大于 DisputeScope；仅 global 争议可以默认暂停整笔交易的有副作用 Action。",
         "证据包进入追加锁定状态，已有证据不得修改或删除。",
+        "非 global 争议必须保留与 dispute_scope 一致的 DisputeScopeDetail；LockPolicy 不得扩大到该范围以外的 Action、资源或金额。",
         "资金补偿必须转换为 RefundInstruction 并调用 utp.pay.refund；Resolve 不直接修改支付渠道状态。",
+        "CompensateInput 仅提交 resolution_outcome_id 与 compensation_order_id 作为权威锚点；兼容字段中的补偿单或退款指令不得覆盖争议档案中的已签名结果。",
+        "CompensationOrder.total_compensation 必须等于 refund_amount、penalty_amount 与其他可计价补偿之和，所有金额币种必须一致，且总额不得超过交易可补偿金额。",
+        "ResponsibilityAssignment.responsibility_ratio 的比例合计必须等于 1.0，primary_responsible.layer 必须对应最大责任比例；并列最大值时必须包含首要责任选择依据。",
+        "只有 CompensationResult.status 为 compensated 且全部子动作 completed 时，Resolve 才能进入 COMPENSATED；processing 或 failed 必须停留在 RESOLVED 并保留可恢复证据。",
         "RESOLVED、DISMISSED 或 COMPENSATED 后的全局状态由全局状态机决定，不得直接写入全局 COMPENSATED。"
       ]
     }

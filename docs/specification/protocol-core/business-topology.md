@@ -11,8 +11,8 @@ format: html
 <p>商业拓扑（Commerce Topology）定义一类采购交易的抽象责任结构。它以角色为节点、角色关系为边，说明本类交易需要哪些协议角色，以及这些角色之间允许存在的业务关系。它用于表达职责协作边界，并为发现范围、权限解释和后续路径编排提供稳定输入。</p>
 <p>商业拓扑采用无向图 <code>G = (R, U)</code>：<code>R（Roles）</code> 是角色节点集合，<code>U（Role Relationships）</code> 是角色之间的无向关系集合。</p>
 <hr />
-<h2 id="s-91-topology-model">9.1 Topology Model（拓扑模型）</h2>
-<h3 id="s-911-commerce-topology">9.1.1 CommerceTopology 形式定义</h3>
+<h2 id="s-91-topology-model">Topology Model（拓扑模型）</h2>
+<h3 id="s-911-commerce-topology">CommerceTopology 形式定义</h3>
 <p><code>CommerceTopology</code> 表达一类采购交易中必须被协议显式识别的角色集合，以及这些角色之间允许建立的无向业务关系。它为应用层形成第 3 章的发现范围配置和后续执行 DAG 提供责任结构，不是 Business Domain 清单，也不描述 Action 调用方向或原语执行顺序。</p>
 <pre class="highlight"><code>CommerceTopology = G(R, U) = {
   topology_id: string,
@@ -37,9 +37,9 @@ format: html
 </ol>
 <hr />
 <span id="s-93-role-registry-governance"></span>
-<h2 id="s-92-role-registry-governance">9.2 Role Registry &amp; Governance（角色注册与治理）</h2>
+<h2 id="s-92-role-registry-governance">Role Registry &amp; Governance（角色注册与治理）</h2>
 <span id="s-935-roledefinition"></span>
-<h3 id="s-921-roledefinition">9.2.1 RoleDefinition 与 RolePermissions 实体</h3>
+<h3 id="s-921-roledefinition">RoleDefinition 与 RolePermissions 实体</h3>
 <p><strong>RoleDefinition 实体定义：</strong></p>
 <table>
 <thead>
@@ -171,7 +171,7 @@ format: html
 
 
 <span id="s-933-r2"></span>
-<h3 id="s-922-standard-roles">9.2.2 R2：标准角色集与角色加入规则</h3>
+<h3 id="s-922-standard-roles">R2：标准角色集与角色加入规则</h3>
 <p>协议 1.0 版本定义以下角色。Buyer、Seller、Payer、Payee、PaymentProcessor 是始终显式进入拓扑的基础角色；即使同一 Business Domain 同时承担多个角色，也不得在商业拓扑中省略或合并角色节点。Escrow、Shipper、Inspector、Arbiter 等扩展角色只有承担相应独立协议责任时才进入拓扑。</p>
 <table>
 <thead>
@@ -336,7 +336,7 @@ Resolve.raise -&gt; Escrow.freeze
 </ol>
 
 <span id="s-931"></span>
-<h3 id="s-923-governance-overview">9.2.3 治理模型概述</h3>
+<h3 id="s-923-governance-overview">治理模型概述</h3>
 <p>与 Mode 维度治理类似（参见<a href="/documentation/specification/protocol-core/procurement-models.html#s-84-dimension-governance">第 8 章 8.4 节</a>），角色集合 R 采用三层治理模型（R1 / R2 / R3）。其中 R1 是判断角色能否成立的元规则，不是 <code>RoleDefinition.governance_layer</code> 的实例取值；可注册的角色实体只属于 R2 或 R3，在通用性与领域适应性之间取得平衡。</p>
 <div class="state-machine-diagram" style="width: 100%; max-width: 900px; border: 1px solid #e5e7eb; border-radius: 8px;">
 <img src="/documentation/assets/diagrams/role-governance.svg" alt="R 角色治理三层模型 R1/R2/R3：R3 领域角色扩展由行业联盟注册，R2 核心角色集需 RFC 治理，R1 角色元规则是极难变更的协议宪法" style="width: 100%; display: block;">
@@ -344,7 +344,7 @@ Resolve.raise -&gt; Escrow.freeze
 
 
 <span id="s-932-r1"></span>
-<h3 id="s-924-r1">9.2.4 R1：角色元规则（协议宪法）</h3>
+<h3 id="s-924-r1">R1：角色元规则（协议宪法）</h3>
 <p>一个候选角色 MUST 同时满足以下三个条件才能成为 UTP 标准角色：</p>
 <p><strong>条件一：职责可区分性（Role Identity）</strong></p>
 <p>该角色 MUST 代表一种与其他角色有本质区别的事务职责。</p>
@@ -366,7 +366,7 @@ Resolve.raise -&gt; Escrow.freeze
 </ul>
 
 <span id="s-934-r3"></span>
-<h3 id="s-925-r3">9.2.5 R3：领域角色扩展</h3>
+<h3 id="s-925-r3">R3：领域角色扩展</h3>
 <p>行业联盟 MAY 在角色注册表中注册领域角色。领域角色注册需满足 R1 元规则，但"职责可区分性"的判定标准在领域内评估（不需要跨行业通用）。</p>
 <p>当前 UTP 采购协议以 Buyer、Seller、Payer、Payee、PaymentProcessor 为始终显式声明的基础角色，并定义 Escrow、Shipper、Inspector、Arbiter 等按责任加入的标准角色。供应链金融、碳排放交易、数据交易等行业角色不属于当前采购协议的角色集合，后续如要支持，应作为独立行业扩展重新评审。</p>
 <p>跨境清关通常先作为 <code>Fulfill</code> 的单证/清关证据流表达；只有当关务服务方需要独立签署清关结果、承担可审计协议责任，并影响 Pay、Fulfill 或 Resolve 的状态时，才应注册为 R3 领域角色。</p>
@@ -379,13 +379,13 @@ Resolve.raise -&gt; Escrow.freeze
 
 <hr />
 <span id="s-94-role-edges"></span>
-<h2 id="s-93-role-relationships">9.3 Role Relationships（角色关系）</h2>
+<h2 id="s-93-role-relationships">Role Relationships（角色关系）</h2>
 <div class="state-machine-diagram" style="width: 100%; max-width: 1120px; border: 1px solid #e5e7eb; border-radius: 8px;">
 <img src="/documentation/assets/diagrams/utp-role-relationship-topology.png" alt="UTP 无向角色关系矩阵：以 Buyer、Seller、Payer、Payee、PaymentProcessor、Escrow、Shipper、Inspector、Arbiter 为行列，其中 Buyer、Seller、Payer、Payee、PaymentProcessor 始终显式声明，并使用 data_flow、authorization（职责授权关系）、payment、fulfillment 四种封闭类型标记允许的直接关系类型上界" style="width: 100%; display: block; border-radius: 8px;">
 </div>
 
 <span id="s-941"></span>
-<h3 id="s-931-role-relationship">9.3.1 RoleRelationship 实体与关系类型</h3>
+<h3 id="s-931-role-relationship">RoleRelationship 实体与关系类型</h3>
 <p><code>RoleRelationship</code> 是 CommerceTopology 中两个角色之间的无向业务关系。它只表达“这两个角色之间存在哪些类别的业务联系”，不表达调用、消息、资金或证据的流向，不描述具体参与方连接，不绑定交易原语，也不描述原语内部状态机。</p>
 <table>
 <thead>
@@ -451,7 +451,7 @@ Resolve.raise -&gt; Escrow.freeze
 </table>
 
 <span id="s-943-roleedge"></span>
-<h3 id="s-933-standard-relationships">9.3.3 示例与标准角色关系全集</h3>
+<h3 id="s-933-standard-relationships">示例与标准角色关系全集</h3>
 <pre class="highlight"><code class="language-json">[
   {
     <span class="k">&quot;role_pair&quot;</span>: [<span class="s">&quot;Buyer&quot;</span>, <span class="s">&quot;Seller&quot;</span>],
@@ -510,7 +510,7 @@ Resolve.raise -&gt; Escrow.freeze
 </tbody>
 </table>
 <hr />
-<h2 id="s-96">9.6 本章实体索引（Entity Index）</h2>
+<h2 id="s-96">本章实体索引（Entity Index）</h2>
 <p>本章当前定义的完整实体列表如下。实体字段及其规范性约束以“所属节”中的定义为准，本节仅提供汇总索引，不重复定义实体。</p>
 <table>
 <thead><tr><th>实体名称</th><th>所属节</th><th>说明</th></tr></thead>

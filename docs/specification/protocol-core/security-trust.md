@@ -6,7 +6,7 @@ status: drafting
 format: html
 ---
 
-<h1 id="s-5-trust-profile">第 5 章：信任准入评估（Trust Admission Evaluation — L2）</h1>
+<h1 id="s-5-trust-profile">信任准入评估（Trust Admission Evaluation — L2）</h1>
 
 <hr />
 
@@ -22,13 +22,13 @@ format: html
 
 <hr />
 
-<h2 id="s-51">5.1 操作准入语义（Operation Admission Semantics）</h2>
-<h3 id="s-511">5.1.1 概述与定位</h3>
+<h2 id="s-51">操作准入语义（Operation Admission Semantics）</h2>
+<h3 id="s-511">概述与定位</h3>
 <p>当采购链路由多个 Agent 接力完成时，安全问题最终落到具体操作：调用方身份是否成立，用户或上游主体是否授权，授权边界是否覆盖本次操作，失败后是否留有审计依据。5.1 将这些问题收敛为操作前准入判定，规定受保护操作进入业务处理前的判定顺序、失败语义和审计责任。</p>
 <p>准入要求由各原语操作直接表达。原语章节负责声明 action scope、是否需要 Mandate、是否触发 Human Confirmation，以及该操作需要哪些审计记录；Mandate Chain 的结构与验证见第 6 章，Evidence Bundle 的采集、保存和导出见第 7 章，Human Confirmation 的交互语义见第 20 章。本节规定这些机制在执行前如何组合成一次可机器判定的放行检查。</p>
 <p>本地安全评估属于策略层输入。平台可以用本地评级做产品分层、生态准入、风控决策或监管报告；治理域也可以把 ISO/IEC 29115、NIST SP 800-63、eIDAS 等 assurance model 映射为本地策略。运行时互操作以具体操作声明、标准错误和审计证据为准；评分结果进入策略层，由各治理域自行解释。</p>
 
-<h3 id="s-512">5.1.2 准入判定顺序</h3>
+<h3 id="s-512">准入判定顺序</h3>
 <p>响应方在处理受保护 primitive action 前，按以下顺序执行准入判定。任一环节失败时，响应方返回标准错误，并保持无业务副作用。</p>
 <table>
 <thead>
@@ -79,7 +79,7 @@ format: html
 </tbody>
 </table>
 
-<h3 id="s-513">5.1.3 原语操作的准入声明方式</h3>
+<h3 id="s-513">原语操作的准入声明方式</h3>
 <p>UTP 将准入要求放在 primitive action 的语义内表达。每个 primitive action 在自身章节中声明与该操作相关的准入差异；全局机制由对应章节统一定义。这些准入项在 P0 原语通用框架的 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1029-operation-admission">10.2.9 操作准入配置</a> 中形式化为每个 Action 的 <code>admission</code> 对象，供机器读取。推荐的操作准入表包含以下项目：</p>
 <table>
 <thead>
@@ -125,7 +125,7 @@ format: html
 
 <p><strong>Profile 边界：</strong>UTPProfile 保持发现与能力入口职责。它声明参与方支持哪些认证、授权、Mandate 和信任画像入口；具体操作是否要求这些机制，由原语章节、会话协商结果、运行时授权挑战或实现方本地策略给出。请求方应以目标 primitive action 的准入声明为准；Profile 中的能力入口只提供可发现性。</p>
 
-<h3 id="s-514">5.1.4 准入结果语义</h3>
+<h3 id="s-514">准入结果语义</h3>
 <ol>
 <li>目标操作声明的准入条件全部满足时，受保护操作可以进入业务处理。</li>
 <li>任一准入条件校验失败时，响应方 MUST 返回标准错误，且 MUST NOT 产生业务副作用。</li>
@@ -133,7 +133,7 @@ format: html
 <li>低风险、只读、无状态副作用的交互可以复用既有安全上下文；该复用不改变受保护操作的准入要求。</li>
 </ol>
 
-<h3 id="s-515">5.1.5 实现边界</h3>
+<h3 id="s-515">实现边界</h3>
 <p>UTP 不规定准入条件由哪个内部组件实现。跨 Agent 互操作只依赖以下外部行为：</p>
 <ol>
 <li>Profile 中可发现对接所需的认证、授权和 Mandate 能力；</li>
@@ -143,9 +143,9 @@ format: html
 </ol>
 <hr />
 
-<h2 id="s-52">5.2 认证与授权机制声明（Authentication and Authorization Mechanism Declaration）</h2>
+<h2 id="s-52">认证与授权机制声明（Authentication and Authorization Mechanism Declaration）</h2>
 
-<h3 id="s-521">5.2.1 概述与定位</h3>
+<h3 id="s-521">概述与定位</h3>
 
 <p>操作准入语义（<a href="#s-51">5.1 节</a>）规定受保护操作进入业务处理前的判定顺序与失败语义；认证与授权机制声明则定义 Profile 发布方向潜在请求方声明的<strong>准入对接机制</strong>，是协议握手阶段交换认证与授权基础设施信息的规范。</p>
 
@@ -157,7 +157,7 @@ format: html
 
 <p>本章仅定义两类机制的<strong>声明层</strong>要求：声明哪些字段、如何验证声明一致性、声明缺失时如何降级。认证与授权机制的发现细节与流程执行见 <a href="/documentation/specification/protocol-core/identity-authorization.html">第 6 章</a>。</p>
 
-<h3 id="s-522">5.2.2 Agent Authentication</h3>
+<h3 id="s-522">Agent Authentication</h3>
 
 <p>Agent Authentication 声明 Profile 发布方作为响应方时接受的、请求方 Agent 用以证明自身身份的 API 认证机制。Profile 发布方通过 <code>agent_authentication</code> 配置块声明这些机制。</p>
 
@@ -285,7 +285,7 @@ format: html
 </tbody>
 </table>
 
-<h3 id="s-523">5.2.3 User Authorization</h3>
+<h3 id="s-523">User Authorization</h3>
 
 <p>User Authorization 声明资源提供方支持的终端用户或上游授权主体授权机制。UTP 当前通过 OAuth 2 协议将用户身份与 Agent 身份关联，实现用户授权。资源提供方通过 <code>user_authorization</code> 配置块声明授权机制及其授权服务入口；授权流程、metadata、scope 目录与 token 验证参数由该入口对应的 Authorization Server metadata 提供，不在 Profile 中重复展开。</p>
 
@@ -347,7 +347,7 @@ format: html
 </tbody>
 </table>
 
-<h3 id="s-524">5.2.4 Mandates Capability</h3>
+<h3 id="s-524">Mandates Capability</h3>
 
 <p>Mandates Capability 声明 Profile 发布方支持哪些 Mandate 类型。它只表达能力集合，不表达某个操作是否强制要求 Mandate；具体操作的 Mandate 要求由原语定义、会话协商、运行时授权挑战或本地策略表达，Mandate Chain 的结构与验证语义见第 6 章。</p>
 
@@ -383,7 +383,7 @@ format: html
 </tbody>
 </table>
 
-<h3 id="s-525">5.2.5 声明验证规则</h3>
+<h3 id="s-525">声明验证规则</h3>
 
 <ol>
 <li><code>agent_authentication</code> 与 <code>user_authorization</code> 均为 OPTIONAL。若资源提供方未声明 <code>user_authorization</code>，请求方 Agent 只能执行无需用户授权的操作（Public 或 Agent-authenticated 级别）。</li>
@@ -396,13 +396,13 @@ format: html
 <li>若 Profile 发布方声明 <code>mandates</code>，则 <code>supported_mandate_types</code> MUST 非空，且每个取值 MUST 属于 <code>"checkout"</code>、<code>"payment"</code>、<code>"operation"</code>。</li>
 </ol>
 
-<h3 id="s-526">5.2.6 授权机制发现（Authorization Mechanism Discovery）</h3>
+<h3 id="s-526">授权机制发现（Authorization Mechanism Discovery）</h3>
 
 <p>在 OAuth 2 授权流程开始前，请求方 Agent MUST 先从资源提供方的 UTPProfile 中发现并验证其 Authorization Server。发现流程包括：从 Profile 端点获取 UTPProfile、读取 <code>user_authorization.supported_mechanisms</code>、校验 <code>endpoint</code> 的 HTTPS 与 trust domain 约束、按第 6 章 6.3.3 节获取 RFC 8414 metadata 并验证 issuer 匹配。</p>
 
-<p>本章只声明发现入口与验证要求，详细的 RFC 8414 metadata 请求、响应字段、错误处理与 Access Token 验证流程见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-633">第 6 章 6.3.3 节</a>；OAuth 2.1 Authorization Code + PKCE 授权流程详见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-63">第 6 章 6.3 节</a>。</p>
+<p>本章只声明发现入口与验证要求，详细的 RFC 8414 metadata 请求、响应字段、错误处理与 Access Token 验证流程见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-633">第 6 章 6.3.3 节</a>；OAuth 2.0 / 2.1 Authorization Code 授权流程详见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-63">第 6 章 6.3 节</a>。PKCE 是否启用由 Authorization Server 与客户端配置决定。</p>
 
-<h3 id="s-527">5.2.7 与操作准入语义的协同</h3>
+<h3 id="s-527">与操作准入语义的协同</h3>
 
 <p>认证与授权机制声明与操作准入语义（<a href="#s-51">5.1 节</a>）共同构成准入对接的双重要求：</p>
 <ul>
@@ -411,7 +411,7 @@ format: html
 </ul>
 <p>两者 MUST NOT 相互替代。即使请求方 Agent 可通过某种机制完成 Agent Authentication，若目标操作要求 User Authorization、Mandate 或 Human Confirmation，请求方仍必须提供对应凭证；反之，即使 User Authorization 声明完整，若请求方无法满足目标操作的准入要求，响应方 MUST 拒绝建立会话或拒绝对应操作（见 <a href="#s-514">5.1.4 节</a>）。</p>
 
-<h3 id="s-528">5.2.8 陌生 Agent 交互的信任准入视角</h3>
+<h3 id="s-528">陌生 Agent 交互的信任准入视角</h3>
 
 <p>陌生 Agent 交互指双方此前缺少直接业务关系、双边凭证或固定授权入口的场景。该场景的发现、Profile 获取、Participant 绑定、Primitive Edge 选择与 BootstrapGraph 生成由<a href="/documentation/specification/protocol-core/discovery-negotiation.html#s-34">第 3 章 3.4 节</a>定义；Session 三步握手由<a href="/documentation/specification/protocol-core/transport-communication.html#s-421">第 4 章 4.2.1 节</a>定义。本节说明同一交互在信任与安全层面的准入逻辑。</p>
 
@@ -440,7 +440,7 @@ format: html
 <figure id="s-528-sequence" style="margin: 20px 0 28px;">
   <div style="max-height: 900px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 8px; background: #ffffff;">
     <img
-      src="diagrams/agent-trust-handshake-sequence.svg"
+      src="/documentation/assets/diagrams/agent-trust-handshake-sequence.svg"
       alt="陌生 Agent 交互的信任准入时序图：用先验身份、确定安全对话方式、获取必要授权、每次操作前重新检查、全程留证五个阶段说明信任准入逻辑"
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>
@@ -455,9 +455,9 @@ format: html
 
 <hr />
 
-<h2 id="s-53-trust-profile">5.3 信任画像（Trust Profile）</h2>
+<h2 id="s-53-trust-profile">信任画像（Trust Profile）</h2>
 
-<h3 id="s-531">5.3.1 概述</h3>
+<h3 id="s-531">概述</h3>
 
 <p>操作准入语义（<a href="#s-51">5.1 节</a>）定义受保护操作的执行前判定顺序；认证与授权机制声明（<a href="#s-52">5.2 节</a>）定义响应方向潜在请求方声明的准入对接机制；信任画像（Trust Profile）则为任一交互方提供<strong>参考性的对手方信誉描述</strong>，用于在 Discover / Negotiate 阶段过滤与排序候选参与方。</p>
 
@@ -465,7 +465,7 @@ format: html
 
 <p>完整的 Profile（定义见<a href="/documentation/specification/protocol-core/discovery-negotiation.html">第 3 章</a>）在 Profile 端点（<code>/.well-known/utp</code>）中发布，并由 AIS 的 ES256 密钥签名。</p>
 
-<h3 id="s-532">5.3.2 UTPProfile 与 TrustProfileReference 的命名边界</h3>
+<h3 id="s-532">UTPProfile 与 TrustProfileReference 的命名边界</h3>
 
 <p><strong>UTPProfile 顶层相关字段摘录：</strong>完整 Profile 的权威结构见<a href="/documentation/specification/protocol-core/discovery-negotiation.html">第 3 章</a>与 <a href="/documentation/specification/schemas/index.html#s-discovery-profile">第 25 章 UTPProfile Schema</a>。本表仅摘录与本章操作准入、认证授权机制声明和信任画像引用相关的顶层字段，用于说明它们在完整 Profile 中的位置。</p>
 <table>
@@ -656,7 +656,7 @@ format: html
 }
 </code></pre>
 
-<h3 id="s-533">5.3.3 TrustScore 与 RiskIndicator</h3>
+<h3 id="s-533">TrustScore 与 RiskIndicator</h3>
 
 <p><strong>TrustScore 实体定义：</strong></p>
 
@@ -736,7 +736,7 @@ format: html
 </tbody>
 </table>
 
-<h3 id="s-534">5.3.4 信任画像验证规则</h3>
+<h3 id="s-534">信任画像验证规则</h3>
 
 <ol>
 <li>接收方在交易建立前 MUST 验证对方 Profile 的 JWS 签名有效性。</li>
@@ -750,7 +750,7 @@ format: html
 
 <hr />
 
-<h2 id="s-54">5.4 实体定义</h2>
+<h2 id="s-54">实体定义</h2>
 <p>本章定义的完整实体列表：</p>
 <table>
 <thead>
@@ -820,7 +820,7 @@ format: html
 <li>凭证授权保存、资金托管、电子证据包等信任基础设施详见<a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章：风控与审计</a></li>
 </ul>
 
-<h2 id="s-55">5.5 Profile 示例</h2>
+<h2 id="s-55">Profile 示例</h2>
 
 <p>以下示例展示瘦身后的 Profile 结构：Profile 只承载发现与能力入口，包含 <a href="#s-52">5.2 节</a>认证与授权机制声明、Mandate 能力声明，以及 <a href="#s-53-trust-profile">5.3 节</a>信任画像引用入口。具体操作的准入要求由协议规范、原语定义、运行时授权挑战或本地策略表达，不在主 Profile 中内联发布。</p>
 
@@ -828,7 +828,7 @@ format: html
   "agent_id": "cn-unified-social-credit-code-91440300MA5FGH2B",
   "agent_authentication": {
     "version": "2026-04-08",
-    "schema": "https://schemas.utp.example/common/agent_authentication.json",
+    "schema": "https://ut-protocol.com/schemas/discovery/agent_authentication.json",
     "supported_mechanisms": [
       {
         "type": "mtls",
@@ -864,7 +864,7 @@ format: html
   },
   "user_authorization": {
     "version": "2026-04-08",
-    "schema": "https://schemas.utp.example/common/user_authorization.json",
+    "schema": "https://ut-protocol.com/schemas/discovery/user_authorization.json",
     "supported_mechanisms": [
       {
         "type": "oauth2",
@@ -874,7 +874,7 @@ format: html
   },
   "mandates": {
     "version": "2026-04-08",
-    "schema": "https://schemas.utp.example/common/mandates.json",
+    "schema": "https://ut-protocol.com/schemas/primitives/common/entities/mandate.json",
     "supported_mandate_types": ["checkout", "payment", "operation"]
   },
   "trust_profile": {

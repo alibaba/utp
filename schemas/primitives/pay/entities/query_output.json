@@ -6,7 +6,11 @@
   "description": "协议引擎记录的单笔支付或 Purchase 级支付状态快照。",
   "type": "object",
   "required": [
+    "purchase_id",
     "status",
+    "total_amount",
+    "paid_amount",
+    "outstanding_amount",
     "as_of"
   ],
   "properties": {
@@ -20,15 +24,15 @@
       "description": "单笔支付或 Purchase 付款义务的汇总状态。"
     },
     "total_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/positive_money.json",
       "description": "查询范围内的应付总金额。"
     },
     "paid_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/non_negative_money.json",
       "description": "查询时点已确认支付的金额。"
     },
     "outstanding_amount": {
-      "$ref": "../../common/entities/money.json",
+      "$ref": "../../common/entities/non_negative_money.json",
       "description": "查询时点尚未确认支付的金额。"
     },
     "confirmations": {
@@ -70,7 +74,7 @@
             "description": "该付款阶段的当前状态。"
           },
           "amount": {
-            "$ref": "../../common/entities/money.json",
+            "$ref": "../../common/entities/positive_money.json",
             "description": "该付款阶段的应付金额。"
           },
           "confirmed_at": {
@@ -86,7 +90,12 @@
           "precondition": {
             "type": "string",
             "minLength": 1,
-            "description": "尚未执行阶段的前置条件说明。"
+            "deprecated": true,
+            "description": "尚未执行阶段的可读前置条件说明；执行判断应使用 fulfillment_trigger。"
+          },
+          "fulfillment_trigger": {
+            "$ref": "fulfillment_condition.json",
+            "description": "尚未执行阶段绑定的结构化履约前置条件。"
           }
         },
         "additionalProperties": true

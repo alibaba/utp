@@ -53,5 +53,45 @@
       "description": "各收款方的分账份额；single 模式仍需包含一个份额。"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "single",
+            "description": "单一收款模式只允许一个分账份额。"
+          }
+        },
+        "required": ["mode"]
+      },
+      "then": {
+        "properties": {
+          "splits": {
+            "maxItems": 1,
+            "description": "single 模式必须且只能包含一个收款份额。"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "split",
+            "description": "多方分账模式至少需要两个收款份额。"
+          }
+        },
+        "required": ["mode"]
+      },
+      "then": {
+        "properties": {
+          "splits": {
+            "minItems": 2,
+            "description": "split 模式至少包含两个收款份额。"
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": true
 }

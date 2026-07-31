@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/mediation_result.json",
+  "version": "2026-07-31",
+  "title": "MediationResult",
+  "description": "L2 调解方签发的结构化调解结论。",
+  "type": "object",
+  "required": [
+    "mediator_id",
+    "result",
+    "decided_at",
+    "evidence_ref"
+  ],
+  "properties": {
+    "mediator_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "签发调解结论的调解方标识。"
+    },
+    "mediator_type": {
+      "type": "string",
+      "enum": ["platform", "industry_body", "independent", "custom"],
+      "description": "调解方类型：平台、行业机构、独立调解方或自定义机构。"
+    },
+    "result": {
+      "type": "string",
+      "enum": ["settled", "partial_settlement", "no_settlement", "dismissed"],
+      "description": "调解结果：达成和解、部分和解、未达成和解或驳回主张。"
+    },
+    "responsibility_assignment": {
+      "$ref": "responsibility_assignment.json",
+      "description": "调解认定的责任主体与责任比例。"
+    },
+    "settlement_description": {
+      "type": "string",
+      "description": "双方接受的和解条件与继续履行安排。"
+    },
+    "compensation_order": {
+      "$ref": "compensation_order.json",
+      "description": "调解结论要求执行补偿时生成的补偿单。"
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "调解结论签发的 RFC 3339 时间。"
+    },
+    "evidence_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "包含调解材料、责任依据和各方确认的证据标识。"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "enum": ["settled", "partial_settlement"],
+            "description": "达成全部或部分和解。"
+          }
+        },
+        "required": ["result"]
+      },
+      "then": {
+        "required": ["responsibility_assignment", "settlement_description"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "enum": ["no_settlement", "dismissed"],
+            "description": "未达成和解或驳回主张。"
+          }
+        },
+        "required": ["result"]
+      },
+      "then": {
+        "not": { "required": ["compensation_order"] }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

@@ -28,14 +28,14 @@
     "line_items": {
       "type": "array",
       "items": {
-        "$ref": "partial_delivery.json#/$defs/partial_delivery_line_item"
+        "$ref": "../../common/entities/line_item.json"
       },
       "description": "本次拒收涉及的订单行项目与数量，可选。分批或部分拒收场景 SHOULD 提供。"
     },
     "rejected_at": {
       "type": "string",
       "format": "date-time",
-      "description": "拒收时间，可选。"
+      "description": "拒收时间，可选。采用 RFC 3339 date-time 格式。"
     },
     "desired_resolution": {
       "type": "string",
@@ -52,9 +52,7 @@
   },
   "required": [
     "order_id",
-    "reason_code",
-    "evidence_refs",
-    "signature"
+    "reason_code"
   ],
   "additionalProperties": true
 }

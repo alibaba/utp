@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/non_negative_money.json",
+  "version": "2026-07-31",
+  "title": "NonNegativeMoney",
+  "description": "金额大于或等于零的货币值；用于累计金额、余额、优惠和其他允许为零的业务金额。",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9]\\d*)(?:\\.\\d{1,4})?$",
+      "description": "大于或等于零的 decimal 字符串，不允许负号或无意义的前导零。"
+    }
+  },
+  "allOf": [
+    { "$ref": "money.json" }
+  ],
+  "additionalProperties": true
+}

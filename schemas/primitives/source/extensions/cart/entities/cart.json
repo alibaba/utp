@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart.json",
+  "version": "2026-07-29",
+  "title": "Cart",
+  "description": "统一的会话或持久购物车。Source Cart 位于交易前阶段，totals 仅表示非锁价的预估金额，不构成最终结算总额或库存承诺。",
+  "type": "object",
+  "$defs": {
+    "total_entry": {
+      "type": "object",
+      "description": "购物车预估金额分解条目。金额仅用于展示和参考，不构成锁价或最终结算承诺。",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "金额类别。常见值包括 subtotal、items_discount、discount、fulfillment、tax、fee、total；实现方 MAY 使用扩展值。",
+          "readOnly": true
+        },
+        "display_text": {
+          "type": "string",
+          "description": "展示文案，如 商品小计、预估运费、预估合计。",
+          "readOnly": true
+        },
+        "amount": {
+          "$ref": "../../../../common/entities/money.json",
+          "description": "该金额条目的货币金额。",
+          "readOnly": true
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "display_text": {
+                "type": "string",
+                "readOnly": true,
+                "description": "金额明细的展示文案。"
+              },
+              "amount": {
+                "$ref": "../../../../common/entities/money.json",
+                "readOnly": true,
+                "description": "金额明细的货币金额。"
+              }
+            },
+            "required": [
+              "display_text",
+              "amount"
+            ],
+            "additionalProperties": true
+          },
+          "description": "可选的子项金额明细。",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "type",
+        "amount"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "properties": {
+    "cart_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "购物车唯一标识。",
+      "readOnly": true
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "session",
+        "persistent"
+      ],
+      "description": "购物车作用域。",
+      "readOnly": true
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "单调递增版本，用于 update/remove 的乐观并发控制。",
+      "readOnly": true
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./cart_item.json"
+      },
+      "description": "购物车项列表，允许为空。",
+      "readOnly": true
+    },
+    "summary": {
+      "$ref": "./cart_summary.json",
+      "readOnly": true,
+      "description": "购物车商品数量与可用性摘要。"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "购物车预估金额使用的 ISO 4217 货币代码。仅当当前购物车可归并到单一币种时返回。",
+      "readOnly": true
+    },
+    "totals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/total_entry"
+      },
+      "description": "购物车预估金额分解。Source Cart 中该字段仅为参考值，不代表锁价、库存承诺或最终应付金额。",
+      "readOnly": true
+    },
+    "resource_uri": {
+      "type": "string",
+      "minLength": 1,
+      "description": "持久购物车的授权资源标识，如 source_cart/{cart_id}。",
+      "readOnly": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "购物车创建时间。采用 RFC 3339 date-time 格式。",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "购物车最后更新时间。采用 RFC 3339 date-time 格式。",
+      "readOnly": true
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "会话购物车或临时购物车失效时间。采用 RFC 3339 date-time 格式。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "cart_id",
+    "scope",
+    "version",
+    "items",
+    "summary",
+    "created_at",
+    "updated_at"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "scope": {
+            "const": "persistent"
+          }
+        },
+        "required": [
+          "scope"
+        ]
+      },
+      "then": {
+        "required": [
+          "resource_uri"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

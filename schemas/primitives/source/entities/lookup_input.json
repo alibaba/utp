@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/lookup_input.json",
+  "version": "2026-07-29",
+  "title": "LookupInput",
+  "description": "utp.source.lookup 的业务输入。支持 UTP 的 item_id + supplier_id 供应商商品快照，也兼容 UCP 单品 id 与批量 ids lookup 业务语义。",
+  "type": "object",
+  "$defs": {
+    "selected_option": {
+      "type": "object",
+      "description": "已选规格项，用于详情页变体收敛。",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "规格名称，如 Size、Color。",
+          "writeOnly": true
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "可选的规格值标识；存在时服务端 SHOULD 优先用于匹配。",
+          "writeOnly": true
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "已选规格展示值，如 Large。",
+          "writeOnly": true
+        }
+      },
+      "required": [
+        "name",
+        "label"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "UCP 兼容的单个商品或变体标识，用于单品详情 lookup。",
+      "writeOnly": true
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "UCP 兼容的批量 lookup 标识列表。实现方 MUST 支持商品 ID 和变体 ID，MAY 支持 SKU、handle 等二级标识。",
+      "writeOnly": true
+    },
+    "item_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "UTP 寻源语义下的商品或服务标识；与 supplier_id 一起定位供应商商品快照。",
+      "writeOnly": true
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "供应商 agent_id。",
+      "writeOnly": true
+    },
+    "filters": {
+      "$ref": "./search_filters.json",
+      "description": "详情页商品或变体过滤条件，语义与 SearchFilters 一致。",
+      "writeOnly": true
+    },
+    "selected": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/selected_option"
+      },
+      "minItems": 1,
+      "description": "已选规格，用于单品详情中的变体收敛和可售性判断。",
+      "writeOnly": true
+    },
+    "preferences": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "description": "规格放宽优先级。无精确变体匹配时，服务端从数组末尾开始放宽条件；例如 [\"Color\", \"Size\"] 表示优先保留 Color，先放宽 Size。",
+      "writeOnly": true
+    },
+    "candidate_set_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "可选的来源候选集合标识，用于审计和相关性校验。",
+      "writeOnly": true
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "需要返回的详情区块，如 credentials、variants、logistics。",
+      "writeOnly": true
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "item_id",
+        "supplier_id"
+      ]
+    },
+    {
+      "required": [
+        "id"
+      ]
+    },
+    {
+      "required": [
+        "ids"
+      ]
+    }
+  ],
+  "additionalProperties": true
+}

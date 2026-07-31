@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/responsibility_assignment.json",
+  "version": "2026-07-31",
+  "title": "ResponsibilityAssignment",
+  "description": "调解或仲裁对 User、Agent、Merchant、Platform、Infrastructure 五层责任的结构化分配。",
+  "type": "object",
+  "required": [
+    "primary_responsible",
+    "responsibility_ratio"
+  ],
+  "properties": {
+    "primary_responsible": {
+      "type": "object",
+      "required": [
+        "layer",
+        "agent_id",
+        "reason"
+      ],
+      "properties": {
+        "layer": {
+          "type": "string",
+          "enum": ["User", "Agent", "Merchant", "Platform", "Infrastructure"],
+          "description": "承担首要责任的责任层。"
+        },
+        "agent_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "首要责任主体的 Agent、组织或基础设施标识。"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "认定该主体承担首要责任的事实与规则依据。"
+        }
+      },
+      "description": "承担最大责任比例的主体和责任层。",
+      "additionalProperties": true
+    },
+    "responsibility_ratio": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "enum": ["User", "Agent", "Merchant", "Platform", "Infrastructure"]
+      },
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "description": "各责任层承担的比例；所有值之和必须等于 1.0。"
+    }
+  },
+  "additionalProperties": true
+}

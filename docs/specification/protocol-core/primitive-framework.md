@@ -66,6 +66,9 @@ Action:           utp.{primitive}.{action}
   "idempotency_key": "optional-idempotency-key",
   "input": {
     "...": "action-specific input fields"
+  },
+  "hai": {
+    "suspend_id": "sus_..."
   }
 }
 ```
@@ -78,6 +81,7 @@ Action:           utp.{primitive}.{action}
 | `session_id` | string | MUST | 当前协议会话标识，用于关联原语内状态和上下文。 |
 | `idempotency_key` | string | 写操作 MUST | 幂等键。对产生副作用的写操作 MUST 提供，只读操作 MAY 省略；键格式与幂等行为的完整规则见[幂等性规则](/documentation/specification/protocol-core/agent-friendly-interface.html#s-183)。 |
 | `input` | object | MUST | 操作特有输入。字段由所属原语的实体定义、Mode 约束和具体操作语义决定。 |
+| `hai` | object | 条件必需 | Principal 对已挂起的 `CONFIRMED` Action 进行确认续跑时 MUST 包含；该对象在本路径仅包含 `suspend_id`，其语义见[人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html)。 |
 
 所有原语操作共享下列响应体骨架：
 
@@ -91,7 +95,10 @@ Action:           utp.{primitive}.{action}
   "output": {
     "...": "action-specific output fields"
   },
-  "valid_next_actions": ["utp.{primitive}.{next_action}"]
+  "valid_next_actions": ["utp.{primitive}.{next_action}"],
+  "hai": {
+    "...": "human-agent interaction envelope when applicable"
+  }
 }
 ```
 
@@ -106,6 +113,7 @@ Action:           utp.{primitive}.{action}
 | `execution_result` | enum | 执行编排和约束场景 MUST；其他场景 MAY | 本次 Action 的执行结果。取值为 `SUCCESS`、`REJECTED` 或 `FAILURE`；该字段不表示全局状态机是否迁移。 |
 | `output` | object | MUST | 操作特有输出。字段由所属原语的实体定义和当前 Mode 决定。 |
 | `valid_next_actions` | string[] | 执行编排和约束场景 MUST；其他场景按需 | 当前响应可继续执行的后续操作。数组元素 MUST 使用完整 Action 名称，例如 `utp.pay.initiate`；无后续操作时返回空数组。 |
+| `hai` | object | 条件必需 | Action 响应包含人机协同控制语义时使用的 HAI 信封；对象定义见[人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html)。 |
 
 `execution_result` 的取值语义如下：
 
@@ -144,7 +152,7 @@ Action:           utp.{primitive}.{action}
 
 ```json
 {
-  "schema": "https://schemas.utp.dev/primitives/purchase/2026-07-01.json",
+  "schema": "https://ut-protocol.com/schemas/primitives/purchase/2026-07-01.json",
   "version": "2026-07-01",
   "extensions": [],
   "authorization": {
@@ -188,8 +196,8 @@ Action:           utp.{primitive}.{action}
     "search": {
       "initiator_role": "Buyer",
       "handler_role": "Seller",
-      "input_schema": "https://schemas.utp.dev/primitives/source/search-request/2026-07-01.json",
-      "output_schema": "https://schemas.utp.dev/primitives/source/search-response/2026-07-01.json",
+      "input_schema": "https://ut-protocol.com/schemas/primitives/source/search-request/2026-07-01.json",
+      "output_schema": "https://ut-protocol.com/schemas/primitives/source/search-response/2026-07-01.json",
       "transport_bindings": [{
         "type": "rest",
         "method": "POST",
@@ -197,7 +205,7 @@ Action:           utp.{primitive}.{action}
       }]
     }
   },
-  "state_machine": "https://schemas.utp.dev/primitives/source/state-machine/2026-07-01.json"
+  "state_machine": "https://ut-protocol.com/schemas/primitives/source/state-machine/2026-07-01.json"
 }
 ```
 
@@ -208,7 +216,7 @@ Action:           utp.{primitive}.{action}
 | `actions` | MUST | 该版本完整核心 Action 集合。每项 MUST 定义单值 `initiator_role`、`handler_role`、`input_schema`、`output_schema` URL，以及至少一个 `transport_bindings`。 |
 | `state_machine` | MUST | 可访问的状态机定义文件 URL。 |
 
-核心原语定义文件只描述稳定的接口契约，不包含实体清单、错误码或能力提供方的授权策略；状态机语义由其引用文件定义，授权策略由 Profile 原语声明中的 `authorization` 提供。Action 的 `initiator_role` 与 `handler_role` 定义静态职责，不直接填写具体 Agent 或 Endpoint；具体主体由拓扑与握手结果绑定。UTP 官方核心原语定义文件的 URL MUST 使用 `https://schemas.utp.dev/primitives/{primitive}/{version}.json`。可复用实体模型的 URL MUST 使用 `https://schemas.utp.dev/entities/{entity}/{version}.json`；生态扩展使用其受控域名下的等价路径，并在扩展声明中给出权威 URL。
+核心原语定义文件只描述稳定的接口契约，不包含实体清单、错误码或能力提供方的授权策略；状态机语义由其引用文件定义，授权策略由 Profile 原语声明中的 `authorization` 提供。Action 的 `initiator_role` 与 `handler_role` 定义静态职责，不直接填写具体 Agent 或 Endpoint；具体主体由拓扑与握手结果绑定。UTP 官方核心原语定义文件的 URL MUST 使用 `https://ut-protocol.com/schemas/primitives/{primitive}/{version}.json`。可复用实体模型的 URL MUST 使用 `https://ut-protocol.com/schemas/entities/{entity}/{version}.json`；生态扩展使用其受控域名下的等价路径，并在扩展声明中给出权威 URL。
 
 
 ## 协议行为约定（Protocol Behavior Conventions） {#s-103-protocol-behavior-conventions}
@@ -239,7 +247,7 @@ UUID 后缀 MUST 使用 RFC 9562 定义的 UUID v4 小写标准文本，并由�
 
 ### 分页约定 {#s-1033-pagination}
 
-列表操作使用 [`Pagination`](https://schemas.utp.dev/primitives/common/pagination.json) 传递分页参数与响应元数据。请求携带 `page` 与 `page_size`；响应在此基础上返回 `total`。
+列表操作使用 [`Pagination`](https://ut-protocol.com/schemas/primitives/common/pagination.json) 传递分页参数与响应元数据。请求携带 `page` 与 `page_size`；响应在此基础上返回 `total`。
 
 ---
 
@@ -358,7 +366,7 @@ Profile 在原语声明的 `extensions` 中声明扩展包。每个声明包含�
 
 ```json
 {
-  "schema": "https://schemas.utp.dev/primitives/source/2026-07-01.json",
+  "schema": "https://ut-protocol.com/schemas/primitives/source/2026-07-01.json",
   "authorization": {
     "scope": "merchant.source",
     "required": false
@@ -366,7 +374,7 @@ Profile 在原语声明的 `extensions` 中声明扩展包。每个声明包含�
   "extensions": [{
     "name": "utp.source_cart",
     "version": "2026-07-01",
-    "schema": "https://schemas.utp.dev/extensions/source/cart/2026-07-01.json"
+    "schema": "https://ut-protocol.com/schemas/extensions/source/cart/2026-07-01.json"
   }]
 }
 ```
@@ -412,14 +420,14 @@ Profile 在原语声明的 `extensions` 中声明扩展包。每个声明包含�
   "extends": "utp.source",
   "version": "2026-07-01",
   "entities": {
-    "cart": "https://schemas.utp.dev/extensions/source/cart/2026-07-01/cart.schema.json"
+    "cart": "https://ut-protocol.com/schemas/extensions/source/cart/2026-07-01/cart.schema.json"
   },
   "actions": {
     "add": {
       "initiator_role": "Buyer",
       "handler_role": "Seller",
-      "input_schema": "https://schemas.utp.dev/extensions/source/cart/2026-07-01/add-request.schema.json",
-      "output_schema": "https://schemas.utp.dev/extensions/source/cart/2026-07-01/add-response.schema.json",
+      "input_schema": "https://ut-protocol.com/schemas/extensions/source/cart/2026-07-01/add-request.schema.json",
+      "output_schema": "https://ut-protocol.com/schemas/extensions/source/cart/2026-07-01/add-response.schema.json",
       "transport_bindings": {
         "rest": { "method": "POST", "path": "/utp/v1/source/cart/items" },
         "mcp": { "tool": "utp_source_cart_add" },
@@ -428,7 +436,7 @@ Profile 在原语声明的 `extensions` 中声明扩展包。每个声明包含�
       "state_effect": { "from": ["DETAIL_VIEWING"], "to": "DETAIL_VIEWING" }
     }
   },
-  "state_machine": "https://schemas.utp.dev/extensions/source/cart/2026-07-01/state-machine.json"
+  "state_machine": "https://ut-protocol.com/schemas/extensions/source/cart/2026-07-01/state-machine.json"
 }
 ```
 
@@ -444,8 +452,8 @@ Profile 在原语声明的 `extensions` 中声明扩展包。每个声明包含�
 
 | Schema | 作用 | 示例 |
 | --- | --- | --- |
-| `https://schemas.utp.dev/entities/service/2026-07-01.json` | 可复用的服务数据模型 | 加工定制或交易保障服务。 |
-| `https://schemas.utp.dev/extensions/purchase/service/2026-07-01/purchase.schema.json` | Purchase 的增强 Schema | 将服务字段叠加到 `Purchase` 或其嵌套 `LineItem`。 |
+| `https://ut-protocol.com/schemas/entities/service/2026-07-01.json` | 可复用的服务数据模型 | 加工定制或交易保障服务。 |
+| `https://ut-protocol.com/schemas/extensions/purchase/service/2026-07-01/purchase.schema.json` | Purchase 的增强 Schema | 将服务字段叠加到 `Purchase` 或其嵌套 `LineItem`。 |
 
 - **嵌套实体示例**
 
@@ -457,10 +465,10 @@ Profile 在原语声明的 `extensions` 中声明扩展包。每个声明包含�
   "$defs": {
     "service_line_item": {
       "allOf": [
-        { "$ref": "https://schemas.utp.dev/primitives/purchase/2026-07-01/entities/line-item.schema.json" },
+        { "$ref": "https://ut-protocol.com/schemas/primitives/purchase/2026-07-01/entities/line-item.schema.json" },
         { "type": "object", "properties": {
           "service": {
-            "$ref": "https://schemas.utp.dev/entities/purchase-service/2026-07-01.json",
+            "$ref": "https://ut-protocol.com/schemas/entities/purchase-service/2026-07-01.json",
             "utp_request": { "create": "optional", "update": "omit", "complete": "omit", "query": "omit" }
           }
         }, "additionalProperties": true }
@@ -468,7 +476,7 @@ Profile 在原语声明的 `extensions` 中声明扩展包。每个声明包含�
     }
   },
   "allOf": [
-    { "$ref": "https://schemas.utp.dev/primitives/purchase/2026-07-01/entities/purchase.schema.json" },
+    { "$ref": "https://ut-protocol.com/schemas/primitives/purchase/2026-07-01/entities/purchase.schema.json" },
     { "type": "object", "properties": {
       "line_items": { "type": "array", "items": { "$ref": "#/$defs/service_line_item" } }
     }, "additionalProperties": true }

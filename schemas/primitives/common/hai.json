@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/hai.json",
+  "version": "2026-07-31",
+  "title": "HumanAgentInteractionContext",
+  "description": "Action 响应中的人机协同控制信封。Principal 确认续跑请求的 hai 附件由 ActionRequest 单独定义。",
+  "type": "object",
+  "properties": {
+    "interaction_level": {
+      "type": "string",
+      "enum": [
+        "AUTONOMOUS",
+        "SUPERVISED",
+        "CONFIRMED"
+      ],
+      "readOnly": true,
+      "description": "Surface 所服务目标 Action 生效的执行门等级；它不必等于产生该响应的前序 Action 等级。"
+    },
+    "suspend": {
+      "type": "object",
+      "readOnly": true,
+      "properties": {
+        "suspend_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Host 和受认证 Principal 承载方使用的权威挂起标识，不得进入 Agent 推理链。"
+        },
+        "suspended_action": {
+          "type": "string",
+          "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$",
+          "description": "挂起解除后允许续跑的唯一业务 Action。"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "挂起原因分类。"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ACTIVE",
+            "RESUMED",
+            "CANCELLED",
+            "EXPIRED"
+          ],
+          "description": "挂起记录当前状态。"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Suspend Record 的创建时间。采用 RFC 3339 date-time 格式。"
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "活跃挂起允许等待 Principal 决策的最长毫秒数。"
+        },
+        "surface_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "与挂起记录绑定的 Action Surface 标识。"
+        }
+      },
+      "description": "Action 当前的挂起控制记录。",
+      "additionalProperties": true
+    },
+    "surface": {
+      "type": "object",
+      "readOnly": true,
+      "required": [
+        "surface_id",
+        "action",
+        "data_visibility"
+      ],
+      "properties": {
+        "surface_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Action Surface 的权威标识。"
+        },
+        "action": {
+          "type": "string",
+          "pattern": "^(?:utp|[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.utp)\\.[a-z][a-z0-9-]*(?:_[a-z][a-z0-9-]*)?\\.[a-z][a-z0-9-]*$",
+          "description": "该 Surface 服务的完整 UTP Action 名称。"
+        },
+        "description": {
+          "type": "string",
+          "description": "面向 Principal 的中性界面说明。"
+        },
+        "data_visibility": {
+          "type": "string",
+          "enum": [
+            "V0",
+            "V1",
+            "V2"
+          ],
+          "description": "该 Surface 处理数据的最高可见性等级。"
+        }
+      },
+      "description": "供 Platform 或 Host 渲染和确认的 Action Surface。",
+      "additionalProperties": true
+    },
+    "data_source": {
+      "type": "object",
+      "readOnly": true,
+      "required": [
+        "action_ref",
+        "session_id"
+      ],
+      "properties": {
+        "action_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "读取或取得权威数据所引用的既有完整 Action 名称。"
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "关联的 UTP 会话标识。"
+        },
+        "trade_context_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "适用时关联的交易上下文标识。"
+        },
+        "transaction_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "适用时关联的交易标识。"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Action 的受控读取或展示初始化参数，例如搜索条件、筛选、分页或资源标识。",
+          "additionalProperties": true
+        },
+        "data_hash": {
+          "type": "string",
+          "minLength": 1,
+          "description": "权威数据快照的完整性摘要。"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "该权威数据快照失效的 RFC 3339 时间。"
+        },
+        "refresh_strategy": {
+          "type": "string",
+          "enum": [
+            "strict",
+            "on_expiry",
+            "manual"
+          ],
+          "description": "适用完整性 Profile 时的刷新和一致性校验策略。"
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 1,
+          "description": "适用时的更高强度完整性证明。"
+        }
+      },
+      "description": "Surface 展示与确认续跑前重读使用的权威数据源。",
+      "additionalProperties": true
+    },
+    "agent_hint": {
+      "type": "string",
+      "readOnly": true,
+      "description": "面向 Agent 的控制边界说明，不得包含 V2 敏感数据或 suspend_id。"
+    }
+  },
+  "required": [
+    "interaction_level"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "surface": {
+            "properties": {
+              "data_visibility": {
+                "const": "V2",
+                "description": "V2 Surface 必须使用权威数据源和显式刷新策略。"
+              }
+            },
+            "required": [
+              "data_visibility"
+            ],
+            "description": "处理 V2 敏感数据的 Action Surface。"
+          }
+        },
+        "required": [
+          "surface"
+        ]
+      },
+      "then": {
+        "required": [
+          "data_source"
+        ],
+        "description": "V2 Surface 必须使用 HAI 信封顶层的权威数据源。"
+      }
+    }
+  ],
+  "additionalProperties": true
+}

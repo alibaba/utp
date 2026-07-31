@@ -1,13 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "error_response.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/error_response.json",
   "version": "2026-07-27",
   "title": "UTP Error Response",
   "description": "所有 UTP 原语操作可使用的标准错误响应。",
   "type": "object",
   "properties": {
     "error": {
-      "$ref": "error_detail.json"
+      "$ref": "error_detail.json",
+      "description": "本次协议级失败的结构化错误详情。"
     }
   },
   "required": [

@@ -44,7 +44,7 @@
         "delivery_deadline": {
           "type": "string",
           "format": "date",
-          "description": "期望交货日期（ISO 8601）。"
+          "description": "期望交货日期。采用 RFC 3339 full-date 格式。"
         },
         "delivery_address": {
           "$ref": "../../common/entities/address.json",
@@ -76,7 +76,7 @@
     "response_deadline": {
       "type": "string",
       "format": "date-time",
-      "description": "期望供应商回复报价的截止时间（ISO 8601）。"
+      "description": "期望供应商回复报价的截止时间。采用 RFC 3339 date-time 格式。"
     }
   },
   "additionalProperties": true

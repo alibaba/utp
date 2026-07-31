@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/trace_info.json",
+  "version": "2026-07-31",
+  "title": "TraceInfo",
+  "description": "单个物流包裹或运单的轨迹信息。",
+  "type": "object",
+  "required": [
+    "tracking_number",
+    "nodes"
+  ],
+  "properties": {
+    "tracking_number": {
+      "type": "string",
+      "minLength": 1,
+      "description": "承运商分配的物流单号。"
+    },
+    "shipment_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "关联的发货批次标识。"
+    },
+    "carrier": {
+      "type": "string",
+      "description": "承运商名称。"
+    },
+    "carrier_code": {
+      "type": "string",
+      "description": "承运商编码。"
+    },
+    "tracking_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "承运商提供的物流查询地址。"
+    },
+    "nodes": {
+      "type": "array",
+      "description": "按发生时间升序排列的物流扫描节点。",
+      "items": {
+        "$ref": "#/$defs/trace_node"
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "trace_node": {
+      "type": "object",
+      "required": [
+        "action_time",
+        "node_code"
+      ],
+      "properties": {
+        "action_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "物流节点的发生时间。采用 RFC 3339 date-time 格式。"
+        },
+        "node_code": {
+          "type": "string",
+          "description": "物流节点状态码。"
+        },
+        "node_desc": {
+          "type": "string",
+          "description": "物流节点状态描述。"
+        },
+        "location": {
+          "type": "string",
+          "description": "物流节点所在地点。"
+        },
+        "location_code": {
+          "type": "string",
+          "description": "物流节点所在地编码。"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

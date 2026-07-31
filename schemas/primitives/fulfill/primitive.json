@@ -2,83 +2,316 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/fulfill/primitive.json",
   "name": "utp.fulfill",
-  "version": "2026-07-27",
+  "version": "2026-07-31",
   "title": "P5 Fulfill 履约原语定义",
-  "description": "履约原语核心定义文件。跟踪交付进展、验收并确认收货；履约锚点为 order_id，物流单、包裹和运单号仅为可选关联资源。前置条件：存在有效 PaymentConfirmation（至少首期支付或按 TradeMethod 后付条款）、会话状态 ∈ {FULFILLING, PAYING}、PurchaseCredential 可访问。receive/reject MUST 校验 Buyer 签名。请求/响应统一信封见 primitives/common/action_request.json 与 action_response.json，采用两段式校验。",
+  "description": "履约原语的操作、角色、传输绑定和状态机定义。",
   "actions": {
     "leadtime": {
       "description": "Buyer 请求备货、运输、清关或服务激活预估。适用状态 INIT/SHIPPED/DELAYED/PARTIAL_DELIVERED；无状态影响。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/leadtime_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/leadtime_output.json",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/leadtime_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/leadtime_output.json"
+      },
       "transport_bindings": [
         {
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/fulfillments/leadtime"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.fulfill.leadtime"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.fulfill.leadtime"
         }
       ]
     },
     "list": {
-      "description": "Buyer 检索与自身关联的订单摘要，支持状态、时间、供应商筛选。任意状态可执行；无状态影响；空列表为正常结果。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/list_output.json",
+      "description": "Buyer 批量查询与自身关联的订单履约信息，支持按 purchase_id、transaction_id 及其他订单条件筛选。任意状态可执行；无状态影响；空列表为正常结果。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/list_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/list_output.json"
+      },
       "transport_bindings": [
         {
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/fulfillments/orders/list"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.fulfill.list"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.fulfill.list"
         }
       ]
     },
     "query": {
-      "description": "Buyer 按 order_id 查询单笔订单履约事件、批次、物流、验货和凭证摘要。任意状态可执行；无状态影响。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/query_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/query_output.json",
+      "description": "Buyer 按 order_id 查询单笔订单及其当前履约信息。任意状态可执行；无状态影响。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/order_fulfillment.json"
+      },
       "transport_bindings": [
         {
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/fulfillments/orders/query"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.fulfill.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.fulfill.query"
         }
       ]
     },
     "notify": {
       "description": "Seller 在发货、延迟、妥投、验货结论等关键节点推送履约事件，驱动采购方可观测状态迁移。MUST 携带 order_id，以对端签名保证来源可信；Buyer 返回成功仅表示已接收；回调不可达时 Buyer 通过 query 轮询兜底。",
-      "direction": "seller_to_buyer",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/notify_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/notify_output.json",
+      "initiator_role": "Seller",
+      "handler_role": "Buyer",
+      "input_schema": {
+        "$ref": "entities/fulfillment_event.json"
+      },
+      "output_schema": {
+        "$ref": "entities/notify_output.json"
+      },
       "transport_bindings": [
         {
           "type": "rest",
           "method": "POST",
           "path": "{callback_base}/utp/v1/fulfillments/notifications"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.fulfill.notify"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.fulfill.notify"
         }
       ]
     },
     "receive": {
       "description": "Buyer 对已妥投且满足验货要求的订单/批次确认收货，MUST 携带 Buyer 签名。当前批次进入 RECEIVED，全部批次完成时进入 FULFILLED；幂等——重复提交返回既有凭证（FULFILL.ALREADY_RECEIVED）。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receive_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receive_output.json",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/receive_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/receipt_confirmation.json"
+      },
       "transport_bindings": [
         {
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/fulfillments/receipts"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.fulfill.receive"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.fulfill.receive"
         }
       ]
     },
     "reject": {
       "description": "Buyer 对不符合约定的已交付批次提交结构化拒收理由与证据，MUST 携带 Buyer 签名。当前批次进入 REJECTED 终态，生成 RejectionConfirmation 并激活 Resolve；幂等（FULFILL.ALREADY_REJECTED）。",
-      "input_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/reject_input.json",
-      "output_schema": "https://ut-protocol.com/schemas/primitives/fulfill/entities/reject_output.json",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/reject_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/rejection_confirmation.json"
+      },
       "transport_bindings": [
         {
           "type": "rest",
           "method": "POST",
           "path": "/utp/v1/fulfillments/rejections"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.fulfill.reject"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.fulfill.reject"
         }
       ]
     }
   },
-  "state_machine": "https://ut-protocol.com/schemas/primitives/fulfill/state_machine.json"
+  "state_machine": {
+    "initial_state": "INIT",
+    "states": {
+      "INIT": {
+        "description": "订单尚未开始履约。"
+      },
+      "SHIPPED": {
+        "description": "订单商品已发出。"
+      },
+      "DELAYED": {
+        "description": "订单履约发生延迟。"
+      },
+      "DELIVERED": {
+        "description": "订单当前批次已妥投。"
+      },
+      "INSPECTED": {
+        "description": "订单当前批次已验货合格。"
+      },
+      "RECEIVED": {
+        "description": "订单当前批次已确认收货。"
+      },
+      "PARTIAL_DELIVERED": {
+        "description": "部分批次已收货且仍有后续批次。"
+      },
+      "FULFILLED": {
+        "description": "订单全部批次已确认收货。"
+      },
+      "REJECTED": {
+        "description": "订单当前批次已拒收。"
+      }
+    },
+    "transitions": [
+      {
+        "from": "INIT",
+        "action": "utp.fulfill.notify",
+        "to": "SHIPPED",
+        "condition": "收到发货事件"
+      },
+      {
+        "from": "INIT",
+        "action": "utp.fulfill.notify",
+        "to": "DELAYED",
+        "condition": "收到延迟事件"
+      },
+      {
+        "from": "INIT",
+        "action": "utp.fulfill.notify",
+        "to": "DELIVERED",
+        "condition": "收到无需物流的交付完成事件"
+      },
+      {
+        "from": "SHIPPED",
+        "action": "utp.fulfill.notify",
+        "to": "DELAYED",
+        "condition": "收到延迟事件"
+      },
+      {
+        "from": "SHIPPED",
+        "action": "utp.fulfill.notify",
+        "to": "DELIVERED",
+        "condition": "收到妥投事件"
+      },
+      {
+        "from": "DELAYED",
+        "action": "utp.fulfill.notify",
+        "to": "SHIPPED",
+        "condition": "收到发货或恢复事件"
+      },
+      {
+        "from": "DELAYED",
+        "action": "utp.fulfill.notify",
+        "to": "DELIVERED",
+        "condition": "收到妥投或无需物流的交付完成事件"
+      },
+      {
+        "from": "DELIVERED",
+        "action": "utp.fulfill.notify",
+        "to": "INSPECTED",
+        "condition": "条款要求验货且收到验货合格结论"
+      },
+      {
+        "from": "DELIVERED",
+        "action": "utp.fulfill.receive",
+        "to": "RECEIVED",
+        "condition": "当前批次为最后批次"
+      },
+      {
+        "from": "DELIVERED",
+        "action": "utp.fulfill.receive",
+        "to": "PARTIAL_DELIVERED",
+        "condition": "仍有后续批次"
+      },
+      {
+        "from": "INSPECTED",
+        "action": "utp.fulfill.receive",
+        "to": "RECEIVED",
+        "condition": "当前批次为最后批次"
+      },
+      {
+        "from": "INSPECTED",
+        "action": "utp.fulfill.receive",
+        "to": "PARTIAL_DELIVERED",
+        "condition": "仍有后续批次"
+      },
+      {
+        "from": "PARTIAL_DELIVERED",
+        "action": "utp.fulfill.notify",
+        "to": "SHIPPED",
+        "condition": "收到后续批次发货事件"
+      },
+      {
+        "from": "PARTIAL_DELIVERED",
+        "action": "utp.fulfill.notify",
+        "to": "DELIVERED",
+        "condition": "收到后续批次妥投事件"
+      },
+      {
+        "from": "PARTIAL_DELIVERED",
+        "action": "utp.fulfill.receive",
+        "to": "RECEIVED",
+        "condition": "当前批次为最后批次"
+      },
+      {
+        "from": "PARTIAL_DELIVERED",
+        "action": "utp.fulfill.receive",
+        "to": "PARTIAL_DELIVERED",
+        "condition": "仍有后续批次"
+      },
+      {
+        "from": "RECEIVED",
+        "event": "all_batches_received",
+        "to": "FULFILLED"
+      },
+      {
+        "from": "DELIVERED",
+        "action": "utp.fulfill.reject",
+        "to": "REJECTED"
+      },
+      {
+        "from": "INSPECTED",
+        "action": "utp.fulfill.reject",
+        "to": "REJECTED"
+      },
+      {
+        "from": "PARTIAL_DELIVERED",
+        "action": "utp.fulfill.reject",
+        "to": "REJECTED",
+        "condition": "拒收当前已交付批次"
+      }
+    ]
+  }
 }

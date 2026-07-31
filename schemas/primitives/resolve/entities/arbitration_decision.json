@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/resolve/entities/arbitration_decision.json",
+  "version": "2026-07-31",
+  "title": "ArbitrationDecision",
+  "description": "L3 仲裁机构签发的具有约束力的结构化裁定。",
+  "type": "object",
+  "required": [
+    "arbitration_case_id",
+    "arbitration_institution",
+    "decision_date",
+    "result",
+    "responsibility_assignment",
+    "evidence_bundle_ref"
+  ],
+  "properties": {
+    "arbitration_case_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "仲裁机构登记的案件标识。"
+    },
+    "arbitration_institution": {
+      "type": "string",
+      "minLength": 1,
+      "description": "签发裁定的仲裁机构名称或登记标识。"
+    },
+    "arbitrator_panel": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "参与裁定的仲裁员标识列表。"
+    },
+    "decision_date": {
+      "type": "string",
+      "format": "date",
+      "description": "仲裁裁定签发日期。采用 RFC 3339 full-date 格式。"
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "claimant_favored",
+        "respondent_favored",
+        "partial_award",
+        "dismissed"
+      ],
+      "description": "仲裁结果：支持申请方、支持被申请方、部分支持或驳回。"
+    },
+    "responsibility_assignment": {
+      "$ref": "responsibility_assignment.json",
+      "description": "仲裁裁定的责任主体与责任比例。"
+    },
+    "compensation_order": {
+      "$ref": "compensation_order.json",
+      "description": "裁定要求执行资金或非资金补偿时生成的补偿单。"
+    },
+    "evidence_bundle_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "仲裁采用的完整证据包标识。"
+    },
+    "judicial_export_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "供司法或监管程序使用的签名证据导出引用。"
+    }
+  },
+  "additionalProperties": true
+}

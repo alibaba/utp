@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/extensions/cart/entities/cart_query_input.json",
+  "version": "2026-07-29",
+  "title": "CartQueryInput",
+  "description": "utp.source_cart.query 的业务输入。空对象表示查询当前 session 购物车。",
+  "type": "object",
+  "properties": {
+    "cart_ref": {
+      "$ref": "./cart_ref.json",
+      "writeOnly": true,
+      "description": "需要查询的购物车引用。"
+    },
+    "pagination": {
+      "$ref": "../../../../common/pagination.json#/$defs/request",
+      "writeOnly": true,
+      "description": "购物车项分页请求参数。"
+    }
+  },
+  "additionalProperties": true
+}

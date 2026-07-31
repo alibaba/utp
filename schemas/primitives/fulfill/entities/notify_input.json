@@ -1,8 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/notify_input.json",
-  "version": "2026-07-27",
-  "title": "FulfillNotifyInput",
-  "description": "utp.fulfill.notify 的业务输入。Seller 推送的履约事件载荷；MUST 携带 order_id，以对端签名保证来源可信。",
-  "$ref": "tracking_event.json"
-}

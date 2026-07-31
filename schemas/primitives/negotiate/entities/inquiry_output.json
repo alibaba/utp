@@ -19,13 +19,13 @@
     "received_at": {
       "type": "string",
       "format": "date-time",
-      "description": "供应商接收询盘的时间。",
+      "description": "供应商接收询盘的时间。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     },
     "estimated_quote_at": {
       "type": "string",
       "format": "date-time",
-      "description": "供应商预计给出报价的时间（可选）。",
+      "description": "供应商预计给出报价的时间（可选）。采用 RFC 3339 date-time 格式。",
       "readOnly": true
     }
   },

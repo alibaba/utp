@@ -1,26 +1,65 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/common/pagination.json",
-  "version": "2026-07-27",
+  "version": "2026-07-31",
   "title": "Pagination",
-  "description": "列表操作共享的分页参数与响应元数据。请求使用 page 与 page_size；响应在此基础上返回 total。具体操作的输入和输出 Schema 决定各字段的适用性。",
+  "description": "列表操作共享的游标分页定义。请求与响应使用不同子 Schema；cursor 是不透明值，调用方不得解析或自行构造。",
   "type": "object",
-  "properties": {
-    "page": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "当前页码，从 1 开始。"
+  "$defs": {
+    "request": {
+      "type": "object",
+      "description": "列表请求中的分页参数。",
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "description": "上一页响应返回的不透明游标；省略时从第一页开始。"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 10,
+          "description": "请求页大小；实现方 MAY 按服务能力裁剪为更低的上限。"
+        }
+      },
+      "additionalProperties": true
     },
-    "page_size": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 100,
-      "description": "每页条目数。"
-    },
-    "total": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "符合当前查询条件的总记录数，仅在响应中返回。"
+    "response": {
+      "type": "object",
+      "description": "列表响应中的分页元数据。",
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "description": "获取下一页的不透明游标；has_next_page 为 true 时 MUST 提供。"
+        },
+        "has_next_page": {
+          "type": "boolean",
+          "description": "是否仍有下一页结果。"
+        },
+        "total_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "符合查询条件的总记录数；无法高效计算时 MAY 省略。"
+        }
+      },
+      "required": [
+        "has_next_page"
+      ],
+      "if": {
+        "properties": {
+          "has_next_page": {
+            "const": true
+          }
+        },
+        "required": [
+          "has_next_page"
+        ]
+      },
+      "then": {
+        "required": [
+          "cursor"
+        ]
+      },
+      "additionalProperties": true
     }
   },
   "additionalProperties": true

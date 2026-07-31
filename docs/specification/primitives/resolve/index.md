@@ -81,12 +81,13 @@ Resolve 覆盖以下场景：
   "postconditions": [
     "dispute_resolution != null",
     "dispute_resolution.status ∈ {resolved, compensated, dismissed, escalated}",
-    "IF compensation_required → compensation_order.executed == true",
+    "IF dispute_resolution.status == compensated → compensation_result.status == compensated AND all executed_actions.status == completed",
     "evidence_bundle.append(['dispute_request', 'evidence_package', 'resolution_result'])",
     "global_state == DISPUTED while active; on completion follow State Machine R3/R4"
   ],
   "invariants": [
-    "compensation_order.total <= purchase_credential.total (补偿金额不超过交易总额)",
+    "compensation_order.total_compensation == sum(refund_amount, penalty_amount, valued_actions) (补偿金额守恒且币种一致)",
+    "compensation_order.total_compensation <= purchase_credential.total (补偿金额不超过交易总额)",
     "evidence_bundle.integrity_check() == true (证据链完整性)",
     "responsibility_assignment.coverage == 1.0 (责任分配覆盖全部争议金额)"
   ],
@@ -123,8 +124,8 @@ Resolve 覆盖以下场景：
 | `RAISED` | 争议已登记 | `resolve.raise` 成功执行 | `resolve.mediate`, `resolve.arbitrate`（若直接升级） |
 | `MEDIATING` | 调解中 | `resolve.mediate` 已调用，调解员已分配 | 等待调解结果；争议方可补充证据 |
 | `ARBITRATING` | 仲裁中 | `resolve.arbitrate` 已调用，仲裁机构已受理 | 等待仲裁裁定；争议方可补充证据 |
-| `RESOLVED` | 争议已解决 | 调解/仲裁达成一致，或 L1 自动补偿完成 | 只读。若需补偿则进入 `COMPENSATED` |
-| `COMPENSATED` | 补偿已执行 | `resolve.compensate` 执行完毕 | 只读。交易恢复至争议前状态或进入新的约定状态 |
+| `RESOLVED` | 争议已形成处置结果 | 调解/仲裁达成一致或 L1 规则形成结果 | 无补偿时结案；有补偿时调用 `resolve.compensate`，处理中或失败仍保持本状态 |
+| `COMPENSATED` | 补偿已执行 | `resolve.compensate` 的全部子动作均为 `completed` | 只读。交易恢复至争议前状态或进入新的约定状态 |
 | `DISMISSED` | 争议被驳回 | 调解/仲裁裁定争议不成立 | 只读。交易继续执行 |
 | `ESCALATED` | 已升级 | 当前级处置失败，升级至下一级 | 进入 `MEDIATING`（L1→L2）或 `ARBITRATING`（L2→L3） |
 
@@ -141,7 +142,7 @@ Resolve 激活时的暂停规则:
 争议范围 = global  → 暂停整个交易会话的有副作用 Action；只读 query MAY 继续
 ```
 
-LockPolicy MUST 明确列出 `locked_actions`、`locked_amount`、`locked_resources` 与 `allowed_readonly_actions`。当争议范围只覆盖部分金额、部分订单或部分批次时，实现方 MUST 允许未被锁定的履约或支付义务按全局状态机继续推进。
+LockPolicy MUST 明确列出 `locked_actions` 与 `locked_resources`，并至少实际锁定一个 Action、资源或金额。支付争议存在金额冻结时 MUST 提供 `locked_amount`；允许保留只读能力时 SHOULD 提供 `allowed_readonly_actions`。当争议范围只覆盖部分金额、部分订单或部分批次时，实现方 MUST 允许未被锁定的履约或支付义务按全局状态机继续推进。
 
 ### 与全局状态机的关系 {#s-1625}
 
@@ -223,6 +224,8 @@ Purchase (合同违约) L3 仲裁赔偿      →    按 ArbitrationDecision 生�
       }
     },
     "retryable": true,
+    "request_id": "req-resolve-mediate-20260820-001",
+    "timestamp": "2026-08-20T09:00:00Z",
     "recovery_actions": [
       {
         "action": "supplement_evidence",
@@ -241,10 +244,10 @@ Resolve 不定义固定的 OAuth scope。能力提供方是否要求用户授权
 
 | 操作或资源 | 描述 | 授予方 | 默认分配 |
 | --- | --- | --- | --- |
-| `raise` | 发起争议。 | 协议默认 | 拓扑中所有参与方 |
-| `mediate` | 提交调解请求或参与调解过程。 | 协议默认 | Buyer、Seller 角色；Mediator 角色（分配后） |
-| `arbitrate` | 提交仲裁请求。 | 协议默认 | Buyer、Seller 角色 |
-| `compensate` | 执行补偿操作。 | 协议受限 | 仅协议引擎（L1 自动补偿）或 Mediator/Arbiter（L2/L3 裁定后） |
+| `raise` | 发起争议。 | 协议默认 | 核心声明的 `initiator_role` 为 Buyer；其他拓扑参与方须经授权并校验 claimant 关系 |
+| `mediate` | 提交调解请求或补充材料。 | 协议默认 | 核心声明的 `initiator_role` 为 Buyer；Seller 或 Mediator 材料由 Arbiter 在授权后收录 |
+| `arbitrate` | 提交仲裁请求。 | 协议默认 | 核心声明的 `initiator_role` 为 Buyer；其他争议方须通过授权入口提交 |
+| `compensate` | 执行补偿操作。 | 协议受限 | `initiator_role` 与 `handler_role` 均为 Arbiter；L1 引擎或 Mediator 通过 Arbiter 角色绑定触发 |
 | `view` | 查看争议详情和证据包。 | 协议默认 | Buyer、Seller 角色；争议相关方可见与其相关的证据 |
 | 争议证据 | 访问完整证据包（含所有 Mandate、签名链、WYSIWYS 快照）。 | 协议按需授予 | Mediator、Arbiter 角色；司法机构（通过导出接口） |
 | `export` | 导出证据包为 JSON+JWS 格式（用于司法存证）。 | 协议受限 | 仅争议当事方和 Arbiter 角色 |
@@ -372,20 +375,26 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
 {
   "action": "utp.resolve.raise",
   "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "dsp-raise-20260815-001",
   "input": {
     "dispute_type": "quality_dispute",
     "dispute_scope": "fulfill",
-    "transaction_id": "utp-txn-20260718-001",
     "related_primitive": "utp.fulfill",
     "related_shipment_id": "shp-20260805-001",
     "dispute_scope_detail": {
       "order_id": "ord-20260718-001",
       "batch_id": "batch-20260805-A",
-      "claimed_amount": { "amount": 18805.80, "currency": "CNY" }
+      "claimed_amount": { "amount": "18805.80", "currency": "CNY" }
     },
     "lock_policy": {
       "locked_actions": ["utp.fulfill.receive", "utp.pay.term"],
-      "locked_resources": ["batch-20260805-A"],
+      "locked_resources": [
+        {
+          "resource_type": "fulfillment_batch",
+          "resource_id": "batch-20260805-A"
+        }
+      ],
       "allowed_readonly_actions": ["utp.fulfill.query", "utp.pay.query"]
     },
     "claimant": {
@@ -395,15 +404,14 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
     "claim": {
       "summary": "Delivered servo motors do not meet agreed torque specification. 15 out of 100 units failed quality inspection.",
       "requested_resolution": "partial_refund",
-      "requested_amount": { "amount": 18805.80, "currency": "CNY" },
+      "requested_amount": { "amount": "18805.80", "currency": "CNY" },
       "deadline": "2026-09-15T23:59:59Z"
     },
     "evidence_refs": [
       "evd-insp-20260810-001",
       "evd-ship-20260805-001",
       "evd-pur-20260718-001"
-    ],
-    "idempotency_key": "dsp-raise-20260815-001"
+    ]
   }
 }
 ```
@@ -413,18 +421,45 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
 ```json
 {
   "action": "utp.resolve.raise",
+  "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "dsp-raise-20260815-001",
+  "primitive_state": "RAISED",
+  "execution_result": "SUCCESS",
   "output": {
     "dispute_id": "dsp-20260815-001",
-    "transaction_id": "utp-txn-20260718-001",
     "status": "raised",
     "dispute_type": "quality_dispute",
     "dispute_scope": "fulfill",
-    "transaction_id": "utp-txn-20260718-001",
-    "session_id": "utp-session-b2b-001",
+    "dispute_scope_detail": {
+      "order_id": "ord-20260718-001",
+      "batch_id": "batch-20260805-A",
+      "claimed_amount": { "amount": "18805.80", "currency": "CNY" }
+    },
+    "lock_policy": {
+      "locked_actions": ["utp.fulfill.receive", "utp.pay.term"],
+      "locked_resources": [
+        {
+          "resource_type": "fulfillment_batch",
+          "resource_id": "batch-20260805-A"
+        }
+      ],
+      "allowed_readonly_actions": ["utp.fulfill.query", "utp.pay.query"]
+    },
     "claimant": {
       "agent_id": "buyer-agent-001",
       "role": "Buyer"
     },
+    "respondent": {
+      "agent_id": "seller-agent-001",
+      "role": "Seller"
+    },
+    "claim": {
+      "summary": "Delivered servo motors do not meet agreed torque specification.",
+      "requested_resolution": "partial_refund",
+      "requested_amount": { "amount": "18805.80", "currency": "CNY" }
+    },
+    "resolution_level": "L1",
     "auto_resolution_check": {
       "l1_applicable": false,
       "reason": "Quality dispute requires subjective assessment. L1 auto-compensation rules do not cover this scenario."
@@ -436,16 +471,17 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
     ],
     "respondent_deadline": "2026-08-22T23:59:59Z",
     "evidence_bundle_ref": "evd-dsp-20260815-001",
-    "valid_next_actions": [
-      "utp.resolve.mediate"
-    ]
-  }
+    "raised_at": "2026-08-15T10:00:00Z"
+  },
+  "valid_next_actions": [
+    "utp.resolve.mediate"
+  ]
 }
 ```
 
 ### utp.resolve.mediate {#s-1672-utpresolvemediate}
 
-**意图：** 提交调解请求或提交调解结果。Buyer/Seller 调用此操作提交调解请求和补充证据；Mediator 调用此操作提交调解结果。
+**意图：** 提交调解请求或补充材料。核心 Action 由 Buyer 发起并由 Arbiter 处理；其他已授权争议参与方的材料及 Mediator 结论由 Arbiter 按交易拓扑和身份结果写入权威争议档案。
 
 **请求（调解申请 —— 由争议方提交）：**
 
@@ -453,9 +489,10 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
 {
   "action": "utp.resolve.mediate",
   "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "dsp-mediate-20260820-001",
   "input": {
     "dispute_id": "dsp-20260815-001",
-    "transaction_id": "utp-txn-20260718-001",
     "mediation_request": {
       "preferred_mediator_type": "platform",
       "additional_evidence": [
@@ -477,7 +514,7 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
         },
         "option_b": {
           "description": "15% price reduction on defective units",
-          "compensation": { "amount": 16200.00, "currency": "CNY" }
+          "compensation": { "amount": "16200.00", "currency": "CNY" }
         }
       }
     }
@@ -485,14 +522,40 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
 }
 ```
 
-**响应（调解结果 —— 由 Mediator 提交）：**
+**响应（Arbiter 收录调解结果后返回权威争议档案）：**
 
 ```json
 {
   "action": "utp.resolve.mediate",
+  "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "dsp-mediate-20260820-001",
+  "primitive_state": "RESOLVED",
+  "execution_result": "SUCCESS",
   "output": {
     "dispute_id": "dsp-20260815-001",
-    "transaction_id": "utp-txn-20260718-001",
+    "status": "resolved",
+    "dispute_type": "quality_dispute",
+    "dispute_scope": "fulfill",
+    "dispute_scope_detail": {
+      "order_id": "ord-20260718-001",
+      "batch_id": "batch-20260805-A",
+      "claimed_amount": { "amount": "18805.80", "currency": "CNY" }
+    },
+    "claimant": {
+      "agent_id": "buyer-agent-001",
+      "role": "Buyer"
+    },
+    "respondent": {
+      "agent_id": "seller-agent-001",
+      "role": "Seller"
+    },
+    "claim": {
+      "summary": "Delivered servo motors do not meet agreed torque specification.",
+      "requested_resolution": "partial_refund",
+      "requested_amount": { "amount": "18805.80", "currency": "CNY" }
+    },
+    "resolution_level": "L2",
     "mediation_result": {
       "mediator_id": "mediator-platform-001",
       "mediator_type": "platform",
@@ -507,33 +570,77 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
           "Merchant": 1.0
         }
       },
-      "settlement": {
-        "selected_option": "option_b_modified",
-        "description": "Seller to refund 15% of defective units' value (15 units × 1080 CNY × 15% = 2,430 CNY) plus cover return shipping for defective units.",
-        "compensation_order": {
-          "refund_amount": { "amount": 2430.00, "currency": "CNY" },
-          "refund_source": "escrow_holdback",
-          "additional_actions": [
-            {
-              "action": "return_shipping",
-              "responsible_party": "Seller",
-              "description": "Seller arranges and pays for return shipping of 15 defective units"
+      "settlement_description": "Seller refunds 2,430 CNY and arranges return shipping for 15 defective units.",
+      "compensation_order": {
+        "compensation_order_id": "comp-order-20260820-001",
+        "refund_amount": { "amount": "2430.00", "currency": "CNY" },
+        "total_compensation": { "amount": "2430.00", "currency": "CNY" },
+        "refund_source": "escrow_holdback",
+        "additional_actions": [
+          {
+            "action_type": "return_shipping",
+            "target_action": "utp.fulfill.reject",
+            "payload": {
+              "batch_id": "batch-20260805-A",
+              "quantity": 15
             }
-          ]
-        }
+          }
+        ],
+        "deadline": "2026-09-01T23:59:59Z"
       },
-      "evidence_summary": {
-        "inspection_report": "insp-20260810-001 (PASS with 15 units borderline)",
-        "buyer_evidence": ["torque test photos", "original spec sheet"],
-        "seller_evidence": ["production QC records", "batch test report"],
-        "mandate_chain_verified": true
-      }
+      "decided_at": "2026-08-20T16:00:00Z",
+      "evidence_ref": "evd-mediation-20260820-001"
     },
-    "status": "resolved",
-    "valid_next_actions": [
-      "utp.resolve.compensate"
-    ]
-  }
+    "resolution_outcome": {
+      "outcome_id": "res-outcome-20260820-001",
+      "dispute_id": "dsp-20260815-001",
+      "result": "partial_compensation",
+      "instructions": [
+        {
+          "instruction_type": "refund",
+          "refund_instruction": {
+            "payment_confirmation_id": "pay-cfm-20260720-001",
+            "source_instruction_ref": "res-outcome-20260820-001",
+            "refund_amount": { "amount": "2430.00", "currency": "CNY" },
+            "refund_reason": "resolve.partial_quality_compensation",
+            "scope_ref": {
+              "batch_id": "batch-20260805-A",
+              "item_refs": ["item-servo-200w-001"]
+            }
+          }
+        },
+        {
+          "instruction_type": "return_shipment",
+          "target_action": "utp.fulfill.reject",
+          "payload": {
+            "batch_id": "batch-20260805-A",
+            "quantity": 15
+          }
+        }
+      ],
+      "compensation_order": {
+        "compensation_order_id": "comp-order-20260820-001",
+        "refund_amount": { "amount": "2430.00", "currency": "CNY" },
+        "total_compensation": { "amount": "2430.00", "currency": "CNY" },
+        "refund_source": "escrow_holdback",
+        "additional_actions": [
+          {
+            "action_type": "return_shipping",
+            "target_action": "utp.fulfill.reject"
+          }
+        ],
+        "deadline": "2026-09-01T23:59:59Z"
+      },
+      "next_global_state_hint": "FULFILLING",
+      "evidence_ref": "evd-resolution-20260820-001"
+    },
+    "evidence_bundle_ref": "evd-dsp-20260815-001",
+    "raised_at": "2026-08-15T10:00:00Z",
+    "resolved_at": "2026-08-20T16:00:00Z"
+  },
+  "valid_next_actions": [
+    "utp.resolve.compensate"
+  ]
 }
 ```
 
@@ -547,6 +654,8 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
 {
   "action": "utp.resolve.arbitrate",
   "session_id": "utp-session-crossborder-001",
+  "transaction_id": "utp-txn-crossborder-001",
+  "idempotency_key": "dsp-arbitrate-20260901-001",
   "input": {
     "dispute_id": "dsp-20260901-001",
     "arbitration_request": {
@@ -555,7 +664,7 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
       "jurisdiction": "Shanghai, China",
       "applicable_law": "CISG (United Nations Convention on Contracts for the International Sale of Goods)",
       "language": "en",
-      "claim_amount": { "amount": 50000.00, "currency": "USD" },
+      "claim_amount": { "amount": "50000.00", "currency": "USD" },
       "grounds": "Seller failed to deliver goods meeting contractual quality standards. Mediation failed as parties could not agree on remediation timeline.",
       "evidence_bundle_export": true
     }
@@ -568,8 +677,34 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
 ```json
 {
   "action": "utp.resolve.arbitrate",
+  "session_id": "utp-session-crossborder-001",
+  "transaction_id": "utp-txn-crossborder-001",
+  "idempotency_key": "dsp-arbitrate-20260901-001",
+  "primitive_state": "RESOLVED",
+  "execution_result": "SUCCESS",
   "output": {
     "dispute_id": "dsp-20260901-001",
+    "status": "resolved",
+    "dispute_type": "quality_dispute",
+    "dispute_scope": "purchase",
+    "dispute_scope_detail": {
+      "order_id": "ord-crossborder-001",
+      "claimed_amount": { "amount": "50000.00", "currency": "USD" }
+    },
+    "claimant": {
+      "agent_id": "buyer-agent-crossborder-001",
+      "role": "Buyer"
+    },
+    "respondent": {
+      "agent_id": "seller-agent-crossborder-001",
+      "role": "Seller"
+    },
+    "claim": {
+      "summary": "Delivered goods do not meet contractual quality standards.",
+      "requested_resolution": "terminate_with_refund",
+      "requested_amount": { "amount": "50000.00", "currency": "USD" }
+    },
+    "resolution_level": "L3",
     "arbitration_decision": {
       "arbitration_case_id": "CIETAC-2026-SH-04521",
       "arbitration_institution": "CIETAC",
@@ -589,28 +724,54 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
         "platform_reason": "Platform recommended supplier without verifying recent quality audit records."
       },
       "compensation_order": {
-        "refund_amount": { "amount": 42500.00, "currency": "USD" },
-        "penalty_amount": { "amount": 5000.00, "currency": "USD" },
-        "total_compensation": { "amount": 47500.00, "currency": "USD" },
-        "cost_allocation": {
-          "arbitration_fee": { "total": { "amount": 8000.00, "currency": "USD" }, "Seller_share": 0.85, "Platform_share": 0.15 }
-        },
+        "compensation_order_id": "comp-order-20261115-001",
+        "refund_amount": { "amount": "42500.00", "currency": "USD" },
+        "total_compensation": { "amount": "42500.00", "currency": "USD" },
         "refund_source": "escrow_full_release_to_buyer",
         "deadline": "2026-12-15T23:59:59Z"
       },
       "evidence_bundle_ref": "evd-arb-20261115-001",
-      "judicial_export": {
-        "format": "json_jws",
-        "export_id": "exp-ci-20261115-001",
-        "chain_of_custody": true,
-        "notarization_ref": "notary-sh-2026-11-0042"
-      }
+      "judicial_export_ref": "exp-ci-20261115-001"
     },
-    "status": "resolved",
-    "valid_next_actions": [
-      "utp.resolve.compensate"
-    ]
-  }
+    "resolution_outcome": {
+      "outcome_id": "res-outcome-20261115-001",
+      "dispute_id": "dsp-20260901-001",
+      "result": "terminate_with_refund",
+      "instructions": [
+        {
+          "instruction_type": "refund",
+          "refund_instruction": {
+            "payment_confirmation_id": "pay-cfm-crossborder-001",
+            "source_instruction_ref": "res-outcome-20261115-001",
+            "refund_amount": { "amount": "42500.00", "currency": "USD" },
+            "refund_reason": "resolve.arbitration_award"
+          }
+        },
+        {
+          "instruction_type": "cancel_transaction",
+          "target_action": "utp.purchase.cancel",
+          "payload": {
+            "order_id": "ord-crossborder-001"
+          }
+        }
+      ],
+      "compensation_order": {
+        "compensation_order_id": "comp-order-20261115-001",
+        "refund_amount": { "amount": "42500.00", "currency": "USD" },
+        "total_compensation": { "amount": "42500.00", "currency": "USD" },
+        "refund_source": "escrow_full_release_to_buyer",
+        "deadline": "2026-12-15T23:59:59Z"
+      },
+      "next_global_state_hint": "CANCELLED",
+      "evidence_ref": "evd-resolution-20261115-001"
+    },
+    "evidence_bundle_ref": "evd-dsp-crossborder-001",
+    "raised_at": "2026-09-01T09:00:00Z",
+    "resolved_at": "2026-11-15T16:00:00Z"
+  },
+  "valid_next_actions": [
+    "utp.resolve.compensate"
+  ]
 }
 ```
 
@@ -624,31 +785,12 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
 {
   "action": "utp.resolve.compensate",
   "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "dsp-compensate-20260821-001",
   "input": {
     "dispute_id": "dsp-20260815-001",
-    "transaction_id": "utp-txn-20260718-001",
-    "compensation_order": {
-      "source": "mediation_result",
-      "mediation_result_ref": "med-20260820-001",
-      "actions": [
-        {
-          "type": "RefundInstruction",
-          "action": "utp.pay.refund",
-          "payment_confirmation_id": "pay-cfm-20260720-001",
-          "refund_amount": { "amount": 2430.00, "currency": "CNY" },
-          "refund_reason": "resolve.partial_quality_compensation",
-          "source_instruction_ref": "res-outcome-20260820-001"
-        },
-        {
-          "type": "return_shipping",
-          "items": [
-            { "item_id": "item-servo-200w-001", "quantity": 15 }
-          ],
-          "responsible_party": "cn-usc-91440300MA5FGH2B",
-          "deadline": "2026-09-01T23:59:59Z"
-        }
-      ]
-    }
+    "resolution_outcome_id": "res-outcome-20260820-001",
+    "compensation_order_id": "comp-order-20260820-001"
   }
 }
 ```
@@ -658,40 +800,109 @@ Resolve 原语包含四个子操作：`raise`、`mediate`、`arbitrate`、`compe
 ```json
 {
   "action": "utp.resolve.compensate",
+  "session_id": "utp-session-b2b-001",
+  "transaction_id": "utp-txn-20260718-001",
+  "idempotency_key": "dsp-compensate-20260821-001",
+  "primitive_state": "COMPENSATED",
+  "execution_result": "SUCCESS",
   "output": {
-    "dispute_id": "dsp-20260815-001",
-    "transaction_id": "utp-txn-20260718-001",
-    "compensation_result": {
+    "dispute_record": {
+      "dispute_id": "dsp-20260815-001",
       "status": "compensated",
-      "executed_actions": [
-        {
-          "type": "RefundResult",
-          "invoked_action": "utp.pay.refund",
-          "status": "completed",
-          "refunded_amount": { "amount": 2430.00, "currency": "CNY" },
-          "channel_refund_id": "refund-alipay-20260821-001",
-          "payment_event_ref": "payevt-refund-20260821-001",
-          "completed_at": "2026-08-21T10:15:00Z"
+      "dispute_type": "quality_dispute",
+      "dispute_scope": "fulfill",
+      "dispute_scope_detail": {
+        "order_id": "ord-20260718-001",
+        "batch_id": "batch-20260805-A",
+        "claimed_amount": { "amount": "18805.80", "currency": "CNY" }
+      },
+      "claimant": {
+        "agent_id": "buyer-agent-001",
+        "role": "Buyer"
+      },
+      "respondent": {
+        "agent_id": "seller-agent-001",
+        "role": "Seller"
+      },
+      "claim": {
+        "summary": "Delivered servo motors do not meet agreed torque specification.",
+        "requested_resolution": "partial_refund",
+        "requested_amount": { "amount": "18805.80", "currency": "CNY" }
+      },
+      "resolution_level": "L2",
+      "resolution_outcome": {
+        "outcome_id": "res-outcome-20260820-001",
+        "dispute_id": "dsp-20260815-001",
+        "result": "partial_compensation",
+        "instructions": [
+          {
+            "instruction_type": "refund",
+            "refund_instruction": {
+              "payment_confirmation_id": "pay-cfm-20260720-001",
+              "source_instruction_ref": "res-outcome-20260820-001",
+              "refund_amount": { "amount": "2430.00", "currency": "CNY" },
+              "refund_reason": "resolve.partial_quality_compensation"
+            }
+          },
+          {
+            "instruction_type": "return_shipment",
+            "target_action": "utp.fulfill.reject"
+          }
+        ],
+        "compensation_order": {
+          "compensation_order_id": "comp-order-20260820-001",
+          "refund_amount": { "amount": "2430.00", "currency": "CNY" },
+          "total_compensation": { "amount": "2430.00", "currency": "CNY" },
+          "refund_source": "escrow_holdback",
+          "additional_actions": [
+            {
+              "action_type": "return_shipping",
+              "target_action": "utp.fulfill.reject"
+            }
+          ],
+          "deadline": "2026-09-01T23:59:59Z"
         },
-        {
-          "type": "return_shipping",
-          "status": "pending",
-          "tracking_number": null,
-          "deadline": "2026-09-01T23:59:59Z",
-          "note": "Seller to arrange return shipping by deadline"
-        }
-      ],
-      "session_state_transition": {
-        "from": "FULFILLING",
-        "to": "FULFILLING",
-        "note": "Partial compensation executed. Remaining fulfillment continues for non-defective units."
-      }
+        "next_global_state_hint": "FULFILLING",
+        "evidence_ref": "evd-resolution-20260820-001"
+      },
+      "compensation_result": {
+        "status": "compensated",
+        "executed_actions": [
+          {
+            "action_type": "refund",
+            "target_action": "utp.pay.refund",
+            "status": "completed",
+            "result_ref": "rfnd-20260821-001",
+            "amount": { "amount": "2430.00", "currency": "CNY" },
+            "completed_at": "2026-08-21T10:15:00Z"
+          },
+          {
+            "action_type": "return_shipping",
+            "target_action": "utp.fulfill.reject",
+            "status": "completed",
+            "result_ref": "return-shipment-20260821-001",
+            "completed_at": "2026-08-21T10:30:00Z"
+          }
+        ],
+        "completed_at": "2026-08-21T10:30:00Z"
+      },
+      "evidence_bundle_ref": "evd-dsp-20260815-001",
+      "raised_at": "2026-08-15T10:00:00Z",
+      "resolved_at": "2026-08-20T16:00:00Z"
     },
-    "valid_next_actions": [
-      "utp.fulfill.receive",
-      "utp.pay.term"
-    ]
-  }
+    "refund_result": {
+      "refund_id": "rfnd-20260821-001",
+      "status": "refunded",
+      "refunded_amount": { "amount": "2430.00", "currency": "CNY" },
+      "channel_refund_id": "refund-alipay-20260821-001",
+      "payment_event_ref": "payevt-refund-20260821-001",
+      "evidence_ref": "evd-refund-20260821-001"
+    }
+  },
+  "valid_next_actions": [
+    "utp.fulfill.receive",
+    "utp.pay.term"
+  ]
 }
 ```
 

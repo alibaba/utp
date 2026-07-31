@@ -9,10 +9,10 @@ format: html
 <h1 id="s-8-procurement-mode">采购模式</h1>
 <p>采购模式（Procurement Mode）用于描述一笔采购交易在价格形成、价格决策、付款、履约、交易关系和合规要求方面的执行要求。UTP 对 B2C 与 B2B 采用统一的协议模型，并通过六个可独立协商的维度配置每笔交易的原语行为、交互流程和约束条件。两类交易共享相同的消息模型、交易原语和状态语义，差异由实际 Mode 配置表达。</p>
 <hr />
-<h2 id="s-81-mode-dimensions">8.1 Mode 维度（Mode Dimensions）</h2>
-<h3 id="s-811">8.1.1 维度模型</h3>
+<h2 id="s-81-mode-dimensions">Mode 维度（Mode Dimensions）</h2>
+<h3 id="s-811">维度模型</h3>
 <p>一次交易的 Mode 是一个六元组：</p>
-<h3 id="s-812">8.1.2 六维度定义表</h3>
+<h3 id="s-812">六维度定义表</h3>
 <table>
 <thead>
 <tr>
@@ -82,7 +82,7 @@ format: html
 </tr>
 </tbody>
 </table>
-<h3 id="s-813-level">8.1.3 Level 语义精确定义</h3>
+<h3 id="s-813-level">Level 语义精确定义</h3>
 <p>每个 Level MUST 有明确的、可机器判定的定义。以下逐维度定义各 Level 的精确语义。</p>
 <p><strong>pricing_mode（价格模式）：</strong></p>
 <table>
@@ -280,11 +280,11 @@ format: html
 </table>
 <p><code>compliance_level</code> 描述本次采购适用的合规要求及其协议行为，不决定其他 Mode 维度的 Level。L2 表示履约跨越关境时启用跨境清关合规校验，并在适用的主体与商品资质上继承 L1 要求；它不描述物流段数或关务复杂度。L3 对本次采购实际适用的合规事项形成完整审计，但不因 Level 升高而引入本次采购不适用的跨境清关义务。</p>
 <hr />
-<h2 id="s-82-mode-evaluation-upgrade">8.2 Mode 判定与升级（Mode Determination and Upgrade）</h2>
+<h2 id="s-82-mode-evaluation-upgrade">Mode 判定与升级（Mode Determination and Upgrade）</h2>
 <p>第三章发现与协商的结果为每个 Mode 维度确定一个可用 Level 交集集合，当前生效的 Mode 则为每个维度选择一个确定 Level。升级表示从当前 Level 切换到复杂度编号更高的 Level，不表示目标 Level 包含当前 Level 或任何中间 Level。升级目标 MUST 是该维度交集集合中明确存在的成员；例如交集为 <code>["L1", "L3"]</code> 时，可以从 L1 直接升级到 L3，但不得选择或隐含支持 L2。</p>
-<h3 id="s-821-mode-evaluation-inputs">8.2.1 Mode 判定依据</h3>
+<h3 id="s-821-mode-evaluation-inputs">Mode 判定依据</h3>
 <p>Mode 决定 Agent 可以规划和执行哪些 Action，Action 不得反向触发 Mode 升级。买方 Agent MUST 在生成下一项 Action 之前，根据机器可读的采购目标、Mandate、当前交易计划、已经确认的结构化交易事实、本章定义的核心 Level 规则和已启用的领域扩展规则，重新判定本次交易所需的 Mode。相同输入和规则 MUST 产生相同的 Mode 判定结果。</p>
-<h3 id="s-823-modeupgrade">8.2.3 ModeUpgrade 实体</h3>
+<h3 id="s-823-modeupgrade">ModeUpgrade 实体</h3>
 <table>
 <thead>
 <tr>
@@ -339,7 +339,7 @@ format: html
 </tr>
 </tbody>
 </table>
-<h3 id="s-824-upgrade-rules">8.2.4 Mode 升级约束</h3>
+<h3 id="s-824-upgrade-rules">Mode 升级约束</h3>
 <ol>
 <li>升级 MUST 仅允许切换至复杂度编号更高的 Level，不允许降级。</li>
 <li>目标 Level MUST 是第三章协商结果中该维度交集集合的成员。协议不得根据目标 Level 的编号推断任何未出现在集合中的中间 Level 可用。</li>
@@ -351,8 +351,8 @@ format: html
 <li>交集集合仅含当前 Level、目标 Level 不在交集集合中或超出 Mandate 时，Agent MUST 重新规划、重新发现协商或终止任务，不得自动扩大能力或授权边界。</li>
 </ol>
 <hr />
-<h2 id="s-83-mode-primitive-rules">8.3 Mode 与原语、角色关联规则（Mode-Based Primitive and Role Association Rules）</h2>
-<h3 id="s-831-primitive-constraints">8.3.1 Mode 对原语执行的约束</h3>
+<h2 id="s-83-mode-primitive-rules">Mode 与原语、角色关联规则（Mode-Based Primitive and Role Association Rules）</h2>
+<h3 id="s-831-primitive-constraints">Mode 对原语执行的约束</h3>
 <p>当前生效的 Mode 决定各交易原语可以执行的 Action、适用的处理流程和约束条件。原语 MUST 按当前 Mode 中各维度的确定 Level 执行，不得使用未在第三章协商交集集合中确认或尚未生效的 Level。</p>
 <table>
 <thead>
@@ -391,7 +391,7 @@ format: html
 </tbody>
 </table>
 <p>详细的行为多态定义参见第 11—16 章各交易原语。</p>
-<h3 id="s-832-role-primitive-associations">8.3.2 Mode Level 角色与原语关联定义</h3>
+<h3 id="s-832-role-primitive-associations">Mode Level 角色与原语关联定义</h3>
 <p>六维 Mode Level 关联定义 MUST 在根对象中声明 <code>base_roles</code>，并在每个 Level 中声明 <code>associated_roles</code> 与 <code>primitives</code>。角色值 MUST 引用角色注册表中的 <code>role_id</code>；<code>primitives</code> MUST 使用标准交易原语标识。</p>
 <p>字段结构如下：</p>
 <table>
@@ -646,12 +646,12 @@ format: html
 
 
 <hr />
-<h2 id="s-84-dimension-governance">8.4 维度扩展与治理（Dimension Extension and Governance）</h2>
-<h3 id="s-841">8.4.1 治理模型概述</h3>
+<h2 id="s-84-dimension-governance">维度扩展与治理（Dimension Extension and Governance）</h2>
+<h3 id="s-841">治理模型概述</h3>
 <p>维度的定义不是静态的。随着商业场景演进，新维度可能出现（如碳排放交易的 <code>sustainability_level</code>、AI 生成服务的 <code>delivery_certainty</code>）。但并非任何维度都可纳入 Mode 体系 —— 如果谁都能定义维度，不同实现使用不同维度体系，Mode 协商将失去互操作性。</p>
 <p>UTP 采用三层治理模型（M1 - M3）：M1 定义维度成立规则，M2 定义协议核心维度，M3 管理经过注册的领域扩展维度。交易参与方不得在单次交易中临时创建新的 Mode 维度。</p>
 
-<h3 id="s-842-m1">8.4.2 M1：维度元规则（协议宪法）</h3>
+<h3 id="s-842-m1">M1：维度元规则（协议宪法）</h3>
 <p>M1 定义"什么是一个合法的 Mode 维度"的判定标准。一个候选维度 MUST 同时满足以下四个条件才能成为 Mode 维度：</p>
 <p><strong>条件一：正交性（Orthogonality）</strong></p>
 <p>候选维度 MUST 与其他已有维度线性无关。一个维度的 Level 变化不隐含任何其他维度的 Level 变化。</p>
@@ -677,7 +677,7 @@ format: html
 <li>正例：<code>payment_structure</code> 在所有电商采购场景中都有意义。</li>
 <li>反例：<code>customs_complexity</code>（海关复杂度）仅在跨境场景有意义，适合作为 M3 领域维度而非 M2 核心维度。</li>
 </ul>
-<h3 id="s-843-m2">8.4.3 M2：核心维度集（协议规范正文）</h3>
+<h3 id="s-843-m2">M2：核心维度集（协议规范正文）</h3>
 <p>协议 1.0 版本在规范正文中定义初始的 6 个核心维度（见 8.1.2）。这些维度覆盖绝大多数 B2B 和 B2C 场景。</p>
 <p><strong>变更规则：</strong></p>
 <ol>
@@ -686,7 +686,7 @@ format: html
 <li>变更 MUST 通过向后兼容性评审 —— 新维度 MUST NOT 破坏已有 Mode 配置的语义。</li>
 <li>废弃维度时 MUST 定义迁移路径，确保已有实现可平滑过渡。</li>
 </ol>
-<h3 id="s-844-m3">8.4.4 M3：领域维度扩展（行业联盟注册）</h3>
+<h3 id="s-844-m3">M3：领域维度扩展（行业联盟注册）</h3>
 <p>当核心维度不足以描述某个行业的交易复杂度时，行业联盟 MAY 定义领域维度组，并在 UTP 维度注册表中注册。</p>
 <p><strong>领域维度注册要求：</strong></p>
 <ol>
@@ -740,7 +740,7 @@ format: html
 </table>
 <p>核心 <code>compliance_level=L2</code> 表示本次采购启用跨境清关合规校验；领域扩展中的 <code>customs_complexity</code> 仅在需要时进一步描述单一关区、多国中转、反倾销或特殊监管区等关务复杂度。前者决定是否执行跨境清关合规校验，后者细化关务复杂度，二者不得重复表达同一语义。</p>
 <p><strong>实现方按需支持</strong> —— 跨境平台实现 <code>cross_border</code> 扩展，不做出海业务的平台 MAY 不实现。</p>
-<h3 id="s-845-dimensiondefinition">8.4.5 DimensionDefinition 实体</h3>
+<h3 id="s-845-dimensiondefinition">DimensionDefinition 实体</h3>
 <p><strong>DimensionDefinition 实体定义：</strong></p>
 <table>
 <thead>
@@ -818,7 +818,7 @@ format: html
 }
 </code></pre>
 
-<h2 id="s-85">8.5 本章实体索引（Entity Index）</h2>
+<h2 id="s-85">本章实体索引（Entity Index）</h2>
 <p>本章当前定义的完整实体列表如下。实体字段及其规范性约束以“所属节”中的定义为准，本节仅提供汇总索引，不重复定义实体。</p>
 <table>
 <thead>

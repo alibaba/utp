@@ -6,7 +6,7 @@ status: drafting
 version: 2026-07-29
 ---
 
-# Fulfill 履约原语 {#s-15-p5-fulfill}
+# 履约原语（Fulfill） {#s-15-p5-fulfill}
 
 ## 原语身份（Primitive Identity） {#s-151}
 
@@ -53,11 +53,11 @@ Fulfill 覆盖采购方在履约阶段的以下能力：
 | 条件 | 说明 |
 | --- | --- |
 | `session.state == 'SETTLED'` | 全部商品已交付并确认收货。 |
-| FulfillmentReceipt 已生成 | 包含所有批次的交付确认记录。 |
+| ReceiptConfirmation 已生成 | 包含当前批次的收货确认记录。 |
 | Escrow 资金已释放（若适用） | 当拓扑包含 Escrow 角色且 `receive` 通过时，触发 Escrow 释放。 |
 | `evidence_bundle` 已追加履约证据 | 物流记录、验货报告、签收确认等已追加至证据包。 |
 
-## 生命周期与状态机（Lifecycle / State Machine） {#s-153}
+## 生命周期与状态机（Lifecycle and State Machine） {#s-153}
 
 ### 采购方可观测状态机 {#s-1531}
 
@@ -91,14 +91,14 @@ Fulfill 覆盖采购方在履约阶段的以下能力：
 | `FULFILL.RECEIVE_BEFORE_DELIVERY` | 409 | 货物送达前尝试确认收货。 | 等待妥投后再确认。 |
 | `FULFILL.RECEIVE_QUANTITY_MISMATCH` | 422 | 确认数量超过应交付数量。 | 校正数量或改为部分收货。 |
 | `FULFILL.INSPECTION_REQUIRED` | 409 | 要求验货但尚未产生验货结论。 | 等待验货结论。 |
-| `FULFILL.ALREADY_RECEIVED` | 409 | 批次已确认收货。 | 幂等返回既有 FulfillmentReceipt。 |
+| `FULFILL.ALREADY_RECEIVED` | 409 | 批次已确认收货。 | 幂等返回既有 ReceiptConfirmation。 |
 | `FULFILL.ALREADY_REJECTED` | 409 | 批次已有拒收记录。 | 幂等返回既有 RejectionConfirmation。 |
 
 尚未发货、暂无物流事件或订单列表为空是正常结果，MUST 通过 `output.status`、空集合或 `valid_next_actions` 表达，不使用错误响应。
 
 ## 采购方职责与访问约束（Buyer Guidelines and Access Constraints） {#s-155}
 
-Fulfill 不定义固定的 OAuth scope。能力提供方是否要求用户授权应在 Profile 的 `utp.fulfill` 声明中通过 `authorization` 表达；物流、签收、拒收与证据字段的可见性由能力提供方策略控制。
+Fulfill 的授权要求由能力提供方在 Profile 的 `utp.fulfill.authorization` 中声明；物流、签收、拒收与证据字段的可见性由能力提供方的访问策略控制。
 
 **约束：** `receive` 和 `reject` MUST 仅由 Buyer 执行。采购方只能通过 `list` 和 `query` 访问与自身关联的订单；采购方 SHOULD 通过 `query` 关注关键节点，对已到达批次 SHOULD 独立验收；拒收时 MUST 提供结构化理由和证据。
 
@@ -125,7 +125,7 @@ Fulfill 不定义固定的 OAuth scope。能力提供方是否要求用户授权
   - **后续操作：** `list`、`query`
 - **`utp.fulfill.query`**
   - **角色绑定：** Buyer → Seller
-  - **执行说明：** Buyer 按 `order_id` 查询单笔订单的履约事件、批次、物流、验货和凭证摘要；Seller 返回当前可见状态，不改变履约状态。
+  - **执行说明：** Buyer 按 `order_id` 查询单笔订单的履约事件、批次、物流、验货和凭证摘要；Seller 返回当前可见状态，履约状态保持不变。
   - **适用状态：** 任意
   - **状态影响：** 无
   - **后续操作：** 当前状态可执行的操作
@@ -157,5 +157,7 @@ Fulfill 不定义固定的 OAuth scope。能力提供方是否要求用户授权
 ### 订单履约事件通知（notify） {#s-1571}
 
 `notify` 是 Seller 向采购方推送的订单履约事件通知，在发货、延迟、妥投、验货结论等关键节点触发，用于驱动采购方可观测状态机迁移。通知 MUST 携带 `order_id`，SHOULD 携带其所属 `purchase_id` 与 `transaction_id`；物流单、包裹和运单号作为事件的可选关联资源返回。
+
+`notify` 的业务输入与 `query` 返回的履约事件历史共用 `FulfillmentEvent` 实体。`event_type` 表示事件类别，`status` 表示已发生的履约事实；处理方 MUST 使用 `event_id` 幂等去重。
 
 `notify` 与 `query` 职责区分明确：`notify` 为对端主动推送并驱动状态迁移；`query` 为采购方针对单个 `order_id` 主动发起的只读查询，不驱动状态迁移。采购方 MAY 仅依赖 `notify` 感知进展，也 MAY 在任意时刻用 `query` 主动核对。

@@ -10,6 +10,7 @@
       "description": "Payer 基于 Purchase 聚合和令牌化支付工具发起支付授权，PaymentProcessor 返回包含协议支付请求标识与当前状态的聚合。",
       "initiator_role": "Payer",
       "handler_role": "PaymentProcessor",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/payment_request.json"
       },
@@ -23,14 +24,15 @@
       ]
     },
     "confirm": {
-      "description": "Payer 或协议引擎提交支付渠道事实，PaymentProcessor 验签并返回支付确认、累计进度和标准支付事件。",
+      "description": "Payer 或协议引擎提交支付渠道事实，PaymentProcessor 验签并返回处理中、已确认或失败状态；仅确认成功时签发 PaymentConfirmation。",
       "initiator_role": "Payer",
       "handler_role": "PaymentProcessor",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/confirm_input.json"
       },
       "output_schema": {
-        "$ref": "entities/confirm_output.json"
+        "$ref": "entities/payment_execution_result.json"
       },
       "transport_bindings": [
         { "type": "rest", "method": "POST", "path": "/utp/v1/payments/{payment_request_id}/confirm" },
@@ -39,14 +41,21 @@
       ]
     },
     "term": {
-      "description": "Payer 在结构化履约条件满足后执行一个付款阶段，PaymentProcessor 返回该阶段确认与累计支付进度。",
+      "description": "Payer 在结构化履约条件满足后执行一个付款阶段，PaymentProcessor 返回当前处理状态与累计进度；仅确认成功时签发 PaymentConfirmation。",
       "initiator_role": "Payer",
       "handler_role": "PaymentProcessor",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/term_input.json"
       },
       "output_schema": {
-        "$ref": "entities/term_output.json"
+        "allOf": [
+          { "$ref": "entities/payment_execution_result.json" },
+          {
+            "type": "object",
+            "required": ["payment_progress"]
+          }
+        ]
       },
       "transport_bindings": [
         { "type": "rest", "method": "POST", "path": "/utp/v1/payments/terms" },
@@ -58,6 +67,7 @@
       "description": "Payer 只读查询单笔支付或 Purchase 下全部付款阶段的协议侧状态快照，不产生资金或状态副作用。",
       "initiator_role": "Payer",
       "handler_role": "PaymentProcessor",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/query_input.json"
       },
@@ -74,6 +84,7 @@
       "description": "Arbiter 代表已授权的 Resolve 或 Saga 处置请求退款，PaymentProcessor 执行后返回渠道退款结果；Buyer 与 Seller 不得直接调用。",
       "initiator_role": "Arbiter",
       "handler_role": "PaymentProcessor",
+      "data_visibility": "V2",
       "input_schema": {
         "$ref": "entities/refund_instruction.json"
       },
@@ -103,22 +114,36 @@
       { "from": "INIT", "action": "utp.pay.initiate", "to": "AUTHORIZED" },
       { "from": "AUTHORIZED", "action": "utp.pay.confirm", "to": "PROCESSING" },
       { "from": "AUTHORIZED", "action": "utp.pay.term", "to": "PROCESSING" },
-      { "from": "PROCESSING", "event": "payment_captured", "to": "CONFIRMED" },
-      { "from": "PROCESSING", "event": "payment_failed", "to": "FAILED" },
-      { "from": "CONFIRMED", "event": "remaining_terms_detected", "to": "PARTIAL" },
-      { "from": "CONFIRMED", "event": "all_terms_completed", "to": "COMPLETED" },
+      { "from": "AUTHORIZED", "action": "utp.pay.confirm", "to": "CONFIRMED", "condition": "同步返回 PAYMENT_CAPTURED" },
+      { "from": "AUTHORIZED", "action": "utp.pay.confirm", "to": "FAILED", "condition": "同步返回 PAYMENT_FAILED" },
+      { "from": "AUTHORIZED", "action": "utp.pay.term", "to": "CONFIRMED", "condition": "同步返回 PAYMENT_CAPTURED" },
+      { "from": "AUTHORIZED", "action": "utp.pay.term", "to": "FAILED", "condition": "同步返回 PAYMENT_FAILED" },
+      { "from": "PROCESSING", "event": "PAYMENT_CAPTURED", "to": "CONFIRMED" },
+      { "from": "PROCESSING", "event": "PAYMENT_FAILED", "to": "FAILED" },
+      { "from": "CONFIRMED", "event": "REMAINING_TERMS_DETECTED", "to": "PARTIAL" },
+      { "from": "CONFIRMED", "event": "ALL_TERMS_COMPLETED", "to": "COMPLETED" },
       { "from": "PARTIAL", "action": "utp.pay.term", "to": "PROCESSING" },
-      { "from": "FAILED", "action": "utp.pay.initiate", "to": "AUTHORIZED", "condition": "失败补偿已完成且仍允许重试" },
-      { "from": "CONFIRMED", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "退款覆盖当前已确认金额" },
-      { "from": "PARTIAL", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "退款终止剩余付款义务" },
-      { "from": "COMPLETED", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "Resolve 或 Saga 授权退款" }
+      { "from": "PARTIAL", "action": "utp.pay.term", "to": "CONFIRMED", "condition": "同步返回 PAYMENT_CAPTURED" },
+      { "from": "PARTIAL", "action": "utp.pay.term", "to": "FAILED", "condition": "同步返回 PAYMENT_FAILED" },
+      { "from": "FAILED", "event": "COMPENSATION_COMPLETED", "to": "COMPENSATED" },
+      { "from": "COMPENSATED", "action": "utp.pay.initiate", "to": "AUTHORIZED", "condition": "交易规则仍允许重试" },
+      { "from": "CONFIRMED", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "退款已完成且覆盖当前已确认金额" },
+      { "from": "CONFIRMED", "action": "utp.pay.refund", "to": "CONFIRMED", "condition": "退款已完成、仅覆盖部分金额且当前付款义务仍然有效" },
+      { "from": "PARTIAL", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "退款已完成且终止剩余付款义务" },
+      { "from": "PARTIAL", "action": "utp.pay.refund", "to": "PARTIAL", "condition": "退款已完成、仅覆盖部分金额且仍有后续付款义务" },
+      { "from": "COMPLETED", "action": "utp.pay.refund", "to": "COMPENSATED", "condition": "Resolve 或 Saga 授权的全额终止性退款已完成" },
+      { "from": "COMPLETED", "action": "utp.pay.refund", "to": "COMPLETED", "condition": "Resolve 或 Saga 授权的部分退款已完成且剩余支付事实仍有效" }
     ],
     "constraints": {
       "notes": [
         "utp.pay.query 在所有状态均为只读操作，不触发状态迁移。",
+        "除 query 外的 Pay Action 必须在统一请求信封中携带 transaction_id 与 idempotency_key；query 必须携带 transaction_id。",
         "支付渠道原始状态必须先通过 PaymentAdapterContract 映射为标准 PaymentEvent。",
         "一个交易可产生多个渠道流水，但所有 Pay Action 必须使用统一请求信封中的 transaction_id 关联交易。",
-        "退款金额不得超过原支付可退余额，并必须产生 PAYMENT_REFUNDED 事件。"
+        "PaymentRequest.amount 必须等于 AmountBreakdown 计算结果，SettlementInstruction.splits 金额合计必须等于本次支付金额，且所有金额币种必须一致。",
+        "PaymentProgress.total_amount 必须等于 paid_amount 与 remaining_amount 之和，completed_terms 不得包含重复阶段；存在剩余付款义务时 next_term 必须对应尚未完成的阶段。",
+        "支付授权必须动态绑定本次金额与收款方；支付工具令牌、Mandate 和委托凭证不得出现在响应或日志中。",
+        "退款金额不得超过原支付可退余额；只有退款完成时才产生 PAYMENT_REFUNDED 事件并迁移 Pay 状态，processing 或 failed 必须保持原支付事实状态且不得伪造完成事件。"
       ]
     }
   }
