@@ -13,43 +13,19 @@
     },
     "stages": {
       "type": "array",
-      "items": { //  履约阶段 ==?
-        "type": "object",
-        "properties": {
-          "stage": {
-            "type": "string",
-            "enum": [
-              "PREPARATION",
-              "SHIPPING",
-              "CUSTOMS",
-              "INSPECTION",
-              "SERVICE_ACTIVATION"
-            ],
-            "description": "履约阶段。"
-          },
-          "estimated_days": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "预估时长（天）。"
-          },
-          "estimated_date": {
-            "type": "string",
-            "format": "date",
-            "description": "预估完成日期。"
-          }
-        },
-        "required": [
-          "stage"
-        ],
-        "additionalProperties": true
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/fulfillment_stage"
       },
-      "description": "分阶段预估明细。"
+      "description": "分阶段预估明细；阶段时效已知时通过 leadtime 表达预计天数和预计完成时间。"
     },
-    // 预计发货时间
-    "estimated_delivery_date": { // 预计收货时间
-      "type": "string",
-      "format": "date",
-      "description": "预估交付日期。"
+    "estimated_delivery_leadtime": {
+      "$ref": "../../common/entities/leadtime.json",
+      "description": "订单预计交付时效。"
+    },
+    "promised_delivery_leadtime": {
+      "$ref": "../../common/entities/leadtime.json",
+      "description": "订单承诺交付时效，可选；由订单或 TradeMethod 提供。"
     },
     "updated_at": {
       "type": "string",
@@ -75,10 +51,33 @@
   },
   "required": [
     "order_id",
-    "estimated_delivery_date"
+    "estimated_delivery_leadtime"
   ],
-
-  // + 承诺时间
-  // 时间（天数）+日期 履约统一表达
-  "additionalProperties": true
+  "additionalProperties": true,
+  "$defs": {
+    "fulfillment_stage": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": [
+            "PREPARATION",
+            "SHIPPING",
+            "CUSTOMS",
+            "INSPECTION",
+            "SERVICE_ACTIVATION"
+          ],
+          "description": "履约阶段。"
+        },
+        "leadtime": {
+          "$ref": "../../common/entities/leadtime.json",
+          "description": "该阶段的履约时效，可选；暂无法估算时可仅返回 stage。"
+        }
+      },
+      "required": [
+        "leadtime"
+      ],
+      "additionalProperties": true
+    }
+  }
 }
