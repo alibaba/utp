@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_execution_result.json",
+  "version": "2026-07-31",
+  "title": "PaymentExecutionResult",
+  "description": "支付渠道确认或付款阶段执行后的当前状态，以及按状态返回的确认凭证、累计进度和标准事件。",
+  "type": "object",
+  "required": [
+    "status"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["processing", "confirmed", "failed"],
+      "description": "本次支付执行后的状态：processing 仍在处理；confirmed 已确认；failed 最终失败。"
+    },
+    "payment_confirmation": {
+      "$ref": "payment_confirmation.json",
+      "description": "支付确认成功后签发的凭证。"
+    },
+    "payment_progress": {
+      "$ref": "payment_progress.json",
+      "description": "包含本次执行结果的累计支付进度。"
+    },
+    "payment_event": {
+      "$ref": "payment_event.json",
+      "description": "本次执行产生的标准支付事件。"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "confirmed", "description": "支付已确认成功。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["payment_confirmation", "payment_event"],
+        "properties": {
+          "payment_event": {
+            "description": "确认成功时产生的标准捕获事件。",
+            "properties": {
+              "event_type": { "const": "PAYMENT_CAPTURED", "description": "确认成功必须产生捕获事件。" }
+            },
+            "required": ["event_type"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "failed", "description": "支付已最终失败。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["payment_event"],
+        "properties": {
+          "payment_event": {
+            "description": "支付失败时产生的标准失败事件。",
+            "properties": {
+              "event_type": { "const": "PAYMENT_FAILED", "description": "最终失败必须产生失败事件。" }
+            },
+            "required": ["event_type"]
+          }
+        },
+        "not": { "required": ["payment_confirmation"] }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "processing", "description": "支付仍在渠道处理中。" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "payment_event": {
+            "description": "处理中可选回显的既有授权事件。",
+            "properties": {
+              "event_type": { "const": "PAYMENT_AUTHORIZED", "description": "处理中若返回事件，只能回显既有授权事实。" }
+            },
+            "required": ["event_type"]
+          }
+        },
+        "not": { "required": ["payment_confirmation"] }
+      }
+    }
+  ],
+  "additionalProperties": true
+}
