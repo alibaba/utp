@@ -15,20 +15,6 @@
       "type": "string",
       "minLength": 1,
       "description": "订单交付批次标识，可选。"
-    },
-    "scope": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "enum": [
-          "PREPARATION",
-          "SHIPPING",
-          "CUSTOMS",
-          "INSPECTION",
-          "SERVICE_ACTIVATION"
-        ]
-      },
-      "description": "可选。请求预估的阶段范围。"
     }
   },
   "required": [

@@ -13,7 +13,7 @@
     },
     "stages": {
       "type": "array",
-      "items": {
+      "items": { //  履约阶段 ==?
         "type": "object",
         "properties": {
           "stage": {
@@ -45,7 +45,8 @@
       },
       "description": "分阶段预估明细。"
     },
-    "estimated_delivery_date": {
+    // 预计发货时间
+    "estimated_delivery_date": { // 预计收货时间
       "type": "string",
       "format": "date",
       "description": "预估交付日期。"
@@ -55,9 +56,9 @@
       "format": "date-time",
       "description": "本次时效预估更新时间，可选。"
     },
-    "delay_reason_code": {
+    "delay_reason": {
       "type": "string",
-      "description": "延迟原因码，可选。"
+      "description": "延迟原因，可选。"
     },
     "risk_flags": {
       "type": "array",
@@ -76,5 +77,8 @@
     "order_id",
     "estimated_delivery_date"
   ],
+
+  // + 承诺时间
+  // 时间（天数）+日期 履约统一表达
   "additionalProperties": true
 }

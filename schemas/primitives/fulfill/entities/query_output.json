@@ -5,6 +5,8 @@
   "title": "FulfillQueryOutput",
   "description": "utp.fulfill.query 的业务输出。返回单笔订单的当前状态、承诺交期、履约事件、履约收据与凭证摘要；回调不可达时 Buyer 通过本操作轮询兜底。",
   "type": "object",
+  // order list
+  //  同一个order
   "properties": {
     "order_id": {
       "type": "string",
@@ -82,10 +84,6 @@
     "evidence_bundle_ref": {
       "type": "string",
       "description": "履约证据包引用，可选。"
-    },
-    "fulfillment_receipt": {
-      "$ref": "fulfillment_receipt.json",
-      "description": "订单履约收据。"
     },
     "receipt_refs": {
       "type": "array",
