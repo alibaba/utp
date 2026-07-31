@@ -1,10 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/receipt_confirmation.json",
-  "version": "2026-07-27",
+  "version": "2026-07-31",
   "title": "ReceiptConfirmation",
   "description": "采购方收货确认凭证。receive 的产出；重复 receive 幂等返回既有凭证。receive 完成可按 TradeMethod 触发 Escrow 释放。",
   "type": "object",
+  "required": [
+    "receipt_id",
+    "order_id",
+    "purchase_id",
+    "transaction_id",
+    "result",
+    "received_quantity",
+    "received_at",
+    "signature"
+  ],
   "properties": {
     "receipt_id": {
       "type": "string",
@@ -15,6 +25,16 @@
       "type": "string",
       "minLength": 1,
       "description": "订单标识。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "订单所属订购标识。"
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "全局事务标识。"
     },
     "batch_id": {
       "type": "string",
@@ -28,6 +48,11 @@
         "CONDITIONAL"
       ],
       "description": "收货结论。CONDITIONAL 表示条件接受，应提供 reason_code。"
+    },
+    "reason_code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "条件接受时的结构化原因码。"
     },
     "received_quantity": {
       "type": "integer",
@@ -45,19 +70,12 @@
       "type": "string",
       "format": "date-time",
       "description": "确认收货时间。"
+    },
+    "signature": {
+      "$ref": "../../common/entities/signature.json",
+      "description": "收货确认凭证的数字签名。"
     }
   },
-  "required": [
-    "receipt_id",
-    "order_id",
-    "purchase_id",
-    "transaction_id",
-    "result",
-    "received_quantity",
-    "received_at",
-    "signature"
-  ],
-  "additionalProperties": true,
   "allOf": [
     {
       "if": {
@@ -76,5 +94,6 @@
         ]
       }
     }
-  ]
+  ],
+  "additionalProperties": true
 }

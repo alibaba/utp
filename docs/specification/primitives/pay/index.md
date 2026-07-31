@@ -509,6 +509,8 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 
 **意图：** 确认支付完成。验证支付渠道的回调结果，确认资金已成功转移（或已入 Escrow 托管）。此操作可在 `initiate` 之后立即调用，也可在异步支付回调到达后由协议引擎自动调用。
 
+`confirm` 与 `term` 共享 `PaymentExecutionResult` 输出实体，以统一 `processing`、`confirmed` 和 `failed` 的凭证与事件约束。`confirm` 在多阶段支付场景中 MAY 返回 `payment_progress`。
+
 **请求（支付渠道回调确认）：**
 
 ```json
@@ -590,6 +592,8 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 ### utp.pay.term {#s-1473-utppayterm}
 
 **意图：** 执行一个付款阶段。在多阶段付款场景中，每个付款阶段调用一次 `term`。每个阶段的前置条件由 TradeMethod 定义，并通过结构化 FulfillmentEventRef 或 MilestoneRef 引用 Fulfill 已定义的事件（如 `notify.status == SHIPPED`、`receive.result == ACCEPTED`），不得引用 Fulfill 原语未定义的内部动作。
+
+`term` 返回同一 `PaymentExecutionResult` 实体，但每次执行 MUST 同时返回 `payment_progress`，用于表达包含当前阶段结果的累计进度。
 
 **请求：**
 

@@ -32,7 +32,7 @@
         "$ref": "entities/confirm_input.json"
       },
       "output_schema": {
-        "$ref": "entities/confirm_output.json"
+        "$ref": "entities/payment_execution_result.json"
       },
       "transport_bindings": [
         { "type": "rest", "method": "POST", "path": "/utp/v1/payments/{payment_request_id}/confirm" },
@@ -49,7 +49,13 @@
         "$ref": "entities/term_input.json"
       },
       "output_schema": {
-        "$ref": "entities/term_output.json"
+        "allOf": [
+          { "$ref": "entities/payment_execution_result.json" },
+          {
+            "type": "object",
+            "required": ["payment_progress"]
+          }
+        ]
       },
       "transport_bindings": [
         { "type": "rest", "method": "POST", "path": "/utp/v1/payments/terms" },

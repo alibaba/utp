@@ -1,10 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/rejection_confirmation.json",
-  "version": "2026-07-27",
+  "version": "2026-07-31",
   "title": "RejectionConfirmation",
   "description": "采购方拒收凭证。生成后激活 Resolve 原语，作为索赔证据链的一部分；被拒批次不再进入 RECEIVED 或 FULFILLED。",
   "type": "object",
+  "required": [
+    "rejection_id",
+    "order_id",
+    "purchase_id",
+    "transaction_id",
+    "reason_code",
+    "evidence_refs",
+    "rejected_at",
+    "signature"
+  ],
   "properties": {
     "rejection_id": {
       "type": "string",
@@ -63,17 +73,19 @@
         "OTHER"
       ],
       "description": "采购方期望的后续处理方向，可选；实际争议处理仍由 Resolve 原语确定。"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "../../common/entities/evidence_reference.json"
+      },
+      "description": "支撑拒收结论的证据引用。"
+    },
+    "signature": {
+      "$ref": "../../common/entities/signature.json",
+      "description": "拒收确认凭证的数字签名。"
     }
   },
-  "required": [
-    "rejection_id",
-    "order_id",
-    "purchase_id",
-    "transaction_id",
-    "reason_code",
-    "evidence_refs",
-    "rejected_at",
-    "signature"
-  ],
   "additionalProperties": true
 }
