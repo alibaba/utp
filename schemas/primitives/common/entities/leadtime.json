@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/leadtime.json",
+  "version": "2026-07-31",
+  "title": "Leadtime",
+  "description": "履约时效实体，包含天数和日期。日期使用 RFC 3339 时间戳。",
+  "type": "object",
+  "properties": {
+    "days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "履约时长（自然日）。"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "履约日期和时间，使用 RFC 3339 格式。"
+    }
+  },
+  "required": [
+    "days",
+    "date"
+  ],
+  "additionalProperties": true
+}
