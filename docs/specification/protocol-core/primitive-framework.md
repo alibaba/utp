@@ -235,7 +235,7 @@ UUID 后缀 MUST 使用 RFC 9562 定义的 UUID v4 小写标准文本，并由�
 
 产生副作用的写操作（创建、修改、删除等）MUST 携带 `idempotency_key`，携带相同幂等键的重复请求返回相同结果、不产生额外副作用；只读操作 MAY 省略。
 
-幂等机制的完整规则——键格式、有效期、内容判重与 `IDEMPOTENCY_CONFLICT` 冲突行为——由[幂等性规则](/documentation/specification/protocol-core/agent-friendly-interface.html#s-183)统一定义，本节不再重复。
+幂等机制的完整规则——键格式、有效期、内容判重与 `TRANSPORT.IDEMPOTENCY_CONFLICT` 冲突行为——由[幂等性规则](/documentation/specification/protocol-core/agent-friendly-interface.html#s-183)统一定义，本节不再重复。
 
 ### 分页约定 {#s-1033-pagination}
 
@@ -247,37 +247,39 @@ UUID 后缀 MUST 使用 RFC 9562 定义的 UUID v4 小写标准文本，并由�
 
 ### 错误码格式 {#s-1041-error-code-format}
 
-UTP 协议采用统一的错误码格式，按来源分为两种形态：
+UTP 协议以同一 `ErrorResponse` / `ErrorDetail` 结构返回错误，并按责任来源使用三种错误码形态：
 
 ```
+TRANSPORT.{CATEGORY}_{DETAIL}   // 网关与通信错误（由传输与通信定义）
 {PRIMITIVE}.{ACTION}.{DETAIL}   // 原语特有错误（三段式）
-UTP.{CATEGORY}_{DETAIL}         // 全局通用错误（两段式）
+UTP.{CATEGORY}_{DETAIL}         // 跨原语通用业务错误（两段式）
 ```
 
+- **TRANSPORT**：传输与通信层的固定命名空间，仅用于网关认证、消息校验、投递、去重和恢复错误；完整类别见[传输与通信](/documentation/specification/protocol-core/transport-communication.html#s-47)。
 - **PRIMITIVE**：原语名称（如 `SOURCE`、`NEGOTIATE`、`PURCHASE`），表示原语特有错误。
 - **ACTION**：触发错误的操作或子域（如 `SEARCH`、`CREATE`、`QUOTE`）。跨操作的通用错误 MAY 省略该段，退化为 `{PRIMITIVE}.{DETAIL}`。
 - **DETAIL**：错误的具体描述标识符。
-- **CATEGORY**：全局错误类别（见 10.4.2）。全局通用错误无操作维度，统一使用 `UTP.{CATEGORY}_{DETAIL}` 两段式。
+- **CATEGORY**：错误类别。`UTP` 类别仅描述业务错误（见 10.4.2）；`TRANSPORT` 类别仅描述网关与通信错误。
 
-示例：`SOURCE.SEARCH.RATE_LIMITED`、`NEGOTIATE.QUOTE.TIMEOUT`、`PURCHASE.CREATE.PRICE_CHANGED`、`UTP.INVALID_PARAM_FORMAT`。
+示例：`TRANSPORT.MESSAGE_INVALID`、`SOURCE.SEARCH.RATE_LIMITED`、`NEGOTIATE.QUOTE.TIMEOUT`、`PURCHASE.CREATE.PRICE_CHANGED`、`UTP.INVALID_PARAM_FORMAT`。
 
 ### 全局错误类别 {#s-1042-global-error-categories}
 
-下列错误类别适用于所有原语，其语义由本章统一定义。
+下列错误类别适用于所有原语，且只描述已进入 P0 或原语处理的业务错误；消息投递、网关认证、Endpoint 可用性和交付超时不属于这些类别。
 
 | 类别 | 前缀 | 含义 | 建议处理 |
 | --- | --- | --- | --- |
 | 请求无效 | `UTP.INVALID_*` | 请求参数格式或语义错误 | 修正参数后重试 |
 | 权限不足 | `UTP.AUTH_FORBIDDEN` | 调用方权限不足 | 检查角色/Scope 授权 |
-| 身份未验证 | `UTP.AUTH_UNAUTHORIZED` | 身份凭证无效或缺失 | 完成身份验证 |
-| 超时 | `UTP.TIMEOUT` | 操作执行超时 | 使用指数退避重试 |
-| 服务不可用 | `UTP.UNAVAILABLE_*` | 服务暂时不可达 | 跳过或延迟重试 |
+| 身份未验证 | `UTP.AUTH_UNAUTHORIZED` | 当前 Action 的身份或授权凭证不满足业务准入 | 完成业务身份验证或更新授权 |
+| 超时 | `UTP.TIMEOUT` | Action 在原语定义的执行时限内未完成 | 使用原语定义的恢复路径或重试 |
+| 服务不可用 | `UTP.UNAVAILABLE_*` | 原语处理所依赖的业务能力暂不可用 | 跳过或延迟重试 |
 | 资源冲突 | `UTP.CONFLICT_*` | 资源状态冲突 | 解决冲突后重试 |
 | 限流 | `UTP.RATE_LIMITED` | 请求频率超出限制 | 按 `Retry-After` 等待 |
 
 ### 标准错误响应格式 {#s-1043-standard-error-response}
 
-UTP 错误响应采用统一的 JSON 结构：
+UTP 直接错误响应采用统一的 JSON 结构（`ErrorResponse`）：
 
 ```json
 {
@@ -310,6 +312,8 @@ UTP 错误响应采用统一的 JSON 结构：
 | `timestamp` | datetime | MUST | 错误发生时间（ISO 8601，UTC）。 |
 
 面向 Agent 的错误恢复语义（`recoverable`、`recovery_actions`、`compensation_log_ref` 等字段）叠加在本结构之上，由[错误恢复语义](/documentation/specification/protocol-core/agent-friendly-interface.html#s-182)定义。
+
+传输与通信层和原语框架 MUST 复用该结构；两者的边界仅由 `error.code` 的前缀决定。`ActionResponse.execution_result` 与 `messages` 的既有语义不因本规则改变。
 
 ### 原语特有错误 {#s-1044-primitive-specific-errors}
 

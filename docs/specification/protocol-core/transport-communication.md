@@ -42,13 +42,13 @@ version: 2026-07-30
 | `sender` | object | MUST | 发送方的可验证主体引用及其当前角色。 |
 | `correlation_id` | string | 响应/通知 SHOULD | 被响应的 `message_id`、Task ID 或已注册订阅引用。 |
 | `mode_ref` / `topology_ref` | string | 会话锁定后 SHOULD | 对已锁定会话快照的不可变引用。 |
-| `payload` | object | MUST | 请求时为完整 P0 ActionRequest；响应时为完整 P0 ActionResponse；错误时为 P0 ErrorDetail。事件通知按事件注册表解释。 |
+| `payload` | object | MUST | 请求时为完整 P0 ActionRequest；响应时为完整 P0 ActionResponse；错误时为 P0 ErrorResponse。事件通知按事件注册表解释。 |
 
 MessageEnvelope 是传输封装，不创建第二套业务请求/响应格式。`payload` 的解释规则如下：
 
 - **请求**：`payload MUST 是完整 P0 ActionRequest`，包括 `action`、`session_id`、条件式 `idempotency_key` 与 `input`。接收方从 `payload.action` 按已协商 Primitive 与扩展声明进行最长匹配，解析所属 Primitive 或扩展。
 - **响应**：`payload MUST 是完整 P0 ActionResponse`，包括 `action`、`session_id`、`output`，并在适用时包含 `idempotency_key`、`primitive_state`、`execution_result` 与 `valid_next_actions`。
-- **错误**：`payload MUST 是 P0 ErrorDetail`。
+- **错误**：`payload MUST 是 P0 ErrorResponse`，即 `{ "error": ErrorDetail }`。错误码的责任归属由本章和 P0 的统一错误规则判定。
 - **通知**：`message_type = notification` 在携带 P0 ActionResponse 的 Action 通知与携带 `event_type` 的事件通知之间二选一；事件通知的 `payload` 按事件注册表中的 Schema 解释。
 
 `payload` 不得成为绕开 P0 Schema、授权或状态校验的旁路。
@@ -108,7 +108,7 @@ MessageEnvelope 是传输封装，不创建第二套业务请求/响应格式。
 
 ### 请求、响应与幂等 {#s-441}
 
-写操作的重试由同一 `session_id`、`action` 和 `idempotency_key` 标识。首次处理完成后，处理方 MUST 在幂等保留期内返回等价的成功、拒绝或失败结果；重试 MUST NOT 创建额外订单、资金动作、库存锁定或补偿记录。幂等键格式、保留期和 `IDEMPOTENCY_CONFLICT` 的完整规则以 P0 的引用规范为准。
+写操作的重试由同一 `session_id`、`action` 和 `idempotency_key` 标识。首次处理完成后，处理方 MUST 在幂等保留期内返回等价的成功、拒绝或失败结果；重试 MUST NOT 创建额外订单、资金动作、库存锁定或补偿记录。幂等键格式、保留期和 `TRANSPORT.IDEMPOTENCY_CONFLICT` 的完整规则以 P0 的引用规范为准。
 
 响应 MUST 通过 `correlation_id`、绑定原生请求标识或两者关联到请求。异步受理而尚无最终结果时，响应 MUST 表达 P0 的 `execution_result = PENDING`；网络已投递不等于业务已完成。
 
@@ -129,7 +129,7 @@ MessageEnvelope 是传输封装，不创建第二套业务请求/响应格式。
 | A2A | Action 映射为 Task，业务结果映射为 Artifact。 | Task 状态与 Artifact 更新。 | Task 生命周期不得替代 P0 原语状态机；Task ID 可作为关联标识。 |
 | Embedded | Action 映射为本地 SDK 调用或事件订阅。 | 回调、Promise 或本地事件流。 | 保留相同的会话、幂等、权限和错误语义。 |
 
-每次请求前，通信层 MUST 按以下顺序确认投递：从 `HandlerRole` 定位其所属的 `service_catalogs` 项；从该目录项的 `services` 唯一服务配置数组取得传输配置；以已协商 Primitive 与扩展声明对完整 Action ID 执行最长匹配，确定适用的 `transport_bindings`；再以 `transport_bindings` 的 `type` 匹配数组项的 `transport`，并将其 Endpoint 与 Action 的 path、Tool、Task 或 SDK 投影组合。UTP 不支持在 Profile、协商结果或路径编排中选择多个 Service：`services` 直接表示同一贸易 API 面的可用传输配置。不存在兼容的可用配置时，通信层 MUST 不发送该请求，并以 P0 的可用性或兼容性错误语义返回结果。
+每次请求前，通信层 MUST 按以下顺序确认投递：从 `HandlerRole` 定位其所属的 `service_catalogs` 项；从该目录项的 `services` 唯一服务配置数组取得传输配置；以已协商 Primitive 与扩展声明对完整 Action ID 执行最长匹配，确定适用的 `transport_bindings`；再以 `transport_bindings` 的 `type` 匹配数组项的 `transport`，并将其 Endpoint 与 Action 的 path、Tool、Task 或 SDK 投影组合。UTP 不支持在 Profile、协商结果或路径编排中选择多个 Service：`services` 直接表示同一贸易 API 面的可用传输配置。不存在兼容的可用配置时，通信层 MUST 不发送该请求，并返回 `TRANSPORT.SERVICE_UNAVAILABLE`。
 
 该确认结果仅服务于本次投递，MUST NOT 写入或冻结为路径编排结果。后续请求 MUST 重新确认，并且仅可在同一已验证的 catalog 中采用另一已声明且可用的兼容绑定；Profile 的 Service 声明发生变化时 MUST 重新发现与协商，再使用新的 catalog。无论选择何种绑定，Action 的业务含义、授权条件、可见数据、调用角色、Selected Mode 和会话语义都不得改变。
 
@@ -151,16 +151,22 @@ MCP、A2A 与 Embedded 绑定 MAY 使用其原生认证机制，但必须提供�
 
 ## 错误与一致性 {#s-47}
 
-传输层错误 MUST 使用 P0 的全局错误框架表达，不得将业务可预期结果伪装为网络错误。
+传输与通信层负责网关与通信错误，MUST 使用 `TRANSPORT.{CATEGORY}_{DETAIL}` 错误码；其返回体 MUST 使用 P0 定义的 `ErrorResponse`。原语框架负责业务错误：跨原语通用业务错误使用 `UTP.{CATEGORY}_{DETAIL}`，原语专有业务错误使用 `{PRIMITIVE}.{ACTION}.{DETAIL}`。调用方 MUST 以错误码前缀判定责任层，不得根据 HTTP 状态、MCP Tool 错误、A2A Task 状态或 SDK 异常推断业务语义。
+
+传输错误发生在 Action 被交给 P0 或原语处理之前，MUST NOT 产生业务状态迁移或业务副作用。原语已受理后的 `PENDING`、`REJECTED`、`FAILURE` 与 `messages` 保持既有 P0 和原语定义；它们不得被通信层改写为 `TRANSPORT.*` 错误。
 
 | 情形 | 处理 | 结果类型 |
 | --- | --- | --- |
-| 签名、会话或上下文无效 | 拒绝投递且不执行 Action。 | `UTP.AUTH_*`、`UTP.INVALID_*` 或实现定义的安全错误。 |
-| Schema 不合法 | 拒绝投递且不执行 Action。 | `UTP.INVALID_*`。 |
-| 幂等键冲突 | 不执行新请求。 | `UTP.CONFLICT_IDEMPOTENCY_KEY`。 |
-| 可恢复的网络或服务故障 | 返回或记录可重试信息。 | `UTP.TIMEOUT`、`UTP.UNAVAILABLE_*`。 |
+| 网关认证或授权失败 | 拒绝投递且不执行 Action。 | `TRANSPORT.AUTH_UNAUTHORIZED` 或 `TRANSPORT.AUTH_FORBIDDEN`。 |
+| 信封、绑定映射或通信载荷不合法 | 拒绝投递且不执行 Action。 | `TRANSPORT.MESSAGE_INVALID`。 |
+| 会话快照、关联或调用方向无效 | 拒绝投递且不执行 Action。 | `TRANSPORT.CONTEXT_INVALID`。 |
+| 防重放校验失败 | 拒绝投递且不执行 Action。 | `TRANSPORT.REPLAY_DETECTED`。 |
+| 幂等键冲突 | 不执行新请求。 | `TRANSPORT.IDEMPOTENCY_CONFLICT`。 |
+| Service、Endpoint 或绑定暂不可用 | 返回可重试信息。 | `TRANSPORT.SERVICE_UNAVAILABLE`。 |
+| 交付窗口内未取得确认 | 不判断原语结果；使用同一幂等键重试、查询或等待通知。 | `TRANSPORT.DELIVERY_TIMEOUT`。 |
+| 网关限流 | 不执行 Action，并按 `retry_after` 等待。 | `TRANSPORT.RATE_LIMITED`。 |
 | 已受理的异步操作 | 返回受理事实并等待后续结果。 | 正常响应，`execution_result = PENDING`。 |
-| 业务拒绝或业务失败 | 由原语定义解释。 | P0 标准错误或原语特有错误。 |
+| 业务拒绝或业务失败 | 由 P0 与原语定义解释。 | `UTP.*` 或 `{PRIMITIVE}.{ACTION}.{DETAIL}`。 |
 
 同一 Action 在任一绑定上产生的最终业务结果 MUST 可归一化为相同的 P0 响应或错误语义。HTTP 状态码、MCP Tool 错误、A2A Task 失败和 SDK 异常只是投影，不得成为跨绑定可观察的业务差异。
 
