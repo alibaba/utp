@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/primitives/common/action_request.json",
-  "version": "2026-07-27",
+  "version": "2026-07-31",
   "title": "UTP Action Request",
   "description": "所有 UTP 原语操作共享的请求信封。操作声明 input_schema 时，input 的具体结构由该 Schema 指定。",
   "type": "object",

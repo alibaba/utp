@@ -200,11 +200,6 @@ Mode 决定全局状态路径实际经过哪些阶段。简单交易和复杂交
 }
 ```
 
-对应的 Schema 入口为：
-
-```text
-https://ut-protocol.com/global-state-machine/state_machine.json
-```
 
 ## 路径编排函数
 
