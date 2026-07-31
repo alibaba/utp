@@ -8,7 +8,7 @@
   "properties": {
     "orders": {
       "type": "array",
-      "items": {
+      "items": { // 避免items
         "type": "object",
         "properties": {
           "order_id": {
@@ -61,10 +61,11 @@
             "minLength": 1,
             "description": "供应商标识。"
           },
-          "summary": {
-            "type": "string",
-            "description": "订单摘要描述。"
-          },
+//          "summary": {
+//            "type": "string",
+//            "description": "订单摘要描述。"
+//          },
+          // 商品基本信息 引用
           "total_quantity": {
             "type": "integer",
             "minimum": 0,
