@@ -18,7 +18,7 @@
     },
     "schema": {
       "const": "https://ut-protocol.com/schemas/primitives/common/entities/mandate.json",
-      "description": "当前 UTP Mandate 凭证实体 schema URI。"
+      "description": "当前 UTP Mandate 凭证实体定义"
     },
     "supported_mandate_types": {
       "type": "array",
