@@ -39,7 +39,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m51">M5.1 Overview（概述）</h2>
     <h3 id="s-m511a">M5.1.1 意图</h3>
-    <p>Quote 是 UTP-M 第五个供应商原语（MP3），其意图是让供应商对买方发起的询盘给出<strong>显式、签名、可审计的报价与应答</strong>。主规范 <a href="/documentation/specification/primitives/negotiate/index.html">P2 询盘原语</a>定义了买方视角的询盘—报价—议价—条款绑定流程；平台托管拓扑下，卖方侧的应答此前只能经 M10.2 的 <code>delegation_policy</code> 透传实现，没有标准化的协议动作。MP3 将其定义为独立原语：<strong>与 P2 共享同一协商上下文与条款绑定语义，但 Action 集按卖家视角独立命名与定义</strong>（B/M 原语对偶、不复用命名——两侧各自声明、互不混淆）。</p>
+    <p>Quote 是 UTP-M 第三个供应商原语（MP3），其意图是让供应商对买方发起的询盘给出<strong>显式、签名、可审计的报价与应答</strong>。主规范 <a href="/documentation/specification/primitives/negotiate/index.html">P2 询盘原语</a>定义了买方视角的询盘—报价—议价—条款绑定流程；平台托管拓扑下，卖方侧的应答此前只能经 M10.2 的 <code>delegation_policy</code> 透传实现，没有标准化的协议动作。MP3 将其定义为独立原语：<strong>与 P2 共享同一协商上下文与条款绑定语义，但 Action 集按卖家视角独立命名与定义</strong>（B/M 原语对偶、不复用命名——两侧各自声明、互不混淆）。</p>
     <h3 id="s-m512">M5.1.2 关键设计原则</h3>
     <ul>
       <li><strong>MP3 不替代 P2，而是喂给 P2。</strong>协商的权威状态机在 P2（询盘/报价/议价/条款绑定）；MP3 <code>quote</code> 的产出（卖方 ES256 签名，覆盖主规范 <code>Quote.terms_hash</code>）是 P2 卖方侧报价事实的可审计证据，条款绑定（Binding Terms）仍由 P2 完成并产出 <code>terms_hash</code> 进入 P3。</li>

@@ -195,10 +195,13 @@ Content-Type: application/json
         <tr><td><code>utp.inventory.hold_created</code> / <code>hold_released</code></td><td>Marketplace</td><td>P3 触发库存占用/释放</td><td>M4.7</td></tr>
         <tr><td><code>utp.acceptance.order_routed</code></td><td>Marketplace</td><td>买方订购草案待受理</td><td>M6.7</td></tr>
         <tr><td><code>utp.acceptance.expired</code></td><td>Marketplace</td><td>受理超时自动处置</td><td>M6.3</td></tr>
-        <tr><td><code>utp.negotiate.inquiry_routed</code></td><td>Marketplace</td><td>询盘透传路由（<code>delegation_policy</code> 为 <code>passthrough</code> 时）</td><td>M1.4.4</td></tr>
+        <tr><td><code>utp.quote.inquiry_routed</code></td><td>Marketplace</td><td>买方询盘待应答（仅声明 <code>utp.quote</code> 的商户推送）</td><td>M5.7</td></tr>
+        <tr><td><code>utp.quote.expired</code></td><td>Marketplace</td><td>询盘应答超时自动谢绝</td><td>M5.3</td></tr>
+        <tr><td><code>utp.quote.withdrawn</code></td><td>Marketplace</td><td>买方撤回询盘，在途报价作废</td><td>M5.1.5</td></tr>
         <tr><td><code>utp.resolve.dispute_routed</code></td><td>Marketplace</td><td>争议答辩透传路由（同上）</td><td>M1.4.4</td></tr>
         <tr><td><code>utp.shipment.delivery_receipt</code></td><td>Marketplace</td><td>物流妥投/买方收货回执</td><td>M7.7</td></tr>
         <tr><td><code>utp.settlement.statement_issued</code></td><td>Marketplace</td><td>结算账单出具</td><td>M8.4</td></tr>
+        <tr><td><code>utp.settlement.paid</code></td><td>Marketplace</td><td>账单打款成功（条目 BILLED → PAID_OUT）</td><td>M8.9</td></tr>
       </tbody>
     </table>
     <p>接收方 MUST 返回 <code>2xx</code> 确认；推送失败按主规范指数退避重试（最多 5 次）后转入轮询降级——供应商可通过各原语的 <code>query</code>/<code>list</code> 操作主动拉取，保证推送丢失不阻塞业务（与主规范 4.3.2 一致）。</p>
@@ -214,6 +217,7 @@ Content-Type: application/json
         <tr><td>5</td><td>发货闭环</td><td><code>shipment.ship</code> → 沙箱买方收到 <code>fulfill.notify(SHIPPED)</code></td></tr>
         <tr><td>6</td><td>回调可达</td><td>全部 M2.6.1 事件推送返回 <code>2xx</code>，验签通过</td></tr>
         <tr><td>7</td><td>幂等</td><td>重复 <code>idempotency_key</code> 返回缓存结果，无重复副作用</td></tr>
+        <tr><td>8</td><td>询盘应答闭环（条件项）</td><td>仅声明 <code>utp.quote</code> 的商户 MUST 通过：模拟询盘路由 → <code>quote.quote</code>（附覆盖 <code>terms_hash</code> 的签名）→ 沙箱买方收到报价；未声明该原语的商户本项不适用（M5.1.2）</td></tr>
       </tbody>
     </table>
 

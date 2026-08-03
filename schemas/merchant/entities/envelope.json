@@ -185,6 +185,82 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.quote.inquiry_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "inquiry_routed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.quote.expired"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "quote_expired_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.quote.withdrawn"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "quote_withdrawn_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.settlement.paid"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "settlement_paid_payload.json"
+          }
+        }
+      }
     }
   ]
 }

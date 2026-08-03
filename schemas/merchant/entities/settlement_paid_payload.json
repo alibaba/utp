@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "settlement_paid_payload.json",
+  "version": "2026-07-30",
+  "title": "SettlementPaidPayload",
+  "description": "utp.settlement.paid 载荷（M8.9）：账单打款成功，条目由 BILLED 迁移至 PAID_OUT。",
+  "type": "object",
+  "required": [
+    "statement_id",
+    "payout_ref",
+    "amount",
+    "paid_at"
+  ],
+  "properties": {
+    "statement_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "payout_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "支付渠道流水；MUST 可关联账单、条目与原始 PaymentConfirmation（M8.9）。"
+    },
+    "amount": {
+      "$ref": "../../primitives/common/entities/money.json",
+      "description": "本次打款金额；分次打款时 Σ 打款 MUST 等于 statement.total_payable。"
+    },
+    "paid_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

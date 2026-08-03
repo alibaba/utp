@@ -112,7 +112,7 @@ format: html
     <ul>
       <li>执行模式对买方 MUST 透明：两种模式下的响应语义、Schema 与错误码 MUST 完全一致，买方 MUST NOT 感知或依赖商家的执行模式。</li>
       <li><code>passthrough</code> MUST 受时限约束（按 Mode 超时配置，主规范 4.2.4）；商家未在时限内回传时，Marketplace MUST 按 <code>delegation_policy</code> 预配置的兜底策略降级（<code>direct</code> 代答或返回结构化超时），MUST NOT 让买方请求悬挂。</li>
-      <li>四个 MP 原语不适用本节：其方向是 Seller → Marketplace，天然由商家侧发起。订单受理路由（M6.7）在结构上等价于 P3 卖方签署义务的 <code>passthrough</code> 特化，其超时兜底由 <code>timeout_policy</code> 承担。</li>
+      <li>MP 原语不适用本节：其方向均为 Seller → Marketplace，天然由商家侧发起（MP3 询盘响应虽应答 P2 询盘，但其提交方向仍是商家侧发起，故同样不适用委派模式）。订单受理路由（M6.7）在结构上等价于 P3 卖方签署义务的 <code>passthrough</code> 特化，其超时兜底由 <code>timeout_policy</code> 承担。</li>
     </ul>
 
     <h2 id="s-m15">M1.5 MP 原语总表（Primitive Summary）</h2>
@@ -142,11 +142,11 @@ format: html
     <ol>
       <li><code>source.lookup</code> 返回的商品结构 == MP1 发布的 Listing 结构在买方可见字段上的投影（M3.9）。</li>
       <li><code>purchase</code> 校验/锁定的库存 == MP2 维护的 <code>available</code> 同一数据源；锁定成功 MUST 反映为 InventoryHold（M4.7）。</li>
+      <li>P2 询盘的卖方侧报价事实 == MP3 <code>quote</code> 提交的签名报价（承载同一份主规范 <code>Quote</code> 实体，签名覆盖同一 <code>terms_hash</code>）；条款绑定后 MP4 <code>accept</code> MUST NOT 偏离已绑定条款（M5.6，仅适用于声明 <code>utp.quote</code> 的商户）。</li>
       <li><code>purchase.complete</code> 所需的卖方承诺处理 == MP4 <code>accept</code>（签名覆盖同一 <code>terms_hash</code>，M6.6）。</li>
       <li>MP5 <code>ship</code> 产出的 Shipment == 买方侧 <code>fulfill.notify</code>/<code>track</code> 呈现的同一 <code>shipment_id</code> 与运单（M7.7）。</li>
       <li>MP1 <code>delist</code> 生效后，<code>source.lookup</code> MUST 返回 <code>SOURCE.LOOKUP.ITEM_NOT_FOUND</code>，<code>purchase.create</code> MUST 返回 <code>PURCHASE.CREATE.INVALID_ITEMS</code>（主规范既有错误码的触发源在此闭合）。</li>
       <li>Mode 能力过滤：商品的有效 Mode 范围（商户 Profile 范围 ∩ 商品级 <code>mode_constraints</code>）不包含会话 <code>ModeConfiguration</code> 时，该商品 MUST NOT 出现在 <code>source.search</code> 结果中——“能被搜到即可被履约”（M3.6）。</li>
-      <li>P2 询盘的卖方侧报价事实 == MP3 <code>quote</code> 提交的签名报价（承载同一份主规范 <code>Quote</code> 实体，签名覆盖同一 <code>terms_hash</code>）；条款绑定后 MP4 <code>accept</code> MUST NOT 偏离已绑定条款（M5.6，仅适用于声明 <code>utp.quote</code> 的商户）。</li>
     </ol>
 
     <h2 id="s-m17">M1.7 与主规范 P1—P6 的衔接矩阵（Interlock Matrix）</h2>
@@ -168,12 +168,12 @@ format: html
     <table>
       <thead><tr><th>Mode 维度</th><th>对 MP 原语的影响</th></tr></thead>
       <tbody>
-        <tr><td><code>pricing_mode</code></td><td>L0：Listing MUST 含固定 <code>unit_price</code>。L1+：Listing MUST 含 <code>pricing_tiers</code>（与主规范 PricingTiers 同构）。L2+：MAY 标记 <code>negotiable: true</code>。</td></tr>
+        <tr><td><code>pricing_mode</code></td><td><strong>数据要求：</strong>L0：Listing MUST 含固定 <code>unit_price</code>。L1+：Listing MUST 含 <code>pricing_tiers</code>（与主规范 PricingTiers 同构）。L2+：MAY 标记 <code>negotiable: true</code>。<strong>适用性：</strong>L0 时 MP3 询盘响应不适用（询盘不产生、不路由）；L1 时 MP3 SHOULD 按分档价自动报价；L2+ 时 MP3 多轮议价生效，轮次上限取自会话 Mode 配置（M5.8）。</td></tr>
         <tr><td><code>decision_path</code></td><td>L0：MP4 MAY 配置自动接单（M6.8、M10.3）。L2+：MP4 SHOULD 人工或策略确认。</td></tr>
         <tr><td><code>payment_structure</code></td><td>L1+：MP4 <code>accept</code> 响应 MUST 确认 TradeMethod 子步骤可执行；M8 账单按期次拆分。</td></tr>
         <tr><td><code>fulfillment_structure</code></td><td>L1：MP5 <code>ship</code> MUST 携带独立履约服务方的交接信息。L2：MP5 产生的履约事实与凭证 MUST 能够关联到其所属履约阶段，并按阶段责任记录交接信息；是否允许 <code>split</code> 分批由已锁定交易条款决定。</td></tr>
-        <tr><td><code>relationship_mode</code></td><td>L2+：框架协议客户的订单路由 SHOULD 携带 <code>framework_agreement_ref</code>，MP4 按协议配额校验。</td></tr>
-        <tr><td><code>compliance_level</code></td><td>L1+：MP1 <code>publish</code> MUST 附合规资质引用（M3.6），Marketplace MUST 审核。L2+：跨境单证进入 MP5 <code>update</code> 事件流。</td></tr>
+        <tr><td><code>relationship_mode</code></td><td>L2+：框架协议客户的订单路由 SHOULD 携带 <code>framework_agreement_ref</code>，MP4 按协议配额校验；MP3 报价 MUST 引用框架价基线，偏离 MUST 显式标注（M5.8）。</td></tr>
+        <tr><td><code>compliance_level</code></td><td>L1+：MP1 <code>publish</code> MUST 附合规资质引用（M3.6），Marketplace MUST 审核。L2+：跨境单证进入 MP5 <code>update</code> 事件流；MP3 报价 SHOULD 声明贸易术语（Incoterms）与单证费用归属（M5.8）。</td></tr>
       </tbody>
     </table>
 
@@ -187,7 +187,7 @@ format: html
     <h2 id="s-m110">M1.10 通用规则继承（Commons Inheritance）</h2>
     <p>MP 原语 MUST 完整继承主规范 P0 原语通用框架（<a href="/documentation/specification/protocol-core/primitive-framework.html">Ch.10</a>）：</p>
     <ul>
-      <li><strong>消息信封：</strong>使用 MessageEnvelope（<a href="/documentation/specification/protocol-core/transport-communication.html#s-411">4.1.1</a>），<code>primitive</code> 字段取值扩展为含 <code>utp.listing</code>、<code>utp.inventory</code>、<code>utp.acceptance</code>、<code>utp.shipment</code>（主规范信封 Schema 的 <code>primitive</code> 枚举扩展为发布协调事项，登记于附录 ME 第 4 项；枚举扩展生效前，处理 MP 原语的实现方 MUST 按本分册声明接受上述取值）。</li>
+      <li><strong>消息信封：</strong>使用 MessageEnvelope（<a href="/documentation/specification/protocol-core/transport-communication.html#s-411">4.1.1</a>），<code>primitive</code> 字段取值扩展为含 <code>utp.listing</code>、<code>utp.inventory</code>、<code>utp.quote</code>、<code>utp.acceptance</code>、<code>utp.shipment</code>（主规范信封 Schema 的 <code>primitive</code> 枚举扩展为发布协调事项，登记于附录 ME 第 4 项；枚举扩展生效前，处理 MP 原语的实现方 MUST 按本分册声明接受上述取值）。</li>
       <li><strong>签名：</strong>全部写操作 MUST 携带 RFC 9421 请求签名；<code>publish</code>/<code>accept</code>/<code>ship</code> 等产生凭证的操作 MUST 附 Seller ES256 业务签名（JWS）。<strong>业务签名统一规则：</strong>JWS payload MUST 是单一 SHA-256 哈希的十六进制小写串；哈希输入由各操作显式定义（accept → 订单路由提供的 <code>terms_hash</code>；publish → <code>version_hash</code>，M3.2.4；ship/split → <code>shipment_hash</code>/<code>plan_hash</code>，M7.9.1；quote/bid → 主规范 <code>Quote.terms_hash</code>，M5.10.1.1）；对象哈希的 JSON 规范化 MUST 使用 RFC 8785（JCS）。实现方 MUST NOT 自行选择签名覆盖范围。</li>
       <li><strong>操作准入：</strong>Marketplace 处理 MP 写操作前 MUST 按主规范<a href="/documentation/specification/protocol-core/security-trust.html#s-5-trust-profile">第 5 章</a> 5.1 节完成操作准入判定，判定顺序与失败语义同主规范；认证与授权失败 MUST 使用全局错误码（<code>UTP.AUTH_UNAUTHORIZED</code> / <code>UTP.AUTH_FORBIDDEN</code>，10.4.2）。Merchant Agent 代理操作时的 Mandate 要求见 M10.4。</li>
       <li><strong>幂等：</strong>全部写操作 MUST 携带 <code>idempotency_key</code>；重复请求 MUST 返回首次执行的缓存结果。幂等键 MUST 保留不短于 24 小时；同一键携带不同请求体 MUST 返回冲突错误（HTTP 409，不执行）。</li>

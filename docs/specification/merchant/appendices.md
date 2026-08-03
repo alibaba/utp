@@ -96,7 +96,7 @@ format: html
         <tr><td>1</td><td>M1 架构总览</td><td>并入主规范 Ch.2（架构总览新增"供应商侧视图"小节）+ Ch.9（角色）</td><td>architecture.html 六层图补充供应商侧调用方向</td></tr>
         <tr><td>2</td><td>Marketplace 角色（M1.3.1）</td><td>主规范 9.2.2 R2 标准角色表（走 RFC 治理流程；过渡期 R3 <code>marketplace.Marketplace</code>，9.2.5）</td><td>topology.html 角色表、加入规则表、RoleDefinition 示例；<code>registries/roles.registry.json</code></td></tr>
         <tr><td>3</td><td>M2 入驻与能力声明</td><td>新章节（建议插在 Ch.3 发现与协商之后，作为"商户接入"章）</td><td>全部 26 个页面 sidebar + 编号 +1 联动；discovery.html 3.3 Profile 增补 <code>dev.utp.merchant_callback</code> Service 说明</td></tr>
-        <tr><td>4</td><td>M3 MP1 / M4 MP2 / M5 MP3 / M6 MP4 / M7 MP5 五个原语章</td><td>交易原语组新增五章（P0 通用框架之后、或独立"供应商原语"分组）</td><td>index.html 目录表与统计；治理侧发布四个 <code>PrimitiveDefinition</code>；MessageEnvelope <code>primitive</code> 枚举扩展（transport.html 4.1.1 + schemas.html 24.4 两处）</td></tr>
+        <tr><td>4</td><td>M3 MP1 / M4 MP2 / M5 MP3 / M6 MP4 / M7 MP5 五个原语章</td><td>交易原语组新增五章（P0 通用框架之后、或独立"供应商原语"分组）</td><td>index.html 目录表与统计；治理侧发布五个 <code>PrimitiveDefinition</code>；MessageEnvelope <code>primitive</code> 枚举扩展（transport.html 4.1.1 + schemas.html 24.4 两处）</td></tr>
         <tr><td>4a</td><td>MP3 与 P2 对偶（M5.6）</td><td>primitive-negotiate.html 增补"卖方侧应答经 utp.quote 完成"的规范通道说明（平台托管拓扑）</td><td>negotiation_id 上下文共享、Quote 实体复用与 terms_hash 计算规则（M5.10.1.1）的双向交叉引用</td></tr>
         <tr><td>5</td><td>MP4 与 P3 衔接（M6.6）</td><td>primitive-purchase.html 13.5.2 / 13.8.1 增补"卖方承诺处理经 utp.acceptance 完成"的规范通道说明</td><td>13.6.2 自动承诺处理脚注指向 AcceptancePolicy</td></tr>
         <tr><td>6</td><td>MP2 与 P3 库存契约（M4.7）</td><td>primitive-purchase.html 13.5.2（锁定库存职责）与 state-machine.html required_evidence 说明处增加交叉引用</td><td>inventory_receipt / inventory_release_receipt 的生成来源注明 InventoryHold</td></tr>

@@ -38,7 +38,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m61">M6.1 Overview（概述）</h2>
     <h3 id="s-m611a">M6.1.1 意图</h3>
-    <p>Acceptance 是 UTP-M 第三个供应商原语（MP4），其意图是让供应商对买方发起的订购给出<strong>显式、签名、可审计的受理结论</strong>。主规范 P3 将卖方接受抽象为"卖方完成自身承诺处理"（<a href="/documentation/specification/primitives/purchase/index.html#s-1323">13.2.3</a>），并要求卖方在 complete 前"确认可行性"（<a href="/documentation/specification/primitives/purchase/index.html#s-1352-seller">13.5.2</a>），但未定义承诺处理的产生机制，拒绝只能以错误码被动表达。MP4 将这一留白定义为显式协议动作，使供应商 Agent、ERP 审批流和人工后台都能以统一接口参与接单决策。</p>
+    <p>Acceptance 是 UTP-M 第四个供应商原语（MP4），其意图是让供应商对买方发起的订购给出<strong>显式、签名、可审计的受理结论</strong>。主规范 P3 将卖方接受抽象为"卖方完成自身承诺处理"（<a href="/documentation/specification/primitives/purchase/index.html#s-1323">13.2.3</a>），并要求卖方在 complete 前"确认可行性"（<a href="/documentation/specification/primitives/purchase/index.html#s-1352-seller">13.5.2</a>），但未定义承诺处理的产生机制，拒绝只能以错误码被动表达。MP4 将这一留白定义为显式协议动作，使供应商 Agent、ERP 审批流和人工后台都能以统一接口参与接单决策。</p>
     <h3 id="s-m612">M6.1.2 关键设计原则</h3>
     <ul>
       <li><strong>MP4 不替代 P3，而是喂给 P3。</strong>订购成立的唯一路径仍然是主规范 <code>purchase.complete</code> 的原子迁移（<code>SIGNING → PURCHASED</code>）；MP4 <code>accept</code> 即 13.2.3 所要求的"卖方承诺处理"在平台托管拓扑下的规范化实现，其产出（卖方 ES256 签名，覆盖 <code>terms_hash</code>）是承诺处理完成的可审计证据。MP4 <code>reject</code> 则触发 P3 既有补偿链（释放库存 → <code>CANCELLED</code>）。</li>

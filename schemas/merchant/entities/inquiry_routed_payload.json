@@ -3,7 +3,7 @@
   "$id": "inquiry_routed_payload.json",
   "version": "2026-07-30",
   "title": "InquiryRoutedPayload",
-  "description": "询盘透传路由（M1.4.4 passthrough）。询盘完整实体属 P2 域，本载荷只承载路由要素；商家 MUST 在 deadline 前回传，否则按 delegation_policy.on_timeout 兜底。",
+  "description": "utp.quote.inquiry_routed 载荷（M5.7.1）：Marketplace 将买方 P2 询盘路由给声明 utp.quote 的供应商；MP3 应答任务的起点。",
   "type": "object",
   "required": [
     "inquiry_id",

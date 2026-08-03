@@ -38,7 +38,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m71">M7.1 Overview（概述）</h2>
     <h3 id="s-m711">M7.1.1 意图</h3>
-    <p>Shipment 是 UTP-M 第四个供应商原语（MP5），其意图是让供应商以标准协议动作申报<strong>履约执行事实</strong>：备货进度、发货（运单）、分批拆单、延迟与异常。主规范 P5 Fulfill 是"采购方可观测"的履约原语（<a href="/documentation/specification/primitives/fulfill/index.html#s-1531">15.3.1</a>），其 <code>notify</code> 推送的事实来源在主规范中留白——MP5 正式定义这些事实的产生方式，闭合"供应商发货 → 买方感知"的链路。</p>
+    <p>Shipment 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商以标准协议动作申报<strong>履约执行事实</strong>：备货进度、发货（运单）、分批拆单、延迟与异常。主规范 P5 Fulfill 是"采购方可观测"的履约原语（<a href="/documentation/specification/primitives/fulfill/index.html#s-1531">15.3.1</a>），其 <code>notify</code> 推送的事实来源在主规范中留白——MP5 正式定义这些事实的产生方式，闭合"供应商发货 → 买方感知"的链路。</p>
     <h3 id="s-m712">M7.1.2 关键设计原则</h3>
     <ul>
       <li><strong>MP5 产生事实，P5 消费事实。</strong>MP5 的每个生效动作 MUST 由 Marketplace 转换为买方侧 <code>fulfill.notify</code> 推送与 <code>fulfill.query</code> 可查询的 TrackingEvent（M7.7）。买方可观测状态机（SHIPPED/DELAYED/DELIVERED）的驱动源即 MP5。</li>
