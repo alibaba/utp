@@ -16,7 +16,6 @@
         "region_unserved",
         "spec_unsupported",
         "compliance_unable",
-        "rounds_exhausted",
         "risk_control",
         "other"
       ]

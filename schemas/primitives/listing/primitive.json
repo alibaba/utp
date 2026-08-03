@@ -179,7 +179,8 @@
         "from": "PENDING_REVIEW",
         "event": "review_pass",
         "to": "PUBLISHED",
-        "by": "Marketplace"
+        "by": "Marketplace",
+        "condition": "publish 请求未声明 auto_list 或声明为 false"
       },
       {
         "from": "PENDING_REVIEW",
