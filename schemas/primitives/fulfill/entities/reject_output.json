@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/rejection_confirmation.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/reject_output.json",
   "version": "2026-07-27",
-  "title": "RejectionConfirmation",
-  "description": "采购方拒收凭证。生成后激活 Resolve 原语，作为索赔证据链的一部分；被拒批次不再进入 RECEIVED 或 FULFILLED。",
+  "title": "FulfillRejectOutput",
+  "description": "utp.fulfill.reject 的业务输出。返回拒收凭证；生成后激活 Resolve（后续可执行 utp.resolve.raise）；幂等——批次已拒收时返回既有凭证（FULFILL.ALREADY_REJECTED 语义）。",
   "type": "object",
   "properties": {
     "rejection_id": {
@@ -71,9 +71,7 @@
     "purchase_id",
     "transaction_id",
     "reason_code",
-    "evidence_refs",
-    "rejected_at",
-    "signature"
+    "rejected_at"
   ],
   "additionalProperties": true
 }

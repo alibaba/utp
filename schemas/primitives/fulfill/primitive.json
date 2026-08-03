@@ -89,7 +89,7 @@
       "initiator_role": "Seller",
       "handler_role": "Buyer",
       "input_schema": {
-        "$ref": "entities/fulfillment_event.json"
+        "$ref": "entities/notify_input.json"
       },
       "output_schema": {
         "$ref": "entities/notify_output.json"
@@ -118,7 +118,7 @@
         "$ref": "entities/receive_input.json"
       },
       "output_schema": {
-        "$ref": "entities/receipt_confirmation.json"
+        "$ref": "entities/receive_output.json"
       },
       "transport_bindings": [
         {
@@ -144,7 +144,7 @@
         "$ref": "entities/reject_input.json"
       },
       "output_schema": {
-        "$ref": "entities/rejection_confirmation.json"
+        "$ref": "entities/reject_output.json"
       },
       "transport_bindings": [
         {

@@ -3,135 +3,74 @@
   "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/fulfillment_event.json",
   "version": "2026-07-31",
   "title": "FulfillmentEvent",
-  "description": "Seller 向 Buyer 推送并由订单履约历史持久化的追加式事件。每条事件描述一个已发生的履约节点，Buyer 依据 status、occurred_at 和自身状态机更新订单展示状态。",
+  "description": "订单履约过程中产生的追加式事件，记录事件涉及的商品、物流与交付事实。",
   "type": "object",
   "required": [
     "event_id",
     "order_id",
-    "status",
-    "occurred_at"
+    "occurred_at",
+    "type",
+    "line_items"
   ],
   "properties": {
     "event_id": {
       "type": "string",
       "minLength": 1,
-      "description": "事件唯一标识。Buyer MUST 使用 event_id 做幂等去重。"
-    },
-    "event_type": {
-      "type": "string",
-      "enum": [
-        "FULFILLMENT_STATUS",
-        "LOGISTICS_TRACE",
-        "CUSTOMS",
-        "INSPECTION",
-        "SERVICE_ACTIVATION",
-        "EXCEPTION"
-      ],
-      "description": "事件类别。FULFILLMENT_STATUS 用于订单履约状态变化，LOGISTICS_TRACE 用于物流轨迹，其他类别用于清关、验货、服务激活和异常事实。"
-    },
-    "order_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "订单标识，履约事件的主关联对象。"
-    },
-    "purchase_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "订单所属订购标识；一次订购可关联多笔订单。"
-    },
-    "transaction_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "全局事务标识。"
-    },
-    "shipment_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "发货单标识。实物履约事件 SHOULD 携带。"
+      "description": "履约事件的唯一标识，用于事件去重和追溯。"
     },
     "batch_id": {
       "type": "string",
       "minLength": 1,
-      "description": "订单交付批次标识。分批交付时 SHOULD 携带。"
+      "description": "事件关联的逻辑交付批次标识。"
     },
-    "status": {
+    "shipment_id": {
       "type": "string",
-      "enum": [
-        "SHIPPED",
-        "IN_TRANSIT",
-        "OUT_FOR_DELIVERY",
-        "DELIVERED",
-        "DELAYED",
-        "CUSTOMS",
-        "CUSTOMS_HOLD",
-        "CUSTOMS_CLEARED",
-        "DELIVERY_ATTEMPT_FAILED",
-        "RETURNED_TO_SENDER",
-        "INSPECTED",
-        "INSPECTION_FAILED",
-        "SERVICE_ACTIVATED"
-      ],
-      "description": "履约事件状态。SHIPPED、DELAYED、DELIVERED、INSPECTED 可驱动 Buyer 侧可观测状态迁移；其他状态作为履约事实展示和记录。"
+      "minLength": 1,
+      "description": "事件关联的发货或物流单元标识。"
     },
     "occurred_at": {
       "type": "string",
       "format": "date-time",
-      "description": "事件实际发生时间，使用 RFC 3339 格式。"
+      "description": "事件实际发生时间。"
     },
-    "sequence": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "同一订单、批次或运单内的单调递增事件序号，用于处理乱序通知。"
-    },
-    "carrier_code": {
+    "type": {
       "type": "string",
       "minLength": 1,
-      "description": "承运商编码；自配送可使用 self_delivery。"
+      "description": "履约事件类型。标准值包括 processing、shipped、in_transit、delayed、delivered、inspected、failed_attempt、undeliverable、returned_to_sender 和 service_activated；实现可扩展其他事件类型。"
     },
-    "carrier": {
+    "line_items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "本次履约事件涉及的商品或服务及其数量。",
+      "items": {
+        "$ref": "../../common/entities/line_item.json"
+      }
+    },
+    "method": {
       "type": "string",
-      "minLength": 1,
-      "description": "承运商名称。"
+      "description": "履约方式，例如 shipment、pickup、digital 或 service。"
     },
     "tracking_number": {
       "type": "string",
       "minLength": 1,
-      "description": "承运商物流单号。虚拟交付或自配送可省略。"
+      "description": "事件关联的承运商物流单号。"
     },
     "tracking_url": {
       "type": "string",
       "format": "uri",
-      "description": "承运商物流查询链接。"
+      "description": "承运商提供的物流查询地址。"
+    },
+    "carrier": {
+      "type": "string",
+      "description": "承运商名称。"
+    },
+    "carrier_code": {
+      "type": "string",
+      "description": "承运商编码。"
     },
     "description": {
       "type": "string",
-      "minLength": 1,
-      "description": "面向 Buyer 的事件说明；物流异常 SHOULD 提供。"
-    },
-    "reason_code": {
-      "type": "string",
-      "minLength": 1,
-      "description": "结构化原因码，例如 stockout_delay、carrier_lost 或 customs_inspection。异常和延迟事件 SHOULD 提供。"
-    },
-    "estimated_delivery_at": {
-      "type": "string",
-      "format": "date-time",
-      "description": "预计送达时间（ETA），使用 RFC 3339 格式。发货或延迟事件可携带。"
-    },
-    "line_items": {
-      "type": "array",
-      "items": {
-        "$ref": "../../common/entities/line_item.json"
-      },
-      "description": "本事件涉及的订单行项目及数量。分批发货或部分妥投时 SHOULD 携带。"
-    },
-    "document_refs": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
-      "description": "清关单证、验货报告、异常凭证等履约文档引用。"
+      "description": "事件的可读说明。"
     }
   },
   "additionalProperties": true
