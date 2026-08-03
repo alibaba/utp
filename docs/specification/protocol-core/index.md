@@ -17,12 +17,12 @@ UTP 为采购交易中的参与方提供共同的商业语言与可组合的执�
 
 | 目标 | UTP 的协议机制 |
 | --- | --- |
-| 适配不同采购形态 | 以[采购模式](/documentation/specification/protocol-core/procurement-models.html)表达价格形成、付款、履约、交易关系和合规等可协商维度。 |
-| 建立跨方协作关系 | 以[商业拓扑](/documentation/specification/protocol-core/business-topology.html)定义 Role 与业务关系，并以[发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html)确认可共同使用的能力。 |
-| 执行可组合的商业动作 | 以[P0 原语通用框架](/documentation/specification/protocol-core/primitive-framework.html)统一 Action、请求响应、错误、幂等和补偿等基础约定。 |
-| 保持交易过程一致 | 以[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)维护跨方可识别的 StateView，并以[路径编排](/documentation/specification/protocol-core/path-orchestration.html)开放当前可执行的 Action。 |
-| 在不同集成方式间互操作 | 以[传输与通信](/documentation/specification/protocol-core/transport-communication.html)统一 REST、MCP、A2A 与 Embedded 承载下的请求、结果和异步语义。 |
-| 建立可验证的信任与控制 | 通过[信任准入评估](/documentation/specification/protocol-core/security-trust.html)、[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)、[风控与审计](/documentation/specification/protocol-core/risk-audit.html)和[人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html)约束准入、授权、证据和人工控制。 |
+| 适配不同采购形态 | 以[采购模式](procurement-models.md)表达价格形成、付款、履约、交易关系和合规等可协商维度。 |
+| 建立跨方协作关系 | 以[商业拓扑](business-topology.md)定义 Role 与业务关系，并以[发现与协商](discovery-negotiation.md)确认可共同使用的能力。 |
+| 执行可组合的商业动作 | 以[P0 原语通用框架](primitive-framework.md)统一 Action、请求响应、错误、幂等和补偿等基础约定。 |
+| 保持交易过程一致 | 以[全局状态机](global-state-machine.md)维护跨方可识别的 StateView，并以[路径编排](path-orchestration.md)开放当前可执行的 Action。 |
+| 在不同集成方式间互操作 | 以[传输与通信](transport-communication.md)统一 REST、MCP、A2A 与 Embedded 承载下的请求、结果和异步语义。 |
+| 建立可验证的信任与控制 | 通过[信任准入评估](security-trust.md)、[认证与授权](identity-authorization.md)、[风控与审计](risk-audit.md)和[人机协同交互](human-agent-interaction.md)约束准入、授权、证据和人工控制。 |
 
 ## 核心运行模型
 
@@ -59,11 +59,11 @@ UTP 将一次交易拆分为连续但可独立验证的阶段。每一阶段只�
 
 | 阶段 | 输入 | 主要处理 | 输出 | 规范入口 |
 | --- | --- | --- | --- | --- |
-| 商业建模 | 采购意图与业务规则 | 选择 Mode，建立 Role 和关系。 | `SelectedMode`、`CommerceTopology`。 | [采购模式](/documentation/specification/protocol-core/procurement-models.html)、[商业拓扑](/documentation/specification/protocol-core/business-topology.html) |
-| 发现与协商 | Role 到业务域的绑定、待协商关系对。 | 读取 Profile，确认可共同使用的 Primitive、版本、扩展和 Mode 范围。 | `relation_compatibilities`、`service_catalogs`。 | [发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html) |
-| 执行准备 | 已锁定的 Mode、拓扑和协商结果。 | 生成 `execution_dag`，初始化 StateView，推导行动空间。 | `dag_id`、StateView、`available_actions`。 | [路径编排](/documentation/specification/protocol-core/path-orchestration.html)、[全局状态机](/documentation/specification/protocol-core/global-state-machine.html) |
-| Action 执行 | 选定 Action、P0 input、会话和幂等上下文。 | 完成状态、授权、风控和人机协同约束，再经通信层投递。 | `ActionRequest` 与标准 `ActionResponse`。 | [原语通用框架](/documentation/specification/protocol-core/primitive-framework.html)、[传输与通信](/documentation/specification/protocol-core/transport-communication.html) |
-| 状态推进与恢复 | `ActionResponse` 或状态机的补偿、超时结论。 | 提交 StateView，更新行动空间；在未知结果时保留上下文并恢复。 | 新 StateView、下一轮 `available_actions` 或恢复结论。 | [全局状态机](/documentation/specification/protocol-core/global-state-machine.html)、[路径编排](/documentation/specification/protocol-core/path-orchestration.html) |
+| 商业建模 | 采购意图与业务规则 | 选择 Mode，建立 Role 和关系。 | `SelectedMode`、`CommerceTopology`。 | [采购模式](procurement-models.md)、[商业拓扑](business-topology.md) |
+| 发现与协商 | Role 到业务域的绑定、待协商关系对。 | 读取 Profile，确认可共同使用的 Primitive、版本、扩展和 Mode 范围。 | `relation_compatibilities`、`service_catalogs`。 | [发现与协商](discovery-negotiation.md) |
+| 执行准备 | 已锁定的 Mode、拓扑和协商结果。 | 生成 `execution_dag`，初始化 StateView，推导行动空间。 | `dag_id`、StateView、`available_actions`。 | [路径编排](path-orchestration.md)、[全局状态机](global-state-machine.md) |
+| Action 执行 | 选定 Action、P0 input、会话和幂等上下文。 | 完成状态、授权、风控和人机协同约束，再经通信层投递。 | `ActionRequest` 与标准 `ActionResponse`。 | [原语通用框架](primitive-framework.md)、[传输与通信](transport-communication.md) |
+| 状态推进与恢复 | `ActionResponse` 或状态机的补偿、超时结论。 | 提交 StateView，更新行动空间；在未知结果时保留上下文并恢复。 | 新 StateView、下一轮 `available_actions` 或恢复结论。 | [全局状态机](global-state-machine.md)、[路径编排](path-orchestration.md) |
 
 这条链路的关键在于：协商结果决定“哪些能力可以进入路径”，行动空间决定“当前哪些 Action 可以执行”，而标准响应和 StateView 决定“执行后可以如何继续”。
 
@@ -134,10 +134,10 @@ UTP 以三类结果区分正常推进与异常处理：
 
 | 能力 | 解决的问题 | 对应规范 |
 | --- | --- | --- |
-| 信任准入 | 对接前和受保护操作前需要满足哪些声明与判定。 | [信任准入评估](/documentation/specification/protocol-core/security-trust.html) |
-| 认证与授权 | 如何建立机器身份、用户委托与操作级授权之间的信任链。 | [认证与授权](/documentation/specification/protocol-core/identity-authorization.html) |
-| 风控与审计 | 如何传递风险信号、封装证据并支持审计。 | [风控与审计](/documentation/specification/protocol-core/risk-audit.html) |
-| 人机协同 | 哪些 Action 可自主推进，哪些需观察、中断或人工确认。 | [人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html) |
+| 信任准入 | 对接前和受保护操作前需要满足哪些声明与判定。 | [信任准入评估](security-trust.md) |
+| 认证与授权 | 如何建立机器身份、用户委托与操作级授权之间的信任链。 | [认证与授权](identity-authorization.md) |
+| 风控与审计 | 如何传递风险信号、封装证据并支持审计。 | [风控与审计](risk-audit.md) |
+| 人机协同 | 哪些 Action 可自主推进，哪些需观察、中断或人工确认。 | [人机协同交互](human-agent-interaction.md) |
 
 这些能力在 Action 执行时与状态守卫共同生效：身份、授权、风控和控制等级提供执行条件，处理方完成本域业务校验，状态机对跨方状态推进给出权威结论。
 
@@ -145,34 +145,34 @@ UTP 以三类结果区分正常推进与异常处理：
 
 UTP 的互操作范围由发现与协商阶段锁定。参与方通过 Profile 和协商结果声明并确认所使用的 Primitive、版本、扩展和 Mode 范围；运行时的 DAG 以这些锁定事实为输入。对已有交易而言，Mode、商业拓扑或协商能力范围发生变化时，会形成新的 DAG 与新的初始 StateView，而不会原地改变既有执行结构。
 
-这一设计将演进分为两个层次：协议实现可以通过新增或升级 Primitive、扩展、Schema 和传输绑定扩展能力；单笔交易则持续使用建立时已经确认的能力集合，直到完成、恢复、补偿或显式重建路径。详见[发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html)、[原语通用框架](/documentation/specification/protocol-core/primitive-framework.html)与[路径编排](/documentation/specification/protocol-core/path-orchestration.html)。
+这一设计将演进分为两个层次：协议实现可以通过新增或升级 Primitive、扩展、Schema 和传输绑定扩展能力；单笔交易则持续使用建立时已经确认的能力集合，直到完成、恢复、补偿或显式重建路径。详见[发现与协商](discovery-negotiation.md)、[原语通用框架](primitive-framework.md)与[路径编排](path-orchestration.md)。
 
 ## 协议层次与阅读路径
 
 UTP 将稳定的跨方约定放在协议核心，将具体业务能力放在原语和扩展中。首次接入时，可按以下顺序阅读：
 
-1. 从[采购模式](/documentation/specification/protocol-core/procurement-models.html)和[商业拓扑](/documentation/specification/protocol-core/business-topology.html)确定交易的业务结构。
-2. 阅读[发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html)，了解 Profile、兼容性和服务目录如何建立。
-3. 阅读[P0 原语通用框架](/documentation/specification/protocol-core/primitive-framework.html)、[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)和[路径编排](/documentation/specification/protocol-core/path-orchestration.html)，了解 Action 如何被允许、执行和推进。
-4. 选择[传输与通信](/documentation/specification/protocol-core/transport-communication.html)定义的适用绑定，并接入认证、授权、信任、风控与审计能力。
-5. 根据业务需要阅读各[交易原语](/documentation/specification/index.html)及其扩展定义。
+1. 从[采购模式](procurement-models.md)和[商业拓扑](business-topology.md)确定交易的业务结构。
+2. 阅读[发现与协商](discovery-negotiation.md)，了解 Profile、兼容性和服务目录如何建立。
+3. 阅读[P0 原语通用框架](primitive-framework.md)、[全局状态机](global-state-machine.md)和[路径编排](path-orchestration.md)，了解 Action 如何被允许、执行和推进。
+4. 选择[传输与通信](transport-communication.md)定义的适用绑定，并接入认证、授权、信任、风控与审计能力。
+5. 根据业务需要阅读各[交易原语](../index.md)及其扩展定义。
 
 ## 协议核心章节
 
 | 主题 | 说明 |
 | --- | --- |
-| [发现与握手](/documentation/specification/protocol-core/discovery-handshake.html) | 建立发现前的基础交互。 |
-| [发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html) | 发现 Profile，并协商 Primitive、扩展和 Mode 兼容范围。 |
-| [采购模式](/documentation/specification/protocol-core/procurement-models.html) | 用可组合维度表达 B2B、B2C 等采购要求。 |
-| [商业拓扑](/documentation/specification/protocol-core/business-topology.html) | 定义 Role、关系与责任结构。 |
-| [路径编排](/documentation/specification/protocol-core/path-orchestration.html) | 将锁定事实编译为 DAG 和行动空间。 |
-| [全局状态机](/documentation/specification/protocol-core/global-state-machine.html) | 定义 StateView、状态迁移、补偿和超时处理。 |
-| [传输与通信](/documentation/specification/protocol-core/transport-communication.html) | 定义跨传输的一致消息、会话与投递语义。 |
-| [认证与授权](/documentation/specification/protocol-core/identity-authorization.html) | 定义身份、授权委托和操作级授权。 |
-| [信任准入评估](/documentation/specification/protocol-core/security-trust.html) | 定义互操作前和受保护操作前的准入语义。 |
-| [风控与审计](/documentation/specification/protocol-core/risk-audit.html) | 定义风控信号、证据与审计机制。 |
-| [人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html) | 定义人工确认、挂起、恢复和可观察控制。 |
-| [商业场景](/documentation/specification/protocol-core/business-scenarios.html) | 通过场景说明各核心构件如何组合。 |
+| [发现与握手](discovery-handshake.md) | 建立发现前的基础交互。 |
+| [发现与协商](discovery-negotiation.md) | 发现 Profile，并协商 Primitive、扩展和 Mode 兼容范围。 |
+| [采购模式](procurement-models.md) | 用可组合维度表达 B2B、B2C 等采购要求。 |
+| [商业拓扑](business-topology.md) | 定义 Role、关系与责任结构。 |
+| [路径编排](path-orchestration.md) | 将锁定事实编译为 DAG 和行动空间。 |
+| [全局状态机](global-state-machine.md) | 定义 StateView、状态迁移、补偿和超时处理。 |
+| [传输与通信](transport-communication.md) | 定义跨传输的一致消息、会话与投递语义。 |
+| [认证与授权](identity-authorization.md) | 定义身份、授权委托和操作级授权。 |
+| [信任准入评估](security-trust.md) | 定义互操作前和受保护操作前的准入语义。 |
+| [风控与审计](risk-audit.md) | 定义风控信号、证据与审计机制。 |
+| [人机协同交互](human-agent-interaction.md) | 定义人工确认、挂起、恢复和可观察控制。 |
+| [商业场景](business-scenarios.md) | 通过场景说明各核心构件如何组合。 |
 
 ## 设计原则
 

@@ -109,7 +109,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m32">M3.2 Lifecycle / State Machine（生命周期 / 状态机）</h2>
     <h3 id="s-m321">M3.2.1 Listing 资源状态机</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-listing-state-machine.svg" alt="Listing 资源状态机：PENDING_REVIEW/REJECTED/PUBLISHED/LISTED/DELISTED/SUSPENDED_BY_PLATFORM/ARCHIVED 及迁移" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-listing-state-machine.svg" alt="Listing 资源状态机：PENDING_REVIEW/REJECTED/PUBLISHED/LISTED/DELISTED/SUSPENDED_BY_PLATFORM/ARCHIVED 及迁移" style="max-width: 100%; height: auto;"></div>
     <h3 id="s-m322">M3.2.2 状态定义与迁移规则</h3>
     <table>
       <thead><tr><th>状态</th><th>含义</th><th>进入条件</th><th>允许的操作</th></tr></thead>
@@ -143,7 +143,7 @@ service:        dev.utp.merchant
 
     <hr />
     <h2 id="s-m33">M3.3 Error Handling（错误处理）</h2>
-    <p>错误响应 MUST 使用主规范 P0 通用框架的标准错误响应格式（<a href="/documentation/specification/protocol-core/primitive-framework.html#s-1043-standard-error-response">10.4.3</a>）。本节定义 Listing 特有错误码：</p>
+    <p>错误响应 MUST 使用主规范 P0 通用框架的标准错误响应格式（<a href="../protocol-core/primitive-framework.md#s-1043-standard-error-response">10.4.3</a>）。本节定义 Listing 特有错误码：</p>
     <table>
       <thead><tr><th>错误码</th><th>严重级别</th><th>HTTP 映射</th><th>描述</th><th>建议处理</th></tr></thead>
       <tbody>
@@ -229,7 +229,7 @@ service:        dev.utp.merchant
 
     <hr />
     <h2 id="s-m37">M3.7 Operations（操作定义）</h2>
-    <p>Listing 的核心操作为 <code>publish</code>、<code>update</code>、<code>list</code>、<code>delist</code>、<code>query</code>、<code>archive</code>，复用主规范 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023-action-definition-format">10.2.3 操作定义格式</a>。</p>
+    <p>Listing 的核心操作为 <code>publish</code>、<code>update</code>、<code>list</code>、<code>delist</code>、<code>query</code>、<code>archive</code>，复用主规范 <a href="../protocol-core/primitive-framework.md#s-1023-action-definition-format">10.2.3 操作定义格式</a>。</p>
     <h3 id="s-m371">M3.7.1 Listing 操作矩阵</h3>
     <table>
       <thead><tr><th>操作</th><th>适用状态</th><th>状态影响</th><th><code>valid_next_actions</code></th><th>关键约束</th></tr></thead>
@@ -301,7 +301,7 @@ service:        dev.utp.merchant
         <tr><td><code>skus</code></td><td>ListingSku[]</td><td>是</td><td>SKU 列表，MUST 至少一条（M3.9.2）。</td></tr>
         <tr><td><code>pricing</code></td><td>ListingPricing</td><td>是</td><td>定价结构（M3.9.3）。</td></tr>
         <tr><td><code>fulfillment_terms</code></td><td>FulfillmentTerms</td><td>是</td><td>履约条款（M3.9.4）。</td></tr>
-        <tr><td><code>trade_methods</code></td><td>array</td><td>是</td><td>支持的 Trade Method 列表，结构同主规范（<a href="/documentation/specification/primitives/purchase/index.html#s-139-entities">13.9</a> 引用的 TradeMethod）。</td></tr>
+        <tr><td><code>trade_methods</code></td><td>array</td><td>是</td><td>支持的 Trade Method 列表，结构同主规范（<a href="../primitives/purchase/index.md#s-139-entities">13.9</a> 引用的 TradeMethod）。</td></tr>
         <tr><td><code>media</code></td><td>ListingMedia[]</td><td>否</td><td>图片/视频资源（M3.9.5）。</td></tr>
         <tr><td><code>compliance_refs</code></td><td>array</td><td>否</td><td>资质文件引用列表（<code>credential_id</code> + 类型）；<code>compliance_level ≥ L1</code> 时必填。</td></tr>
         <tr><td><code>visibility</code></td><td>enum</td><td>否</td><td><code>public</code>（默认）/ <code>framework_only</code>（仅框架协议客户可见）。</td></tr>
@@ -329,7 +329,7 @@ service:        dev.utp.merchant
       <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
       <tbody>
         <tr><td><code>pricing_mode</code></td><td>enum</td><td>是</td><td>本商品支持的最低定价模式：<code>L0</code>—<code>L3</code>，MUST 落在会话 Mode 协商范围内。</td></tr>
-        <tr><td><code>unit_price</code></td><td>Money</td><td>条件</td><td>固定单价；<code>pricing_mode == L0</code> 时必填。Money 结构同主规范 <a href="/documentation/specification/schemas/index.html#s-common-money">25.2 Money</a>。</td></tr>
+        <tr><td><code>unit_price</code></td><td>Money</td><td>条件</td><td>固定单价；<code>pricing_mode == L0</code> 时必填。Money 结构同主规范 <a href="../schemas/index.md#s-common-money">25.2 Money</a>。</td></tr>
         <tr><td><code>pricing_tiers</code></td><td>array</td><td>条件</td><td>阶梯价数组 <code>{min_quantity, unit_price}</code>；<code>pricing_mode ≥ L1</code> 时必填，与主规范 PricingTiers 同构。</td></tr>
         <tr><td><code>negotiable</code></td><td>boolean</td><td>否</td><td>是否可议价（对应 <code>pricing_mode ≥ L2</code>）。</td></tr>
         <tr><td><code>bid_starting_price</code> / <code>bid_deadline</code></td><td>Money / ISO-8601</td><td>条件</td><td>竞价起拍价与截止时间；<code>pricing_mode == L3</code> 时必填。</td></tr>

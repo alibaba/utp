@@ -25,7 +25,7 @@ UTP 通过稳定标识、受控扩展和协商版本，让参与方能够明确�
 
 原语和扩展的命名、版本和 Schema 声明由 Profile 发布，并在相关 Role 关系的协商中选择共同可用的范围。核心 Primitive 的声明表示支持该版本定义的完整核心操作集合；扩展不能改写核心 Action 的名称、语义、既有字段含义或核心状态迁移。协商完成后，调用方只能使用选定版本中已有的 Action 和 Schema 字段。
 
-这套治理方式将“标识是否有效”“双方是否共同支持”“本次会话是否可用”分开处理：命名保证可识别，Profile 说明可提供的版本与扩展，协商结果决定当前交易的实际能力范围。详见[原语框架](/documentation/specification/protocol-core/primitive-framework.html)和[发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html)。
+这套治理方式将“标识是否有效”“双方是否共同支持”“本次会话是否可用”分开处理：命名保证可识别，Profile 说明可提供的版本与扩展，协商结果决定当前交易的实际能力范围。详见[原语框架](../protocol-core/primitive-framework.md)和[发现与协商](../protocol-core/discovery-negotiation.md)。
 
 ## 商业场景
 
@@ -38,7 +38,7 @@ UTP 通过稳定标识、受控扩展和协商版本，让参与方能够明确�
 
 一笔交易的实际路径由当前 Mode、`CommerceTopology`、已锁定交易条款和对应原语的标准响应共同决定。例如，`purchase.complete` 形成独立交易边界和 `transaction_id`；后续 Purchase、Pay、Fulfill 与可能发生的 Resolve 都绑定同一交易标识。B2B 并不等同于议价、账期或多方履约，B2C 也不意味着省略协议状态和责任角色。
 
-完整的基线配置、角色关系和 Action 序列见[商业场景](/documentation/specification/protocol-core/business-scenarios.html)；面向实际接入的端到端示例见[采购全链路指南](/documentation/specification/guides/procurement-walkthrough.html)。
+完整的基线配置、角色关系和 Action 序列见[商业场景](../protocol-core/business-scenarios.md)；面向实际接入的端到端示例见[采购全链路指南](../guides/procurement-walkthrough.md)。
 
 ## 采购模式
 
@@ -55,7 +55,7 @@ UTP 通过稳定标识、受控扩展和协商版本，让参与方能够明确�
 
 一次交易的 `SelectedMode` 是这六个维度的锁定组合。Mode 不是标签：它裁剪可用 Primitive、Action 和行为变体，也参与角色关系、状态迁移、路径编排和前置约束的判定。Mode 的升级必须遵循规范定义的升级规则，不能由某一次传输选择或本地实现自行改变。
 
-[采购模式](/documentation/specification/protocol-core/procurement-models.html)定义全部维度、Level 语义、Mode 判定、升级约束以及 Mode 与原语和角色的关联规则。
+[采购模式](../protocol-core/procurement-models.md)定义全部维度、Level 语义、Mode 判定、升级约束以及 Mode 与原语和角色的关联规则。
 
 ## 商业拓扑
 
@@ -70,7 +70,7 @@ UTP 通过稳定标识、受控扩展和协商版本，让参与方能够明确�
 
 一个商业实体可以承担多个 Role，一个 Role 也可能由独立业务域承担。路径编排根据 Action 的 `initiator_role` 和 `handler_role`，在已锁定的拓扑中确定唯一调用方向；发现与协商则按拓扑中相关的 Role 关系验证能力兼容性。
 
-[商业拓扑](/documentation/specification/protocol-core/business-topology.html)给出 `CommerceTopology`、标准角色集、角色关系类型及领域扩展治理的权威定义。
+[商业拓扑](../protocol-core/business-topology.md)给出 `CommerceTopology`、标准角色集、角色关系类型及领域扩展治理的权威定义。
 
 ## 发现与协商
 
@@ -85,7 +85,7 @@ UTP 通过稳定标识、受控扩展和协商版本，让参与方能够明确�
 
 协商不直接选择某一次调用的 Service、Endpoint 或传输方式；这些信息保留在服务目录中，由通信层在请求时结合目标 Action 的 `transport_bindings` 和当前 `HandlerRole` 确认。协商也不替代商业拓扑：拓扑给出责任结构，协商给出在该结构中实际可用的协议能力。
 
-详见[发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html)；发现前的基础交互入口见[发现与握手](/documentation/specification/protocol-core/discovery-handshake.html)。
+详见[发现与协商](../protocol-core/discovery-negotiation.md)；发现前的基础交互入口见[发现与握手](../protocol-core/discovery-handshake.md)。
 
 ## 路径编排
 
@@ -111,7 +111,7 @@ UTP 通过稳定标识、受控扩展和协商版本，让参与方能够明确�
 
 调用方只能从 `available_actions` 中选择 Action，并携带会话、幂等和输入上下文。处理方返回的 `valid_next_actions` 只是候选；路径编排会在状态机提交后再次过滤。调用观察结果未知时，路径编排保留会话与幂等上下文，通过重试、查询或异步通知恢复；`PENDING` 则是已取得的标准 `ActionResponse`，会进入状态机推进。
 
-[路径编排](/documentation/specification/protocol-core/path-orchestration.html)定义 DAG、行动空间、约束校验、恢复和生命周期；[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)定义 StateView、迁移、补偿和状态同步。
+[路径编排](../protocol-core/path-orchestration.md)定义 DAG、行动空间、约束校验、恢复和生命周期；[全局状态机](../protocol-core/global-state-machine.md)定义 StateView、迁移、补偿和状态同步。
 
 ## 原语框架
 
@@ -128,7 +128,7 @@ UTP 通过稳定标识、受控扩展和协商版本，让参与方能够明确�
 
 每个 Primitive 的规范定义包含业务意图、前置条件、后置条件、不变量、角色绑定、适用状态、状态影响、可暴露的 `valid_next_actions` 和关键约束。`ActionRequest` 与 `ActionResponse` 使用 P0 约定交换；`trade_context_id` 标识商业意图上下文，`transaction_id` 标识独立交易边界，`idempotency_key` 保障可安全重试。
 
-扩展在不改变核心 Primitive 语义的前提下增加能力。它们必须声明宿主原语、版本和 Schema，并在当前 Role 关系的协商结果中共同支持后才能进入请求、响应和 `valid_next_actions`。权威的通用约定见[P0 原语框架](/documentation/specification/protocol-core/primitive-framework.html)，具体语义见[交易原语](/documentation/specification/index.html)。
+扩展在不改变核心 Primitive 语义的前提下增加能力。它们必须声明宿主原语、版本和 Schema，并在当前 Role 关系的协商结果中共同支持后才能进入请求、响应和 `valid_next_actions`。权威的通用约定见[P0 原语框架](../protocol-core/primitive-framework.md)，具体语义见[交易原语](../index.md)。
 
 ## 信任与安全
 
@@ -144,7 +144,7 @@ UTP 将“能否互操作”和“能否执行受保护操作”拆分为可组�
 
 处理 Action 时，身份、授权、风险和人机控制等级共同构成前置约束；处理方还需完成本域的 Schema、业务资源、权限和幂等校验。标准响应才会进入全局状态机，形成可追溯的跨方状态结论。
 
-参见[信任准入评估](/documentation/specification/protocol-core/security-trust.html)、[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)、[风控与审计](/documentation/specification/protocol-core/risk-audit.html)和[传输与通信](/documentation/specification/protocol-core/transport-communication.html)。
+参见[信任准入评估](../protocol-core/security-trust.md)、[认证与授权](../protocol-core/identity-authorization.md)、[风控与审计](../protocol-core/risk-audit.md)和[传输与通信](../protocol-core/transport-communication.md)。
 
 ## 人机交互友好
 
@@ -160,6 +160,6 @@ UTP 将自动化执行、受监督执行和人工确认表达为协议控制语�
 
 人机协同并不改变商业拓扑、Mode 或原语的业务含义；它在执行链路中增加可观察、可中断和可确认的控制点。Agent 友好设计也不意味着绕过状态、授权或风险约束：运行时仍只能从 `available_actions` 中选择动作，并以标准响应和 StateView 作为后续决策依据。
 
-详细控制语义见[人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html)，自描述响应、错误恢复和幂等重试约定见[Agent 友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html)。
+详细控制语义见[人机协同交互](../protocol-core/human-agent-interaction.md)，自描述响应、错误恢复和幂等重试约定见[Agent 友好接口](../protocol-core/agent-friendly-interface.md)。
 
 本页的叙事层次参考《智能体交易研究报告》对协议愿景、架构、安全、集成与共建机制的组织方式，以及 [UCP Overview](https://ucp.dev/latest/specification/overview/) 的概览层次。UTP 的术语、对象、版本和规范性要求仅以 `documentation` 中当前协议章节为准。

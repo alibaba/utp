@@ -52,7 +52,7 @@ version: 2026-07-29
 
 ## 状态迁移图
 
-![UTP 交易上下文级与交易级状态迁移图：上下文级状态从 INIT、SOURCING、NEGOTIATING 推进到交易级 PURCHASING，并在交易级状态中流转 PAYING、FULFILLING、SETTLED、DISPUTED、FAILED 和 CANCELLED。](/documentation/assets/diagrams/global-state-machine-transition.svg)
+![UTP 交易上下文级与交易级状态迁移图：上下文级状态从 INIT、SOURCING、NEGOTIATING 推进到交易级 PURCHASING，并在交易级状态中流转 PAYING、FULFILLING、SETTLED、DISPUTED、FAILED 和 CANCELLED。](../../assets/diagrams/global-state-machine-transition.svg)
 
 ## 状态迁移约定
 

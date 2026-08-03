@@ -10,13 +10,18 @@ version: 2026-07-29
   UTP 协议章节标准模板（protocol-chapter，Markdown 版）
   ============================================================
   使用方法：
-  1. 复制本文件到 docs-src/specification/ 目标目录（如 protocol-core/xxx.md），
+  1. 复制本文件到 docs/specification/ 目标目录（如 protocol-core/xxx.md），
      修改上方 front-matter；
-  2. 在 docs-src/specification/manifest.json 的 navigation 与 pages 中注册
+  2. 在 docs/specification/manifest.json 的 navigation 与 pages 中注册
      该页面的产物路径（.html 后缀）；
-  3. 页面外壳（导航、面包屑、页内目录、前后页、代码复制按钮）由构建脚本
-     scripts/build-docs.mjs 统一生成，正文只需按本模板的写法书写；
-  4. 执行 npm run docs:build 后在 public/documentation/ 查看渲染结果。
+  3. 页面外壳（导航、面包屑、页内目录、前后页、代码复制按钮）由文档站仓库的
+     构建脚本统一生成，正文只需按本模板的写法书写；
+  4. 在文档站仓库执行 npm run docs:build 后，在 public/specification/<协议版本>/
+     查看渲染结果；构建会同时校验注册表与站内链接，目标缺失时直接中断。
+
+  引用写法：
+    章节链接与图片引用一律使用「相对当前 md 文件的仓库内路径」，不得使用站点
+    绝对路径；带协议版本的站点地址由构建时统一生成。
 
   front-matter 字段：
     title    页面标题（必填，作为"页面 md"的识别标志）
@@ -65,8 +70,10 @@ version: 2026-07-29
 三类链接的标准写法：
 
 - 页内锚点：[X.1 总览](#s-overview)（指向本页标题锚点）；
-- 已发布章节：[协议概览](/documentation/specification/concepts/index.html)（使用以 `/documentation/specification/` 开头的绝对路径，目标为 `.html` 产物路径）；
-- 未发布章节（待补引用）：<span class="pending-ref" data-ref="/documentation/specification/protocol-core/identity-authorization.html" title="目标章节尚未发布，链接待补">第 N 章</span>——目标章节发布后，将 `span` 恢复为 `[第 N 章]({data-ref})` 即可。
+- 已发布章节：[协议概览](../concepts/index.md)（用相对当前 md 文件的仓库内路径，指向目标的源 `.md`；锚点直接跟在后面，如 `../protocol-core/x.md#s-19-1`）；
+- 未发布章节（待补引用）：<span class="pending-ref" data-ref="../protocol-core/identity-authorization.md" title="目标章节尚未发布，链接待补">第 N 章</span>——目标章节发布后，将 `span` 恢复为 `[第 N 章]({data-ref})` 即可。
+
+构建时上述相对路径会被换算为产物内的 `.html` 相对路径。不得使用站点绝对路径，也不得直接指向 `.html`。
 
 ## X.3 表格 {#s-tables}
 
@@ -95,18 +102,18 @@ version: 2026-07-29
 
 ## X.5 图片区 {#s-figures}
 
-图表文件放入 `docs-src/assets/diagrams/`，首选 Markdown 图片语法 + 站点绝对路径（云构建时自动改写为 CDN 地址），alt 文本完整描述图中信息：
+图表文件放入 `docs/assets/diagrams/`，首选 Markdown 图片语法 + **相对当前 md 文件的仓库内路径**，alt 文本完整描述图中信息：
 
-![Escrow 托管资金流转：采购方付款进托管方，验收通过后释放资金给供应商。](/documentation/assets/diagrams/escrow-flow.svg)
+![Escrow 托管资金流转：采购方付款进托管方，验收通过后释放资金给供应商。](../../assets/diagrams/escrow-flow.svg)
 
 需要图题时改用 `figure` + `figcaption`（内联 HTML）：
 
 <figure>
-<img src="/documentation/assets/diagrams/escrow-flow.svg" alt="图示替代文本">
+<img src="../../assets/diagrams/escrow-flow.svg" alt="图示替代文本">
 <figcaption>图 X-1：图题说明</figcaption>
 </figure>
 
-SVG 根元素应声明 `viewBox`（不写死 `width/height`），以适配正文区自适应缩放；禁止相对路径与外部图床。
+上例的 `../../` 对应 `specification/protocol-core/xxx.md` 这个位置（protocol-core → specification → docs），实际层数按当前文件深度计算（如 `specification/primitives/pay/index.md` 需 `../../../`）。SVG 根元素应声明 `viewBox`（不写死 `width/height`），以适配正文区自适应缩放；不得使用站点绝对路径与外部图床。
 
 ## X.6 分节与收尾 {#s-sections}
 

@@ -42,7 +42,7 @@ service:        dev.utp.merchant
     <ul>
       <li><strong>数量与信息分离：</strong>Inventory 只管数量，商品信息属于 MP1。二者可独立变更、独立授权、独立限流（库存变更频率通常比商品信息高 2—3 个数量级）。</li>
       <li><strong>供应商是数量的唯一权威写入方：</strong><code>available</code> 只能由 Seller 通过 <code>set</code>/<code>adjust</code> 写入；Marketplace MUST NOT 主动修改 <code>available</code>，只能在其上叠加交易性占用。</li>
-      <li><strong>交易性占用是 P3 的副作用，不是 MP2 的 Action：</strong>hold（临时占用）与 lock（最终锁定）由主规范 <code>purchase.create</code>/<code>complete</code> 触发（<a href="/documentation/specification/primitives/purchase/index.html#s-1352-seller">13.5.2 Seller 职责"锁定库存"</a>），MP2 提供 <code>hold.query</code> 让供应商核验占用明细。这保持了 P3 与 MP2 的正交：P3 消费库存，MP2 供给库存。</li>
+      <li><strong>交易性占用是 P3 的副作用，不是 MP2 的 Action：</strong>hold（临时占用）与 lock（最终锁定）由主规范 <code>purchase.create</code>/<code>complete</code> 触发（<a href="../primitives/purchase/index.md#s-1352-seller">13.5.2 Seller 职责"锁定库存"</a>），MP2 提供 <code>hold.query</code> 让供应商核验占用明细。这保持了 P3 与 MP2 的正交：P3 消费库存，MP2 供给库存。</li>
       <li><strong>乐观并发：</strong>写操作 MUST 携带 <code>expected_revision</code>（乐观锁）或声明 <code>commutative: true</code>（纯增量可交换模式，仅 <code>adjust</code>），防止 ERP 回写与平台扣减的并发丢失更新（M8.5 的防超卖基础）。<strong>最简接入路径：</strong>日常同步只用 <code>adjust + commutative: true</code>（无需维护版本号、天然抗乱序重试），仅在盘点校准时用 <code>set + expected_revision</code>——两个操作、两个场景，足以覆盖全部库存需求。</li>
     </ul>
     <h3 id="s-m413">M4.1.3 前置条件与后置条件</h3>
@@ -87,7 +87,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m42">M4.2 库存模型（Inventory Model）</h2>
     <p>MP2 定义三层数量视图，粒度为 <code>listing_id + sku_id</code>（可选叠加 <code>warehouse_id</code> 多仓维度）：</p>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-inventory-model.svg" alt="库存三层数量视图：available 权威值内含 active_holds 占用与 sellable 派生量，发货核销转入 consumed；下半部为 InventoryHold 生命周期 HELD/LOCKED/CONSUMED/RELEASED" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-inventory-model.svg" alt="库存三层数量视图：available 权威值内含 active_holds 占用与 sellable 派生量，发货核销转入 consumed；下半部为 InventoryHold 生命周期 HELD/LOCKED/CONSUMED/RELEASED" style="max-width: 100%; height: auto;"></div>
     <table>
       <thead><tr><th>数量语义</th><th>写入方</th><th>变更途径</th></tr></thead>
       <tbody>

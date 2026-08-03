@@ -25,14 +25,14 @@ format: html
     <h2 id="s-m12">M1.2 设计原则（Design Principles）</h2>
     <p>本规范在主规范五条核心设计约束（原语正交性、状态机确定性、模式参数化、传输无关性、向后兼容）之上，增加三条供应商侧原则：</p>
     <ol>
-      <li><strong>方向一致性（Directional Consistency）：</strong>所有 MP 原语的 <code>initiator_role</code> MUST 为 <code>Seller</code>，<code>handler_role</code> MUST 为 <code>Marketplace</code>（M1.3）。供应商侧能力不通过“给既有原语增加反向 Action”表达，避免破坏主规范 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023-action-definition-format">10.2.3</a> 中“每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>，不得声明多组角色对”的不变式。</li>
-      <li><strong>资源状态与交易状态分离（Resource vs. Transaction State）：</strong>商品、库存、发货单是<strong>资源级状态</strong>，其状态机由各 MP 原语在原语内部定义；全局状态机（主规范 <a href="/documentation/specification/protocol-core/global-state-machine.html#s-171">17.1</a>）只管理 <code>transaction_id</code> 生命周期。MP 原语 MUST NOT 定义或迁移任何全局交易状态；MP 原语对交易的影响只能通过主规范已定义的事实（如库存校验结果、卖方签名、履约 Evidence）传导。</li>
+      <li><strong>方向一致性（Directional Consistency）：</strong>所有 MP 原语的 <code>initiator_role</code> MUST 为 <code>Seller</code>，<code>handler_role</code> MUST 为 <code>Marketplace</code>（M1.3）。供应商侧能力不通过“给既有原语增加反向 Action”表达，避免破坏主规范 <a href="../protocol-core/primitive-framework.md#s-1023-action-definition-format">10.2.3</a> 中“每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>，不得声明多组角色对”的不变式。</li>
+      <li><strong>资源状态与交易状态分离（Resource vs. Transaction State）：</strong>商品、库存、发货单是<strong>资源级状态</strong>，其状态机由各 MP 原语在原语内部定义；全局状态机（主规范 <a href="../protocol-core/global-state-machine.md#s-171">17.1</a>）只管理 <code>transaction_id</code> 生命周期。MP 原语 MUST NOT 定义或迁移任何全局交易状态；MP 原语对交易的影响只能通过主规范已定义的事实（如库存校验结果、卖方签名、履约 Evidence）传导。</li>
       <li><strong>单一事实源（Single Source of Truth）：</strong>供应商通过 MP1/MP2 发布的商品与库存结构，与买方通过 P1 Source 查询到的 <code>item</code>/<code>skus</code>/<code>pricing</code> 结构 MUST 字段对齐（对齐关系见 M3.9 与附录 MD）。"发布的即是被搜到的"，禁止两套商品模型。</li>
     </ol>
 
     <h2 id="s-m13">M1.3 角色模型（Role Model）</h2>
     <h3 id="s-m131">M1.3.1 新增角色：Marketplace</h3>
-    <p>主规范 R2 标准角色集（<a href="/documentation/specification/protocol-core/business-topology.html#s-922-standard-roles">9.2.2</a>）没有承载商品目录与订单路由的平台角色。本规范按 R1 角色元规则（<a href="/documentation/specification/protocol-core/business-topology.html#s-924-r1">9.2.4</a>）论证并新增扩展角色 <code>Marketplace</code>：</p>
+    <p>主规范 R2 标准角色集（<a href="../protocol-core/business-topology.md#s-922-standard-roles">9.2.2</a>）没有承载商品目录与订单路由的平台角色。本规范按 R1 角色元规则（<a href="../protocol-core/business-topology.md#s-924-r1">9.2.4</a>）论证并新增扩展角色 <code>Marketplace</code>：</p>
     <table>
       <thead><tr><th>R1 条件</th><th>论证</th></tr></thead>
       <tbody>
@@ -41,7 +41,7 @@ format: html
         <tr><td>权限差异性</td><td>Marketplace 可见全量商品与订单路由信息，但 MUST NOT 可见供应商成本结构；对买方侧仅暴露已上架（LISTED）商品。</td></tr>
       </tbody>
     </table>
-    <p><strong>RoleDefinition（按主规范 <a href="/documentation/specification/protocol-core/business-topology.html#s-921-roledefinition">9.2.1</a> 格式）：</strong></p>
+    <p><strong>RoleDefinition（按主规范 <a href="../protocol-core/business-topology.md#s-921-roledefinition">9.2.1</a> 格式）：</strong></p>
 <pre class="highlight"><code class="language-json">{
   "role_id": "Marketplace",
   "display_name": "平台方",
@@ -80,9 +80,9 @@ format: html
     <h2 id="s-m14">M1.4 两种部署拓扑（Deployment Topologies）</h2>
     <h3 id="s-m141">M1.4.1 平台托管拓扑（Marketplace-Hosted）</h3>
     <p>本规范的主线拓扑。供应商将商品发布到 Marketplace 运营的 UTP Server；买方的 P1—P6 请求由 Marketplace 的 Endpoint 处理（Marketplace 同时以 <code>Seller</code> 代理身份或路由方式响应），供应商通过 MP 原语与 Marketplace 交互：</p>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-hosted-topology.svg" alt="平台托管拓扑：Seller 经 MP1—MP4 对接 Marketplace，买方经 P1—P6 对接 Marketplace，回调反向推送" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-hosted-topology.svg" alt="平台托管拓扑：Seller 经 MP1—MP4 对接 Marketplace，买方经 P1—P6 对接 Marketplace，回调反向推送" style="max-width: 100%; height: auto;"></div>
     <ul>
-      <li>Marketplace MUST 将 LISTED 状态的商品纳入其 P1 Source 的可搜索范围（<code>handler_role=Seller</code> 的 Source 由 Marketplace 的 Business Domain 承载，见主规范 <a href="/documentation/specification/protocol-core/discovery-negotiation.html#s-332">3.3.2</a>“同一 Business Domain MAY 承担多个 Role”）。</li>
+      <li>Marketplace MUST 将 LISTED 状态的商品纳入其 P1 Source 的可搜索范围（<code>handler_role=Seller</code> 的 Source 由 Marketplace 的 Business Domain 承载，见主规范 <a href="../protocol-core/discovery-negotiation.md#s-332">3.3.2</a>“同一 Business Domain MAY 承担多个 Role”）。</li>
       <li>买方 <code>purchase.create</code>/<code>complete</code> 触发的库存校验与锁定 MUST 落到 MP2 维护的同一库存视图（M4.7）。</li>
       <li>订购成立所需的"卖方承诺处理"（主规范 13.2.3），经 MP3 <code>acceptance.accept</code> 以签名形式完成（M5.6）。</li>
     </ul>
@@ -99,7 +99,7 @@ format: html
       </tbody>
     </table>
     <h3 id="s-m144">M1.4.4 Handler 侧执行模式：平台代答与透传（Delegation Mode）</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-delegation-flow.svg" alt="Handler 执行模式：direct 平台代答与 passthrough 透传，超时按 on_timeout 兜底，买方不感知模式" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-delegation-flow.svg" alt="Handler 执行模式：direct 平台代答与 passthrough 透传，超时按 on_timeout 兜底，买方不感知模式" style="max-width: 100%; height: auto;"></div>
     <p>平台托管拓扑下，<code>handler_role = Seller</code> 的既有原语由 Marketplace 的 Endpoint 承载。其中 P1 Source 的应答 MUST 为平台直接处理（其数据即 MP1/MP2 发布结构的投影，M3.9.6）；对 <strong>P2 Negotiate 与 P6 Resolve 的卖方应答义务</strong>，商家 MUST 在入驻时（M2.4.1 <code>delegation_policy</code>）逐原语选择一种执行模式：</p>
     <table>
       <thead><tr><th>模式</th><th>语义</th><th>适用</th></tr></thead>
@@ -135,7 +135,7 @@ format: html
     </ul>
 
     <h2 id="s-m16">M1.6 商品—交易闭环（End-to-End Loop）</h2>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-closed-loop.svg" alt="商品—交易闭环：供应商侧发布/库存/接单/发货与买方侧发现/寻源/订购/履约/支付的咬合关系" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-closed-loop.svg" alt="商品—交易闭环：供应商侧发布/库存/接单/发货与买方侧发现/寻源/订购/履约/支付的咬合关系" style="max-width: 100%; height: auto;"></div>
     <p><strong>闭环不变式（协议引擎 MUST 保证）：</strong></p>
     <ol>
       <li><code>source.lookup</code> 返回的商品结构 == MP1 发布的 Listing 结构在买方可见字段上的投影（M3.9）。</li>
@@ -160,7 +160,7 @@ format: html
     </table>
 
     <h2 id="s-m18">M1.8 Mode 对供应商侧的影响（Mode Awareness）</h2>
-    <p>MP 原语复用主规范六个 Mode 维度（<a href="/documentation/specification/protocol-core/procurement-models.html">Ch.8</a>），不新增维度。</p>
+    <p>MP 原语复用主规范六个 Mode 维度（<a href="../protocol-core/procurement-models.md">Ch.8</a>），不新增维度。</p>
     <p><strong>Mode 默认无关性原则（Mode-Agnostic by Default，规范性裁决）：</strong>MP 原语的操作语义、状态机与错误码<strong>默认不随 Mode 变化</strong>（publish 就是 publish，ship 就是 ship）。Mode 对供应商侧的影响被收敛在三个显式接触点：① <strong>数据要求</strong>（如 pricing_mode 决定价格字段，已由 Schema 条件必填机器化）；② <strong>时限配置</strong>（受理/履约 deadline 取自 Mode 协商的超时配置，4.2.4）；③ <strong>搜索可见性</strong>（supported_mode_range ∩ mode_constraints 过滤，M3.6）。下表是 Mode 影响的<strong>穷尽清单</strong>：本表未列出的行为差异不存在，各原语章不再逐一定义六维行为矩阵，实现方 MUST NOT 自行引入未声明的 Mode 分支。该裁决的目的是把供应商接入复杂度锁定在最小值：<strong>零 Mode 配置即可跑通全流程</strong>（mode_constraints 缺省继承 Profile 全量范围）。</p>
     <table>
       <thead><tr><th>Mode 维度</th><th>对 MP 原语的影响</th></tr></thead>
@@ -175,18 +175,18 @@ format: html
     </table>
 
     <h2 id="s-m19">M1.9 全局状态机边界声明（State Machine Boundary）</h2>
-    <p>本规范<strong>不新增任何全局状态</strong>。对照主规范 <a href="/documentation/specification/protocol-core/global-state-machine.html#s-1711">17.1.1 状态枚举</a>：</p>
+    <p>本规范<strong>不新增任何全局状态</strong>。对照主规范 <a href="../protocol-core/global-state-machine.md#s-1711">17.1.1 状态枚举</a>：</p>
     <ul>
       <li>Listing 状态机（M3.3）、Shipment 状态机（M6.3）、Acceptance 状态机（M5.3）均为<strong>资源级/原语内部状态</strong>，与 <code>trade_context_id</code>/<code>transaction_id</code> 两个作用域并列存在第三个作用域：<strong>资源作用域（resource scope）</strong>，以 <code>listing_id</code>/<code>shipment_id</code> 等资源标识为生命周期锚点。</li>
       <li>MP 原语的执行结果只能通过主规范已定义的机制影响全局状态：MP3 的受理结论完成 13.2.3 的"卖方承诺处理"，驱动 <code>SIGNING → PURCHASED</code> 原子迁移；MP4 的发货事实经 <code>fulfill.notify</code> 驱动买方可观测状态机。符合主规范 17.0.1 "Binding Terms、商家内部字段、任意 output 字段和 Evidence 内容不得成为公共迁移条件；这些业务条件必须先由对应原语处理，并通过 P0 标准 Action Response 表达"的约束。</li>
     </ul>
 
     <h2 id="s-m110">M1.10 通用规则继承（Commons Inheritance）</h2>
-    <p>MP 原语 MUST 完整继承主规范 P0 原语通用框架（<a href="/documentation/specification/protocol-core/primitive-framework.html">Ch.10</a>）：</p>
+    <p>MP 原语 MUST 完整继承主规范 P0 原语通用框架（<a href="../protocol-core/primitive-framework.md">Ch.10</a>）：</p>
     <ul>
-      <li><strong>消息信封：</strong>使用 MessageEnvelope（<a href="/documentation/specification/protocol-core/transport-communication.html#s-411">4.1.1</a>），<code>primitive</code> 字段取值扩展为含 <code>utp.listing</code>、<code>utp.inventory</code>、<code>utp.acceptance</code>、<code>utp.shipment</code>（主规范信封 Schema 的 <code>primitive</code> 枚举扩展为发布协调事项，登记于附录 ME 第 4 项；枚举扩展生效前，处理 MP 原语的实现方 MUST 按本分册声明接受上述取值）。</li>
+      <li><strong>消息信封：</strong>使用 MessageEnvelope（<a href="../protocol-core/transport-communication.md#s-411">4.1.1</a>），<code>primitive</code> 字段取值扩展为含 <code>utp.listing</code>、<code>utp.inventory</code>、<code>utp.acceptance</code>、<code>utp.shipment</code>（主规范信封 Schema 的 <code>primitive</code> 枚举扩展为发布协调事项，登记于附录 ME 第 4 项；枚举扩展生效前，处理 MP 原语的实现方 MUST 按本分册声明接受上述取值）。</li>
       <li><strong>签名：</strong>全部写操作 MUST 携带 RFC 9421 请求签名；<code>publish</code>/<code>accept</code>/<code>ship</code> 等产生凭证的操作 MUST 附 Seller ES256 业务签名（JWS）。<strong>业务签名统一规则：</strong>JWS payload MUST 是单一 SHA-256 哈希的十六进制小写串；哈希输入由各操作显式定义（accept → 订单路由提供的 <code>terms_hash</code>；publish → <code>version_hash</code>，M3.2.4；ship/split → <code>shipment_hash</code>/<code>plan_hash</code>，M6.9.1）；对象哈希的 JSON 规范化 MUST 使用 RFC 8785（JCS）。实现方 MUST NOT 自行选择签名覆盖范围。</li>
-      <li><strong>操作准入：</strong>Marketplace 处理 MP 写操作前 MUST 按主规范<a href="/documentation/specification/protocol-core/security-trust.html#s-5-trust-profile">第 5 章</a> 5.1 节完成操作准入判定，判定顺序与失败语义同主规范；认证与授权失败 MUST 使用全局错误码（<code>UTP.AUTH_UNAUTHORIZED</code> / <code>UTP.AUTH_FORBIDDEN</code>，10.4.2）。Merchant Agent 代理操作时的 Mandate 要求见 M9.4。</li>
+      <li><strong>操作准入：</strong>Marketplace 处理 MP 写操作前 MUST 按主规范<a href="../protocol-core/security-trust.md#s-5-trust-profile">第 5 章</a> 5.1 节完成操作准入判定，判定顺序与失败语义同主规范；认证与授权失败 MUST 使用全局错误码（<code>UTP.AUTH_UNAUTHORIZED</code> / <code>UTP.AUTH_FORBIDDEN</code>，10.4.2）。Merchant Agent 代理操作时的 Mandate 要求见 M9.4。</li>
       <li><strong>幂等：</strong>全部写操作 MUST 携带 <code>idempotency_key</code>；重复请求 MUST 返回首次执行的缓存结果。幂等键 MUST 保留不短于 24 小时；同一键携带不同请求体 MUST 返回冲突错误（HTTP 409，不执行）。</li>
       <li><strong>错误响应：</strong>使用主规范 10.4.3 标准错误响应格式；本规范错误码统一登记在<a href="appendices.html#s-mb">附录 MB</a>。</li>
       <li><strong>响应自描述：</strong>响应 MUST 携带 <code>valid_next_actions</code>，相对动作名按所属原语解析。</li>

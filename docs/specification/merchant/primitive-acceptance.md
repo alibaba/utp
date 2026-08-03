@@ -38,7 +38,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m51">M5.1 Overview（概述）</h2>
     <h3 id="s-m511a">M5.1.1 意图</h3>
-    <p>Acceptance 是 UTP-M 第三个供应商原语（MP3），其意图是让供应商对买方发起的订购给出<strong>显式、签名、可审计的受理结论</strong>。主规范 P3 将卖方接受抽象为"卖方完成自身承诺处理"（<a href="/documentation/specification/primitives/purchase/index.html#s-1323">13.2.3</a>），并要求卖方在 complete 前"确认可行性"（<a href="/documentation/specification/primitives/purchase/index.html#s-1352-seller">13.5.2</a>），但未定义承诺处理的产生机制，拒绝只能以错误码被动表达。MP3 将这一留白定义为显式协议动作，使供应商 Agent、ERP 审批流和人工后台都能以统一接口参与接单决策。</p>
+    <p>Acceptance 是 UTP-M 第三个供应商原语（MP3），其意图是让供应商对买方发起的订购给出<strong>显式、签名、可审计的受理结论</strong>。主规范 P3 将卖方接受抽象为"卖方完成自身承诺处理"（<a href="../primitives/purchase/index.md#s-1323">13.2.3</a>），并要求卖方在 complete 前"确认可行性"（<a href="../primitives/purchase/index.md#s-1352-seller">13.5.2</a>），但未定义承诺处理的产生机制，拒绝只能以错误码被动表达。MP3 将这一留白定义为显式协议动作，使供应商 Agent、ERP 审批流和人工后台都能以统一接口参与接单决策。</p>
     <h3 id="s-m512">M5.1.2 关键设计原则</h3>
     <ul>
       <li><strong>MP3 不替代 P3，而是喂给 P3。</strong>订购成立的唯一路径仍然是主规范 <code>purchase.complete</code> 的原子迁移（<code>SIGNING → PURCHASED</code>）；MP3 <code>accept</code> 即 13.2.3 所要求的"卖方承诺处理"在平台托管拓扑下的规范化实现，其产出（卖方 ES256 签名，覆盖 <code>terms_hash</code>）是承诺处理完成的可审计证据。MP3 <code>reject</code> 则触发 P3 既有补偿链（释放库存 → <code>CANCELLED</code>）。</li>
@@ -94,7 +94,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m52">M5.2 Lifecycle / State Machine（生命周期 / 状态机）</h2>
     <h3 id="s-m521">M5.2.1 受理任务状态机</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-acceptance-state-machine.svg" alt="受理任务状态机：PENDING_ACCEPT/ON_HOLD/AMEND_PROPOSED 收敛至 ACCEPTED/REJECTED，超时按 timeout_policy 兜底" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-acceptance-state-machine.svg" alt="受理任务状态机：PENDING_ACCEPT/ON_HOLD/AMEND_PROPOSED 收敛至 ACCEPTED/REJECTED，超时按 timeout_policy 兜底" style="max-width: 100%; height: auto;"></div>
     <h3 id="s-m522">M5.2.2 状态定义与迁移规则</h3>
     <table>
       <thead><tr><th>状态</th><th>含义</th><th>进入条件</th><th>允许的操作</th></tr></thead>
@@ -106,7 +106,7 @@ service:        dev.utp.merchant
         <tr><td><code>REJECTED</code></td><td>已拒绝（终态）</td><td><code>reject</code>；或买方拒绝交期变更；或超时策略 auto_reject</td><td><code>query</code>（只读）</td></tr>
       </tbody>
     </table>
-    <p><strong>确定性约束：</strong>终态到达后任何写操作 MUST 返回 <code>ACCEPTANCE.STATE_CONFLICT</code>（幂等重放同一 <code>idempotency_key</code> 除外）。<code>deadline</code> 由订单路由时的 Mode 超时配置决定（主规范 <a href="/documentation/specification/protocol-core/transport-communication.html#s-424">4.2.4</a> Mode 协商确定的超时配置），挂起不延长时限；延时需求 MUST 走 <code>amend_leadtime</code> 或买方侧 HAI 超时扩展。</p>
+    <p><strong>确定性约束：</strong>终态到达后任何写操作 MUST 返回 <code>ACCEPTANCE.STATE_CONFLICT</code>（幂等重放同一 <code>idempotency_key</code> 除外）。<code>deadline</code> 由订单路由时的 Mode 超时配置决定（主规范 <a href="../protocol-core/transport-communication.md#s-424">4.2.4</a> Mode 协商确定的超时配置），挂起不延长时限；延时需求 MUST 走 <code>amend_leadtime</code> 或买方侧 HAI 超时扩展。</p>
 
     <hr />
     <h2 id="s-m53">M5.3 Error Handling（错误处理）</h2>

@@ -58,7 +58,7 @@ Purchase 覆盖以下场景：
 | `purchase.status == 'purchased'` 或 `agreement.status == 'agreement_active'` | 相应承诺凭证已成立；只有订单进入 `PURCHASED`。 |
 | `purchase.purchase_id != null` 或 `contract.agreement_id != null` | 承诺凭证已生成唯一标识；订单为 `purchase_id`，协议为 `agreement_id`。 |
 | `purchase.terms_snapshot` 被 SHA256 哈希锁定 | 条款快照不可篡改。 |
-| `complete` 或 `contract-complete` 的 Mandate 准入已满足 | 完成操作已按[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)通过 Mandate 准入。 |
+| `complete` 或 `contract-complete` 的 Mandate 准入已满足 | 完成操作已按[信任准入评估规则](../../protocol-core/security-trust.md)通过 Mandate 准入。 |
 | `purchase.complete → inventory.locked(purchase.line_items) == true` | 仅订单在完成时锁定对应库存；协议不锁定某一笔订单库存。 |
 | `purchase.complete → session.state == 'PAYING'` | 仅订单完成后进入支付阶段；合同和框架协议生效后可创建后续订单。 |
 | `evidence_bundle.contains(['mandate', 'authorization_decision', 'terms_hash'])` | 证据包已生成。 |
@@ -105,7 +105,7 @@ Purchase 覆盖以下场景：
 
 ### Purchase 原语内部状态机 {#s-1321-purchase}
 
-![Purchase 原语内部状态机](/documentation/assets/diagrams/purchase-state-machine.svg)
+![Purchase 原语内部状态机](../../../assets/diagrams/purchase-state-machine.svg)
 
 ### 状态定义与迁移规则 {#s-1322}
 
@@ -124,7 +124,7 @@ Purchase 使用一张内部状态机描述订单与协议的衔接。订单由 `
 
 ### 状态迁移的原子性 {#s-1323}
 
-`complete` 与 `contract-complete` 必须先通过[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)定义的 Mandate 准入，方可进入 `*_SIGNING`。所有 `*_SIGNING → *` 的状态迁移 MUST 是原子操作；订单额外保证最终库存锁定成功：
+`complete` 与 `contract-complete` 必须先通过[信任准入评估规则](../../protocol-core/security-trust.md)定义的 Mandate 准入，方可进入 `*_SIGNING`。所有 `*_SIGNING → *` 的状态迁移 MUST 是原子操作；订单额外保证最终库存锁定成功：
 
 1. 卖方完成自身承诺处理
 2. 当动作是 `purchase.complete` 时，最终库存锁定成功
@@ -201,7 +201,7 @@ Purchase 的授权要求由能力提供方在 Profile 的 `utp.purchase.authoriz
 **角色约束：**
 
 - Seller MUST NOT 执行 `create` 或 `update` 操作 —— 订购的发起方始终是 Buyer。
-- `complete` 与 `contract-complete` 均由 Buyer 发起、Seller 处理；两者在进入业务处理前 MUST 满足[信任准入评估规则](/documentation/specification/protocol-core/security-trust.html)定义的 Mandate 准入要求。准入失败时，Seller MUST NOT 创建或迁移 Purchase 业务状态。
+- `complete` 与 `contract-complete` 均由 Buyer 发起、Seller 处理；两者在进入业务处理前 MUST 满足[信任准入评估规则](../../protocol-core/security-trust.md)定义的 Mandate 准入要求。准入失败时，Seller MUST NOT 创建或迁移 Purchase 业务状态。
 - `query` 为只读操作，MUST NOT 改变 Purchase 内部状态或全局状态。
 - `cancel` 仅在 `DRAFT` 状态下允许。一旦进入 `SIGNING` 或 `PURCHASED` 状态，取消 MUST 通过 Resolve 原语或 Saga 补偿处理。
 

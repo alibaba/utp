@@ -132,12 +132,12 @@ Pay 覆盖以下场景：
 
 参照强客户认证（Strong Customer Authentication, SCA）的**动态关联（Dynamic Linking）** 原则：用户对支付的授权与认证 MUST 与本笔交易的**（金额 + 收款方）** 密码学绑定，使一次认证结果 MUST NOT 被复用到另一金额或另一收款方。
 
-1. Payment Mandate 的用户签名（在 TEE 内经 WYSIWYS 确认生成，见[Payment Mandate 规则](/documentation/specification/protocol-core/identity-authorization.html#s-6423)）MUST 覆盖 `authorized_amount` 与收款方标识；二者任一变化 MUST 使既有确认与签名失效并重新确认。
-2. 用户认证因子（生物识别 / PIN，见[人机交互协同](/documentation/specification/protocol-core/human-agent-interaction.html)确认面）的确认结果 MUST 绑定到该 Payment Mandate 的内容哈希（`confirmed_hash`，见[确认内容绑定规则](/documentation/specification/protocol-core/identity-authorization.html#s-643)），MUST NOT 以“仅确认过一次”的形式复用于不同金额或收款方。
-3. 强确认下限：交易金额达到或超过 `confirmation_threshold`，或目标支付操作要求 Human Confirmation / Payment Mandate 强确认时（见[安全与信任规则](/documentation/specification/protocol-core/security-trust.html)），MUST 要求多因子 / 生物识别确认，MUST NOT 仅凭点击放行大额支付。协议 MUST 设默认下限，实现方 MAY 收紧但 MUST NOT 放宽至无强确认即可完成大额支付。
+1. Payment Mandate 的用户签名（在 TEE 内经 WYSIWYS 确认生成，见[Payment Mandate 规则](../../protocol-core/identity-authorization.md#s-6423)）MUST 覆盖 `authorized_amount` 与收款方标识；二者任一变化 MUST 使既有确认与签名失效并重新确认。
+2. 用户认证因子（生物识别 / PIN，见[人机交互协同](../../protocol-core/human-agent-interaction.md)确认面）的确认结果 MUST 绑定到该 Payment Mandate 的内容哈希（`confirmed_hash`，见[确认内容绑定规则](../../protocol-core/identity-authorization.md#s-643)），MUST NOT 以“仅确认过一次”的形式复用于不同金额或收款方。
+3. 强确认下限：交易金额达到或超过 `confirmation_threshold`，或目标支付操作要求 Human Confirmation / Payment Mandate 强确认时（见[安全与信任规则](../../protocol-core/security-trust.md)），MUST 要求多因子 / 生物识别确认，MUST NOT 仅凭点击放行大额支付。协议 MUST 设默认下限，实现方 MAY 收紧但 MUST NOT 放宽至无强确认即可完成大额支付。
 4. B2C 一次性授权复用 MUST 设协议级上限：单次授权的累计金额、复用次数与时间窗 MUST 有明确上界，超出 MUST 重新进行用户强确认。
 
-动态关联将“该用户授权了这笔金额支付给这个收款方”钉死在认证凭证中，防止认证结果被移花接木到其他交易；其确认要求由 Checkout Mandate、Payment Mandate、Human Confirmation 与目标支付操作的准入声明共同确定（见[安全与信任规则](/documentation/specification/protocol-core/security-trust.html)）。
+动态关联将“该用户授权了这笔金额支付给这个收款方”钉死在认证凭证中，防止认证结果被移花接木到其他交易；其确认要求由 Checkout Mandate、Payment Mandate、Human Confirmation 与目标支付操作的准入声明共同确定（见[安全与信任规则](../../protocol-core/security-trust.md)）。
 
 ---
 
@@ -145,7 +145,7 @@ Pay 覆盖以下场景：
 
 ### Pay 原语内部状态机 {#s-1421-pay}
 
-![Pay 原语内部状态机](/documentation/assets/diagrams/pay-state-machine.svg)
+![Pay 原语内部状态机](../../../assets/diagrams/pay-state-machine.svg)
 
 ### 状态定义与迁移规则 {#s-1422}
 
@@ -437,7 +437,7 @@ pay.initiate (选择支付工具 + 令牌化凭证)
 
 Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`（确认支付）、`term`（付款阶段执行）、`query`（支付状态查询）、`refund`（退款执行）。`request_payment` 属于 Autonomous Payment Profile 的扩展操作，仅在 HTTP 402 自主资源付费场景启用，不参与 PurchaseCredential 驱动的标准电商交易全局状态迁移。
 
-`query` 为只读性质的观测操作：用于随时获取某笔支付或某个 PurchaseCredential 下的实时支付状态，MUST NOT 触发资金变动或状态迁移。`refund` 是有资金副作用的受限操作，MUST 由 Resolve、Saga 补偿规则或具备协议授权的资金服务触发，Buyer 与 Seller MUST NOT 直接调用。各 Action 是否携带[原语声明](/documentation/specification/protocol-core/primitive-framework.html#s-1026-primitive-declaration-schema)（`hai`）及具体 `interaction_level`，由**实现方** 在其原语定义文件中决定，本原语章不作逐 Action 规定。
+`query` 为只读性质的观测操作：用于随时获取某笔支付或某个 PurchaseCredential 下的实时支付状态，MUST NOT 触发资金变动或状态迁移。`refund` 是有资金副作用的受限操作，MUST 由 Resolve、Saga 补偿规则或具备协议授权的资金服务触发，Buyer 与 Seller MUST NOT 直接调用。各 Action 是否携带[原语声明](../../protocol-core/primitive-framework.md#s-1026-primitive-declaration-schema)（`hai`）及具体 `interaction_level`，由**实现方** 在其原语定义文件中决定，本原语章不作逐 Action 规定。
 
 ### utp.pay.initiate {#s-1471-utppayinitiate}
 
@@ -899,9 +899,9 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 
 在 `trust_level` 要求较高或 `compliance_level >= L2` 的交易中，UTP 支持引入 Escrow（托管方）作为拓扑中的参与方。Escrow 方独立于买卖双方，负责资金的托管与条件释放。
 
-Escrow 方的角色和权限在拓扑协商阶段确定（参见[商业拓扑](/documentation/specification/protocol-core/business-topology.html)），其参与使资金流转模式变为：
+Escrow 方的角色和权限在拓扑协商阶段确定（参见[商业拓扑](../../protocol-core/business-topology.md)），其参与使资金流转模式变为：
 
-![Escrow 托管资金流转：采购方付款进托管方，验收通过后托管方释放资金给供应商（绿色主路径）；若争议发生则冻结资金，由仲裁结果决定资金归属（橙色分支）。](/documentation/assets/diagrams/escrow-flow.svg)
+![Escrow 托管资金流转：采购方付款进托管方，验收通过后托管方释放资金给供应商（绿色主路径）；若争议发生则冻结资金，由仲裁结果决定资金归属（橙色分支）。](../../../assets/diagrams/escrow-flow.svg)
 
 ### EscrowConfig 实体 {#s-14102-escrowconfig}
 
@@ -1018,7 +1018,7 @@ Escrow 托管资金在交易生命周期内遵循确定性状态机。每个状�
 1. Escrow 状态机 MUST 遵循确定性迁移：同一状态下同一输入 MUST 产生唯一的迁移结果。
 2. 从 `funded` 到 `frozen` 的迁移 MUST 在 Resolve 原语触发争议时自动执行，Escrow 方 MUST NOT 拒绝冻结请求。
 3. 终态（`released`、`refunded`、`cancelled`）MUST NOT 发生进一步迁移。
-4. 每次状态迁移 MUST 生成 EscrowOperation 记录（见 Escrow 操作规范），并写入 Evidence Bundle（见[风控与审计](/documentation/specification/protocol-core/risk-audit.html#s-73-evidence-bundle)）。
+4. 每次状态迁移 MUST 生成 EscrowOperation 记录（见 Escrow 操作规范），并写入 Evidence Bundle（见[风控与审计](../../protocol-core/risk-audit.md#s-73-evidence-bundle)）。
 
 ### Escrow 操作规范 {#s-14105-escrow-operations}
 
@@ -1053,7 +1053,7 @@ Escrow 托管资金在交易生命周期内遵循确定性状态机。每个状�
 1. 每个 EscrowOperation MUST 包含操作方的 JWS 签名，签名覆盖 `operation_type`、`amount` 和 `timestamp` 字段。
 2. 操作权限矩阵定义了各操作在特定状态下的允许性。不在矩阵中的操作-状态组合 MUST 被拒绝。
 3. `freeze` 操作 MUST 在 Resolve 原语触发争议时由协议引擎自动发起，Escrow 方 MUST NOT 延迟执行。
-4. 所有 EscrowOperation 记录 MUST 追加到 Evidence Bundle（见[风控与审计](/documentation/specification/protocol-core/risk-audit.html#s-73-evidence-bundle)），作为交易凭证链的组成部分。
+4. 所有 EscrowOperation 记录 MUST 追加到 Evidence Bundle（见[风控与审计](../../protocol-core/risk-audit.md#s-73-evidence-bundle)），作为交易凭证链的组成部分。
 
 ### 超时与自动处置 {#s-14106-escrow-timeout}
 

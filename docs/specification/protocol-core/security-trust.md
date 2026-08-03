@@ -80,7 +80,7 @@ format: html
 </table>
 
 <h3 id="s-513">原语操作的准入声明方式</h3>
-<p>UTP 将准入要求放在 primitive action 的语义内表达。每个 primitive action 在自身章节中声明与该操作相关的准入差异；全局机制由对应章节统一定义。这些准入项在 P0 原语通用框架的 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1029-operation-admission">10.2.9 操作准入配置</a> 中形式化为每个 Action 的 <code>admission</code> 对象，供机器读取。推荐的操作准入表包含以下项目：</p>
+<p>UTP 将准入要求放在 primitive action 的语义内表达。每个 primitive action 在自身章节中声明与该操作相关的准入差异；全局机制由对应章节统一定义。这些准入项在 P0 原语通用框架的 <a href="primitive-framework.md#s-1029-operation-admission">10.2.9 操作准入配置</a> 中形式化为每个 Action 的 <code>admission</code> 对象，供机器读取。推荐的操作准入表包含以下项目：</p>
 <table>
 <thead>
 <tr>
@@ -155,7 +155,7 @@ format: html
 <li><strong>User Authorization</strong>：请求方 Agent 如何获得代表终端用户或上游授权主体在资源提供方处行事的授权。它回答「谁授权的」，对应 <strong>User-authenticated</strong> 操作级别。</li>
 </ul>
 
-<p>本章仅定义两类机制的<strong>声明层</strong>要求：声明哪些字段、如何验证声明一致性、声明缺失时如何降级。认证与授权机制的发现细节与流程执行见 <a href="/documentation/specification/protocol-core/identity-authorization.html">第 6 章</a>。</p>
+<p>本章仅定义两类机制的<strong>声明层</strong>要求：声明哪些字段、如何验证声明一致性、声明缺失时如何降级。认证与授权机制的发现细节与流程执行见 <a href="identity-authorization.md">第 6 章</a>。</p>
 
 <h3 id="s-522">Agent Authentication</h3>
 
@@ -218,7 +218,7 @@ format: html
 <td><code>issuer</code></td>
 <td>string</td>
 <td>条件</td>
-<td>凭证签发方标识。<code>type="mtls"</code> 时为受信任 CA issuer；<code>type="api_keys"</code> 时为 key 发行方；<code>type="http_message_signatures"</code> 时为签名密钥发布方；<code>type="wimse"</code> 时为 workload identity issuer 或 Agent Identity Server（AIS）。除具备跨域信任锚背书外，issuer MUST 与 <code>agent_id</code> 同属一个 trust domain。跨域信任锚背书的登记与查证机制见<a href="/documentation/specification/protocol-core/identity-authorization.html#s-651">第 6 章 6.5.1 节</a>。</td>
+<td>凭证签发方标识。<code>type="mtls"</code> 时为受信任 CA issuer；<code>type="api_keys"</code> 时为 key 发行方；<code>type="http_message_signatures"</code> 时为签名密钥发布方；<code>type="wimse"</code> 时为 workload identity issuer 或 Agent Identity Server（AIS）。除具备跨域信任锚背书外，issuer MUST 与 <code>agent_id</code> 同属一个 trust domain。跨域信任锚背书的登记与查证机制见<a href="identity-authorization.md#s-651">第 6 章 6.5.1 节</a>。</td>
 </tr>
 <tr>
 <td><code>config</code></td>
@@ -256,7 +256,7 @@ format: html
 <td><code>mtls</code></td>
 <td><code>trust_anchor_endpoint</code></td>
 <td>否</td>
-<td>指向受背书信任锚集合的获取端点（HTTPS URL）；返回内容的格式由实现方与治理域约定，本规范不作约束。声明后，接收方在证书链无法于本地 <code>ca_issuer</code> 下验证时 MAY 从该端点获取受背书信任锚重试；未声明时行为与现状一致。参见<a href="/documentation/specification/protocol-core/identity-authorization.html#s-651">第 6 章 6.5.1 节</a>。</td>
+<td>指向受背书信任锚集合的获取端点（HTTPS URL）；返回内容的格式由实现方与治理域约定，本规范不作约束。声明后，接收方在证书链无法于本地 <code>ca_issuer</code> 下验证时 MAY 从该端点获取受背书信任锚重试；未声明时行为与现状一致。参见<a href="identity-authorization.md#s-651">第 6 章 6.5.1 节</a>。</td>
 </tr>
 <tr>
 <td><code>http_message_signatures</code></td>
@@ -400,7 +400,7 @@ format: html
 
 <p>在 OAuth 2 授权流程开始前，请求方 Agent MUST 先从资源提供方的 UTPProfile 中发现并验证其 Authorization Server。发现流程包括：从 Profile 端点获取 UTPProfile、读取 <code>user_authorization.supported_mechanisms</code>、校验 <code>endpoint</code> 的 HTTPS 与 trust domain 约束、按第 6 章 6.3.3 节获取 RFC 8414 metadata 并验证 issuer 匹配。</p>
 
-<p>本章只声明发现入口与验证要求，详细的 RFC 8414 metadata 请求、响应字段、错误处理与 Access Token 验证流程见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-633">第 6 章 6.3.3 节</a>；OAuth 2.0 / 2.1 Authorization Code 授权流程详见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-63">第 6 章 6.3 节</a>。PKCE 是否启用由 Authorization Server 与客户端配置决定。</p>
+<p>本章只声明发现入口与验证要求，详细的 RFC 8414 metadata 请求、响应字段、错误处理与 Access Token 验证流程见 <a href="identity-authorization.md#s-633">第 6 章 6.3.3 节</a>；OAuth 2.0 / 2.1 Authorization Code 授权流程详见 <a href="identity-authorization.md#s-63">第 6 章 6.3 节</a>。PKCE 是否启用由 Authorization Server 与客户端配置决定。</p>
 
 <h3 id="s-527">与操作准入语义的协同</h3>
 
@@ -413,7 +413,7 @@ format: html
 
 <h3 id="s-528">陌生 Agent 交互的信任准入视角</h3>
 
-<p>陌生 Agent 交互指双方此前缺少直接业务关系、双边凭证或固定授权入口的场景。该场景的发现、Profile 获取、Participant 绑定、Primitive Edge 选择与 BootstrapGraph 生成由<a href="/documentation/specification/protocol-core/discovery-negotiation.html#s-34">第 3 章 3.4 节</a>定义；Session 三步握手由<a href="/documentation/specification/protocol-core/transport-communication.html#s-421">第 4 章 4.2.1 节</a>定义。本节说明同一交互在信任与安全层面的准入逻辑。</p>
+<p>陌生 Agent 交互指双方此前缺少直接业务关系、双边凭证或固定授权入口的场景。该场景的发现、Profile 获取、Participant 绑定、Primitive Edge 选择与 BootstrapGraph 生成由<a href="discovery-negotiation.md#s-34">第 3 章 3.4 节</a>定义；Session 三步握手由<a href="transport-communication.md#s-421">第 4 章 4.2.1 节</a>定义。本节说明同一交互在信任与安全层面的准入逻辑。</p>
 
 <p>从信任准入角度看，陌生 Agent 首次交互的目标，是把发现阶段得到的 Profile、Trust Anchor、能力入口和目标操作要求收敛为可验证的会话安全上下文。协议引擎在进入受保护操作前需要完成四类判断：对端身份是否由签名 Profile 支撑，双方是否存在可共同使用的 Agent Authentication 机制，目标操作是否需要 User Authorization 或 Mandate，以及相关确认与证据是否可以在运行时生成并追溯。</p>
 
@@ -440,7 +440,7 @@ format: html
 <figure id="s-528-sequence" style="margin: 20px 0 28px;">
   <div style="max-height: 900px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 8px; background: #ffffff;">
     <img
-      src="/documentation/assets/diagrams/agent-trust-handshake-sequence.svg"
+      src="../../assets/diagrams/agent-trust-handshake-sequence.svg"
       alt="陌生 Agent 交互的信任准入时序图：用先验身份、确定安全对话方式、获取必要授权、每次操作前重新检查、全程留证五个阶段说明信任准入逻辑"
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>
@@ -463,11 +463,11 @@ format: html
 
 <p>信任画像不属于准入强制校验内容。UTPProfile 只声明 <code>trust_profile</code> 引用入口；完整 Trust Profile 文档通过该入口获取，并由 JWS 签名保证真实性与完整性。完整 Trust Profile 包含 <code>trust_level</code>、<code>trust_score</code> 与 <code>risk_indicators</code> 等字段，供买方 Agent 在候选参与方之间做偏好排序与风险提示，MUST NOT 替代 Profile 签名链、认证与授权机制声明、Mandate 或操作准入判定。</p>
 
-<p>完整的 Profile（定义见<a href="/documentation/specification/protocol-core/discovery-negotiation.html">第 3 章</a>）在 Profile 端点（<code>/.well-known/utp</code>）中发布，并由 AIS 的 ES256 密钥签名。</p>
+<p>完整的 Profile（定义见<a href="discovery-negotiation.md">第 3 章</a>）在 Profile 端点（<code>/.well-known/utp</code>）中发布，并由 AIS 的 ES256 密钥签名。</p>
 
 <h3 id="s-532">UTPProfile 与 TrustProfileReference 的命名边界</h3>
 
-<p><strong>UTPProfile 顶层相关字段摘录：</strong>完整 Profile 的权威结构见<a href="/documentation/specification/protocol-core/discovery-negotiation.html">第 3 章</a>与 <a href="/documentation/specification/schemas/index.html#s-discovery-profile">第 25 章 UTPProfile Schema</a>。本表仅摘录与本章操作准入、认证授权机制声明和信任画像引用相关的顶层字段，用于说明它们在完整 Profile 中的位置。</p>
+<p><strong>UTPProfile 顶层相关字段摘录：</strong>完整 Profile 的权威结构见<a href="discovery-negotiation.md">第 3 章</a>与 <a href="../schemas/index.md#s-discovery-profile">第 25 章 UTPProfile Schema</a>。本表仅摘录与本章操作准入、认证授权机制声明和信任画像引用相关的顶层字段，用于说明它们在完整 Profile 中的位置。</p>
 <table>
 <thead>
 <tr>
@@ -744,7 +744,7 @@ format: html
 <li>若 Profile 声明 <code>trust_profile</code>，接收方 MUST 校验 <code>trust_profile.endpoint</code> 为 HTTPS URL，且其域名 MUST 与 Profile 发布域同属一个治理登记的信任域，或具备跨域信任锚背书。</li>
 <li>接收方获取 TrustProfileDocument 后 MUST 验证其签名、证书链或等价完整性证明、<code>agent_id</code> 绑定、<code>issuer</code> 信任链、<code>issued_at</code> / <code>expires_at</code> 时间窗，以及可选 <code>digest</code>。TrustProfileDocument 的 <code>issuer</code> 是该信任画像的发放方和公共评分背书方，不在 UTPProfile 的 <code>trust_profile</code> 引用中重复声明。</li>
 <li>若买方 Agent 参考 TrustProfileDocument 的 <code>trust_level</code>，该值低于当前交易所需的最低信任等级时，MAY 拒绝交易或要求升级信任等级。</li>
-<li>若 TrustProfileDocument 的 <code>risk_indicators</code> 中存在 <code>severity</code> 为 <code>"critical"</code> 的指标，接收方 SHOULD 将其作为本地策略输入，触发更强认证、人机协同确认（参见<a href="/documentation/specification/protocol-core/human-agent-interaction.html">第 20 章</a>）或拒绝该操作。</li>
+<li>若 TrustProfileDocument 的 <code>risk_indicators</code> 中存在 <code>severity</code> 为 <code>"critical"</code> 的指标，接收方 SHOULD 将其作为本地策略输入，触发更强认证、人机协同确认（参见<a href="human-agent-interaction.md">第 20 章</a>）或拒绝该操作。</li>
 <li>TrustProfileDocument 的 <code>trust_level</code> 声明 MUST NOT 超过 Registry 为该 <code>agent_id</code> 记录的最高信任等级。</li>
 </ol>
 
@@ -815,9 +815,9 @@ format: html
 </table>
 <p><strong>交叉引用：</strong></p>
 <ul>
-<li>Profile 发布格式见<a href="/documentation/specification/protocol-core/discovery-negotiation.html">第 3 章：发现基础设施</a></li>
-<li>Agent 身份令牌与授权机制定义见<a href="/documentation/specification/protocol-core/identity-authorization.html">第 6 章：认证与授权</a></li>
-<li>凭证授权保存、资金托管、电子证据包等信任基础设施详见<a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章：风控与审计</a></li>
+<li>Profile 发布格式见<a href="discovery-negotiation.md">第 3 章：发现基础设施</a></li>
+<li>Agent 身份令牌与授权机制定义见<a href="identity-authorization.md">第 6 章：认证与授权</a></li>
+<li>凭证授权保存、资金托管、电子证据包等信任基础设施详见<a href="risk-audit.md">第 7 章：风控与审计</a></li>
 </ul>
 
 <h2 id="s-55">Profile 示例</h2>

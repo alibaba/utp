@@ -10,7 +10,7 @@ version: 2026-07-30
 
 本章规定 UTP Action 如何在参与方之间可靠、安全且可互操作地交换。它的目标是让同一 Action 无论承载于 REST、MCP、A2A 或 Embedded SDK，上层观察到的请求、结果、幂等和异步语义保持一致。
 
-本章不定义原语的业务输入、输出、状态机或补偿逻辑；这些内容由 [P0 原语通用框架](/documentation/specification/protocol-core/primitive-framework.html) 和各原语定义文件规定。
+本章不定义原语的业务输入、输出、状态机或补偿逻辑；这些内容由 [P0 原语通用框架](primitive-framework.md) 和各原语定义文件规定。
 
 ---
 

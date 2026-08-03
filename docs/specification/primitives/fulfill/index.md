@@ -61,7 +61,7 @@ Fulfill 覆盖采购方在履约阶段的以下能力：
 
 ### 采购方可观测状态机 {#s-1531}
 
-![Fulfill 原语采购方可观测状态机](/documentation/assets/diagrams/fulfill-state-machine.svg)
+![Fulfill 原语采购方可观测状态机](../../../assets/diagrams/fulfill-state-machine.svg)
 
 采购方可观测状态机按订单建模会通知采购方的履约节点——`SHIPPED`（已发货）、`DELAYED`（延迟）、`DELIVERED`（已妥投）；备货、待发等供应方内部状态不在本状态机范围内。这些节点由 `notify` 推送给采购方并驱动状态迁移；`query` 仅供采购方主动查询单个订单，不驱动迁移。
 

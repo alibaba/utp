@@ -843,8 +843,8 @@ format: html
 </table>
 <p><strong>交叉引用：</strong></p>
 <ul>
-<li>Mode 协商在会话建立中的时序位置见<a href="/documentation/specification/protocol-core/transport-communication.html">第 4 章：传输与通信</a></li>
+<li>Mode 协商在会话建立中的时序位置见<a href="transport-communication.md">第 4 章：传输与通信</a></li>
 <li>Mode 与原语执行规则详见第 11—16 章各交易原语</li>
-<li>履约结构（<code>fulfillment_structure</code>）维度与商业拓扑中履约角色、角色关系边的关系见<a href="/documentation/specification/protocol-core/business-topology.html">第 9 章</a></li>
-<li>合规要求（<code>compliance_level</code>）维度与资质认证的关系见<a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章</a></li>
+<li>履约结构（<code>fulfillment_structure</code>）维度与商业拓扑中履约角色、角色关系边的关系见<a href="business-topology.md">第 9 章</a></li>
+<li>合规要求（<code>compliance_level</code>）维度与资质认证的关系见<a href="risk-audit.md">第 7 章</a></li>
 </ul>

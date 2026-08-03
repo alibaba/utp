@@ -38,7 +38,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m61">M6.1 Overview（概述）</h2>
     <h3 id="s-m611">M6.1.1 意图</h3>
-    <p>Shipment 是 UTP-M 第四个供应商原语（MP4），其意图是让供应商以标准协议动作申报<strong>履约执行事实</strong>：备货进度、发货（运单）、分批拆单、延迟与异常。主规范 P5 Fulfill 是"采购方可观测"的履约原语（<a href="/documentation/specification/primitives/fulfill/index.html#s-1531">15.3.1</a>），其 <code>notify</code> 推送的事实来源在主规范中留白——MP4 正式定义这些事实的产生方式，闭合"供应商发货 → 买方感知"的链路。</p>
+    <p>Shipment 是 UTP-M 第四个供应商原语（MP4），其意图是让供应商以标准协议动作申报<strong>履约执行事实</strong>：备货进度、发货（运单）、分批拆单、延迟与异常。主规范 P5 Fulfill 是"采购方可观测"的履约原语（<a href="../primitives/fulfill/index.md#s-1531">15.3.1</a>），其 <code>notify</code> 推送的事实来源在主规范中留白——MP4 正式定义这些事实的产生方式，闭合"供应商发货 → 买方感知"的链路。</p>
     <h3 id="s-m612">M6.1.2 关键设计原则</h3>
     <ul>
       <li><strong>MP4 产生事实，P5 消费事实。</strong>MP4 的每个生效动作 MUST 由 Marketplace 转换为买方侧 <code>fulfill.notify</code> 推送与 <code>fulfill.query</code> 可查询的 TrackingEvent（M6.7）。买方可观测状态机（SHIPPED/DELAYED/DELIVERED）的驱动源即 MP4。</li>
@@ -93,7 +93,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m62">M6.2 Lifecycle / State Machine（生命周期 / 状态机）</h2>
     <h3 id="s-m621">M6.2.1 Shipment 资源状态机（供应商视角）</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-shipment-state-machine.svg" alt="Shipment 资源状态机：PREPARING/READY/SHIPPED/EXCEPTION/DELIVERED/CLOSED 及买方可观测映射" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-shipment-state-machine.svg" alt="Shipment 资源状态机：PREPARING/READY/SHIPPED/EXCEPTION/DELIVERED/CLOSED 及买方可观测映射" style="max-width: 100%; height: auto;"></div>
     <p>分批交付时，每个批次（<code>batch_id</code>）独立走上述状态机；订单级视图是全部批次状态的聚合。</p>
     <h3 id="s-m622">M6.2.2 状态定义与迁移规则</h3>
     <table>
@@ -192,7 +192,7 @@ service:        dev.utp.merchant
     </table>
     <ul>
       <li><code>shipment_id</code>、<code>batch_id</code>、<code>tracking_number</code> 在两侧 MUST 同值——买方 <code>track</code> 查到的与供应商 <code>query</code> 查到的 是同一记录的两个投影（字段可见性按角色权限裁剪）。</li>
-      <li>转换生成的 TrackingEvent MUST 符合主规范 <a href="/documentation/specification/primitives/fulfill/index.html#s-1591">15.9.1 TrackingEvent</a> 实体定义并携带 <code>transaction_id</code>。</li>
+      <li>转换生成的 TrackingEvent MUST 符合主规范 <a href="../primitives/fulfill/index.md#s-1591">15.9.1 TrackingEvent</a> 实体定义并携带 <code>transaction_id</code>。</li>
       <li>买方 <code>receive</code> 生成的 FulfillmentReceipt、<code>reject</code> 生成的 RejectionConfirmation MUST 经回调 <code>utp.shipment.delivery_receipt</code> 通知供应商（M2.6.1），驱动 MP4 侧 <code>CLOSED</code>。</li>
       <li>全部批次 <code>CLOSED</code> 且其他义务完成后，全局状态是否迁移 <code>SETTLED</code> 由全局状态机决定（主规范 15.3.2），MP4 不参与该判定。</li>
     </ul>

@@ -18,7 +18,7 @@ version: 2026-07-30
 
 除首次建立路径外，后续每次 Action 都从当前 DAG、StateView 与 `available_actions` 开始；它不因通信绑定变化而重新生成路径。
 
-![路径编排总体时序](/documentation/assets/diagrams/path-orchestration-overall-flow.svg)
+![路径编排总体时序](../../assets/diagrams/path-orchestration-overall-flow.svg)
 
 ## 编排输入 {#s-182}
 
@@ -26,12 +26,12 @@ version: 2026-07-30
 
 | 模块 | 向路径编排提供 | 路径编排如何使用 |
 | --- | --- | --- |
-| [采购模式](/documentation/specification/protocol-core/procurement-models.html) | 六维 Level 的语义及其对原语/Action 的裁剪规则 | 在 DAG 生成时从协商交集中选择确定 `mode`，再展开或裁剪业务路径。 |
-| [商业拓扑](/documentation/specification/protocol-core/business-topology.html) | Role、业务关系和已锁定的拓扑快照 | 验证角色关系与调用方向。 |
-| [发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html) | `relation_compatibilities`、已选 Primitive/扩展、`role_domain_bindings` 与 `service_catalogs` | 以兼容 Primitive/扩展确定路径可用范围，并向通信层提供逐请求投递所需的 `service_catalogs`。 |
-| [P0 原语通用框架](/documentation/specification/protocol-core/primitive-framework.html) | Action 的 `initiator_role`、`handler_role`、Schema、`execution_result` 与 `valid_next_actions` | 定义 Action 的业务契约；路径编排不解释原语内部业务事实。 |
-| [全局状态机](/documentation/specification/protocol-core/global-state-machine.html) | StateView、Action 守卫、迁移、补偿和超时结论 | 路径编排在规定时点调用状态机，不自行裁定状态迁移。 |
-| [人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html) | 生效控制等级、挂起与恢复语义 | Provider 在 Action 执行边界应用控制门；路径编排仅使用其业务结果更新行动空间，不解释或校验 HAI 语义。 |
+| [采购模式](procurement-models.md) | 六维 Level 的语义及其对原语/Action 的裁剪规则 | 在 DAG 生成时从协商交集中选择确定 `mode`，再展开或裁剪业务路径。 |
+| [商业拓扑](business-topology.md) | Role、业务关系和已锁定的拓扑快照 | 验证角色关系与调用方向。 |
+| [发现与协商](discovery-negotiation.md) | `relation_compatibilities`、已选 Primitive/扩展、`role_domain_bindings` 与 `service_catalogs` | 以兼容 Primitive/扩展确定路径可用范围，并向通信层提供逐请求投递所需的 `service_catalogs`。 |
+| [P0 原语通用框架](primitive-framework.md) | Action 的 `initiator_role`、`handler_role`、Schema、`execution_result` 与 `valid_next_actions` | 定义 Action 的业务契约；路径编排不解释原语内部业务事实。 |
+| [全局状态机](global-state-machine.md) | StateView、Action 守卫、迁移、补偿和超时结论 | 路径编排在规定时点调用状态机，不自行裁定状态迁移。 |
+| [人机协同交互](human-agent-interaction.md) | 生效控制等级、挂起与恢复语义 | Provider 在 Action 执行边界应用控制门；路径编排仅使用其业务结果更新行动空间，不解释或校验 HAI 语义。 |
 
 处理方在本域完成 Schema、业务资源、权限和幂等校验；状态机提交全局状态。路径编排以这些已定义的协议事实为基础形成和更新行动空间。
 

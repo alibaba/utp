@@ -84,7 +84,7 @@ B2C 标准采购使用基础支付和履约责任结构。Buyer 与 Payer 可以
 
 ### 原语路径
 
-![B2C 标准采购原语路径：P1 Source 形成候选集合，P3 Purchase 确认订购，P4 Pay 完成支付，P5 Fulfill 履约和收货。](/documentation/assets/diagrams/b2c-standard-purchase-primitive-path.svg)
+![B2C 标准采购原语路径：P1 Source 形成候选集合，P3 Purchase 确认订购，P4 Pay 完成支付，P5 Fulfill 履约和收货。](../../assets/diagrams/b2c-standard-purchase-primitive-path.svg)
 
 | 顺序 | 原语 Action | 状态影响 | 说明 |
 | --- | --- | --- | --- |
@@ -171,7 +171,7 @@ Mode 六元组为 `(L0, L0, L0, L0, L0, L1)`。该配置表示本笔交易采用
 
 #### 原语路径
 
-![B2B 最低标准采购原语路径：P1 Source 管理采购意图、企业主体核验和候选商品，跳过 P2 Negotiate，P3 Purchase 形成采购凭证，P4 Pay 使用企业账户全额支付，P5 Fulfill 由卖方直接履约。](/documentation/assets/diagrams/b2b-baseline-procurement-primitive-path.svg)
+![B2B 最低标准采购原语路径：P1 Source 管理采购意图、企业主体核验和候选商品，跳过 P2 Negotiate，P3 Purchase 形成采购凭证，P4 Pay 使用企业账户全额支付，P5 Fulfill 由卖方直接履约。](../../assets/diagrams/b2b-baseline-procurement-primitive-path.svg)
 
 | 顺序 | 原语 Action | 状态影响 | 说明 |
 | --- | --- | --- | --- |

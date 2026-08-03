@@ -11,7 +11,7 @@ format: html
 
     <h2 id="s-m91">M9.1 定位（Positioning）</h2>
     <p><strong>Merchant Agent</strong> 是代表供应商（Principal：商家法人或其授权经营者）自主执行经营决策的 AI Agent。它不是拓扑角色（M1.3.2）——协议交互中它以 <code>Seller</code> 身份出现，与人工后台操作在协议层不可区分；区别在于<strong>授权链、决策审计与人机控制点</strong>，这正是本章的规范对象。</p>
-    <p>本章将主规范人机协同框架（<a href="/documentation/specification/protocol-core/human-agent-interaction.html">Ch.20</a>）与身份授权框架（<a href="/documentation/specification/protocol-core/identity-authorization.html">Ch.6</a>）应用到供应商侧，遵循同一交互控制等级与 HAI 挂起语义，不新造机制。</p>
+    <p>本章将主规范人机协同框架（<a href="../protocol-core/human-agent-interaction.md">Ch.20</a>）与身份授权框架（<a href="../protocol-core/identity-authorization.md">Ch.6</a>）应用到供应商侧，遵循同一交互控制等级与 HAI 挂起语义，不新造机制。</p>
 
     <h2 id="s-m92">M9.2 Merchant Agent 职责边界（Responsibility Boundary）</h2>
     <table>
@@ -52,7 +52,7 @@ format: html
     </ul>
 
     <h2 id="s-m94">M9.4 Agent 授权链（Delegation &amp; Mandate）</h2>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-agent-authorization.svg" alt="Agent 授权链：Principal 主密钥签发 Mandate（Scope/金额/时效）授予 Agent 工作密钥，签名动作带 decided_by 进入审计，可回溯可吊销" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-agent-authorization.svg" alt="Agent 授权链：Principal 主密钥签发 Mandate（Scope/金额/时效）授予 Agent 工作密钥，签名动作带 decided_by 进入审计，可回溯可吊销" style="max-width: 100%; height: auto;"></div>
     <p>Merchant Agent 的每次签名动作 MUST 可回溯到 Principal 授权，复用主规范 Ch.6 的认证与授权框架（Agent 身份凭证 + 授权链），供应商侧的授权要素：</p>
     <table>
       <thead><tr><th>要素</th><th>要求</th></tr></thead>
@@ -66,7 +66,7 @@ format: html
     </table>
 
     <h2 id="s-m95">M9.5 人机控制点（HAI Control Points）</h2>
-    <p>复用<a href="/documentation/specification/protocol-core/human-agent-interaction.html#s-19-1-2">人机协同交互控制</a>的交互控制等级（AUTONOMOUS / CONFIRMED）与 HAI 挂起语义，定义供应商侧默认控制点矩阵：</p>
+    <p>复用<a href="../protocol-core/human-agent-interaction.md#s-19-1-2">人机协同交互控制</a>的交互控制等级（AUTONOMOUS / CONFIRMED）与 HAI 挂起语义，定义供应商侧默认控制点矩阵：</p>
     <table>
       <thead><tr><th>决策场景</th><th>默认交互等级</th><th>说明</th></tr></thead>
       <tbody>
@@ -80,7 +80,7 @@ format: html
         <tr><td>平台账号注册、商户协议签署、密钥轮换、授权变更</td><td>CONFIRMED（仅 Principal）</td><td>MUST NOT 委托给 Agent（M2.4.3）。</td></tr>
       </tbody>
     </table>
-    <p><strong>与买方侧 HAI 挂起的关系：</strong>供应商侧人工确认发生在 MP3 受理窗口内（<code>ON_HOLD</code> 状态），属于供应商内部流程，<strong>不产生</strong>买方会话的 HAI 挂起记录（Suspend Record）——后者是买方 Principal 对待确认 Action 的控制语义（见<a href="/documentation/specification/protocol-core/human-agent-interaction.html">人机协同交互控制</a>）。两侧时限的衔接由 M5 的 <code>deadline</code> 统一约束。</p>
+    <p><strong>与买方侧 HAI 挂起的关系：</strong>供应商侧人工确认发生在 MP3 受理窗口内（<code>ON_HOLD</code> 状态），属于供应商内部流程，<strong>不产生</strong>买方会话的 HAI 挂起记录（Suspend Record）——后者是买方 Principal 对待确认 Action 的控制语义（见<a href="../protocol-core/human-agent-interaction.md">人机协同交互控制</a>）。两侧时限的衔接由 M5 的 <code>deadline</code> 统一约束。</p>
 
     <h2 id="s-m96">M9.6 决策审计（Decision Audit）</h2>
     <ul>

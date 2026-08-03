@@ -68,13 +68,13 @@ format: html
           <table>
             <thead><tr><th>编号</th><th>原语</th><th>规范入口</th></tr></thead>
             <tbody>
-              <tr><td>P0</td><td>公共框架</td><td><a href="/documentation/specification/protocol-core/primitive-framework.html">概览</a></td></tr>
-              <tr><td>P1</td><td>寻源</td><td><a href="/documentation/specification/primitives/source/index.html">概览</a></td></tr>
-              <tr><td>P2</td><td>询盘</td><td><a href="/documentation/specification/primitives/negotiate/index.html">概览</a></td></tr>
-              <tr><td>P3</td><td>订购</td><td><a href="/documentation/specification/primitives/purchase/index.html">概览</a></td></tr>
-              <tr><td>P4</td><td>支付</td><td><a href="/documentation/specification/primitives/pay/index.html">概览</a></td></tr>
-              <tr><td>P5</td><td>履约</td><td><a href="/documentation/specification/primitives/fulfill/index.html">概览</a></td></tr>
-              <tr><td>P6</td><td>争议解决</td><td><a href="/documentation/specification/primitives/resolve/index.html">概览</a></td></tr>
+              <tr><td>P0</td><td>公共框架</td><td><a href="../protocol-core/primitive-framework.md">概览</a></td></tr>
+              <tr><td>P1</td><td>寻源</td><td><a href="../primitives/source/index.md">概览</a></td></tr>
+              <tr><td>P2</td><td>询盘</td><td><a href="../primitives/negotiate/index.md">概览</a></td></tr>
+              <tr><td>P3</td><td>订购</td><td><a href="../primitives/purchase/index.md">概览</a></td></tr>
+              <tr><td>P4</td><td>支付</td><td><a href="../primitives/pay/index.md">概览</a></td></tr>
+              <tr><td>P5</td><td>履约</td><td><a href="../primitives/fulfill/index.md">概览</a></td></tr>
+              <tr><td>P6</td><td>争议解决</td><td><a href="../primitives/resolve/index.md">概览</a></td></tr>
             </tbody>
           </table>
 
@@ -91,4 +91,4 @@ format: html
           <p>本节将定义 Draft、Approved、Published 和废弃状态的进入条件。</p>
 
           <h2 id="glossary">术语入口</h2>
-          <p>稳定术语集中维护在<a href="/documentation/specification/reference/glossary.html">术语表</a>。</p>
+          <p>稳定术语集中维护在<a href="../reference/glossary.md">术语表</a>。</p>

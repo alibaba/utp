@@ -15,8 +15,8 @@ format: html
 
     <h2 id="s-positioning">定位与阅读方式</h2>
     <p>主规范 UTP v1.0 定义的六大交易原语（P1—P6）以采购方（Buyer）为主要发起方，回答"交易如何执行"。本规范回答其前置与对偶问题：<strong>商品从哪里来、订单如何被供应商受理与履行、货款如何回到供应商</strong>。二者合起来构成完整的商业闭环：</p>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-volume-map.svg" alt="商家侧分册与主规范的章节对偶：M2→L0 发现、MP1→P1、MP2/MP3↔P3、MP4→P5、M7←P4" style="max-width: 100%; height: auto;"></div>
-    <p>本规范所有原语遵守主规范 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023-action-definition-format">10.2.3 操作定义格式</a>的角色绑定规则：每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>。"UTP-M"仅是编辑与阅读上的分组名称，发现与协商流程 MUST NOT 据此推断角色方向。</p>
+<div class="diagram"><img src="../../assets/diagrams/m-volume-map.svg" alt="商家侧分册与主规范的章节对偶：M2→L0 发现、MP1→P1、MP2/MP3↔P3、MP4→P5、M7←P4" style="max-width: 100%; height: auto;"></div>
+    <p>本规范所有原语遵守主规范 <a href="../protocol-core/primitive-framework.md#s-1023-action-definition-format">10.2.3 操作定义格式</a>的角色绑定规则：每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>。"UTP-M"仅是编辑与阅读上的分组名称，发现与协商流程 MUST NOT 据此推断角色方向。</p>
 
     <h2 id="s-toc-tables">章节目录</h2>
     <h3 id="s-part-0">导读</h3>
