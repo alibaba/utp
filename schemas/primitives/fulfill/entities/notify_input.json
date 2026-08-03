@@ -115,7 +115,7 @@
     "line_items": {
       "type": "array",
       "items": {
-        "$ref": "partial_delivery.json#/$defs/partial_delivery_line_item"
+        "$ref": "../../common/entities/line_item.json"
       },
       "description": "本通知涉及的订单行项目及数量。分批发货或部分妥投时 SHOULD 携带。"
     },

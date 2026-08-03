@@ -71,9 +71,7 @@
     "purchase_id",
     "transaction_id",
     "reason_code",
-    "evidence_refs",
-    "rejected_at",
-    "signature"
+    "rejected_at"
   ],
   "additionalProperties": true
 }
