@@ -115,7 +115,7 @@ Resolve 覆盖以下场景：
 
 ### 三级处置路径详解 {#s-1622}
 
-![RESOLVE 三级处置路径：L1 协议自治（自动补偿，秒级）→ L2 平台/社会化调解（天级 3-15 工作日，输出 MediationResult）→ L3 仲裁/诉讼（月级 30-180 天，输出 ArbitrationDecision），逐级升级，证据包向上层传递。](diagrams_adjust/resolve-tiers.svg)
+![RESOLVE 三级处置路径：L1 协议自治（自动补偿，秒级）→ L2 平台/社会化调解（天级 3-15 工作日，输出 MediationResult）→ L3 仲裁/诉讼（月级 30-180 天，输出 ArbitrationDecision），逐级升级，证据包向上层传递。](/documentation/assets/diagrams/resolve-tiers.svg)
 
 ### 状态定义与迁移规则 {#s-1623}
 
