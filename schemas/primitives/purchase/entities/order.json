@@ -78,6 +78,12 @@
       "items": {
         "$ref": "../../common/entities/price.json"
       }
+    },
+    "permalink_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "商家端订单详情链接（complete 后返回）",
+      "readOnly": true
     }
   },
   "additionalProperties": true

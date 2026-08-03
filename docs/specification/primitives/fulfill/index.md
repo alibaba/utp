@@ -53,7 +53,7 @@ Fulfill 覆盖采购方在履约阶段的以下能力：
 | 条件 | 说明 |
 | --- | --- |
 | `session.state == 'SETTLED'` | 全部商品已交付并确认收货。 |
-| FulfillmentReceipt 已生成 | 包含所有批次的交付确认记录。 |
+| ReceiptConfirmation 已生成 | 包含当前批次的收货确认记录。 |
 | Escrow 资金已释放（若适用） | 当拓扑包含 Escrow 角色且 `receive` 通过时，触发 Escrow 释放。 |
 | `evidence_bundle` 已追加履约证据 | 物流记录、验货报告、签收确认等已追加至证据包。 |
 
@@ -91,7 +91,7 @@ Fulfill 覆盖采购方在履约阶段的以下能力：
 | `FULFILL.RECEIVE_BEFORE_DELIVERY` | 409 | 货物送达前尝试确认收货。 | 等待妥投后再确认。 |
 | `FULFILL.RECEIVE_QUANTITY_MISMATCH` | 422 | 确认数量超过应交付数量。 | 校正数量或改为部分收货。 |
 | `FULFILL.INSPECTION_REQUIRED` | 409 | 要求验货但尚未产生验货结论。 | 等待验货结论。 |
-| `FULFILL.ALREADY_RECEIVED` | 409 | 批次已确认收货。 | 幂等返回既有 FulfillmentReceipt。 |
+| `FULFILL.ALREADY_RECEIVED` | 409 | 批次已确认收货。 | 幂等返回既有 ReceiptConfirmation。 |
 | `FULFILL.ALREADY_REJECTED` | 409 | 批次已有拒收记录。 | 幂等返回既有 RejectionConfirmation。 |
 
 尚未发货、暂无物流事件或订单列表为空是正常结果，MUST 通过 `output.status`、空集合或 `valid_next_actions` 表达，不使用错误响应。
@@ -157,5 +157,7 @@ Fulfill 的授权要求由能力提供方在 Profile 的 `utp.fulfill.authorizat
 ### 订单履约事件通知（notify） {#s-1571}
 
 `notify` 是 Seller 向采购方推送的订单履约事件通知，在发货、延迟、妥投、验货结论等关键节点触发，用于驱动采购方可观测状态机迁移。通知 MUST 携带 `order_id`，SHOULD 携带其所属 `purchase_id` 与 `transaction_id`；物流单、包裹和运单号作为事件的可选关联资源返回。
+
+`notify` 的业务输入与 `query` 返回的履约事件历史共用 `FulfillmentEvent` 实体。`event_type` 表示事件类别，`status` 表示已发生的履约事实；处理方 MUST 使用 `event_id` 幂等去重。
 
 `notify` 与 `query` 职责区分明确：`notify` 为对端主动推送并驱动状态迁移；`query` 为采购方针对单个 `order_id` 主动发起的只读查询，不驱动状态迁移。采购方 MAY 仅依赖 `notify` 感知进展，也 MAY 在任意时刻用 `query` 主动核对。

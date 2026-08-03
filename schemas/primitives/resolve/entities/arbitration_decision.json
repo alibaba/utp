@@ -37,11 +37,16 @@
     "decision_date": {
       "type": "string",
       "format": "date",
-      "description": "仲裁裁定签发日期。"
+      "description": "仲裁裁定签发日期。采用 RFC 3339 full-date 格式。"
     },
     "result": {
       "type": "string",
-      "enum": ["claimant_favored", "respondent_favored", "partial_award", "dismissed"],
+      "enum": [
+        "claimant_favored",
+        "respondent_favored",
+        "partial_award",
+        "dismissed"
+      ],
       "description": "仲裁结果：支持申请方、支持被申请方、部分支持或驳回。"
     },
     "responsibility_assignment": {

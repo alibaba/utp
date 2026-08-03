@@ -7,10 +7,10 @@
   "type": "object",
   "required": [
     "order_id",
-    "purchase_id",
-    "transaction_id",
     "line_items",
     "status",
+    "prices",
+    "created_at",
     "fulfillment"
   ],
   "properties": {
@@ -34,6 +34,11 @@
       "minLength": 1,
       "description": "履行该订单的供应商标识。"
     },
+    "permalink_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "商家提供的订单详情地址。"
+    },
     "line_items": {
       "type": "array",
       "minItems": 1,
@@ -44,38 +49,56 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "INIT",
-        "SHIPPED",
-        "DELAYED",
-        "DELIVERED",
-        "INSPECTED",
-        "RECEIVED",
-        "PARTIAL_DELIVERED",
-        "FULFILLED",
-        "REJECTED"
-      ],
-      "description": "订单当前的履约状态。"
+      "description": "商家订单系统提供的当前业务状态。"
+    },
+    "status_events": {
+      "type": "array",
+      "description": "商家订单业务状态的变化记录。",
+      "items": {
+        "$ref": "status_event.json"
+      }
+    },
+    "prices": {
+      "type": "array",
+      "description": "订单的金额构成及总额。",
+      "items": {
+        "$ref": "../../common/entities/price.json"
+      }
+    },
+    "note": {
+      "type": "string",
+      "description": "买方为该订单提交的备注。"
+    },
+    "invoice_profile": {
+      "$ref": "../../common/entities/invoice_profile.json",
+      "description": "该订单使用的开票资料。"
+    },
+    "trade_mode": {
+      "$ref": "../../common/entities/trade_mode.json",
+      "description": "该订单最终采用的业务交易方式。"
     },
     "created_at": {
       "type": "string",
       "format": "date-time",
-      "description": "订单创建时间。"
+      "description": "订单创建时间。采用 RFC 3339 date-time 格式。"
     },
     "updated_at": {
       "type": "string",
       "format": "date-time",
-      "description": "订单信息或履约状态的最近更新时间。"
+      "description": "订单信息或履约状态的最近更新时间。采用 RFC 3339 date-time 格式。"
     },
     "fulfillment": {
       "$ref": "#/$defs/fulfillment",
-      "description": "订单的交付预期、实际交付批次、物流轨迹和履约事件。"
+      "description": "订单的分批交付摘要、物流轨迹和履约事件。"
     }
   },
   "additionalProperties": true,
   "$defs": {
     "fulfillment": {
       "type": "object",
+      "required": [
+        "expectations"
+      ],
       "properties": {
         "expectations": {
           "type": "array",
@@ -102,7 +125,7 @@
           "type": "array",
           "description": "订单履约过程中产生的事件记录。",
           "items": {
-            "$ref": "tracking_event.json"
+            "$ref": "fulfillment_event.json"
           }
         }
       },

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/mode_response_summary.json",
+  "version": "2026-07-29",
+  "title": "ModeResponseSummary",
+  "description": "候选供应商支持的 Transaction Mode 范围摘要，不替代会话中已协商的权威 Mode。",
+  "type": "object",
+  "properties": {
+    "pricing_mode": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "L0",
+          "L1",
+          "L2",
+          "L3"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "支持的定价模式等级。",
+      "readOnly": true
+    },
+    "decision_path": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "L0",
+          "L1",
+          "L2",
+          "L3"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "支持的决策路径等级。",
+      "readOnly": true
+    },
+    "payment_structure": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "L0",
+          "L1",
+          "L2",
+          "L3"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "支持的付款结构等级。",
+      "readOnly": true
+    },
+    "supported_trade_methods": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "支持的交易方式，如 prepay、installment 或 escrow。",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "pricing_mode",
+    "decision_path"
+  ],
+  "additionalProperties": true
+}

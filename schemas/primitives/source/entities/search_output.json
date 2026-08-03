@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/search_output.json",
+  "version": "2026-07-29",
+  "title": "SearchOutput",
+  "description": "utp.source.search 的业务输出。valid_next_actions、execution_result 和 primitive_state 位于统一响应信封中。",
+  "$ref": "./candidate_set.json"
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/common/entities/time_value.json",
+  "version": "2026-07-31",
+  "title": "TimeValue",
+  "description": "以相对自然日数或绝对日期时间表示的时间值，两种表示方式必须且只能使用一种。",
+  "type": "object",
+  "properties": {
+    "days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "相对时长，单位为自然日。"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "绝对日期时间，遵循 RFC 3339。"
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "days"
+      ]
+    },
+    {
+      "required": [
+        "date"
+      ]
+    }
+  ],
+  "additionalProperties": true
+}

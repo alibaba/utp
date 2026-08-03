@@ -1,10 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/notify_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/fulfill/entities/fulfillment_event.json",
   "version": "2026-07-31",
-  "title": "FulfillNotifyInput",
-  "description": "Seller 向 Buyer 推送的订单履约通知。每条通知描述一个已发生的履约节点；Buyer 依据 status、occurred_at 和自身状态机更新订单展示状态。",
+  "title": "FulfillmentEvent",
+  "description": "Seller 向 Buyer 推送并由订单履约历史持久化的追加式事件。每条事件描述一个已发生的履约节点，Buyer 依据 status、occurred_at 和自身状态机更新订单展示状态。",
   "type": "object",
+  "required": [
+    "event_id",
+    "order_id",
+    "status",
+    "occurred_at"
+  ],
   "properties": {
     "event_id": {
       "type": "string",
@@ -26,7 +32,7 @@
     "order_id": {
       "type": "string",
       "minLength": 1,
-      "description": "订单标识，履约通知的主关联对象。"
+      "description": "订单标识，履约事件的主关联对象。"
     },
     "purchase_id": {
       "type": "string",
@@ -41,7 +47,7 @@
     "shipment_id": {
       "type": "string",
       "minLength": 1,
-      "description": "发货单标识。实物履约通知 SHOULD 携带。"
+      "description": "发货单标识。实物履约事件 SHOULD 携带。"
     },
     "batch_id": {
       "type": "string",
@@ -65,7 +71,7 @@
         "INSPECTION_FAILED",
         "SERVICE_ACTIVATED"
       ],
-      "description": "履约通知状态。SHIPPED、DELAYED、DELIVERED、INSPECTED 可驱动 Buyer 侧可观测状态迁移；其他状态作为履约事实展示和记录。"
+      "description": "履约事件状态。SHIPPED、DELAYED、DELIVERED、INSPECTED 可驱动 Buyer 侧可观测状态迁移；其他状态作为履约事实展示和记录。"
     },
     "occurred_at": {
       "type": "string",
@@ -97,11 +103,6 @@
       "format": "uri",
       "description": "承运商物流查询链接。"
     },
-    "location": {
-      "type": "string",
-      "minLength": 1,
-      "description": "事件发生地点，例如城市、网点或海关。"
-    },
     "description": {
       "type": "string",
       "minLength": 1,
@@ -110,19 +111,19 @@
     "reason_code": {
       "type": "string",
       "minLength": 1,
-      "description": "结构化原因码，例如 stockout_delay、carrier_lost 或 customs_inspection。异常和延迟通知 SHOULD 提供。"
+      "description": "结构化原因码，例如 stockout_delay、carrier_lost 或 customs_inspection。异常和延迟事件 SHOULD 提供。"
     },
     "estimated_delivery_at": {
       "type": "string",
       "format": "date-time",
-      "description": "预计送达时间（ETA），使用 RFC 3339 格式。发货或延迟通知可携带。"
+      "description": "预计送达时间（ETA），使用 RFC 3339 格式。发货或延迟事件可携带。"
     },
     "line_items": {
       "type": "array",
       "items": {
-        "$ref": "partial_delivery.json#/$defs/partial_delivery_line_item"
+        "$ref": "../../common/entities/line_item.json"
       },
-      "description": "本通知涉及的订单行项目及数量。分批发货或部分妥投时 SHOULD 携带。"
+      "description": "本事件涉及的订单行项目及数量。分批发货或部分妥投时 SHOULD 携带。"
     },
     "document_refs": {
       "type": "array",
@@ -133,11 +134,5 @@
       "description": "清关单证、验货报告、异常凭证等履约文档引用。"
     }
   },
-  "required": [
-    "event_id",
-    "order_id",
-    "status",
-    "occurred_at"
-  ],
   "additionalProperties": true
 }

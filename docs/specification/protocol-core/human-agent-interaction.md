@@ -8,7 +8,7 @@ version: 2026-07-29
 
 # 人机协同交互控制（Human-Agent Interaction Control） {#s-human-agent-interaction-control}
 
-UTP 中，Agent 代理 Principal（人类委托人）经 Agent 接口调用业务原语推进交易。**人机协同交互控制**解决的不是界面体验问题，而是 Agent 交易中的**控制权边界**问题：哪些 Action 可由 Agent 自主推进，哪些 Action 必须保持 Principal 可观察、可中断，哪些 Action 必须等待 Principal 明确确认后再执行。协议以**执行门**（`interaction_level`）、**HAI 信封**与**挂起凭证**（`suspend_id`）约束上述边界：Agent 发起调用为默认路径；当执行门要求人工确认时，Agent 首次调用 MUST 返回 HAI 信封并挂起执行，Platform 代表 Principal 确认续跑 MUST 调用与该挂起绑定的 `suspended_action` 并携带对应 `suspend_id`（见 确认后续跑）。各 Action 的控制等级由**实现方**在其原语定义文件中静态声明（见 10.2.8）。敏感数据 MUST NOT 进入 Agent 推理链路，关键交易事实 MUST 来自权威数据源，并在最终执行前完成一致性校验。
+UTP 中，Agent 代理 Principal（人类委托人）经 Agent 接口调用业务原语推进交易。**人机协同交互控制**解决的不是界面体验问题，而是 Agent 交易中的**控制权边界**问题：哪些 Action 可由 Agent 自主推进，哪些 Action 必须保持 Principal 可观察、可中断，哪些 Action 必须等待 Principal 明确确认后再执行。协议以**执行门**（`interaction_level`）、**HAI 信封**与**挂起凭证**（`suspend_id`）约束上述边界：Agent 发起调用为默认路径；当执行门要求人工确认时，Agent 首次调用 MUST 返回 HAI 信封并挂起执行，Platform 代表 Principal 确认续跑 MUST 调用与该挂起绑定的 `suspended_action` 并携带对应 `suspend_id`（见 确认后续跑）。各 Action 的控制等级由**实现方**在其原语定义文件中静态声明。敏感数据 MUST NOT 进入 Agent 推理链路，关键交易事实 MUST 来自权威数据源，并在最终执行前完成一致性校验。
 
 本章定义执行门、HAI 信封、挂起凭证（`suspend_id`）、数据可见性、权威数据读取、一致性校验及其与证据和安全要求的绑定关系。Mandate 范围、信任策略等分别由[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)、[风控与审计](/documentation/specification/protocol-core/risk-audit.html)在 Action 执行前校验；本章不定义上述策略求值规则，只规定各 `interaction_level` 下的执行与约束语义。业务 Action 的 input 语义、UI 技术栈及渲染机制不属于本章规范性要求。
 
@@ -20,14 +20,15 @@ HAI 规定 Action 执行前后的**可观察控制语义**：如何组合**执�
 
 ### HAI 控制剖面（HAI Control Profile） {#s-19-1-1}
 
-对每个具有 HAI 语义的 Action，协议从下列四类要素描述其控制剖面。四类要素职责独立，MUST NOT 混为同一分类轴。
+对具有 HAI 语义的 Action，交互控制剖面由下列三个要素组成：
 
-- **数据可见性声明（data visibility declaration）**：原语定义文件中 Action 顶层的 `data_visibility`，规定该 Action 处理数据的最高可见性等级；它适用于所有 Action，不属于 `hai` 对象（见 数据可见性规范）。
 - **执行门（execution gate）**：规定 Agent 能否在无 Principal 介入下推进当前 Action；由 Action 在原语定义文件的人机协同扩展中声明的 `interaction_level` 表达（见 交互控制等级）。
 - **HAI 信封（HAI envelope）**：Action 响应中承载 Suspend Record、动作承接界面（Action Surface，本章简称 Surface）与 Data Source 等并行协议对象的出站对象（见本节、[Agent友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html)）。
-- **挂起凭证（suspend credential）**：`suspend_id` 及其关联 Suspend Record，供 Principal 确认后续跑鉴别（见 挂起记录）。身份、授权、证据和完整性要求分别适用相关章节及 Action/Profile 规则。
+- **挂起凭证（suspend credential）**：`suspend_id` 及其关联 Suspend Record，用于鉴别 Principal 的确认续跑（见 挂起记录）。身份、授权、证据和完整性要求分别适用相关章节及 Action/Profile 规则。
 
-Action 顶层 `data_visibility` 为必需的静态声明，取值 `V0` / `V1` / `V2`；它定义 Action 能处理的最高数据可见性等级。运行时 Surface 的 `data_visibility` MUST NOT 高于对应 Action 的声明值；若使用 V2，权威读取、`data_source` 与完整性校验仍必须满足 Data Source 的规则。`interaction_level` 为 Action 级声明：**未声明 `hai` 的 Action 视为 `AUTONOMOUS`**；Action 在原语定义文件携带 `hai` 时 MUST 声明 `interaction_level`（取值 `AUTONOMOUS` / `SUPERVISED` / `CONFIRMED`）。具体配置由**实现方**决定，协议正文不作逐 Action 规定。显式声明 `AUTONOMOUS` 表示该 Action 支持**非阻断 UI 交互**（MAY 返回 HAI 信封供 Surface 或 `submission`，见 AUTONOMOUS 控制语义），但不改变其不以人工确认为继续执行前提的执行门语义。处理方 MUST 按适用的 `interaction_level` 及各控制等级应用相应控制语义。各参与方 MAY 通过最低控制要求所列来源声明 Action 的最低控制要求；若 Action 静态声明严格度低于适用最低要求，处理方 MUST 拒绝执行或返回能力不匹配错误（见能力求值与差异处理）。Mandate 校验以[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)为准；Mandate 通过或拒绝不改变该 Action 所适用的 `interaction_level` 控制语义。
+`data_visibility` 是适用于所有 Action 的顶层静态声明，取值 `V0` / `V1` / `V2`。它不属于 `hai` 对象，也不构成交互控制剖面。HAI 信封、Surface、Data Source 与 Agent 可见响应处理数据时 MUST 遵守 数据可见性规范。运行时 Surface 的 `data_visibility` MUST NOT 高于其所服务 Action 的声明值；若使用 V2，权威读取、`data_source` 与适用的完整性校验仍必须满足 Data Source 的规则。
+
+`interaction_level` 为 Action 级声明：**未声明 `hai` 的 Action 视为 `AUTONOMOUS`**；Action 在原语定义文件携带 `hai` 时 MUST 声明 `interaction_level`（取值 `AUTONOMOUS` / `SUPERVISED` / `CONFIRMED`）。具体配置由**实现方**决定，协议正文不作逐 Action 规定。显式声明 `AUTONOMOUS` 表示该 Action 支持**非阻断 UI 交互**（MAY 返回 HAI 信封供 Surface 或 `submission`，见 AUTONOMOUS 控制语义），但不改变其不以人工确认为继续执行前提的执行门语义。处理方 MUST 按适用的 `interaction_level` 及各控制等级应用相应控制语义。各参与方 MAY 通过最低控制要求所列来源声明 Action 的最低控制要求；若 Action 静态声明严格度低于适用最低要求，处理方 MUST 拒绝执行或返回能力不匹配错误（见能力求值与差异处理）。Mandate 校验以[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)为准；Mandate 通过或拒绝不改变该 Action 所适用的 `interaction_level` 控制语义。
 
 ### 交互控制等级（interaction_level） {#s-19-1-2}
 
@@ -113,7 +114,7 @@ Principal 确认续跑所允许的具名业务 Action 由 Suspend Record 中的 
       "status": "ACTIVE",
       "reason": "purchase_confirmation",
       "suspended_action": "utp.purchase.complete",
-      "timeout_ms": 300000,
+      "timeout_ms": 300000
     }
   },
   "agent_hint": "采购单 purchase-5-001 正等待委托人在 UI 中确认。在挂起解除之前，你可以回答澄清性问题或引导用户进入确认界面，但不得将该采购视为已确认，也不得调用会推进该挂起交易的原语。"
@@ -242,22 +243,6 @@ Action Surface 表达 UI 承接语义，本身 MUST NOT 触发状态迁移或产
   "action": "utp.purchase.complete",
   "description": "purchase confirmation surface",
   "data_visibility": "V2"
-}
-```
-
-同一 HAI 信封中的 `data_source` 可表达为：
-
-```json
-{
-  "action_ref": "utp.purchase.get_details",
-  "session_id": "utp-session-abc123",
-  "trade_context_id": "utp-ctx-xyz789",
-  "transaction_id": "utp-txn-xyz789",
-  "parameters": {
-    "purchase_id": "pur-001",
-    "view": "confirmation"
-  },
-  "refresh_strategy": "strict"
 }
 ```
 

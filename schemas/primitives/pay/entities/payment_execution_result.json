@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/confirm_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/pay/entities/payment_execution_result.json",
   "version": "2026-07-31",
-  "title": "PayConfirmOutput",
-  "description": "支付渠道确认尝试的当前状态，以及按状态返回的支付确认、累计进度和标准事件。",
+  "title": "PaymentExecutionResult",
+  "description": "支付渠道确认或付款阶段执行后的当前状态，以及按状态返回的确认凭证、累计进度和标准事件。",
   "type": "object",
   "required": [
     "status"
@@ -12,26 +12,26 @@
     "status": {
       "type": "string",
       "enum": ["processing", "confirmed", "failed"],
-      "description": "本次渠道确认后的状态：processing 仍在处理；confirmed 已确认；failed 最终失败。"
+      "description": "本次支付执行后的状态：processing 仍在处理；confirmed 已确认；failed 最终失败。"
     },
     "payment_confirmation": {
       "$ref": "payment_confirmation.json",
-      "description": "渠道事实验证通过后签发的支付确认凭证。"
+      "description": "支付确认成功后签发的凭证。"
     },
     "payment_progress": {
       "$ref": "payment_progress.json",
-      "description": "多阶段付款场景中的累计支付进度。"
+      "description": "包含本次执行结果的累计支付进度。"
     },
     "payment_event": {
       "$ref": "payment_event.json",
-      "description": "本次确认产生的标准支付事件。"
+      "description": "本次执行产生的标准支付事件。"
     }
   },
   "allOf": [
     {
       "if": {
         "properties": {
-          "status": { "const": "confirmed", "description": "渠道已确认扣付成功。" }
+          "status": { "const": "confirmed", "description": "支付已确认成功。" }
         },
         "required": ["status"]
       },
@@ -51,7 +51,7 @@
     {
       "if": {
         "properties": {
-          "status": { "const": "failed", "description": "渠道已返回最终失败。" }
+          "status": { "const": "failed", "description": "支付已最终失败。" }
         },
         "required": ["status"]
       },
@@ -59,7 +59,7 @@
         "required": ["payment_event"],
         "properties": {
           "payment_event": {
-            "description": "确认失败时产生的标准失败事件。",
+            "description": "支付失败时产生的标准失败事件。",
             "properties": {
               "event_type": { "const": "PAYMENT_FAILED", "description": "最终失败必须产生失败事件。" }
             },
@@ -72,7 +72,7 @@
     {
       "if": {
         "properties": {
-          "status": { "const": "processing", "description": "渠道仍在处理中。" }
+          "status": { "const": "processing", "description": "支付仍在渠道处理中。" }
         },
         "required": ["status"]
       },

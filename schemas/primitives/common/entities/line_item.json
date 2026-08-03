@@ -10,6 +10,11 @@
     "quantity"
   ],
   "properties": {
+    "line_item_id": {
+      "type": "string",
+      "description": "行项标识。",
+      "readOnly": true
+    },
     "item_id": {
       "type": "string",
       "description": "商品或服务标识。"

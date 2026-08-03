@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/entities/search_filters.json",
+  "version": "2026-07-29",
+  "title": "SearchFilters",
+  "description": "utp.source.search 的完整筛选条件。所有硬性条件使用 AND 组合；required 条件用于排除候选，preferred 条件用于评分和排序。协议不提供独立 filter Action。",
+  "type": "object",
+  "$defs": {
+    "price_range": {
+      "type": "object",
+      "properties": {
+        "min_amount": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,4})?$",
+          "description": "最低可接受单价的 decimal 字符串。",
+          "writeOnly": true
+        },
+        "max_amount": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,4})?$",
+          "description": "最高可接受单价的 decimal 字符串。",
+          "writeOnly": true
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "价格区间使用的 ISO 4217 货币代码。",
+          "writeOnly": true
+        }
+      },
+      "required": [
+        "currency"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "min_amount"
+          ]
+        },
+        {
+          "required": [
+            "max_amount"
+          ]
+        }
+      ],
+      "additionalProperties": true
+    },
+    "certification_filter": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "候选供应商必须全部具备的认证；缺少任一认证时排除候选。",
+          "writeOnly": true
+        },
+        "preferred": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "用于提高 match_score 的优选认证，不作为排除条件。",
+          "writeOnly": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "supplier_filter": {
+      "type": "object",
+      "properties": {
+        "min_verification_level": {
+          "type": "string",
+          "enum": [
+            "basic",
+            "silver",
+            "gold",
+            "platinum"
+          ],
+          "description": "最低平台验证等级。",
+          "writeOnly": true
+        },
+        "min_on_time_delivery_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "最低准时交货率。",
+          "writeOnly": true
+        },
+        "min_years_in_business": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "最低经营年限。",
+          "writeOnly": true
+        },
+        "verified_supplier": {
+          "type": "boolean",
+          "description": "为 true 时仅返回已通过平台或第三方实地核验的供应商。",
+          "writeOnly": true
+        },
+        "geographic_coverage": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "供应商必须覆盖的 ISO 3166-1 alpha-2 国家或地区代码。",
+          "writeOnly": true
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "供应商画像标签，如 OEM、ODM 或 small_batch。",
+          "writeOnly": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "logistics_filter": {
+      "type": "object",
+      "properties": {
+        "max_lead_time_days": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "最大可接受交期，单位为自然日。",
+          "writeOnly": true
+        },
+        "shipping_from_country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "description": "要求的发货国家或地区，使用 ISO 3166-1 alpha-2 代码。",
+          "writeOnly": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "properties": {
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "按商品品类筛选；匹配任一品类即可通过，品类值可使用 UNSPSC 或服务端声明的分类体系。",
+      "writeOnly": true
+    },
+    "price_range": {
+      "$ref": "#/$defs/price_range",
+      "writeOnly": true,
+      "description": "候选商品的价格区间筛选条件。"
+    },
+    "moq": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "最大可接受最小起订量，过滤掉起订量更高的候选。",
+      "writeOnly": true
+    },
+    "negotiable": {
+      "type": "boolean",
+      "description": "为 true 时仅返回支持议价的候选。该字段继承自既有 UCP-B 搜索能力。",
+      "writeOnly": true
+    },
+    "geographic_coverage": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]{2}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "供应商发货地域覆盖要求，使用 ISO 3166-1 alpha-2 代码。",
+      "writeOnly": true
+    },
+    "certifications": {
+      "$ref": "#/$defs/certification_filter",
+      "writeOnly": true,
+      "description": "供应商认证筛选条件。"
+    },
+    "supplier": {
+      "$ref": "#/$defs/supplier_filter",
+      "writeOnly": true,
+      "description": "供应商属性筛选条件。"
+    },
+    "logistics": {
+      "$ref": "#/$defs/logistics_filter",
+      "writeOnly": true,
+      "description": "履约和物流筛选条件。"
+    }
+  },
+  "additionalProperties": true
+}

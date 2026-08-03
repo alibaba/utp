@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/source/primitive.json",
+  "name": "utp.source",
+  "version": "2026-07-29",
+  "title": "P1 Source 寻源原语定义",
+  "description": "Source 核心原语只声明 search 与 lookup。Search 同时完成召回、筛选、评分和排序，不提供独立 filter Action。请求和响应采用 primitives/common 下的统一信封并进行两段式校验。",
+  "actions": {
+    "search": {
+      "description": "根据关键词、图片或链接搜索候选，并依据 input.filters 完成硬性筛选和偏好评分。每次调用生成新的 candidate_set_id。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/search_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/search_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/source/search"
+        }
+      ]
+    },
+    "lookup": {
+      "description": "获取商品或供应商商品组合的完整详情快照；支持 item_id + supplier_id、单个 id 或批量 ids，快照不构成锁价或库存承诺。",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "input_schema": {
+        "$ref": "entities/lookup_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/lookup_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/source/lookup"
+        },
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/v1/source/items/{item_id}?supplier_id={supplier_id}&sections={sections}"
+        }
+      ]
+    }
+  },
+  "state_machine": {
+    "initial_state": "INIT",
+    "states": {
+      "INIT": {
+        "description": "尚未生成候选集合或详情快照。"
+      },
+      "SEARCHING": {
+        "description": "异步 Search 已受理但尚未返回候选集合。"
+      },
+      "CANDIDATES_READY": {
+        "description": "Search 已成功生成候选集合。"
+      },
+      "DETAIL_VIEWING": {
+        "description": "Lookup 已成功生成详情快照。"
+      },
+      "RELEASED": {
+        "description": "候选或详情资源已释放或失效，可重新 Search 或 Lookup。"
+      }
+    },
+    "transitions": [
+      {
+        "from": "INIT",
+        "action": "utp.source.search",
+        "execution_result": "PENDING",
+        "to": "SEARCHING"
+      },
+      {
+        "from": "INIT",
+        "action": "utp.source.search",
+        "execution_result": "SUCCESS",
+        "to": "CANDIDATES_READY"
+      },
+      {
+        "from": "SEARCHING",
+        "action": "utp.source.search",
+        "execution_result": "PENDING",
+        "to": "SEARCHING"
+      },
+      {
+        "from": "SEARCHING",
+        "action": "utp.source.search",
+        "execution_result": "SUCCESS",
+        "to": "CANDIDATES_READY"
+      },
+      {
+        "from": "CANDIDATES_READY",
+        "action": "utp.source.search",
+        "execution_result": "PENDING",
+        "to": "SEARCHING"
+      },
+      {
+        "from": "CANDIDATES_READY",
+        "action": "utp.source.search",
+        "execution_result": "SUCCESS",
+        "to": "CANDIDATES_READY"
+      },
+      {
+        "from": "DETAIL_VIEWING",
+        "action": "utp.source.search",
+        "execution_result": "PENDING",
+        "to": "SEARCHING"
+      },
+      {
+        "from": "DETAIL_VIEWING",
+        "action": "utp.source.search",
+        "execution_result": "SUCCESS",
+        "to": "CANDIDATES_READY"
+      },
+      {
+        "from": "RELEASED",
+        "action": "utp.source.search",
+        "execution_result": "PENDING",
+        "to": "SEARCHING"
+      },
+      {
+        "from": "RELEASED",
+        "action": "utp.source.search",
+        "execution_result": "SUCCESS",
+        "to": "CANDIDATES_READY"
+      },
+      {
+        "from": "INIT",
+        "action": "utp.source.lookup",
+        "execution_result": "SUCCESS",
+        "to": "DETAIL_VIEWING"
+      },
+      {
+        "from": "CANDIDATES_READY",
+        "action": "utp.source.lookup",
+        "execution_result": "SUCCESS",
+        "to": "DETAIL_VIEWING"
+      },
+      {
+        "from": "DETAIL_VIEWING",
+        "action": "utp.source.lookup",
+        "execution_result": "SUCCESS",
+        "to": "DETAIL_VIEWING"
+      },
+      {
+        "from": "RELEASED",
+        "action": "utp.source.lookup",
+        "execution_result": "SUCCESS",
+        "to": "DETAIL_VIEWING"
+      },
+      {
+        "from": "DETAIL_VIEWING",
+        "event": "snapshot_expired_or_released",
+        "to": "RELEASED"
+      }
+    ],
+    "constraints": {
+      "notes": [
+        "utp.source.search 的 filters 是 Search 输入的一部分，不存在 utp.source.filter 状态迁移。",
+        "Search 在 REJECTED 或 FAILURE 时保持调用前状态，错误详情使用统一错误响应。",
+        "Lookup 快照不锁定价格和库存，进入后续原语前必须重新执行相应业务校验。"
+      ]
+    }
+  },
+  "constraints": {
+    "transaction_id": "Source 核心位于交易前阶段，请求和响应必须省略 transaction_id。",
+    "idempotency": [
+      "utp.source.search 必须在统一请求信封中提供 idempotency_key。",
+      "utp.source.lookup 为只读操作，可以省略 idempotency_key。"
+    ]
+  }
+}

@@ -60,20 +60,9 @@
         },
         "status": {
           "type": "array",
-          "description": "按一个或多个履约状态筛选。",
+          "description": "按一个或多个商家订单业务状态筛选。",
           "items": {
-            "type": "string",
-            "enum": [
-              "INIT",
-              "SHIPPED",
-              "DELAYED",
-              "DELIVERED",
-              "INSPECTED",
-              "RECEIVED",
-              "PARTIAL_DELIVERED",
-              "FULFILLED",
-              "REJECTED"
-            ]
+            "type": "string"
           }
         },
         "keyword": {
@@ -83,12 +72,12 @@
         "created_after": {
           "type": "string",
           "format": "date-time",
-          "description": "筛选在该时间之后创建的订单。"
+          "description": "筛选在该时间之后创建的订单。采用 RFC 3339 date-time 格式。"
         },
         "created_before": {
           "type": "string",
           "format": "date-time",
-          "description": "筛选在该时间之前创建的订单。"
+          "description": "筛选在该时间之前创建的订单。采用 RFC 3339 date-time 格式。"
         }
       },
       "additionalProperties": true

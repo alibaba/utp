@@ -18,7 +18,7 @@
     "acknowledged_at": {
       "type": "string",
       "format": "date-time",
-      "description": "接收确认时间，可选。"
+      "description": "接收确认时间，可选。采用 RFC 3339 date-time 格式。"
     }
   },
   "additionalProperties": true

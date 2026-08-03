@@ -6,7 +6,7 @@ status: drafting
 format: html
 ---
 
-<h1 id="s-7-security-trust">第 7 章：风控与审计（Risk &amp; Audit — L2）</h1>
+<h1 id="s-7-security-trust">风控与审计（Risk &amp; Audit — L2）</h1>
 
 <hr />
 <p>风控与审计是 UTP 协议 Layer 2 的保障层，为交易事实、资金流向与关键操作提供<strong>可独立验证</strong>的协议级机制。本章定义三类核心能力：</p>
@@ -18,9 +18,9 @@ format: html
 <p>资金托管（Escrow）的详细规范已移至 <a href="/documentation/specification/primitives/pay/index.html#s-1410-escrow">P4 支付原语第 14.10 节</a>。Mandate Chain 的签发与数据结构见 <a href="/documentation/specification/protocol-core/identity-authorization.html#s-64">第 6 章 6.4 节</a>。</p>
 <hr />
 
-<h2 id="s-71-risk-signals">7.1 Risk Signals（风控信号）</h2>
+<h2 id="s-71-risk-signals">Risk Signals（风控信号）</h2>
 
-<h3 id="s-711">7.1.1 概述</h3>
+<h3 id="s-711">概述</h3>
 <p><strong>风控信号</strong>（Risk Signal）是交易全生命周期中采集的可验证环境事实（Observable Fact）。UTP 风控信号覆盖从寻源到履约的完整交易链路，支持多参与方采集，服务于授权、速率限制、欺诈防控及其他信任评估场景。</p>
 <blockquote>
 <p><strong>协议边界声明：</strong>UTP 只定义 Risk Signal 的<strong>最小数据结构与传递方式</strong>，<strong>不定义</strong>采集来源、PII 分级、保留策略等平台运营职责，也不定义任何风控策略、阈值、评分模型或处置动作。如何消费 Risk Signal、如何构建风控策略，由消费方自主决定。</p>
@@ -37,7 +37,7 @@ format: html
 </table>
 <p><code>risk_signals</code> 位于 <a href="/documentation/specification/protocol-core/transport-communication.html#s-411">MessageEnvelope</a> 层，而非业务负载（payload）层。其设计意图是：任何原语消息 MAY 在信封中附带与本消息相关的风控上下文，且不影响 payload 的结构定义；接收方 MAY 消费这些信号，但 <strong>MUST NOT</strong> 因无法识别的信号名而拒绝消息。信号的持久化与审计消费由 <a href="#s-72-evidence-bundle">Evidence Bundle</a> 承担。</p>
 
-<h3 id="s-712">7.1.2 命名与扩展</h3>
+<h3 id="s-712">命名与扩展</h3>
 <p>所有信号名 <strong>MUST</strong> 采用反向域名格式，以确保不同来源的信号互不冲突。格式为 <code>{反向域名}.{信号类别}.{具体信号}</code>，标准信号由 UTP 规范注册表维护，实现方可通过自有域名命名空间扩展。</p>
 <p>反向域名本身已隐含编码了信号的类别与来源信息——例如 <code>org.utp.transport.*</code> 表示传输层信号，<code>org.utp.identity.*</code> 表示身份与认证信号，<code>org.utp.device.*</code> 表示设备与环境信号——因此协议无需额外的信号类型或来源字段。</p>
 <p><strong>命名冲突避免：</strong>自定义信号 <strong>MUST NOT</strong> 使用 <code>org.utp.*</code> 命名空间；该命名空间保留给 UTP 规范标准信号。</p>
@@ -49,7 +49,7 @@ format: html
 </ul>
 <p><strong>PII 分级：</strong>个人信息分级在 EvidenceComponent 层执行，不在信号层定义。信号被纳入 Evidence Bundle 时，其对应的 EvidenceComponent <strong>MUST</strong> 通过 <code>pii_level</code> 字段标注个人信息分级（<code>"none"</code>、<code>"low"</code>、<code>"high"</code>），具体分级规则参见 <a href="#s-724-evidencecomponent">7.2.4 EvidenceComponent 定义</a>。</p>
 
-<h3 id="s-713">7.1.3 数据结构</h3>
+<h3 id="s-713">数据结构</h3>
 <p>每个信号的值可以是任意 JSON 类型，具体由对应信号名的规范定义：</p>
 <ul>
 <li><strong>简单值</strong>（字符串 / 数值）：如 IP 地址、User-Agent，一个标量即可表达。</li>
@@ -84,7 +84,7 @@ format: html
 <li><code>com.acme.device.attestation</code>：设备安全态势证明，含签名和公钥来源，接收方可独立验证。</li>
 </ul>
 
-<h3 id="s-714">7.1.4 采集规则</h3>
+<h3 id="s-714">采集规则</h3>
 <p>采集要求随操作风险等级递增：低风险操作只需基础传输层信号，高风险资金或状态迁移操作要求完整信号采集与 Evidence Bundle 归档。协议只规定各操作类型下的采集粒度要求，具体采集哪些信号由实现方根据操作语义决定。</p>
 <table>
 <thead>
@@ -104,7 +104,7 @@ format: html
 <li>争议发生时：按请求方要求补充采集指定信号。</li>
 </ol>
 
-<h3 id="s-715">7.1.5 传递与请求</h3>
+<h3 id="s-715">传递与请求</h3>
 <p>风控信号通过消息信封的 <code>risk_signals</code> 字段传递（字段定义见 <a href="#s-711">7.1.1</a>）。信号传递的协议级规则：</p>
 <ol>
 <li>发送方 <strong>MAY</strong> 在消息信封中附带已采集的信号，为接收方提供风控上下文；</li>
@@ -114,7 +114,7 @@ format: html
 </ol>
 <p>示例参见 <a href="/documentation/specification/protocol-core/transport-communication.html#s-411">第 4 章 4.1.1 节</a>。</p>
 
-<h4 id="s-7151">7.1.5.1 信号请求机制</h4>
+<h4 id="s-7151">信号请求机制</h4>
 <p>接收方可能需要发送方补充特定信号。除发送方主动附带外，协议支持接收方通过响应消息请求所需信号。<strong>此机制仅适用于 UTP 标准注册信号</strong>（<code>org.utp.*</code> 命名空间下定义了请求语义的信号），自定义信号不在本机制范围内。</p>
 <p>接收方可在响应的 <code>messages</code> 数组中发出信号请求，通过 <code>code: "signal"</code> 标识请求类型，并使用 JSONPath 表达式（如 <code>$.risk_signals['org.utp.transport.buyer_ip']</code>）指明所需信号的具体路径。以下为包含必选信号和可选信号的请求示例：</p>
 <pre><code class="language-json">{
@@ -141,7 +141,7 @@ format: html
 <li>接收方 <strong>MUST NOT</strong> 通过此机制请求标准注册表之外的自定义信号。</li>
 </ul>
 
-<h3 id="s-716">7.1.6 隐私与合规</h3>
+<h3 id="s-716">隐私与合规</h3>
 <p>风控信号的采集与处理涉及个人信息保护，实现方须遵循以下合规要求：</p>
 <ol>
 <li><strong>最小必要</strong>：平台 <strong>SHOULD</strong> 仅采集与当前交易安全验证直接相关的信号，<strong>SHOULD NOT</strong> 为构建用户画像等与交易无关的目的过度采集环境数据。</li>
@@ -151,7 +151,7 @@ format: html
 <li><strong>保留期限</strong>：信号的保留期限由 <a href="#s-723-evidencebundle">EvidenceBundle.retention_policy</a>（见 <a href="#s-723-evidencebundle">7.2.3</a>）统一管理，<strong>MUST</strong> 同时符合保留策略要求与管辖法域的法定期限，到期后安全删除。</li>
 </ol>
 
-<h3 id="s-717">7.1.7 与消费方的边界</h3>
+<h3 id="s-717">与消费方的边界</h3>
 <p>协议层输出标准化的可验证事实，消费方据此做出交易级决策。两层分工如下：</p>
 <table>
 <thead>
@@ -167,9 +167,9 @@ format: html
 
 <hr />
 
-<h2 id="s-72-evidence-bundle">7.2 Evidence Bundle（电子证据包）</h2>
+<h2 id="s-72-evidence-bundle">Evidence Bundle（电子证据包）</h2>
 
-<h3 id="s-721">7.2.1 概述</h3>
+<h3 id="s-721">概述</h3>
 <p>UTP 定义协议级电子证据包（Evidence Bundle），将交易全生命周期中产生的凭证统一封装为可对外交付的标准证据容器。其设计目标是：<strong>字节级可验证、跨平台可携带、面向司法可采信</strong>。</p>
 <p>Evidence Bundle 不是必须由 UTP 官方或某个中心化审计服务提供的产品，而是一个由实现方维护的证据组件（Evidence Component）集合。每个组件都有独立的内容哈希与来源引用，整体通过 <code>integrity_hash</code> 保证一致性。UTP 规定证据格式、最小记录要求、完整性验证和访问/导出语义，不规定数据库、部署形态或唯一的审计服务供应方。</p>
 <p><strong>操作最低证据集：</strong>除原语章节另有更高要求外，涉及资金、授权或状态迁移的操作 MUST 至少记录以下组件；只读操作 MAY 省略与其无关的组件，但 MUST 记录请求摘要、身份验证结果与 Authorization Decision。</p>
@@ -184,7 +184,7 @@ format: html
 </tbody>
 </table>
 
-<h4 id="s-7211">7.2.1.1 审计架构与部署边界</h4>
+<h4 id="s-7211">审计架构与部署边界</h4>
 <p>UTP 采用<strong>参与方分别留证、按需验证</strong>的架构。各参与方记录自己产生或观察到的事实，审计、Resolve 或监管方按授权取得证据并独立验证；协议不要求部署中心化审计服务。</p>
 <table>
 <thead><tr><th>角色</th><th>角色定义</th><th>具体主体</th><th>责任边界</th></tr></thead>
@@ -200,7 +200,7 @@ format: html
 
 <p><strong>证据消费者定义：</strong>证据消费者是获授权读取 Evidence Bundle，并根据其中证据作出业务、审计或监管判断的角色。具体角色包括：交易参与方核对本方记录，审计方检查协议执行过程，风控系统决定放行、增强认证或拒绝，争议解决方处理争议，监管机构依法开展合规检查。同一主体 MAY 同时承担多个角色，但每次使用证据时 MUST 明确访问目的和授权范围。</p>
 
-<h4 id="s-7212">7.2.1.2 责任链与跨参与方证据</h4>
+<h4 id="s-7212">责任链与跨参与方证据</h4>
 <p>一笔交易不要求所有事实集中在一个 Bundle 中。各方可以保存自己的证据，并通过 <code>source_ref</code>、交易标识、Mandate 引用和内容哈希建立关联。Resolve 或审计方取得必要组件后，MUST 先验证事实凭证，再验证 Bundle 完整性。</p>
 <ol>
 <li>事实产生方负责事实内容的准确性、签发和撤销语义；</li>
@@ -213,16 +213,16 @@ format: html
 <figure id="s-721-architecture" style="margin: 24px 0 32px;">
   <div style="max-height: 900px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 8px; background: #ffffff;">
     <img
-      src="docs/assets/diagrams/evidence-bundle-audit-architecture.svg"
+      src="/documentation/assets/diagrams/evidence-bundle-audit-architecture.svg"
       alt="UTP Evidence Bundle 审计架构：事实产生方把事实交给交易参与方整理成 Evidence Bundle，审计方、风控系统、争议解决方和监管机构按授权读取并独立验证"
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>
   <figcaption style="margin-top: 10px; color: #6b7280; font-size: 13px; text-align: center;">
-    图 7-1 Evidence Bundle 审计架构与责任边界（可在图内滚动查看完整架构；<a href="diagrams/png2x/evidence-bundle-audit-architecture.png">PNG 大图</a>）
+    图 7-1 Evidence Bundle 审计架构与责任边界（可在图内滚动查看完整架构；<a href="/documentation/assets/diagrams/png2x/evidence-bundle-audit-architecture.png">PNG 大图</a>）
   </figcaption>
 </figure>
 
-<h3 id="s-722">7.2.2 证据包颁发机制</h3>
+<h3 id="s-722">证据包颁发机制</h3>
 <p><strong>证据颁发主体（Evidence Issuer）：</strong>每个 Evidence Bundle <strong>MUST</strong> 由唯一的证据颁发主体创建并签名。唯一的证据颁发主体表示该 Bundle 的容器完整性责任主体，不表示该主体是所有底层事实的唯一产生方，也不要求其成为全网中心化服务。证据颁发主体通常是：</p>
 <ul>
 <li>交易参与方：为其负责的交易整理并维护主证据包；</li>
@@ -237,7 +237,7 @@ format: html
 <li>交易结束后，证据包进入只读归档状态，证据颁发主体 <strong>MUST</strong> 签发最终 <code>issuer_signature</code>。</li>
 </ol>
 
-<h3 id="s-723-evidencebundle">7.2.3 EvidenceBundle 实体</h3>
+<h3 id="s-723-evidencebundle">EvidenceBundle 实体</h3>
 <table>
 <thead>
 <tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr>
@@ -258,7 +258,7 @@ format: html
 </tbody>
 </table>
 
-<h3 id="s-724-evidencecomponent">7.2.4 EvidenceComponent 实体</h3>
+<h3 id="s-724-evidencecomponent">EvidenceComponent 实体</h3>
 <table>
 <thead>
 <tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr>
@@ -275,7 +275,7 @@ format: html
 </tbody>
 </table>
 
-<h4 id="s-7241">7.2.4.1 EvidenceBundle 示例</h4>
+<h4 id="s-7241">EvidenceBundle 示例</h4>
 <pre><code class="language-json">{
   "bundle_id": "bundle-20260720-001",
   "session_id": "utp-session-x9y8z7w6",
@@ -329,10 +329,10 @@ format: html
   ]
 }</code></pre>
 
-<h3 id="s-725">7.2.5 申请使用流程</h3>
+<h3 id="s-725">申请使用流程</h3>
 <p>Evidence Bundle 的访问不是无条件的。任何非交易参与方请求访问时，<strong>MUST</strong> 经过申请与审批流程。</p>
 
-<h4 id="s-7251">7.2.5.1 EvidenceBundleRequest 实体</h4>
+<h4 id="s-7251">EvidenceBundleRequest 实体</h4>
 <table>
 <thead>
 <tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr>
@@ -348,7 +348,7 @@ format: html
 </tbody>
 </table>
 
-<h4 id="s-7252">7.2.5.2 EvidenceBundleAccessDecision 实体</h4>
+<h4 id="s-7252">EvidenceBundleAccessDecision 实体</h4>
 <table>
 <thead>
 <tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr>
@@ -365,7 +365,7 @@ format: html
 </tbody>
 </table>
 
-<h4 id="s-7253">7.2.5.3 访问控制规则</h4>
+<h4 id="s-7253">访问控制规则</h4>
 <ol>
 <li>交易参与方 <strong>MAY</strong> 直接访问本方生成的 Evidence Bundle 组件；</li>
 <li>非参与方 <strong>MUST</strong> 提交 EvidenceBundleRequest，并出示合法法律基础；</li>
@@ -373,7 +373,7 @@ format: html
 <li>对于 <code>high</code> PII 组件，默认 <strong>MUST</strong> 采用 <code>approved_with_redaction</code> 或拒绝，除非申请方获得数据主体明确授权。</li>
 </ol>
 
-<h3 id="s-726">7.2.6 签发安全机制</h3>
+<h3 id="s-726">签发安全机制</h3>
 <p>Evidence Bundle 的不可篡改性依赖三层机制：</p>
 <ol>
 <li><strong>组件哈希</strong>：每个 EvidenceComponent 的 <code>content_hash</code> 是 <code>SHA-256(content)</code>；</li>
@@ -382,10 +382,10 @@ format: html
 </ol>
 <p>每次追加组件后，负责整理证据的一方 <strong>MUST</strong> 重新计算 <code>integrity_hash</code> 并更新 <code>last_updated_at</code>。交易结束后，证据颁发主体 <strong>MUST</strong> 签发最终签名，签名后证据包进入只读状态。</p>
 
-<h3 id="s-727">7.2.7 导出规则</h3>
+<h3 id="s-727">导出规则</h3>
 <p>Evidence Bundle 可应合法请求导出为标准证据文件。导出时 <strong>MUST</strong> 附带 ExportManifest，声明导出内容与处理方式。</p>
 
-<h4 id="s-7271">7.2.7.1 ExportManifest 实体</h4>
+<h4 id="s-7271">ExportManifest 实体</h4>
 <table>
 <thead>
 <tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr>
@@ -403,7 +403,7 @@ format: html
 </tbody>
 </table>
 
-<h4 id="s-7272">7.2.7.2 导出约束</h4>
+<h4 id="s-7272">导出约束</h4>
 <ol>
 <li>导出操作本身 <strong>MUST</strong> 在审计日志（Audit Log）中记录，并将 ExportManifest 保存为 Evidence Bundle 的 <code>export_manifest</code> 字段；</li>
 <li><code>high</code> PII 组件导出时 <strong>MUST</strong> 脱敏，除非 EvidenceBundleAccessDecision 明确授权完整导出；</li>
@@ -411,7 +411,7 @@ format: html
 <li>导出副本 <strong>MUST</strong> 附带原证据颁发主体签名与导出清单签名，便于第三方验证完整性。</li>
 </ol>
 
-<h3 id="s-728">7.2.8 完整逻辑链路</h3>
+<h3 id="s-728">完整逻辑链路</h3>
 <p>Evidence Bundle 的生命周期链路如下：</p>
 <pre><code>会话建立
   → 交易参与方创建 EvidenceBundle（生成 bundle_id、evidence_issuer、retention_policy）
@@ -426,15 +426,15 @@ format: html
 
 <hr />
 
-<h2 id="s-73-dynamic-trust-adjustment">7.3 Dynamic Trust Adjustment（动态信任调整）</h2>
+<h2 id="s-73-dynamic-trust-adjustment">Dynamic Trust Adjustment（动态信任调整）</h2>
 
-<h3 id="s-731">7.3.1 概述</h3>
+<h3 id="s-731">概述</h3>
 <p><strong>动态信任调整</strong>（Dynamic Trust Adjustment，DTA）是协议引擎对 Agent 长期信任状态进行治理的事件机制。它基于可验证事实（如 Risk Signal、对账异常、Mandate 验证失败）产生信任等级变化事件，进而影响协议级行为（如 HAI 控制等级、Delegation Scope 边界）。</p>
 <blockquote>
 <p><strong>协议边界声明：</strong>UTP 只定义 DTA 的<strong>事件格式、信任等级语义、以及等级变化对协议级能力的约束映射</strong>，<strong>不定义</strong>具体的升级/降级策略、触发阈值或评分算法。策略由协议引擎实现方或平台治理方制定。</p>
 </blockquote>
 
-<h3 id="s-732">7.3.2 实现主体与消费方</h3>
+<h3 id="s-732">实现主体与消费方</h3>
 <p><strong>实现主体：</strong>DTA 事件的签发方可以是协议引擎、审计服务或其他受信任治理方；UTP 不要求存在单一中心化的全局信任服务。任何消费者 MUST 先验证事件签名、来源、时间顺序与触发证据，再按本地治理策略计算当前有效信任状态。单一交易参与方不得仅凭本方声明直接改变其他参与方的协议权限。</p>
 <p><strong>消费方：</strong></p>
 <ul>
@@ -446,7 +446,7 @@ format: html
 </ul>
 <p>商家风控系统可订阅 TrustAdjustmentEvent 作为参考，但主要消费原始 Risk Signal 进行单笔交易决策。</p>
 
-<h3 id="s-733-trustadjustmentevent">7.3.3 TrustAdjustmentEvent 实体</h3>
+<h3 id="s-733-trustadjustmentevent">TrustAdjustmentEvent 实体</h3>
 <table>
 <thead>
 <tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr>
@@ -467,7 +467,7 @@ format: html
 </tbody>
 </table>
 
-<h4 id="s-7331">7.3.3.1 TrustAdjustmentEvent 示例</h4>
+<h4 id="s-7331">TrustAdjustmentEvent 示例</h4>
 <pre><code class="language-json">{
   "event_id": "dta-20260720-001",
   "subject_agent": "buyer-agent-001",
@@ -492,7 +492,7 @@ format: html
   "issued_by": "utp-engine-platform"
 }</code></pre>
 
-<h3 id="s-734">7.3.4 协议级影响</h3>
+<h3 id="s-734">协议级影响</h3>
 <p>信任等级变化对协议行为的约束映射如下：</p>
 <table>
 <thead>
@@ -512,7 +512,7 @@ format: html
 <li>HAI 控制等级的上调 <strong>MUST NOT</strong> 静默绕过，必须向用户或监管认可的 Confirmation Surface 发出明确通知。</li>
 </ol>
 
-<h3 id="s-735">7.3.5 与商家风控的边界</h3>
+<h3 id="s-735">与商家风控的边界</h3>
 <table>
 <thead>
 <tr><th>维度</th><th>商家风控</th><th>协议级 DTA</th></tr>
@@ -529,7 +529,7 @@ format: html
 
 <hr />
 
-<h2 id="s-74-entities">7.4 实体定义速查</h2>
+<h2 id="s-74-entities">实体定义速查</h2>
 <p>本节集中列出本章实体定义的入口。实体字段在所属业务规则附近说明，统一从以下索引访问；本节不重复复制字段表。</p>
 <table>
 <thead><tr><th>实体</th><th>定义入口</th><th>用途</th></tr></thead>
