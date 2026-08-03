@@ -172,7 +172,7 @@ service:        dev.utp.merchant
       <li><strong>第一跳（本原语）：</strong>Seller → Marketplace，<code>utp.quote.quote</code> 提交带签名的报价事实。</li>
       <li><strong>第二跳（主规范 P2）：</strong>Marketplace 以 Seller 侧 handler 身份执行 <code>utp.negotiate.quote</code>，把<strong>同一份 Quote 实体</strong>交付买方。Marketplace MUST NOT 改写报价内容（金额、有效期、条款、<code>terms_hash</code> 逐字节保持）；平台加价或补贴 MUST 以独立条目呈现。</li>
     </ol>
-    <p>自托管拓扑（<a href="overview.html#s-m142">M1.4.2</a>）下本原语不适用：供应商 Endpoint 直接作为 P2 的 handler 执行 <code>utp.negotiate.quote</code> 回调，本原语是其内部模型的参考。</p>
+    <p>自托管拓扑（<a href="../../overview.html#s-m142">M1.4.2</a>）下本原语不适用：供应商 Endpoint 直接作为 P2 的 handler 执行 <code>utp.negotiate.quote</code> 回调，本原语是其内部模型的参考。</p>
     <h3 id="s-m562">M5.6.2 状态映射（State Correspondence）</h3>
     <p>本原语状态机是同一协商在供应商侧的<strong>任务视图</strong>，与主规范 P2 协商状态机（<code>primitives/negotiate/state_machine.json</code>）逐状态对应：</p>
     <table>

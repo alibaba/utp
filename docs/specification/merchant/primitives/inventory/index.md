@@ -165,7 +165,7 @@ service:        dev.utp.merchant
 
     <hr />
     <h2 id="s-m47">M4.7 与 P3 Purchase 的库存一致性契约（Interlock with P3）</h2>
-    <p>本节是闭环不变式 2（<a href="overview.html#s-m16">M1.6</a>）的规范定义。平台托管拓扑下，协议引擎 MUST 保证：</p>
+    <p>本节是闭环不变式 2（<a href="../../overview.html#s-m16">M1.6</a>）的规范定义。平台托管拓扑下，协议引擎 MUST 保证：</p>
     <ol>
       <li><strong>同源：</strong><code>purchase.create</code> 校验库存可用性（主规范 13.5.2 Seller 职责与 13.7 操作定义）读取的数量 == MP2 的 <code>sellable</code>。</li>
       <li><strong>hold 映射：</strong><code>purchase.create</code> 创建的临时库存 hold（主规范 13.5.2）MUST 生成 MP2 InventoryHold 记录（状态 <code>HELD</code>，含 <code>transaction_id</code>、TTL）。</li>

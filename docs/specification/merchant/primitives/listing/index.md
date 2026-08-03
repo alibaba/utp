@@ -41,7 +41,7 @@ service:        dev.utp.merchant
     <p>Listing 是整个商业闭环的起点：没有 Listing，P1 Source 无货可搜。主规范中"商品已下架"（<code>PURCHASE.CREATE.INVALID_ITEMS</code>）、"商品不存在或已下架"（<code>SOURCE.LOOKUP.ITEM_NOT_FOUND</code>）等既有错误码的触发源，由本原语的 <code>delist</code>/<code>archive</code> 正式闭合。</p>
     <h3 id="s-m312">M3.1.2 关键设计原则</h3>
     <p><strong>"商品发布"与"商品上架"是两个独立动作。</strong><code>publish</code> 建立商品档案并进入平台审核；<code>list</code> 使审核通过的商品进入可交易状态。分离的原因：审核是平台治理动作（时长不可控），上架是供应商经营决策（可反复执行）。供应商 MAY 在 <code>publish</code> 请求中声明 <code>auto_list: true</code>，审核通过后自动上架。</p>
-    <p><strong>Listing 管信息，不管数量。</strong>商品的可售数量由 MP2 Inventory（<a href="primitive-inventory.html">M4</a>）独立管理。<code>publish</code>/<code>update</code> 请求 MUST NOT 携带库存数量字段；实现方若在同一 UI 中同时编辑信息与库存，MUST 在协议层拆分为 MP1 与 MP2 两次调用。</p>
+    <p><strong>Listing 管信息，不管数量。</strong>商品的可售数量由 MP2 Inventory（<a href="../../primitives/inventory/index.html">M4</a>）独立管理。<code>publish</code>/<code>update</code> 请求 MUST NOT 携带库存数量字段；实现方若在同一 UI 中同时编辑信息与库存，MUST 在协议层拆分为 MP1 与 MP2 两次调用。</p>
     <h3 id="s-m313">M3.1.3 范围</h3>
     <p>Listing 覆盖以下场景：</p>
     <ul>
@@ -56,7 +56,7 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>条件</th><th>必需？</th><th>说明</th></tr></thead>
       <tbody>
-        <tr><td><code>merchant.status == 'ACTIVE'</code></td><td>MUST</td><td>供应商已完成入驻五步流程（<a href="onboarding.html#s-m27">M2.7</a>）。<code>SANDBOX</code> 状态仅允许沙箱环境操作。</td></tr>
+        <tr><td><code>merchant.status == 'ACTIVE'</code></td><td>MUST</td><td>供应商已完成入驻五步流程（<a href="../../onboarding.html#s-m27">M2.7</a>）。<code>SANDBOX</code> 状态仅允许沙箱环境操作。</td></tr>
         <tr><td><code>seller.identity.verified == true</code></td><td>MUST</td><td>Seller 身份已验证，请求携带有效 RFC 9421 签名。</td></tr>
         <tr><td><code>category ∈ merchant.qualified_categories</code></td><td>MUST</td><td>商品类目在供应商资质核准范围内。</td></tr>
         <tr><td><code>compliance_level ≥ L1 → compliance_refs != null</code></td><td>MUST</td><td>合规要求类目 MUST 附资质文件引用。</td></tr>
@@ -225,7 +225,7 @@ service:        dev.utp.merchant
         <tr><td><code>compliance_level</code> L1+</td><td><code>compliance_refs</code> MUST 存在且审核通过；L2+（跨境）MUST 含原产地与进出口许可引用；L3 MUST 附审计报告引用。</td></tr>
       </tbody>
     </table>
-    <p><strong>搜索可见性规则（Mode 过滤）：</strong>商品的有效 Mode 范围 = 商户 Profile 中对应原语的 <code>supported_mode_range</code>（<code>utp.roles.seller.primitives</code>，主规范 3.3.2） ∩ 商品 <code>mode_constraints</code>（缺省为前者）。Marketplace 的 P1 Source MUST 按会话 <code>ModeConfiguration</code> 过滤：会话 Mode 任一维度不在商品有效范围内的商品，MUST NOT 出现在携带任意 <code>filters</code> 的 <code>search</code> 结果中，对其 <code>lookup</code> MUST 返回 <code>SOURCE.MODE.UNSUPPORTED</code>（主规范 11.3.1）。该规则将主规范的运行时错误前置为搜索期过滤，消除“能搜到却无法按该模式成交”的供需错配（闭环不变式 6，见 <a href="overview.html#s-m16">M1.6</a>）。</p>
+    <p><strong>搜索可见性规则（Mode 过滤）：</strong>商品的有效 Mode 范围 = 商户 Profile 中对应原语的 <code>supported_mode_range</code>（<code>utp.roles.seller.primitives</code>，主规范 3.3.2） ∩ 商品 <code>mode_constraints</code>（缺省为前者）。Marketplace 的 P1 Source MUST 按会话 <code>ModeConfiguration</code> 过滤：会话 Mode 任一维度不在商品有效范围内的商品，MUST NOT 出现在携带任意 <code>filters</code> 的 <code>search</code> 结果中，对其 <code>lookup</code> MUST 返回 <code>SOURCE.MODE.UNSUPPORTED</code>（主规范 11.3.1）。该规则将主规范的运行时错误前置为搜索期过滤，消除“能搜到却无法按该模式成交”的供需错配（闭环不变式 6，见 <a href="../../overview.html#s-m16">M1.6</a>）。</p>
 
     <hr />
     <h2 id="s-m37">M3.7 Operations（操作定义）</h2>
@@ -244,7 +244,7 @@ service:        dev.utp.merchant
       </tbody>
     </table>
     <h3 id="s-m372">M3.7.2 批量模式（Batch Mode）</h3>
-    <p>面向 ERP 全量/增量同步场景（<a href="erp-bridge.html#s-m94">M9.4</a>），<code>publish</code> 与 <code>update</code> MUST 支持批量提交：</p>
+    <p>面向 ERP 全量/增量同步场景（<a href="../../erp-bridge.html#s-m94">M9.4</a>），<code>publish</code> 与 <code>update</code> MUST 支持批量提交：</p>
     <ul>
       <li>批量请求为条目数组（单批 MUST ≤ 500 条），整批共享一个 <code>idempotency_key</code>，逐条独立校验、独立成败。</li>
       <li>响应 MUST 逐条返回 <code>{index, listing_id | error}</code>；部分失败不影响其余条目（部分成功语义）。</li>
@@ -311,7 +311,7 @@ service:        dev.utp.merchant
         <tr><td><code>created_at</code> / <code>updated_at</code></td><td>ISO-8601</td><td>是</td><td>创建/最近生效变更时间。</td></tr>
       </tbody>
     </table>
-    <blockquote><p>Listing MUST NOT 含任何库存数量字段。库存见 <a href="primitive-inventory.html#s-m49">M4.9 InventoryRecord</a>。</p></blockquote>
+    <blockquote><p>Listing MUST NOT 含任何库存数量字段。库存见 <a href="../../primitives/inventory/index.html#s-m49">M4.9 InventoryRecord</a>。</p></blockquote>
     <h3 id="s-m392">M3.9.2 ListingSku</h3>
     <table>
       <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>

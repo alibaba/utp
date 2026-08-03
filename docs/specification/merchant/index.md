@@ -38,11 +38,11 @@ format: html
     <table>
       <thead><tr><th>章节</th><th>原语</th><th>原语 ID</th><th>方向</th><th>核心 Action</th></tr></thead>
       <tbody>
-        <tr><td>M3</td><td><a href="primitive-listing.html">MP1 商品管理</a></td><td><code>utp.listing</code></td><td>Seller → Marketplace</td><td><code>publish</code>, <code>update</code>, <code>list</code>, <code>delist</code>, <code>query</code>, <code>archive</code>, <code>batch</code></td></tr>
-        <tr><td>M4</td><td><a href="primitive-inventory.html">MP2 库存管理</a></td><td><code>utp.inventory</code></td><td>Seller → Marketplace</td><td><code>set</code>, <code>adjust</code>, <code>query</code>, <code>hold.query</code>, <code>batch</code></td></tr>
-        <tr><td>M5</td><td><a href="primitive-quote.html">MP3 询盘响应（草案新增）</a></td><td><code>utp.quote</code></td><td>Seller → Marketplace</td><td><code>quote, revise, bid, decline, query, list</code></td></tr>
-        <tr><td>M6</td><td><a href="primitive-acceptance.html">MP4 订单受理</a></td><td><code>utp.acceptance</code></td><td>Seller → Marketplace</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>amend_leadtime</code>, <code>query</code>, <code>list</code></td></tr>
-        <tr><td>M7</td><td><a href="primitive-shipment.html">MP5 发货执行</a></td><td><code>utp.shipment</code></td><td>Seller → Marketplace</td><td><code>prepare</code>, <code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td></tr>
+        <tr><td>M3</td><td><a href="primitives/listing/index.html">MP1 商品管理</a></td><td><code>utp.listing</code></td><td>Seller → Marketplace</td><td><code>publish</code>, <code>update</code>, <code>list</code>, <code>delist</code>, <code>query</code>, <code>archive</code>, <code>batch</code></td></tr>
+        <tr><td>M4</td><td><a href="primitives/inventory/index.html">MP2 库存管理</a></td><td><code>utp.inventory</code></td><td>Seller → Marketplace</td><td><code>set</code>, <code>adjust</code>, <code>query</code>, <code>hold.query</code>, <code>batch</code></td></tr>
+        <tr><td>M5</td><td><a href="primitives/quote/index.html">MP3 询盘响应（草案新增）</a></td><td><code>utp.quote</code></td><td>Seller → Marketplace</td><td><code>quote, revise, bid, decline, query, list</code></td></tr>
+        <tr><td>M6</td><td><a href="primitives/acceptance/index.html">MP4 订单受理</a></td><td><code>utp.acceptance</code></td><td>Seller → Marketplace</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>amend_leadtime</code>, <code>query</code>, <code>list</code></td></tr>
+        <tr><td>M7</td><td><a href="primitives/shipment/index.html">MP5 发货执行</a></td><td><code>utp.shipment</code></td><td>Seller → Marketplace</td><td><code>prepare</code>, <code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td></tr>
       </tbody>
     </table>
     <h3 id="s-part-3">经营与集成</h3>

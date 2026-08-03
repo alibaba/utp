@@ -164,7 +164,7 @@ service:        dev.utp.merchant
 
     <hr />
     <h2 id="s-m66">M6.6 与 P3 Purchase 签名流程的衔接（Interlock with P3）</h2>
-    <p>本节是闭环不变式 3（<a href="overview.html#s-m16">M1.6</a>）的规范定义：</p>
+    <p>本节是闭环不变式 3（<a href="../../overview.html#s-m16">M1.6</a>）的规范定义：</p>
     <ol>
       <li>买方 <code>purchase.complete</code> 通过第 5 章 Mandate 操作准入后，P3 进入 <code>SIGNING</code>；平台托管拓扑下，协议引擎 MUST 生成受理任务并路由给供应商（M6.7）。</li>
       <li>MP4 <code>accept</code> 请求 MUST 携带卖方 ES256 签名（JWS），签名内容 MUST 覆盖该订购的 <code>terms_hash</code>。主规范未规定"卖方承诺处理"的具体形式（13.2.3 留白）；<strong>本规范将带签名的 <code>accept</code> 定义为平台托管拓扑下承诺处理的规范形式</strong>，AcceptanceRecord 即其可审计凭证。</li>

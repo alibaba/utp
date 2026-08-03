@@ -296,23 +296,23 @@
       "children": [
         {
           "title": "MP1 商品管理",
-          "path": "merchant/primitive-listing.html"
+          "path": "merchant/primitives/listing/index.html"
         },
         {
           "title": "MP2 库存管理",
-          "path": "merchant/primitive-inventory.html"
+          "path": "merchant/primitives/inventory/index.html"
         },
         {
           "title": "MP3 询盘响应（草案）",
-          "path": "merchant/primitive-quote.html"
+          "path": "merchant/primitives/quote/index.html"
         },
         {
           "title": "MP4 订单受理",
-          "path": "merchant/primitive-acceptance.html"
+          "path": "merchant/primitives/acceptance/index.html"
         },
         {
           "title": "MP5 发货执行",
-          "path": "merchant/primitive-shipment.html"
+          "path": "merchant/primitives/shipment/index.html"
         }
       ]
     }
@@ -590,27 +590,27 @@
     {
       "group": "商家侧 UTP-M · 原语",
       "title": "M3 MP1 商品管理原语",
-      "path": "merchant/primitive-listing.html"
+      "path": "merchant/primitives/listing/index.html"
     },
     {
       "group": "商家侧 UTP-M · 原语",
       "title": "M4 MP2 库存管理原语",
-      "path": "merchant/primitive-inventory.html"
+      "path": "merchant/primitives/inventory/index.html"
     },
     {
       "group": "商家侧 UTP-M · 原语",
       "title": "M5 MP3 询盘响应原语",
-      "path": "merchant/primitive-quote.html"
+      "path": "merchant/primitives/quote/index.html"
     },
     {
       "group": "商家侧 UTP-M · 原语",
       "title": "M6 MP4 订单受理原语",
-      "path": "merchant/primitive-acceptance.html"
+      "path": "merchant/primitives/acceptance/index.html"
     },
     {
       "group": "商家侧 UTP-M · 原语",
       "title": "M7 MP5 发货执行原语",
-      "path": "merchant/primitive-shipment.html"
+      "path": "merchant/primitives/shipment/index.html"
     },
     {
       "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",

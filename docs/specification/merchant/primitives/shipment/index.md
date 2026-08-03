@@ -179,7 +179,7 @@ service:        dev.utp.merchant
 
     <hr />
     <h2 id="s-m77">M7.7 与 P5 Fulfill 的事实传导契约（Interlock with P5）</h2>
-    <p>本节是闭环不变式 4（<a href="overview.html#s-m16">M1.6</a>）的规范定义。Marketplace MUST 按下表执行 MP5 → P5 的事实转换：</p>
+    <p>本节是闭环不变式 4（<a href="../../overview.html#s-m16">M1.6</a>）的规范定义。Marketplace MUST 按下表执行 MP5 → P5 的事实转换：</p>
     <table>
       <thead><tr><th>MP5 事件</th><th>买方侧 <code>fulfill.notify</code></th><th>TrackingEvent.status</th><th>买方可观测状态</th></tr></thead>
       <tbody>

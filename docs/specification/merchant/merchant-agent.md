@@ -20,7 +20,7 @@ format: html
         <tr><td>入驻资料与资质维护</td><td>在授权下代办资料提交、资质更新与换证（M2.5）；平台账号注册与商户协议签署除外（M2.4.3 / M10.5）</td><td>入驻管理接口（非原语）</td></tr>
         <tr><td>商品运营</td><td>依据 ERP 主数据与销售策略发布/更新/上下架商品；类目属性补全；低销量商品下架建议</td><td>MP1</td></tr>
         <tr><td>库存运营</td><td>渠道配额分配、低库存预警响应（补货/下架）、全量校准调度</td><td>MP2</td></tr>
-        <tr><td>询盘与报价</td><td>响应买方 P2 询盘经 MP3 应答（<a href="primitive-quote.html">M5</a>）：<code>delegation_policy</code> 为 <code>passthrough</code> 时接收 <code>inquiry_routed</code> 回调，依据定价策略生成 <code>quote</code>/还盘并回传；框架协议客户按协议价自动报价</td><td>P2（Seller 作为 handler 侧的应答方，执行模式见 M1.4.4）</td></tr>
+        <tr><td>询盘与报价</td><td>响应买方 P2 询盘经 MP3 应答（<a href="primitives/quote/index.html">M5</a>）：<code>delegation_policy</code> 为 <code>passthrough</code> 时接收 <code>inquiry_routed</code> 回调，依据定价策略生成 <code>quote</code>/还盘并回传；框架协议客户按协议价自动报价</td><td>P2（Seller 作为 handler 侧的应答方，执行模式见 M1.4.4）</td></tr>
         <tr><td>接单决策</td><td>按 AcceptancePolicy 自动接单/拒单/挂起/申报交期</td><td>MP4</td></tr>
         <tr><td>履约调度</td><td>备货申报、选择承运商、发货上报、延迟预警与申报</td><td>MP5</td></tr>
         <tr><td>结算核对</td><td>三方对账（M8.5）、差异申报草案生成</td><td>settlement 扩展</td></tr>
@@ -85,6 +85,7 @@ format: html
     <p><strong>与买方侧 HAI 挂起的关系：</strong>供应商侧人工确认发生在 MP4 受理窗口内（<code>ON_HOLD</code> 状态），属于供应商内部流程，<strong>不产生</strong>买方会话的 HAI 挂起记录（Suspend Record）——后者是买方 Principal 对待确认 Action 的控制语义（主规范 20.7.2，执行前控制见 17.1.6.6）。两侧时限的衔接由 M6 的 <code>deadline</code> 统一约束。</p>
 
     <h2 id="s-m106">M10.6 决策审计（Decision Audit）</h2>
+    <p>本节审计要求继承主规范<a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章</a>（风控与审计）：审计记录结构、保留期限与风控信号采集规则以该章为准，本节只补充供应商侧的决策来源维度。</p>
     <ul>
       <li>每次 Agent 自主决策 MUST 记录：输入摘要（路由订单/询盘要点）、命中的策略规则与版本、输出动作、授权凭证引用、时间戳。</li>
       <li>审计记录 SHOULD 以追加式存储（append-only）保存，保存期不低于争议时效期；争议中 MAY 作为证据提交（Evidence Bundle）。</li>

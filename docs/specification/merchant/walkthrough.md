@@ -28,7 +28,7 @@ format: html
     <p>按 M2 五步流程完成：生成 ES256 密钥对 → 发布 Profile（声明 Seller 角色 + MP1—MP5 原语 + <code>dev.utp.merchant_callback</code> Service，示例见 <a href="onboarding.html#s-m23">M2.3</a>）→ 注册获取 <code>merchant_id: mch-sh-00812</code> → 资质审核 <code>QUALIFIED</code> → 沙箱验收 7 项全过 → 状态 <code>ACTIVE</code>。</p>
 
     <h2 id="s-m113">M11.3 Phase 1：发布商品与设置库存</h2>
-    <p>Bridge 从 ERP 物料主数据生成发布请求（完整示例见 <a href="primitive-listing.html#s-m3101">M3.10.1</a>）：</p>
+    <p>Bridge 从 ERP 物料主数据生成发布请求（完整示例见 <a href="primitives/listing/index.html#s-m3101">M3.10.1</a>）：</p>
 <pre class="highlight"><code>1. POST /utp/m/v1/listings           → listing_id=item-BT-NC-001, PENDING_REVIEW
 2. 回调 utp.listing.review_result    → APPROVED, auto_list 生效 → LISTED
 3. PUT  /utp/m/v1/inventory/item-BT-NC-001/sku-X3-BLK

@@ -14,9 +14,9 @@ format: html
     <table>
       <thead><tr><th>#</th><th>问题</th><th>本规范的回答</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>商品如何进入 UTP 网络并可被 P1 Source 搜索到？</td><td>MP1 <code>utp.listing</code>（<a href="primitive-listing.html">M3</a>）+ MP2 <code>utp.inventory</code>（<a href="primitive-inventory.html">M4</a>）</td></tr>
-        <tr><td>2</td><td>订单成立前，供应商如何显式接单、拒单或申报交期变更？</td><td>MP4 <code>utp.acceptance</code>（<a href="primitive-acceptance.html">M6</a>）</td></tr>
-        <tr><td>3</td><td>供应商如何以协议动作完成备货、发货、拆单与异常申报？</td><td>MP5 <code>utp.shipment</code>（<a href="primitive-shipment.html">M7</a>）</td></tr>
+        <tr><td>1</td><td>商品如何进入 UTP 网络并可被 P1 Source 搜索到？</td><td>MP1 <code>utp.listing</code>（<a href="primitives/listing/index.html">M3</a>）+ MP2 <code>utp.inventory</code>（<a href="primitives/inventory/index.html">M4</a>）</td></tr>
+        <tr><td>2</td><td>订单成立前，供应商如何显式接单、拒单或申报交期变更？</td><td>MP4 <code>utp.acceptance</code>（<a href="primitives/acceptance/index.html">M6</a>）</td></tr>
+        <tr><td>3</td><td>供应商如何以协议动作完成备货、发货、拆单与异常申报？</td><td>MP5 <code>utp.shipment</code>（<a href="primitives/shipment/index.html">M7</a>）</td></tr>
         <tr><td>4</td><td>货款如何对账回款、供应商系统（ERP/WMS）与 Agent 如何接入？</td><td>结算扩展（<a href="settlement.html">M8</a>）、Bridge 规范（<a href="erp-bridge.html">M9</a>）、Merchant Agent（<a href="merchant-agent.html">M10</a>）</td></tr>
       </tbody>
     </table>
@@ -181,7 +181,7 @@ format: html
     <p>本规范<strong>不新增任何全局状态</strong>。对照主规范 <a href="/documentation/specification/protocol-core/global-state-machine.html#s-1711">17.1.1 状态枚举</a>：</p>
     <ul>
       <li>Listing 状态机（M3.3）、Shipment 状态机（M7.3）、Acceptance 状态机（M6.3）均为<strong>资源级/原语内部状态</strong>，与 <code>trade_context_id</code>/<code>transaction_id</code> 两个作用域并列存在第三个作用域：<strong>资源作用域（resource scope）</strong>，以 <code>listing_id</code>/<code>shipment_id</code> 等资源标识为生命周期锚点。</li>
-      <li>MP 原语的执行结果只能通过主规范已定义的机制影响全局状态：MP4 的受理结论完成 13.2.3 的"卖方承诺处理"，驱动 <code>SIGNING → PURCHASED</code> 原子迁移；MP5 的发货事实经 <code>fulfill.notify</code> 驱动买方可观测状态机。符合主规范 17.0.1 "Binding Terms、商家内部字段、任意 output 字段和 Evidence 内容不得成为公共迁移条件；这些业务条件必须先由对应原语处理，并通过 P0 标准 Action Response 表达"的约束。</li>
+      <li>MP 原语<strong>不参与买方侧 DAG 的节点生成</strong>：路径编排（主规范 <a href="/documentation/specification/protocol-core/path-orchestration.html">第 18 章</a>，<code>primitive_dag_skeleton</code>）只编排买方侧 P1—P6；MP 原语是 DAG 节点执行时在供应商侧被触发的对偶动作（订单路由、询盘路由）或供应商自主发起的供给侧动作（发品、库存），因此 MUST NOT 出现在 DAG 骨架中。MP 原语的执行结果只能通过主规范已定义的机制影响全局状态：MP4 的受理结论完成 13.2.3 的"卖方承诺处理"，驱动 <code>SIGNING → PURCHASED</code> 原子迁移；MP5 的发货事实经 <code>fulfill.notify</code> 驱动买方可观测状态机。符合主规范 17.0.1 "Binding Terms、商家内部字段、任意 output 字段和 Evidence 内容不得成为公共迁移条件；这些业务条件必须先由对应原语处理，并通过 P0 标准 Action Response 表达"的约束。</li>
     </ul>
 
     <h2 id="s-m110">M1.10 通用规则继承（Commons Inheritance）</h2>
@@ -192,6 +192,6 @@ format: html
       <li><strong>操作准入：</strong>Marketplace 处理 MP 写操作前 MUST 按主规范<a href="/documentation/specification/protocol-core/security-trust.html#s-5-trust-profile">第 5 章</a> 5.1 节完成操作准入判定，判定顺序与失败语义同主规范；认证与授权失败 MUST 使用全局错误码（<code>UTP.AUTH_UNAUTHORIZED</code> / <code>UTP.AUTH_FORBIDDEN</code>，10.4.2）。Merchant Agent 代理操作时的 Mandate 要求见 M10.4。</li>
       <li><strong>幂等：</strong>全部写操作 MUST 携带 <code>idempotency_key</code>；重复请求 MUST 返回首次执行的缓存结果。幂等键 MUST 保留不短于 24 小时；同一键携带不同请求体 MUST 返回冲突错误（HTTP 409，不执行）。</li>
       <li><strong>错误响应：</strong>使用主规范 10.4.3 标准错误响应格式；本规范错误码统一登记在<a href="appendices.html#s-mb">附录 MB</a>。</li>
-      <li><strong>响应自描述：</strong>响应 MUST 携带 <code>valid_next_actions</code>，元素 MUST 为全限定 Action 名（如 <code>utp.acceptance.query</code>；Schema 约束见 <code>primitives/common/valid_next_actions.json</code>）。列表操作的分页 MUST 使用游标语义（<code>cursor</code>/<code>limit</code>，<code>primitives/common/pagination.json</code>）。</li>
+      <li><strong>响应自描述：</strong>遵循主规范 <a href="/documentation/specification/protocol-core/agent-friendly-interface.html">第 19 章</a> 自描述响应原则（19.1）：响应 MUST 携带 <code>valid_next_actions</code>，元素 MUST 为全限定 Action 名（如 <code>utp.acceptance.query</code>；Schema 约束见 <code>primitives/common/valid_next_actions.json</code>）。列表操作的分页 MUST 使用游标语义（<code>cursor</code>/<code>limit</code>，<code>primitives/common/pagination.json</code>）。</li>
       <li><strong>传输绑定支持要求：</strong>MP 原语的 REST Binding 为 MUST（基线，所有 Marketplace 必须提供）；MCP / A2A Binding 为 MAY（面向 Agent 原生接入）；Embedded SDK Binding 不适用于供应商侧（无对应场景，不定义）。供应商只需实现 REST 客户端 + 回调接收端即可完整接入。</li>
     </ul>

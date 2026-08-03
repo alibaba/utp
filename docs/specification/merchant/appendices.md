@@ -48,10 +48,10 @@ format: html
     <table>
       <thead><tr><th>错误码空间</th><th>数量</th><th>定义位置</th><th>代表条目</th></tr></thead>
       <tbody>
-        <tr><td><code>LISTING.*</code></td><td>15</td><td><a href="primitive-listing.html#s-m33">M3.3</a></td><td><code>LISTING.PUBLISH.MERCHANT_NOT_ACTIVE</code>、<code>LISTING.PUBLISH.INGEST_FAILED</code>、<code>LISTING.UPDATE.VERSION_CONFLICT</code>、<code>LISTING.LIST.NOT_REVIEWED</code>、<code>LISTING.ARCHIVE.OPEN_ORDERS</code></td></tr>
-        <tr><td><code>INVENTORY.*</code></td><td>7</td><td><a href="primitive-inventory.html#s-m43">M4.3</a></td><td><code>INVENTORY.REVISION_CONFLICT</code>、<code>INVENTORY.NEGATIVE_RESULT</code>、<code>INVENTORY.HOLD_NOT_FOUND</code></td></tr>
-        <tr><td><code>ACCEPTANCE.*</code></td><td>8</td><td><a href="primitive-acceptance.html#s-m63">M6.3</a></td><td><code>ACCEPTANCE.EXPIRED</code>、<code>ACCEPTANCE.SIGNATURE_INVALID</code>、<code>ACCEPTANCE.AMEND.OUT_OF_RANGE</code></td></tr>
-        <tr><td><code>SHIPMENT.*</code></td><td>8</td><td><a href="primitive-shipment.html#s-m73">M7.3</a></td><td><code>SHIPMENT.PAYMENT_PRECONDITION</code>、<code>SHIPMENT.QUANTITY_MISMATCH</code>、<code>SHIPMENT.SPLIT_NOT_ALLOWED</code></td></tr>
+        <tr><td><code>LISTING.*</code></td><td>15</td><td><a href="primitives/listing/index.html#s-m33">M3.3</a></td><td><code>LISTING.PUBLISH.MERCHANT_NOT_ACTIVE</code>、<code>LISTING.PUBLISH.INGEST_FAILED</code>、<code>LISTING.UPDATE.VERSION_CONFLICT</code>、<code>LISTING.LIST.NOT_REVIEWED</code>、<code>LISTING.ARCHIVE.OPEN_ORDERS</code></td></tr>
+        <tr><td><code>INVENTORY.*</code></td><td>7</td><td><a href="primitives/inventory/index.html#s-m43">M4.3</a></td><td><code>INVENTORY.REVISION_CONFLICT</code>、<code>INVENTORY.NEGATIVE_RESULT</code>、<code>INVENTORY.HOLD_NOT_FOUND</code></td></tr>
+        <tr><td><code>ACCEPTANCE.*</code></td><td>8</td><td><a href="primitives/acceptance/index.html#s-m63">M6.3</a></td><td><code>ACCEPTANCE.EXPIRED</code>、<code>ACCEPTANCE.SIGNATURE_INVALID</code>、<code>ACCEPTANCE.AMEND.OUT_OF_RANGE</code></td></tr>
+        <tr><td><code>SHIPMENT.*</code></td><td>8</td><td><a href="primitives/shipment/index.html#s-m73">M7.3</a></td><td><code>SHIPMENT.PAYMENT_PRECONDITION</code>、<code>SHIPMENT.QUANTITY_MISMATCH</code>、<code>SHIPMENT.SPLIT_NOT_ALLOWED</code></td></tr>
         <tr><td><code>SETTLEMENT.*</code></td><td>5</td><td><a href="settlement.html#s-m87">M8.7</a></td><td><code>SETTLEMENT.DISCREPANCY_WINDOW_CLOSED</code>、<code>SETTLEMENT.STATEMENT_NOT_FOUND</code></td></tr>
       </tbody>
     </table>
