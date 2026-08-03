@@ -116,7 +116,7 @@
   "state_machine": {
     "scope": "resource",
     "resource_key": "inquiry_id",
-    "description": "应答任务状态机（M5.2）。资源键 inquiry_id：主线协商 RELEASED 后买方重新 inquiry 会产生新的 inquiry_id，因此本原语终态不可逆不妨碍协商重启（新询盘 = 新任务）。多轮议价 = QUOTED ⇄ BUYER_COUNTERED 循环，round_no 单调递增；轮次上限由主线 P2 引擎执行（拒绝超限的 counter_offer 并返回 NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS），本原语不因轮次超限产生迁移。超时缺省 auto_decline（不存在 auto_accept）。终态后写操作 MUST 返回 QUOTE.STATE_CONFLICT。",
+    "description": "应答任务状态机（M5.2）。资源键 inquiry_id：主线协商 RELEASED 后买方重新 inquiry 会产生新的 inquiry_id，因此本原语终态不可逆不妨碍协商重启（新询盘 = 新任务）。多轮议价 = QUOTED ⇄ BUYER_COUNTERED 循环，round_no 单调递增；轮次上限由主线 P2 引擎执行（拒绝超限的 counter-offer 并返回 NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS），本原语不因轮次超限产生迁移。超时缺省 auto_decline（不存在 auto_accept）。终态后写操作 MUST 返回 QUOTE.STATE_CONFLICT。",
     "initial_state": "INQUIRY_PENDING",
     "states": {
       "INQUIRY_PENDING": {

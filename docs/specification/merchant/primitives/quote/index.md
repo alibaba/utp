@@ -109,7 +109,7 @@ service:        dev.utp.merchant
         <tr><td><code>EXPIRED</code></td><td>报价失效（终态）</td><td><code>valid_until</code> 到期买方未接受；或询盘撤回</td><td><code>query</code>（只读）</td></tr>
       </tbody>
     </table>
-    <p><strong>确定性约束：</strong>终态到达后任何写操作 MUST 返回 <code>QUOTE.STATE_CONFLICT</code>（幂等重放同一 <code>idempotency_key</code> 除外）。多轮议价 = <code>QUOTED ⇄ BUYER_COUNTERED</code> 循环，轮次 <code>round_no</code> 单调递增；<strong>轮次上限由主规范 P2 引擎执行</strong>（拒绝超限的买方 <code>counter_offer</code> 并返回 <code>NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS</code>，协商停留 <code>QUOTED</code>），本原语不因轮次超限产生迁移。各状态与主规范 P2 协商状态的对应见 <a href="#s-m562">M5.6.2</a>。</p>
+    <p><strong>确定性约束：</strong>终态到达后任何写操作 MUST 返回 <code>QUOTE.STATE_CONFLICT</code>（幂等重放同一 <code>idempotency_key</code> 除外）。多轮议价 = <code>QUOTED ⇄ BUYER_COUNTERED</code> 循环，轮次 <code>round_no</code> 单调递增；<strong>轮次上限由主规范 P2 引擎执行</strong>（拒绝超限的买方 <code>counter-offer</code> 并返回 <code>NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS</code>，协商停留 <code>QUOTED</code>），本原语不因轮次超限产生迁移。各状态与主规范 P2 协商状态的对应见 <a href="#s-m562">M5.6.2</a>。</p>
 
     <hr />
     <h2 id="s-m53">M5.3 Error Handling（错误处理）</h2>
@@ -180,7 +180,7 @@ service:        dev.utp.merchant
       <tbody>
         <tr><td><code>INQUIRY_PENDING</code></td><td><code>INQUIRED</code></td><td>询盘已提交、等待供应商报价。</td></tr>
         <tr><td><code>QUOTED</code></td><td><code>QUOTED</code></td><td>报价已交付买方（两跳完成）。</td></tr>
-        <tr><td><code>BUYER_COUNTERED</code></td><td><code>COUNTERED</code></td><td>买方经 <code>utp.negotiate.counter_offer</code> 还价。</td></tr>
+        <tr><td><code>BUYER_COUNTERED</code></td><td><code>COUNTERED</code></td><td>买方经 <code>utp.negotiate.counter-offer</code> 还价。</td></tr>
         <tr><td><code>BOUND</code>（终）</td><td><code>BOUND</code></td><td>买方经 <code>utp.negotiate.binding</code> 绑定条款，全局状态迁移至 PURCHASING。</td></tr>
         <tr><td><code>DECLINED</code> / <code>EXPIRED</code>（终）</td><td><code>RELEASED</code></td><td>协商失败、超时或买方退出。</td></tr>
       </tbody>
@@ -190,7 +190,7 @@ service:        dev.utp.merchant
     <ol>
       <li><strong>条款绑定是 P2 的权威职责。</strong>买方在 <code>quote.validity</code> 内接受报价后，由 P2 执行绑定核查并产出 <code>terms_hash</code> 与 NegotiationResult（主规范 3.7），随后进入 P3 订购；本原语 MUST NOT 自行宣称绑定成立。</li>
       <li><strong>签名与哈希同源。</strong>本原语 <code>quote</code> 的签名覆盖主规范 <code>Quote.terms_hash</code>（计算规则见 M5.10.1.1）。绑定后 MP4 <code>accept</code> 的签名覆盖订购 <code>terms_hash</code>，二者构成完整价格证据链；<strong>MP4 <code>accept</code> MUST NOT 偏离已绑定条款</strong>。</li>
-      <li><strong>轮次上限由 P2 引擎执行。</strong>会话锁定轮次约束时，超限的买方 <code>counter_offer</code> 由 P2 引擎拒绝并返回 <code>NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS</code>，协商停留在 <code>QUOTED</code>；<strong>本原语不因轮次超限产生迁移，供应商无需为此 <code>decline</code></strong>。</li>
+      <li><strong>轮次上限由 P2 引擎执行。</strong>会话锁定轮次约束时，超限的买方 <code>counter-offer</code> 由 P2 引擎拒绝并返回 <code>NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS</code>，协商停留在 <code>QUOTED</code>；<strong>本原语不因轮次超限产生迁移，供应商无需为此 <code>decline</code></strong>。</li>
       <li><strong>报价修订的第二跳表达。</strong><code>revise</code> 产生新版本后，Marketplace MUST 以新的 <code>utp.negotiate.quote</code> 交付修订报价，主规范协商状态停留 <code>QUOTED</code>。主规范状态机当前未定义 <code>QUOTED</code> 自环，该表达已登记为跨规范协调项（附录 ME）。</li>
       <li><strong>L3 竞价的分支独立性。</strong>多供应商竞价时各报价分支相互独立（主规范 P2 约束），买方 <code>binding</code> 只能选择其中一个分支；未被选中的分支收敛为 <code>EXPIRED</code>。</li>
     </ol>
