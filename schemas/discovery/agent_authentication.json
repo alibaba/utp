@@ -44,8 +44,9 @@
         "type": {
           "type": "string",
           "enum": [
-            "mtls",
             "api_keys",
+            "mtls",
+            "oauth2_client_credentials",
             "http_message_signatures",
             "wimse"
           ],

@@ -161,9 +161,9 @@ format: html
 
 <p>Agent Authentication 声明 Profile 发布方作为响应方时接受的、请求方 Agent 用以证明自身身份的 API 认证机制。Profile 发布方通过 <code>agent_authentication</code> 配置块声明这些机制。</p>
 
-<p>响应方 SHOULD 对调用其 API 的请求方 Agent 进行认证，以防止冒充、凭证重放与消息内容被篡改。UTP 的 Profile 声明支持四类 Agent Authentication 机制：<code>mtls</code> 表示基于客户端证书的双向 TLS；<code>api_keys</code> 表示带外交换的预共享密钥；<code>http_message_signatures</code> 表示按 RFC 9421 对 HTTP 消息进行签名；<code>wimse</code> 表示基于 WIMSE（Workload Identity in Multi-System Environments）的 workload identity 凭证与请求级 proof token。OAuth 相关的终端用户授权入口只在 <code>user_authorization</code> 中声明，MUST NOT 作为 Agent Authentication 机制类型表达。</p>
+<p>响应方 SHOULD 对调用其 API 的请求方 Agent 进行认证，以防止冒充、凭证重放与消息内容被篡改。UTP 的 Profile 声明支持五类 Agent Authentication 机制：<code>api_keys</code> 表示带外交换的预共享密钥；<code>mtls</code> 表示基于客户端证书的双向 TLS；<code>oauth2_client_credentials</code> 表示 OAuth 2.0 Client Credentials 机器到机器认证；<code>http_message_signatures</code> 表示按 RFC 9421 对 HTTP 消息进行签名；<code>wimse</code> 表示基于 WIMSE（Workload Identity in Multi-System Environments）的 workload identity 凭证与请求级 proof token。OAuth Authorization Code、Device Authorization 等终端用户授权入口只在 <code>user_authorization</code> 中声明，MUST NOT 作为 Agent Authentication 机制类型表达。</p>
 
-<p>这些机制的信任建立方式不同。<code>api_keys</code>、<code>mtls</code> 通常需要事先交换凭证或建立 CA 信任关系，因此隐含预建立业务关系；<code>http_message_signatures</code> 可通过 Profile/JWKS 中公开声明的签名公钥完成验证，在 Profile 签名链可信时支持较低预协调的接入；<code>wimse</code> 在 Profile 声明 workload 标识方案后，由对应 issuer、Trust Anchor 与运行时凭证完成动态 workload 认证，适合高安全要求和云原生部署。</p>
+<p>这些机制的信任建立方式不同。<code>api_keys</code> 和 <code>mtls</code> 通常需要预先分发凭证或建立 CA 信任关系；<code>oauth2_client_credentials</code> 由 Authorization Server 为已注册 Agent Client 签发短寿命机器 Access Token；<code>http_message_signatures</code> 通过 Profile/JWKS 公钥验证请求签名；<code>wimse</code> 由 workload identity issuer、Trust Anchor 与运行时 proof token 完成动态 workload 认证。</p>
 
 <p><strong>AgentAuthenticationConfig 实体定义：</strong></p>
 <table>
@@ -212,13 +212,13 @@ format: html
 <td><code>type</code></td>
 <td>enum</td>
 <td>是</td>
-<td>机制类型。有效值：<code>"mtls"</code>、<code>"api_keys"</code>、<code>"http_message_signatures"</code>、<code>"wimse"</code>。</td>
+<td>机制类型。有效值：<code>"api_keys"</code>、<code>"mtls"</code>、<code>"oauth2_client_credentials"</code>、<code>"http_message_signatures"</code>、<code>"wimse"</code>。</td>
 </tr>
 <tr>
 <td><code>issuer</code></td>
 <td>string</td>
 <td>条件</td>
-<td>凭证签发方标识。<code>type="mtls"</code> 时为受信任 CA issuer；<code>type="api_keys"</code> 时为 key 发行方；<code>type="http_message_signatures"</code> 时为签名密钥发布方；<code>type="wimse"</code> 时为 workload identity issuer 或 Agent Identity Server（AIS）。除具备跨域信任锚背书外，issuer MUST 与 <code>agent_id</code> 同属一个 trust domain。跨域信任锚背书的登记与查证机制见<a href="identity-authorization.md#s-651">第 6 章 6.5.1 节</a>。</td>
+<td>凭证签发方标识。<code>type="api_keys"</code> 时为 key 发行方；<code>type="mtls"</code> 时为受信任 CA issuer；<code>type="oauth2_client_credentials"</code> 时为 OAuth Authorization Server issuer；<code>type="http_message_signatures"</code> 时为签名密钥发布方；<code>type="wimse"</code> 时为 workload identity issuer 或 Agent Identity Server（AIS）。除具备跨域信任锚背书外，issuer MUST 与 <code>agent_id</code> 同属一个 trust domain。跨域信任锚背书的登记与查证机制见<a href="identity-authorization.md#s-651">第 6 章 6.5.1 节</a>。</td>
 </tr>
 <tr>
 <td><code>config</code></td>
@@ -229,13 +229,13 @@ format: html
 </tbody>
 </table>
 
-<p><strong>AgentAuthenticationMechanism.config 按 type 的结构：</strong></p>
+<p><strong>AgentAuthenticationMechanism.config 按 type 的最小提示：</strong></p>
+<p><code>config</code> 是开放式机制配置 map，只用于声明 Profile 层可安全公开的发现入口或信任提示。完整密钥材料、客户端注册细节、secret、授权策略、scope 判定与运行时挑战 MUST 由对应机制、Authorization Server metadata、Trust Anchor 或带外治理流程提供，MUST NOT 强行内联到 Profile。</p>
 <table>
 <thead>
 <tr>
 <th>type</th>
-<th>config 字段</th>
-<th>必填</th>
+<th>典型 config 提示</th>
 <th>描述</th>
 </tr>
 </thead>
@@ -243,44 +243,27 @@ format: html
 <tr>
 <td><code>api_keys</code></td>
 <td><code>key_distribution</code></td>
-<td>是</td>
-<td>key 分发方式，如 <code>"out_of_band"</code>。API Key 属于预共享密钥机制，适用于沙箱、内部或低风险调用。涉及资金、授权、受限数据或状态迁移的操作 SHOULD 使用请求级签名、mTLS、WIMSE 或等价的强认证机制，MUST NOT 仅依赖静态 API Key。</td>
+<td>仅声明 key 分发方式或使用约定，如 <code>"out_of_band"</code>。不得在 Profile 中公开 API Key；涉及资金、授权、受限数据或状态迁移的操作 MUST NOT 仅依赖静态 API Key。</td>
 </tr>
 <tr>
 <td><code>mtls</code></td>
-<td><code>ca_issuer</code></td>
-<td>是</td>
-<td>受信任 CA 的 issuer 或证书分发地址。</td>
+<td><code>ca_issuer</code> / <code>trust_anchor_endpoint</code></td>
+<td>声明可用于证书链验证的 CA issuer 或受背书信任锚发现入口。证书准入、吊销、新鲜度与 federation 细节由运行时信任策略处理。</td>
 </tr>
 <tr>
-<td><code>mtls</code></td>
-<td><code>trust_anchor_endpoint</code></td>
-<td>否</td>
-<td>指向受背书信任锚集合的获取端点（HTTPS URL）；返回内容的格式由实现方与治理域约定，本规范不作约束。声明后，接收方在证书链无法于本地 <code>ca_issuer</code> 下验证时 MAY 从该端点获取受背书信任锚重试；未声明时行为与现状一致。参见<a href="identity-authorization.md#s-651">第 6 章 6.5.1 节</a>。</td>
+<td><code>oauth2_client_credentials</code></td>
+<td><code>metadata_endpoint</code> / <code>issuer</code></td>
+<td>声明 OAuth Authorization Server 的发现入口或 issuer。token endpoint、JWKS、客户端认证方式、scope 与 token 绑定能力 SHOULD 从 RFC 8414 metadata 或双方注册关系中获取。</td>
 </tr>
 <tr>
 <td><code>http_message_signatures</code></td>
 <td><code>jwks_uri</code></td>
-<td>是</td>
-<td>签名公钥 JWKS 端点（RFC 7517），用于动态拉取当前有效公钥。</td>
-</tr>
-<tr>
-<td><code>http_message_signatures</code></td>
-<td><code>profile</code></td>
-<td>否</td>
-<td>支持的签名 profile 列表，如 <code>["rsa-v1", "ecdsa-v1"]</code>。</td>
-</tr>
-<tr>
-<td><code>http_message_signatures</code></td>
-<td><code>key_protection</code></td>
-<td>否</td>
-<td>私钥保护方式，供实现方本地策略判断认证机制强度。有效值：<code>"software"</code>、<code>"os-keystore"</code>、<code>"tee"</code>、<code>"hsm"</code>；默认 <code>"software"</code>。</td>
+<td>声明签名公钥发现入口；若 Profile 已通过 <code>signing_keys</code> 或等价 Trust Anchor 暴露公钥，可省略该提示。具体签名覆盖字段、算法选择、时间窗与防重放规则由请求的 <code>Signature-Input</code>、传输章节和运行时策略约束。</td>
 </tr>
 <tr>
 <td><code>wimse</code></td>
-<td><code>workload_identifier_scheme</code></td>
-<td>是</td>
-<td>workload 标识方案，如 <code>"spiffe"</code>、<code>"dns"</code>、<code>"urn"</code> 或 <code>"did"</code>。</td>
+<td><code>workload_identifier_scheme</code> / <code>issuer</code></td>
+<td>声明 workload 标识方案或 issuer 提示。WIT/WIC/WPT 的签发、绑定、证明字段和撤销检查由 WIMSE issuer、Trust Anchor 与运行时验证流程完成。</td>
 </tr>
 </tbody>
 </table>
@@ -424,7 +407,7 @@ format: html
 </thead>
 <tbody>
 <tr><td>Profile 验证结果</td><td>第 3 章 Profile、Registry、Trust Anchor</td><td>确认 <code>agent_id</code>、签名公钥、issuer、trust domain 与撤销状态</td><td>绑定 Participant 身份、Profile 摘要与后续验签材料</td></tr>
-<tr><td>Agent Authentication 选择</td><td>双方 <code>agent_authentication.supported_mechanisms</code> 的交集</td><td>确认请求方 workload 可用哪种机制证明自身身份</td><td>每次请求验证 mTLS、HTTP Message Signatures、WIMSE WIT/WPT 或等价凭证</td></tr>
+<tr><td>Agent Authentication 选择</td><td>双方 <code>agent_authentication.supported_mechanisms</code> 的交集</td><td>确认请求方 workload 可用哪种机制证明自身身份</td><td>每次请求验证 API Key、mTLS、OAuth Client Credentials token、HTTP Message Signatures、WIMSE WIT/WPT 或等价凭证</td></tr>
 <tr><td>User Authorization 入口</td><td>资源提供方 <code>user_authorization.supported_mechanisms</code></td><td>确认需要代表用户访问资源时应从哪个 Authorization Server 获取授权</td><td>发现 OAuth metadata，获取并校验 Access Token、issuer 与 scope</td></tr>
 <tr><td>Mandate 能力边界</td><td>双方 <code>mandates.supported_mandate_types</code> 与第 6 章 Mandate Chain</td><td>确认双方是否支持目标操作所需的 Checkout、Payment 或 Operation Mandate</td><td>在下单、支付、验收、退款、取消等操作前校验 Mandate Chain</td></tr>
 <tr><td>操作准入条件</td><td>原语定义、Mode、会话协商、运行时授权挑战或本地策略</td><td>明确本次 action 需要哪些认证、授权、Mandate、人类确认与证据</td><td>按 5.1.2 的顺序执行准入判定，并将结果写入 Authorization Decision</td></tr>
@@ -848,9 +831,7 @@ format: html
         "type": "http_message_signatures",
         "issuer": "https://agent.supplier.example.com",
         "config": {
-          "jwks_uri": "https://agent.supplier.example.com/.well-known/jwks.json",
-          "profile": ["rsa-v1", "ecdsa-v1"],
-          "key_protection": "os-keystore"
+          "jwks_uri": "https://agent.supplier.example.com/.well-known/jwks.json"
         }
       },
       {
