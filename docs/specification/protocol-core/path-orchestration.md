@@ -98,39 +98,15 @@ Source → Negotiate → Purchase → Pay → Fulfill
 
 ### 运行期执行 DAG 示例
 
-`execution_dag` 是本地执行快照，不是协议网络实体；它记录生成后的 `mode`、节点、角色方向、结构依赖和协商服务目录。状态机和后续请求均使用其中冻结的 `mode`，而不是重新选择 Mode。
+`execution_dag` 是路径编排生成的本地执行快照。它记录生成后的 `mode`、上游结果引用、入口节点、Primitive 节点、节点角色、节点 Domain、节点 Service 引用、主路径依赖边和异常依赖边。状态机和后续请求均使用其中冻结的 `mode`。
 
-```text
-execution_dag
-├─ dag_id
-├─ mode                         # DAG 生成阶段选择的六维确定值
-├─ topology_ref
-├─ negotiation_ref
-├─ service_catalogs[]
-├─ nodes[]
-│  ├─ node_id
-│  ├─ primitive
-│  ├─ actions[]
-│  ├─ initiator_role
-│  └─ handler_role
-├─ edges[]
-└─ entry_node_ids[]
-```
-
-| 字段 | 说明 |
-| --- | --- |
-| `dag_id` | 本次 DAG 的本地标识。 |
-| `mode` | 由关系级 `common_mode_range` 交集按最低兼容级生成的完整六维 Mode。 |
-| `topology_ref`、`negotiation_ref` | 生成该图所依据的商业拓扑和协商结果快照。 |
-| `service_catalogs` | 唯一 `NegotiationResult.service_catalogs` 的完整原样快照；可携带端点声明，但不代表已选定服务或端点。 |
-| `nodes` | 原语、允许的 Action 和唯一角色方向；节点不得保存 `selected_service_id`、`endpoint` 或具体传输绑定。 |
-| `edges`、`entry_node_ids` | 原语节点之间的结构依赖与入口节点。 |
-
-以下示例展示未加入 `Negotiate` 的压缩主链。节点只表达业务原语及角色，通信层在请求时才解析实际投递方式。
+以下示例展示未加入 `Negotiate` 的压缩主链，并在异常条件下保留进入 `Resolve` 的依赖边。
 
 ```json
 {
-  "dag_id": "dag-20260731-001",
+  "schema_version": "0.5.0",
+  "kind": "utp.execution_dag",
+  "dag_id": "dag-20260804-001",
   "mode": {
     "pricing_mode": "L0",
     "decision_path": "L0",
@@ -142,17 +118,141 @@ execution_dag
   "topology_ref": "commerce_topology:topology-001",
   "negotiation_result_ref": "NegotiationResult:negotiation-001",
   "profile_interaction_result_ref": "profile_interaction_result:pir-001",
+  "service_catalogs": [
+    {
+      "service_ref": "service_catalog:seller.source",
+      "service_domain": "seller.example.com",
+      "handler_role": "Seller"
+    },
+    {
+      "service_ref": "service_catalog:seller.purchase",
+      "service_domain": "seller.example.com",
+      "handler_role": "Seller"
+    },
+    {
+      "service_ref": "service_catalog:pay.processor",
+      "service_domain": "pay.example.com",
+      "handler_role": "PaymentProcessor"
+    },
+    {
+      "service_ref": "service_catalog:seller.fulfill",
+      "service_domain": "seller.example.com",
+      "handler_role": "Seller"
+    },
+    {
+      "service_ref": "service_catalog:arbiter.resolve",
+      "service_domain": "arbiter.example.com",
+      "handler_role": "Arbiter"
+    }
+  ],
   "entry_node_ids": ["P1"],
   "nodes": [
-    { "node_id": "P1", "primitive": "utp.source", "actions": ["utp.source.search"], "initiator_role": "Buyer", "handler_role": "Seller" },
-    { "node_id": "P3", "primitive": "utp.purchase", "actions": ["utp.purchase.create"], "initiator_role": "Buyer", "handler_role": "Seller" },
-    { "node_id": "P4", "primitive": "utp.pay", "actions": ["utp.pay.initiate"], "initiator_role": "Buyer", "handler_role": "PaymentProcessor" },
-    { "node_id": "P5", "primitive": "utp.fulfill", "actions": ["utp.fulfill.receive"], "initiator_role": "Seller", "handler_role": "Buyer" }
+    {
+      "node_id": "P1",
+      "primitive": "utp.source",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "initiator_domain": "buyer.example.com",
+      "handler_domain": "seller.example.com",
+      "services": [
+        {
+          "service_ref": "service_catalog:seller.source",
+          "service_domain": "seller.example.com"
+        }
+      ],
+      "actions": [
+        "utp.source.search",
+        "utp.source.lookup"
+      ]
+    },
+    {
+      "node_id": "P3",
+      "primitive": "utp.purchase",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "initiator_domain": "buyer.example.com",
+      "handler_domain": "seller.example.com",
+      "services": [
+        {
+          "service_ref": "service_catalog:seller.purchase",
+          "service_domain": "seller.example.com"
+        }
+      ],
+      "actions": [
+        "utp.purchase.create",
+        "utp.purchase.update",
+        "utp.purchase.complete"
+      ]
+    },
+    {
+      "node_id": "P4",
+      "primitive": "utp.pay",
+      "initiator_role": "Payer",
+      "handler_role": "PaymentProcessor",
+      "initiator_domain": "payer.example.com",
+      "handler_domain": "pay.example.com",
+      "services": [
+        {
+          "service_ref": "service_catalog:pay.processor",
+          "service_domain": "pay.example.com"
+        }
+      ],
+      "actions": [
+        "utp.pay.initiate",
+        "utp.pay.query"
+      ]
+    },
+    {
+      "node_id": "P5",
+      "primitive": "utp.fulfill",
+      "initiator_role": "Buyer",
+      "handler_role": "Seller",
+      "initiator_domain": "buyer.example.com",
+      "handler_domain": "seller.example.com",
+      "services": [
+        {
+          "service_ref": "service_catalog:seller.fulfill",
+          "service_domain": "seller.example.com"
+        }
+      ],
+      "actions": [
+        "utp.fulfill.query",
+        "utp.fulfill.receive"
+      ]
+    },
+    {
+      "node_id": "P6",
+      "primitive": "utp.resolve",
+      "initiator_role": "Buyer",
+      "handler_role": "Arbiter",
+      "initiator_domain": "buyer.example.com",
+      "handler_domain": "arbiter.example.com",
+      "services": [
+        {
+          "service_ref": "service_catalog:arbiter.resolve",
+          "service_domain": "arbiter.example.com"
+        }
+      ],
+      "actions": [
+        "utp.resolve.raise",
+        "utp.resolve.mediate",
+        "utp.resolve.arbitrate"
+      ]
+    }
   ],
   "edges": [
-    { "from_node_id": "P1", "to_node_id": "P3" },
-    { "from_node_id": "P3", "to_node_id": "P4" },
-    { "from_node_id": "P4", "to_node_id": "P5" }
+    {
+      "from_node_id": "P1",
+      "to_node_id": "P3"
+    },
+    {
+      "from_node_id": "P3",
+      "to_node_id": "P4"
+    },
+    {
+      "from_node_id": "P4",
+      "to_node_id": "P5"
+    }
   ],
   "exception_edges": [
     {
@@ -185,11 +285,15 @@ execution_dag
 | --- | --- |
 | `schema_version` | `execution_dag` 结构版本。 |
 | `kind` | 对象类型，固定表示该对象为运行期 DAG。 |
-| `dag_id` | 此次编排生成的 DAG 标识。 |
-| `selected_mode` | 本次采购模式六元组的已锁定取值。 |
+| `dag_id` | 本次 DAG 的本地标识。 |
+| `mode` | 由关系级 `common_mode_range` 交集按最低兼容级生成的完整六维 Mode。 |
 | `topology_ref` | 生成该图所依据的商业拓扑引用。 |
 | `negotiation_result_ref` | 生成该图所依据的协商结果引用。 |
 | `profile_interaction_result_ref` | 生成该图所依据的 Profile 交互结果引用。 |
+| `service_catalogs` | 唯一 `NegotiationResult.service_catalogs` 的服务目录快照。 |
+| `service_catalogs[].service_ref` | 服务目录中的 Service 引用。 |
+| `service_catalogs[].service_domain` | 该 Service 所属或承接的 Domain。 |
+| `service_catalogs[].handler_role` | 该 Service 承接的处理方角色。 |
 | `entry_node_ids` | 可开始执行的入口节点；主链入口为 `Source`。 |
 | `nodes` | 本次 DAG 中的 Primitive 节点列表。 |
 | `nodes[].node_id` | 节点在本次 DAG 中的唯一标识。 |
@@ -211,7 +315,6 @@ execution_dag
 | `exception_edges[].condition` | 激活该异常依赖边的条件。 |
 
 通信层应使用节点中的 `handler_role`、`handler_domain`、`services` 与目标 Action 的传输绑定，在每一次请求时确定可用的 Service、Endpoint 和传输方式。
-通信层使用 `execution_dag.service_catalogs`、节点的 `handler_role` 与目标 Action 的传输绑定，在每次请求时确定可用的 Service、Endpoint 和传输方式；该决定不回写 DAG，也不改变其服务目录快照。
 
 ## 状态机初始化 {#s-184}
 
