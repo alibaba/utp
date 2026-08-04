@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "statement_issued_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/statement_issued_payload.json",
   "version": "2026-07-30",
   "title": "StatementIssuedPayload",
   "description": "结算账单出具通知（M8.4）。明细经 settlement.statement.detail 拉取。",

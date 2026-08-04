@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "fulfillment_terms.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/fulfillment_terms.json",
   "version": "2026-07-01",
   "title": "FulfillmentTerms",
   "description": "FulfillmentTerms（M3.9.4）。",

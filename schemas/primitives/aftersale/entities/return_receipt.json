@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "return_receipt.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/return_receipt.json",
   "version": "2026-08-04",
   "title": "ReturnReceipt",
   "description": "退货收货与验货结论。Marketplace 据此决定退款金额。",

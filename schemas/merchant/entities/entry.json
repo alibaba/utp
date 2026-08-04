@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "entry.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/entry.json",
   "version": "2026-07-01",
   "title": "Entry",
   "description": "SettlementEntry（M8.6.2）：逐笔可追溯到交易与支付凭证。",

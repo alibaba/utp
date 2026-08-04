@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "state_change_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/state_change_input.json",
   "version": "2026-07-01",
   "title": "StateChangeInput",
   "description": "utp.listing.list / delist / archive 请求（幂等状态迁移）。",

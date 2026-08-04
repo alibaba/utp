@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "aftersale_refund_completed_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/aftersale_refund_completed_payload.json",
   "version": "2026-08-04",
   "title": "AftersaleRefundCompletedPayload",
   "description": "平台退款完成载荷。供应商据此冲销 ERP 应收，并核对结算调整项。",

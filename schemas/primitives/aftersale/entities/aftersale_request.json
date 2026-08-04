@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "aftersale_request.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/aftersale_request.json",
   "version": "2026-08-04",
   "title": "AftersaleRequest",
   "description": "买方售后请求，由 Marketplace 校验售后窗口与订单状态后路由至供应商。供应商 MUST 在 deadline 内给出处置结论。",

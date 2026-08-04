@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "quote_record.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/quote/entities/quote_record.json",
   "version": "2026-07-30",
   "title": "QuoteRecord",
   "description": "MP3 应答记录（utp-m M5.10.1）。报价内容以主线权威 Quote 实体承载，本实体只增加供应商侧任务状态、轮次/版本与审计维度；纳入协商 Evidence Bundle 供 P6 举证。",

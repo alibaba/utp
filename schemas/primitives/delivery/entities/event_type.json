@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "event_type.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/event_type.json",
   "version": "2026-07-01",
   "title": "EventType",
   "description": "履约补充事件类型（M7.9.3）。delay MUST 附 new_eta。",

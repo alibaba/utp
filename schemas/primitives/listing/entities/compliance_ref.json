@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "compliance_ref.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/compliance_ref.json",
   "version": "2026-07-01",
   "title": "ComplianceRef",
   "type": "object",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "adjust_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/adjust_input.json",
   "version": "2026-07-01",
   "title": "AdjustInput",
   "description": "utp.inventory.adjust：增量调整。",

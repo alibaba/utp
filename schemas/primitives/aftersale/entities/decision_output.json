@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "decision_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/decision_output.json",
   "version": "2026-08-04",
   "title": "AftersaleDecisionOutput",
   "description": "售后处置决策的统一响应（approve / reject 共用）。",

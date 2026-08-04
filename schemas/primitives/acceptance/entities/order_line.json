@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "order_line.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/order_line.json",
   "version": "2026-07-01",
   "title": "OrderLine",
   "type": "object",

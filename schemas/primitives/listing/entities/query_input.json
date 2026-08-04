@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "query_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/query_input.json",
   "version": "2026-07-01",
   "title": "QueryInput",
   "description": "utp.listing.query：单查（listing_id）、列表查询（filters + 分页）或批量任务结果轮询（batch_id，M3.7.2）。",

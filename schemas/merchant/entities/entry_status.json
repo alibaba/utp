@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "entry_status.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/entry_status.json",
   "version": "2026-07-01",
   "title": "EntryStatus",
   "description": "结算条目生命周期（M8.3）。",

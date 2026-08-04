@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "accept_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/accept_input.json",
   "version": "2026-07-01",
   "title": "AcceptInput",
   "description": "utp.acceptance.accept（M6.9.1）：接受订单并提交卖方签名。terms_hash MUST 与路由载荷一致。",

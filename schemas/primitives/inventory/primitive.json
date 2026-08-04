@@ -2,8 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json",
   "name": "utp.inventory",
-  "version": "2026-07-01",
-  "status": "release-candidate",
+  "version": "2026-07-31",
   "title": "MP2 Inventory Primitive Definition",
   "description": "库存管理原语定义文件（UTP-M M4）。声明操作、角色绑定、传输绑定与 InventoryHold 状态机投影。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/inventory.json。",
   "service": "dev.utp.merchant",
@@ -23,6 +22,14 @@
           "type": "rest",
           "method": "PUT",
           "path": "/utp/m/v1/inventory/{listing_id}/{sku_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.inventory.set"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.inventory.set"
         }
       ]
     },
@@ -41,6 +48,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/inventory/{listing_id}/{sku_id}/adjustments"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.inventory.adjust"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.inventory.adjust"
         }
       ]
     },
@@ -59,6 +74,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/m/v1/inventory"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.inventory.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.inventory.query"
         }
       ]
     },
@@ -77,6 +100,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/m/v1/inventory/holds"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.inventory.hold.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.inventory.hold.query"
         }
       ]
     },
@@ -95,6 +126,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/inventory/batch"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.inventory.batch"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.inventory.batch"
         }
       ]
     }
@@ -123,41 +162,43 @@
     "transitions": [
       {
         "from": null,
-        "event": "purchase.create",
+        "event": "purchase_created",
         "to": "HELD",
-        "by": "protocol_engine"
+        "condition": "主规范 purchase.create 创建临时库存占用（13.5.2）。"
       },
       {
         "from": null,
-        "event": "purchase.complete",
+        "event": "purchase_completed",
         "to": "LOCKED",
-        "by": "protocol_engine",
         "condition": "无先行 hold 时直接创建 LOCKED 记录"
       },
       {
         "from": "HELD",
-        "event": "purchase.complete",
-        "to": "LOCKED",
-        "by": "protocol_engine"
+        "event": "purchase_completed",
+        "to": "LOCKED"
       },
       {
         "from": "HELD",
-        "event": "ttl_expired | compensation",
+        "event": "ttl_expired",
         "to": "RELEASED",
-        "by": "protocol_engine",
-        "condition": "释放后 MUST 推送 hold_released 回调"
+        "condition": "hold TTL 到期自动释放；释放后 MUST 推送 hold_released 回调。"
+      },
+      {
+        "from": "HELD",
+        "event": "compensation",
+        "to": "RELEASED",
+        "condition": "P3 补偿链释放（13.3.2）；释放后 MUST 推送 hold_released 回调。"
       },
       {
         "from": "LOCKED",
-        "event": "shipment.ship 核销",
+        "event": "delivery_shipped",
         "to": "CONSUMED",
-        "by": "protocol_engine"
+        "condition": "MP5 utp.delivery.ship 确认后按实际交付数量核销（M4.7 核销映射）。"
       },
       {
         "from": "LOCKED",
         "event": "compensation",
         "to": "RELEASED",
-        "by": "protocol_engine",
         "condition": "P3 补偿链『释放已锁库存』（13.3.2）"
       }
     ]

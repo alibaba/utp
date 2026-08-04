@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "sku.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/sku.json",
   "version": "2026-07-01",
   "title": "Sku",
   "description": "ListingSku（M3.9.2）。买方侧 P1/P3 的 sku_id 与此同值。",

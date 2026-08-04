@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "adjustment.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/adjustment.json",
   "version": "2026-07-01",
   "title": "Adjustment",
   "description": "调整项：方向由 direction 表达（credit 增加应结 / debit 减少应结），amount 恒为非负 Money；MUST 引用裁决或退款凭证（M8.2.2 不变式 3）。",

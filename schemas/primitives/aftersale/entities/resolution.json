@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "resolution.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/resolution.json",
   "version": "2026-08-04",
   "title": "AftersaleResolution",
   "description": "售后处置方案。方案一旦成立即构成双方合意，退款执行与退货义务以此为准。",

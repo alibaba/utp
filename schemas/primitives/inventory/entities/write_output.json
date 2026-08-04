@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "write_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/write_output.json",
   "version": "2026-07-01",
   "title": "WriteOutput",
   "description": "set/adjust 的响应：返回最新数量视图。",

@@ -24,12 +24,12 @@ format: html
     <hr />
     <h2 id="s-m4-identity">原语身份</h2>
 <pre class="highlight"><code>primitive_id:   utp.inventory
-version:        2026-07-01
+version:        2026-07-31
 initiator_role: Seller
 handler_role:   Marketplace
 intent:         供应商维护商品可售数量，并与交易性占用（hold/lock）保持可核验一致
 state_delta:    inventory.available 数值变更（资源作用域，无独立状态机）
-actions:        set, adjust, query, hold.query
+actions:        set, adjust, query, hold.query, batch
 compensation:   adjust（反向调整）；交易性占用的释放由 P3 补偿链触发
 service:        dev.utp.merchant
 </code></pre>

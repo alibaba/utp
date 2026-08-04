@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "batch_publish_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/batch_publish_input.json",
   "version": "2026-07-01",
   "title": "BatchPublishInput",
   "description": "批量发布（M3.7.2）：单批 ≤ 500 条，整批共享幂等键，逐条独立成败。",

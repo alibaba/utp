@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "order_summary.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/order_summary.json",
   "version": "2026-07-01",
   "title": "OrderSummary",
   "description": "路由订单摘要（M6.7.1 order_summary）。",

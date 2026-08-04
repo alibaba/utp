@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "statement_list_input.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/statement_list_input.json",
   "version": "2026-07-01",
   "title": "StatementListInput",
   "description": "utp.pay.settlement.statement.list：按周期/状态筛选账单。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "query_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/query_input.json",
   "version": "2026-08-04",
   "title": "QueryInput",
   "description": "utp.aftersale.query：按售后单标识查询权威档案。",

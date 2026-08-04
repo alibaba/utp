@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "reject_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/reject_input.json",
   "version": "2026-07-01",
   "title": "RejectInput",
   "description": "utp.acceptance.reject：拒绝订单，触发 P3 补偿链。",

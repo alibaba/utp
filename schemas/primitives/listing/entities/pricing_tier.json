@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "pricing_tier.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/pricing_tier.json",
   "version": "2026-07-01",
   "title": "PricingTier",
   "type": "object",

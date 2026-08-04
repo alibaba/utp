@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "order_routing.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/order_routing.json",
   "version": "2026-07-01",
   "title": "OrderRouting",
   "description": "OrderRouting 事件载荷（M6.7.1）：Marketplace → Seller 路由的待受理订单。",

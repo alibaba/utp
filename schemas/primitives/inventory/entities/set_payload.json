@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "set_payload.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/set_payload.json",
   "version": "2026-07-01",
   "title": "SetPayload",
   "description": "set 操作业务载荷（不含幂等键；供单条请求与批量条目复用）。",

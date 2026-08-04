@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "event_payload.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/event_payload.json",
   "version": "2026-07-01",
   "title": "EventPayload",
   "description": "事件业务载荷（不含服务端生成的 event_id 与路径中的 shipment_id）。",

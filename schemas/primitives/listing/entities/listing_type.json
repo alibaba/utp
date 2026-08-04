@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "listing_type.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/listing_type.json",
   "version": "2026-07-01",
   "title": "ListingType",
   "description": "商品类型：实物/服务/虚拟（M3.9.1）。",

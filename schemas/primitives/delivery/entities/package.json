@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "package.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/package.json",
   "version": "2026-07-01",
   "title": "Package",
   "description": "Package（M7.9.2）：装箱明细，与订单行对齐。",

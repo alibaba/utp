@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "fee.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/fee.json",
   "version": "2026-07-01",
   "title": "Fee",
   "description": "扣减项：每笔 MUST 有费率依据引用（M8.2.2 不变式 2）。",

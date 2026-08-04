@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "dispute_routed_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/dispute_routed_payload.json",
   "version": "2026-07-30",
   "title": "DisputeRoutedPayload",
   "description": "争议答辩透传路由（M1.4.4）。争议完整实体属 P6 域；答辩提交前 MUST 人工确认（M10.5）。",

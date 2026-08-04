@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "aftersale_reason.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/aftersale_reason.json",
   "version": "2026-08-04",
   "title": "AftersaleReason",
   "description": "买方申请售后的原因码，由 Marketplace 在路由时透传。供应商 Agent MAY 据此自动决策。",

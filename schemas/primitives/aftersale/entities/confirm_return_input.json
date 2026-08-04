@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "confirm_return_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/confirm_return_input.json",
   "version": "2026-08-04",
   "title": "ConfirmReturnInput",
   "description": "utp.aftersale.confirm_return：确认退货收货与验货结论。验货结果非 pass 时 MUST 提供差异说明。",

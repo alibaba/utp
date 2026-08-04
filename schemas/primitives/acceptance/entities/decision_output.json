@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "decision_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/decision_output.json",
   "version": "2026-07-01",
   "title": "DecisionOutput",
   "description": "accept/reject/hold/amend 的响应：返回受理记录与（accept 时）P3 推进结果。",

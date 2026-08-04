@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "action_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/action_output.json",
   "version": "2026-07-01",
   "title": "ActionOutput",
   "description": "update/list/delist/archive 的通用响应。",

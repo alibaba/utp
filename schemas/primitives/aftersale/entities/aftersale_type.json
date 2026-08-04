@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "aftersale_type.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/aftersale_type.json",
   "version": "2026-08-04",
   "title": "AftersaleType",
   "description": "售后类型。决定方案是否需要退货与是否触发重新发货。",

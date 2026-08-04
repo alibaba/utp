@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "update_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/update_input.json",
   "version": "2026-07-01",
   "title": "UpdateInput",
   "description": "utp.delivery.update：追加履约事件（delay/exception/customs/document/correction）。event_id 由服务端生成。",

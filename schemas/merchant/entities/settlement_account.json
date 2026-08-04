@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "settlement_account.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/settlement_account.json",
   "version": "2026-07-30",
   "title": "SettlementAccount",
   "description": "结算收款账户引用（脱敏形式，M8.2.1）。具体账户信息经平台安全通道登记，协议内只传引用。",

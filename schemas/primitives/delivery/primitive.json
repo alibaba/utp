@@ -2,8 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/delivery/primitive.json",
   "name": "utp.delivery",
-  "version": "2026-07-01",
-  "status": "release-candidate",
+  "version": "2026-07-31",
   "title": "MP5 交付原语（Delivery Primitive）",
   "description": "供应商侧交付执行原语：申报备货、发货、分批交付计划与运输异常，产生可核验的履约事实。本原语覆盖履约的卖方执行面（备货 → 发货 → 运输 → 妥投），MUST NOT 定义验收动作——验收（receive / reject / inspect）始终归买方侧 P5 履约原语。",
   "service": "dev.utp.merchant",
@@ -23,6 +22,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/deliveries/preparations"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.delivery.prepare"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.delivery.prepare"
         }
       ]
     },
@@ -41,6 +48,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/deliveries/split-plans"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.delivery.split"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.delivery.split"
         }
       ]
     },
@@ -59,6 +74,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/deliveries"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.delivery.ship"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.delivery.ship"
         }
       ]
     },
@@ -77,6 +100,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/deliveries/{shipment_id}/events"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.delivery.update"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.delivery.update"
         }
       ]
     },
@@ -95,6 +126,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/m/v1/deliveries"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.delivery.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.delivery.query"
         }
       ]
     }
@@ -129,60 +168,51 @@
       {
         "from": null,
         "action": "utp.delivery.prepare",
-        "to": "PREPARING",
-        "by": "Seller"
+        "to": "PREPARING"
       },
       {
         "from": "PREPARING",
         "event": "prepare_completed",
-        "to": "READY",
-        "by": "Seller"
+        "to": "READY"
       },
       {
         "from": null,
         "action": "utp.delivery.ship",
         "to": "SHIPPED",
-        "by": "Seller",
         "condition": "跳过备货申报直接发货"
       },
       {
         "from": "PREPARING",
         "action": "utp.delivery.ship",
-        "to": "SHIPPED",
-        "by": "Seller"
+        "to": "SHIPPED"
       },
       {
         "from": "READY",
         "action": "utp.delivery.ship",
-        "to": "SHIPPED",
-        "by": "Seller"
+        "to": "SHIPPED"
       },
       {
         "from": "SHIPPED",
         "action": "utp.delivery.update",
         "to": "EXCEPTION",
-        "by": "Seller",
         "condition": "type = delay | exception"
       },
       {
         "from": "EXCEPTION",
         "action": "utp.delivery.update",
         "to": "SHIPPED",
-        "by": "Seller",
         "condition": "更正 / 重发"
       },
       {
         "from": "SHIPPED",
         "event": "carrier_delivery_receipt",
         "to": "DELIVERED",
-        "by": "Marketplace",
         "condition": "承运商妥投回执经 Marketplace 确认"
       },
       {
         "from": "DELIVERED",
         "event": "buyer_receive_or_resolved",
         "to": "CLOSED",
-        "by": "protocol_engine",
         "condition": "买方 receive；或 reject 进入 P6 Resolve 后裁决完毕"
       }
     ]

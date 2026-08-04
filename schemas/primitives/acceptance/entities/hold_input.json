@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "hold_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/hold_input.json",
   "version": "2026-07-01",
   "title": "HoldInput",
   "description": "utp.acceptance.hold：挂起待内部审批。每单至多一次；不延长 deadline。",

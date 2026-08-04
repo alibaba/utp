@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "listing_core.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/listing_core.json",
   "version": "2026-07-01",
   "title": "ListingCore",
   "description": "供应商可写的商品字段集合（publish/update 的载荷基底）。库存数量字段被显式禁止（正交性，M1.5）。",

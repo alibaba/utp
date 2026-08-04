@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "amend_price_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/amend_price_input.json",
   "version": "2026-08-04",
   "title": "AmendPriceInput",
   "description": "utp.acceptance.amend_price：卖方提出价格调整提议，进入 AMEND_PROPOSED 等待买方确认。改价 MUST NOT 单方生效——买方确认后新条款方成立并产出新 terms_hash。逐行调整与整单调整至少其一；两者同时给出时，line_adjustments 优先，order_adjustments 仅表达非商品项（运费、包装费等）。",

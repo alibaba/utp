@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "freight_responsibility.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/freight_responsibility.json",
   "version": "2026-08-04",
   "title": "FreightResponsibility",
   "description": "退货运费责任方。质量问题类 SHOULD 由卖方承担，买方原因类 SHOULD 由买方承担。",

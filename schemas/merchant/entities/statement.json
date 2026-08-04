@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "statement.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/statement.json",
   "version": "2026-07-01",
   "title": "Statement",
   "description": "SettlementStatement（M8.6.1）：Marketplace 签名账单；差异更正生成新版本，旧版本保留。",

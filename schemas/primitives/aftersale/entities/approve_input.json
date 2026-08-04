@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "approve_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/approve_input.json",
   "version": "2026-08-04",
   "title": "ApproveInput",
   "description": "utp.aftersale.approve：同意售后并给出最终方案。签名 MUST 覆盖 resolution.resolution_hash。",

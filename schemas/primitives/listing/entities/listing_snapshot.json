@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "listing_snapshot.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/listing_snapshot.json",
   "version": "2026-07-01",
   "title": "ListingSnapshot",
   "description": "ListingSnapshot（M3.9.5）：生效版本存档，可按 listing_id + version_hash 检索并纳入 Evidence Bundle。",

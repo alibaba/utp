@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "list_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/list_input.json",
   "version": "2026-08-04",
   "title": "ListInput",
   "description": "utp.aftersale.list：筛选售后单，游标分页。用于待处理队列拉取与推送丢失时的轮询降级。",

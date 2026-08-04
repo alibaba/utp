@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "quote_expired_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/quote_expired_payload.json",
   "version": "2026-07-30",
   "title": "QuoteExpiredPayload",
   "description": "utp.quote.expired 载荷（M5.3）：应答时限到期按 quote_policy.on_timeout 自动谢绝（MP3 不存在 auto_accept，M5.1.2）。",

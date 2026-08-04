@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "listing.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/listing.json",
   "version": "2026-07-01",
   "title": "Listing",
   "description": "Listing 完整实体（M3.9.1，服务端权威态）。",

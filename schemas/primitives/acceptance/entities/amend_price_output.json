@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "amend_price_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/amend_price_output.json",
   "version": "2026-08-04",
   "title": "AmendPriceOutput",
   "description": "utp.acceptance.amend_price 的响应。提议已登记但未生效——MUST 等待买方确认。",

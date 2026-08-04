@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "merchant_registration.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/merchant_registration.json",
   "version": "2026-07-30",
   "title": "MerchantRegistration",
   "description": "MerchantRegistration（M2.4.1）：注册请求载荷。注册 MUST 由商家主体自行完成，MUST NOT 委托 Agent（M2.4.3）。",

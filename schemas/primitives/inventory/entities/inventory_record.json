@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "inventory_record.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/inventory_record.json",
   "version": "2026-07-01",
   "title": "InventoryRecord",
   "description": "InventoryRecord（M4.9.1）：sellable = available − held − locked（派生只读）。",

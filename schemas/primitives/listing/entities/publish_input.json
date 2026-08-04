@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "publish_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/publish_input.json",
   "version": "2026-07-01",
   "title": "PublishInput",
   "description": "utp.listing.publish 请求（M3.7.1）。listing 为草稿：不含服务端生成字段（listing_id/status/version/version_hash）。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "query_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/query_input.json",
   "version": "2026-07-01",
   "title": "QueryInput",
   "description": "utp.inventory.query：按 listing_id（必填）与可选 sku_id 批量查询数量视图。",

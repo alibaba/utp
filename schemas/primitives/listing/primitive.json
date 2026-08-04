@@ -2,8 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/listing/primitive.json",
   "name": "utp.listing",
-  "version": "2026-07-01",
-  "status": "release-candidate",
+  "version": "2026-07-31",
   "title": "MP1 Listing Primitive Definition",
   "description": "商品管理原语定义文件（UTP-M M3）。声明操作、角色绑定、传输绑定与 Listing 资源状态机。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/listing.json。",
   "service": "dev.utp.merchant",
@@ -23,6 +22,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/listings"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.listing.publish"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.listing.publish"
         }
       ]
     },
@@ -41,6 +48,14 @@
           "type": "rest",
           "method": "PATCH",
           "path": "/utp/m/v1/listings/{listing_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.listing.update"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.listing.update"
         }
       ]
     },
@@ -59,6 +74,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/listings/{listing_id}/list"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.listing.list"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.listing.list"
         }
       ]
     },
@@ -77,6 +100,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/listings/{listing_id}/delist"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.listing.delist"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.listing.delist"
         }
       ]
     },
@@ -100,6 +131,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/m/v1/listings"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.listing.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.listing.query"
         }
       ]
     },
@@ -118,6 +157,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/listings/{listing_id}/archive"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.listing.archive"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.listing.archive"
         }
       ]
     },
@@ -136,6 +183,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/listings/batch"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.listing.batch"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.listing.batch"
         }
       ]
     }
@@ -172,98 +227,83 @@
       {
         "from": null,
         "action": "utp.listing.publish",
-        "to": "PENDING_REVIEW",
-        "by": "Seller"
+        "to": "PENDING_REVIEW"
       },
       {
         "from": "PENDING_REVIEW",
         "event": "review_pass",
         "to": "PUBLISHED",
-        "by": "Marketplace",
         "condition": "publish 请求未声明 auto_list 或声明为 false"
       },
       {
         "from": "PENDING_REVIEW",
         "event": "review_pass",
         "to": "LISTED",
-        "by": "Marketplace",
         "condition": "publish 请求声明 auto_list: true"
       },
       {
         "from": "PENDING_REVIEW",
         "event": "review_reject",
-        "to": "REJECTED",
-        "by": "Marketplace"
+        "to": "REJECTED"
       },
       {
         "from": "PENDING_REVIEW",
         "action": "utp.listing.archive",
         "to": "ARCHIVED",
-        "by": "Seller",
         "condition": "供应商撤回"
       },
       {
         "from": "REJECTED",
         "action": "utp.listing.update",
-        "to": "PENDING_REVIEW",
-        "by": "Seller"
+        "to": "PENDING_REVIEW"
       },
       {
         "from": "REJECTED",
         "action": "utp.listing.archive",
-        "to": "ARCHIVED",
-        "by": "Seller"
+        "to": "ARCHIVED"
       },
       {
         "from": "PUBLISHED",
         "action": "utp.listing.list",
-        "to": "LISTED",
-        "by": "Seller"
+        "to": "LISTED"
       },
       {
         "from": "PUBLISHED",
         "action": "utp.listing.archive",
-        "to": "ARCHIVED",
-        "by": "Seller"
+        "to": "ARCHIVED"
       },
       {
         "from": "LISTED",
         "action": "utp.listing.delist",
-        "to": "DELISTED",
-        "by": "Seller"
+        "to": "DELISTED"
       },
       {
         "from": "LISTED",
         "event": "update_major",
         "to": "PENDING_REVIEW",
-        "by": "Seller",
         "condition": "重大变更走新版本送审，旧版本保持 LISTED 继续可售（M3.2.4）"
       },
       {
         "from": "LISTED",
         "event": "platform_suspend",
         "to": "SUSPENDED_BY_PLATFORM",
-        "by": "Marketplace",
         "condition": "资质过期、违规、风控触发"
       },
       {
         "from": "SUSPENDED_BY_PLATFORM",
         "event": "platform_reinstate",
         "to": "PUBLISHED",
-        "by": "Marketplace",
         "condition": "整改通过"
       },
       {
         "from": "DELISTED",
         "action": "utp.listing.list",
-        "to": "LISTED",
-        "by": "Seller"
+        "to": "LISTED"
       },
       {
         "from": "DELISTED",
         "action": "utp.listing.archive",
-        "to": "ARCHIVED",
-        "by": "Seller"
+        "to": "ARCHIVED"
       }
     ]
   }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "timeout_policy.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/timeout_policy.json",
   "version": "2026-07-01",
   "title": "TimeoutPolicy",
   "description": "受理超时自动处置策略（订单路由时按商户配置与 Mode 确定，M6.7.1）。",

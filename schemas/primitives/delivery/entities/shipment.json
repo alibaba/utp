@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "shipment.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/shipment.json",
   "version": "2026-07-01",
   "title": "Shipment",
   "description": "Shipment 发货凭证（M7.9.1）。carrier_code ≠ self_delivery 时 tracking_number 必填；虚拟交付以激活凭证替代（M7.6）。",

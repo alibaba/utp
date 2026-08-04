@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "acceptance_policy.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/acceptance_policy.json",
   "version": "2026-07-30",
   "title": "AcceptancePolicy",
   "description": "AcceptancePolicy（M10.3.1）：Principal 签名的自动接单策略——策略即授权的书面化。规则条件结构由实现定义，本 Schema 约束治理要素。",
@@ -46,6 +46,14 @@
         "type": "object",
         "additionalProperties": true
       }
+    },
+    "amend_price_allowed": {
+      "type": "boolean",
+      "description": "是否允许卖方在受理阶段发起 amend_price 改价提议（M6.12）。默认值随交易 decision 模式取值：B2C（decision=L0，即时零售）默认 false，B2B（decision=L1—L2，标准采购）默认 true。为 false 时 amend_price MUST 返回 ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED。省略时由 Marketplace 按类目与模式取默认值。"
+    },
+    "amend_price_auto_accept_ceiling": {
+      "$ref": "../../primitives/common/entities/money.json",
+      "description": "买方侧可自动确认改价提议的价差封顶（绝对额）。超封顶的改价提议 MUST 升级人工（B2B HAI）或自动拒绝（B2C）。仅当 amend_price_allowed=true 时生效。"
     },
     "escalation": {
       "type": "object",

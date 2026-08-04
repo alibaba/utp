@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "list_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/list_input.json",
   "version": "2026-07-01",
   "title": "ListInput",
   "description": "utp.acceptance.list：待受理/历史任务检索（轮询降级通道，M6.7）。",

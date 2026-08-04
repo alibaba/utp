@@ -21,11 +21,12 @@ format: html
       <li><a href="#s-m69">M6.9 Operations 与 Transport Bindings</a></li>
       <li><a href="#s-m610">M6.10 Entities（实体定义）</a></li>
       <li><a href="#s-m611a2">M6.11 Use Case Walkthroughs（用例演练）</a></li>
+      <li><a href="#s-m612">M6.12 改价提议（Price Amendment · B2B / B2C）</a></li>
     </ul>
     <hr />
     <h2 id="s-m6-identity">原语身份</h2>
 <pre class="highlight"><code>primitive_id:   utp.acceptance
-version:        2026-07-01
+version:        2026-07-31
 initiator_role: Seller
 handler_role:   Marketplace
 intent:         供应商对路由到达的订购请求给出可核验的受理结论（接受/拒绝/挂起/交期变更/价格调整提议）
@@ -51,6 +52,7 @@ service:        dev.utp.merchant
       <li><strong>拒绝（reject）</strong>：以结构化原因码拒绝（库存不足、区域限售、风控、价格失效等）。</li>
       <li><strong>挂起（hold）</strong>：在受理时限内暂缓（等待 ERP 审批/人工确认），MUST 声明预计答复时间。</li>
       <li><strong>交期变更申报（amend_leadtime）</strong>：接受订单但申报与 Listing 承诺不同的交期，交买方确认。</li>
+      <li><strong>改价提议（amend_price）</strong>：接受订单但提议与下单条款不同的价格（运费重算、规格差价、阶梯价等），交买方确认后按新条款成立。改价 MUST NOT 单方生效，且是否允许由交易模式（B2B / B2C）与受理策略决定（M6.12）。</li>
       <li><strong>查询（query / list）</strong>：待受理与历史受理记录检索。</li>
     </ul>
     <p>MP4 不覆盖：订购草案的创建与修改（Buyer 专属，主规范 13.4）、询盘与报价（P2 询盘 / MP3 询盘响应，M5）、发货（MP5）。</p>
@@ -62,8 +64,6 @@ service:        dev.utp.merchant
         <tr><td><code>purchase.status ∈ {DRAFT, SIGNING}</code></td><td>MUST</td><td>受理窗口仅存在于订购成立之前。</td></tr>
         <tr><td><code>merchant.status ∈ {ACTIVE, RESTRICTED}</code></td><td>MUST</td><td><code>RESTRICTED</code> 商户 MUST 仍可履行既有路由订单的受理义务。</td></tr>
         <tr><td><code>acceptance.deadline > now()</code></td><td>MUST</td><td>受理时限内。</td></tr>
-        <tr><td><code>ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH</code></td><td>error</td><td>422</td><td><code>proposed_total</code> 与逐行及整单调整的累加结果不一致</td><td>重算总额；确认逐行与整单调整未重复计入同一项</td></tr>
-        <tr><td><code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code></td><td>error</td><td>403</td><td>受理策略禁止本类目或本商户改价（<code>amend_price_allowed = false</code>）</td><td>改用 <code>accept</code> 或 <code>reject</code>；如需改价能力联系平台调整受理策略</td></tr>
       </tbody>
     </table>
     <h3 id="s-m615">M6.1.5 后置条件与语义契约</h3>
@@ -101,11 +101,11 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>状态</th><th>含义</th><th>进入条件</th><th>允许的操作</th></tr></thead>
       <tbody>
-        <tr><td><code>PENDING_ACCEPT</code></td><td>待受理</td><td>订单路由送达</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>amend_leadtime</code>, <code>query</code></td></tr>
-        <tr><td><code>ON_HOLD</code></td><td>供应商挂起（内部审批中）</td><td><code>hold</code> 成功执行</td><td><code>accept</code>, <code>reject</code>, <code>amend_leadtime</code>, <code>query</code>（时限不因挂起延长）</td></tr>
-        <tr><td><code>AMEND_PROPOSED</code></td><td>交期变更待买方确认</td><td><code>amend_leadtime</code> 成功执行</td><td><code>query</code>；等待买方确认/拒绝或超时</td></tr>
-        <tr><td><code>ACCEPTED</code></td><td>已接受（终态）</td><td><code>accept</code> 签名验证通过；或买方确认交期变更；或超时策略 auto_accept</td><td><code>query</code>；衔接 <code>purchase.complete</code>（M6.6）</td></tr>
-        <tr><td><code>REJECTED</code></td><td>已拒绝（终态）</td><td><code>reject</code>；或买方拒绝交期变更；或超时策略 auto_reject</td><td><code>query</code>（只读）</td></tr>
+        <tr><td><code>PENDING_ACCEPT</code></td><td>待受理</td><td>订单路由送达</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>amend_leadtime</code>, <code>amend_price</code>, <code>query</code></td></tr>
+        <tr><td><code>ON_HOLD</code></td><td>供应商挂起（内部审批中）</td><td><code>hold</code> 成功执行</td><td><code>accept</code>, <code>reject</code>, <code>amend_leadtime</code>, <code>amend_price</code>, <code>query</code>（时限不因挂起延长）</td></tr>
+        <tr><td><code>AMEND_PROPOSED</code></td><td>交期/价格变更待买方确认</td><td><code>amend_leadtime</code> 或 <code>amend_price</code> 成功执行</td><td><code>query</code>；等待买方确认/拒绝或超时</td></tr>
+        <tr><td><code>ACCEPTED</code></td><td>已接受（终态）</td><td><code>accept</code> 签名验证通过；或买方确认交期/价格变更；或超时策略 auto_accept</td><td><code>query</code>；衔接 <code>purchase.complete</code>（M6.6）</td></tr>
+        <tr><td><code>REJECTED</code></td><td>已拒绝（终态）</td><td><code>reject</code>；或买方拒绝交期/价格变更；或超时策略 auto_reject</td><td><code>query</code>（只读）</td></tr>
       </tbody>
     </table>
     <p><strong>确定性约束：</strong>终态到达后任何写操作 MUST 返回 <code>ACCEPTANCE.STATE_CONFLICT</code>（幂等重放同一 <code>idempotency_key</code> 除外）。<code>deadline</code> 由订单路由时的 Mode 超时配置决定（主规范 <a href="/documentation/specification/protocol-core/transport-communication.html#s-424">4.2.4</a> Mode 协商确定的超时配置），挂起不延长时限；延时需求 MUST 走 <code>amend_leadtime</code> 或买方侧 HAI 超时扩展。</p>
@@ -123,6 +123,9 @@ service:        dev.utp.merchant
         <tr><td><code>ACCEPTANCE.REJECT.REASON_REQUIRED</code></td><td>error</td><td>400</td><td><code>reject</code> 缺少结构化原因码。</td><td>按 M6.10.2 原因码枚举补充。</td></tr>
         <tr><td><code>ACCEPTANCE.AMEND.OUT_OF_RANGE</code></td><td>error</td><td>422</td><td>申报交期超出平台允许的变更幅度。</td><td>调整交期或直接 <code>reject</code>。</td></tr>
         <tr><td><code>ACCEPTANCE.HOLD.LIMIT_EXCEEDED</code></td><td>error</td><td>429</td><td>同一订单重复挂起超过上限（MUST ≤ 1 次）。</td><td>在时限内给出终局结论。</td></tr>
+        <tr><td><code>ACCEPTANCE.TERMS_MISMATCH</code></td><td>error</td><td>409</td><td><code>amend_price</code> 携带的 <code>base_terms_hash</code> 与当前订购条款快照不一致。</td><td>用最新 <code>terms_hash</code> 重新提议；防止基于过期条款改价。</td></tr>
+        <tr><td><code>ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH</code></td><td>error</td><td>422</td><td><code>proposed_total</code> 与逐行及整单调整的累加结果不一致。</td><td>重算总额；确认逐行与整单调整未重复计入同一项。</td></tr>
+        <tr><td><code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code></td><td>error</td><td>403</td><td>受理策略禁止本类目/本商户改价（<code>amend_price_allowed = false</code>，B2C 闪购默认禁止）。</td><td>改用 <code>accept</code>，或以 <code>price_stale</code> <code>reject</code>；改价能力由平台受理策略与交易模式控制。</td></tr>
       </tbody>
     </table>
 
@@ -173,6 +176,7 @@ service:        dev.utp.merchant
       <li>协议引擎确认卖方承诺处理完成后，按主规范 13.2.3 执行 <code>SIGNING → PURCHASED</code> 原子迁移（承诺处理完成、最终库存锁定、terms_hash 与条款快照一致）；任一失败按 13.3.2 补偿链处理，MP4 侧受理任务保持 ACCEPTED（签名事实不回滚，重试由引擎负责）。</li>
       <li>B2C 全 L0 模式的"自动承诺处理"（主规范 13.6.2）在本模型中实现为：<code>acceptance_policy.mode == "auto"</code> 时由 Merchant Agent 或平台代理组件按预授权策略即时调用 <code>accept</code>（M11.3），协议语义完全一致，无特殊路径。</li>
       <li><code>amend_leadtime</code> 被买方确认后，协议引擎 MUST 以 <code>purchase.update</code> 语义刷新履约条款（交期属于可变履约信息），再走签名收集；买方拒绝则视同 REJECTED。</li>
+      <li><code>amend_price</code> 被买方确认后，协议引擎 MUST 以 <code>proposed_terms_hash</code> 作为订购的新权威条款哈希（<strong>价格是核心条款，不同于交期这类可变履约信息</strong>），并重新收集覆盖新哈希的双方签名；买方拒绝则任务按 <code>AMEND_PROPOSED</code> 的既有收敛规则处置。因此改价与交期变更的关键区别是：前者改变 <code>terms_hash</code>（须重签、买方重新授权），后者仅刷新履约信息。</li>
     </ol>
 
     <hr />
@@ -218,7 +222,7 @@ service:        dev.utp.merchant
         <tr><td><code>utp.acceptance.reject</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>REJECTED</code> 终态；触发 P3 补偿</td><td><code>query</code></td><td>Seller；MUST 携带结构化原因码。</td></tr>
         <tr><td><code>utp.acceptance.hold</code></td><td><code>PENDING_ACCEPT</code></td><td>进入 <code>ON_HOLD</code>；不延长 deadline</td><td><code>accept</code>, <code>reject</code>, <code>amend_leadtime</code>, <code>query</code></td><td>Seller；每单至多一次；MUST 声明 <code>expected_reply_at</code>。</td></tr>
         <tr><td><code>utp.acceptance.amend_leadtime</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>AMEND_PROPOSED</code>，等待买方确认</td><td><code>query</code></td><td>Seller；新交期 MUST 在平台允许幅度内；MUST 提供 <code>amended_leadtime_days</code>（相对交期）或 <code>promised_ship_at</code>（绝对发货时间）至少其一；买方确认后视同 ACCEPTED。</td></tr>
-        <tr><td><code>utp.acceptance.amend_price</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>AMEND_PROPOSED</code>，等待买方确认</td><td><code>query</code></td><td>Seller；新交期 MUST 在平台允许幅度内；MUST 提供 <code>amended_leadtime_days</code>（相对交期）或 <code>promised_ship_at</code>（绝对发货时间）至少其一；买方确认后视同 ACCEPTED。</td></tr>
+        <tr><td><code>utp.acceptance.amend_price</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>AMEND_PROPOSED</code>，等待买方确认</td><td><code>query</code></td><td>Seller；受理策略 MUST 允许改价（<code>amend_price_allowed</code>，B2C 默认禁止）；MUST 携带 <code>base_terms_hash</code> 与覆盖 <code>proposed_terms_hash</code> 的卖方签名；<code>line_adjustments</code>/<code>order_adjustments</code> 至少其一；买方确认后按新 <code>terms_hash</code> 视同 ACCEPTED（M6.12）。</td></tr>
         <tr><td><code>utp.acceptance.query</code></td><td>任意</td><td>无</td><td>当前状态下可执行动作</td><td>Seller；按 <code>routing_id</code>/<code>purchase_id</code> 查询。</td></tr>
         <tr><td><code>utp.acceptance.list</code></td><td>—</td><td>无</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>query</code></td><td>Seller；按状态/时间筛选，分页；轮询降级通道。</td></tr>
       </tbody>
@@ -231,6 +235,7 @@ service:        dev.utp.merchant
         <tr><td><code>reject</code></td><td><code>POST /utp/m/v1/acceptances/{routing_id}/reject</code></td><td><code>utp_acceptance_reject</code></td><td><code>utp:acceptance:reject</code></td></tr>
         <tr><td><code>hold</code></td><td><code>POST /utp/m/v1/acceptances/{routing_id}/hold</code></td><td><code>utp_acceptance_hold</code></td><td><code>utp:acceptance:hold</code></td></tr>
         <tr><td><code>amend_leadtime</code></td><td><code>POST /utp/m/v1/acceptances/{routing_id}/amendments</code></td><td><code>utp_acceptance_amend</code></td><td><code>utp:acceptance:amend</code></td></tr>
+        <tr><td><code>amend_price</code></td><td><code>POST /utp/m/v1/acceptances/{routing_id}/amend-price</code></td><td><code>utp_acceptance_amend_price</code></td><td><code>utp:acceptance:amend_price</code></td></tr>
         <tr><td><code>query</code></td><td><code>GET /utp/m/v1/acceptances/{routing_id}</code></td><td><code>utp_acceptance_query</code></td><td><code>utp:acceptance:query</code></td></tr>
         <tr><td><code>list</code></td><td><code>GET /utp/m/v1/acceptances?status=&amp;from=&amp;cursor=&amp;limit=</code></td><td><code>utp_acceptance_list</code></td><td><code>utp:acceptance:list</code></td></tr>
       </tbody>
@@ -323,7 +328,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
     <hr />
     <h2 id="s-m612">M6.12 改价提议（Price Amendment）</h2>
 
-    <p><code>utp.acceptance.amend_price</code> 允许供应商在受理阶段提出价格调整。<strong>本动作是提议，不是变更</strong>——这是本节最重要的约束。</p>
+    <p><code>utp.acceptance.amend_price</code> 允许供应商在受理阶段提出价格调整。本节确立两条约束：<strong>其一，本动作是提议，不是变更</strong>（改价 MUST NOT 单方生效）；<strong>其二，改价是否可用、如何被确认，由交易模式（B2B / B2C）与受理策略参数化决定</strong>（M6.12.2），而非对场景硬编码。</p>
 
     <h3 id="s-m6121">M6.12.1 为什么改价必须是提议</h3>
 
@@ -335,7 +340,29 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
     </ul>
     <p>因此协议规定：<code>amend_price</code> MUST NOT 单方生效。供应商提出提议后任务进入 <code>AMEND_PROPOSED</code>，<strong>买方确认后新条款方成立</strong>，此时 <code>proposed_terms_hash</code> 成为订购的权威条款哈希，供应商需在新条款下完成 <code>accept</code>。</p>
 
-    <h3 id="s-m6122">M6.12.2 适用场景与原因码</h3>
+    <h3 id="s-m6122">M6.12.2 B2B 与 B2C 场景的改价策略</h3>
+
+    <p>改价<strong>是否被允许</strong>、买方<strong>如何确认</strong>，不是两套独立规则，而是沿主规范<a href="/documentation/specification/protocol-core/procurement-models.html">交易模式频谱</a>（第 8 章）<code>decision</code> 维度参数化的同一机制——<code>amend_price_allowed</code>（受理策略字段）与买方侧确认阈值随模式取值不同。“B2C” 与 “B2B” 是 <code>decision=L0</code> 与 <code>decision=L1—L2</code> 两类常见取值的通俗称呼，协议 MUST NOT 为它们硬编码特例。</p>
+
+    <table>
+      <thead><tr><th>维度</th><th>B2C（<code>decision=L0</code> 闪购/即时零售）</th><th>B2B（<code>decision=L1—L2</code> 标准采购/大宗）</th></tr></thead>
+      <tbody>
+        <tr><td><code>amend_price_allowed</code> 默认</td><td><strong>false</strong>（默认禁止）</td><td><strong>true</strong>（受类目规则约束）</td></tr>
+        <tr><td>语义定位</td><td>受限例外，非常态</td><td>常态议价环节</td></tr>
+        <tr><td>典型合法场景</td><td>仅偏远/超尺寸目的地的 <code>freight_recalculation</code>，且 MUST 在平台公示封顶内</td><td><code>freight_recalculation</code>、<code>volume_tier_change</code>、<code>spec_difference</code>、<code>cost_fluctuation</code>、<code>tax_or_duty_change</code></td></tr>
+        <tr><td>价格不符时首选动作</td><td><code>reject</code>（<code>price_stale</code>）→ 买方重新寻源</td><td><code>amend_price</code> 提议 → 买方评估</td></tr>
+        <tr><td>买方确认方式</td><td>Agent 在极小阈值内 MAY 自动确认，超阈值 → 自动拒绝（即时零售通常无人工在环）</td><td>Agent 按采购授权容差评估：容差内 MAY 自动确认，超容差 → 升级人工（<a href="../../merchant-agent.html">HAI</a>）</td></tr>
+        <tr><td>底层理由</td><td>消费者“所见即所得”信任；买方 Agent 授权低值且窄</td><td>采购 Agent 持议价授权、金额容差与审批链</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>B2C（<code>decision=L0</code>）为什么默认禁止改价。</strong>即时零售场景中，买方 Agent 以下单价即时成交、且通常无人工在环。若允许卖方在受理阶段抬价，买方 Agent 既无授权确认、也无人可升级，只能超时拒绝——这既伤害“所见即所得”的消费者信任，也让订单在 <code>AMEND_PROPOSED</code> 空耗时限。因此 B2C 默认 <code>amend_price_allowed = false</code>：价格错误 MUST 以 <code>reject</code>（<code>price_stale</code>）表达，由买方回到寻源。唯一窄例外是偏远/超尺寸目的地的运费重算，且平台 MUST 对可自动接受的运费差额设封顶，超封顶仍走拒绝。</p>
+
+    <p><strong>B2B（<code>decision=L1—L2</code>）为什么改价是常态。</strong>大宗采购中，运费按实际抛重结算、数量落入不同阶梯价、原材料成本波动都是订单成立前的正常变量。买方是持采购授权（Mandate，第 5 章）的采购 Agent，天然具备“在授权容差内接受价格调整”的能力。因此 B2B 默认允许改价：卖方以 <code>amend_price</code> 结构化提议，买方 Agent 依原因码（M6.12.3）与采购授权的金额容差自动判定——容差内 MAY 自动确认，超容差 MUST 升级人工买家（HAI）。提议—确认的双动作全程保持双签与 <code>terms_hash</code> 证据链完整。</p>
+
+    <p class="note"><strong>框架协议（<code>relationship=L2+</code>）下的改价。</strong>存在框架协议时，价格 MUST 遵循框架的定价规则；受理阶段的 <code>amend_price</code> SHOULD 仅反映框架许可的调整（如指数化的原材料成本、约定的运费公式），并 MUST 在 <code>reason_note</code> 中引用 <code>framework_agreement_ref</code>。超出框架条款的价格变化 MUST 以 <code>reject</code> 处置或走框架重新协商，而非逐单改价。</p>
+
+    <h3 id="s-m6123">M6.12.3 适用场景与原因码</h3>
 
     <table>
       <thead><tr><th>原因码</th><th>典型场景</th><th>买方 Agent 自动处置建议</th></tr></thead>
@@ -351,22 +378,22 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
       </tbody>
     </table>
 
-    <h3 id="s-m6123">M6.12.3 约束（MUST / MUST NOT）</h3>
+    <h3 id="s-m6124">M6.12.4 约束（MUST / MUST NOT）</h3>
     <ul>
       <li>请求 MUST 携带 <code>base_terms_hash</code>（被调整的原条款）。与当前订购条款快照不一致时 MUST 返回 <code>ACCEPTANCE.TERMS_MISMATCH</code>——防止基于过期条款提议。</li>
       <li>MUST 提供 <code>proposed_terms_hash</code>，且 <code>seller_signature</code> MUST 覆盖该值。买方 MUST 在确认前验签。</li>
       <li>逐行调整（<code>line_adjustments</code>）与整单调整（<code>order_adjustments</code>）<strong>至少其一</strong>。<code>proposed_total</code> MUST 与调整累加结果一致，否则返回 <code>ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH</code>。</li>
-      <li>Marketplace MAY 按类目与商户等级禁止改价（受理策略 <code>amend_price_allowed = false</code>），此时返回 <code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code>。</li>
+      <li>改价可用性 MUST 由受理策略 <code>amend_price_allowed</code> 声明，其默认值随 <code>decision</code> 模式取值（B2C <code>decision=L0</code> 默认 <code>false</code>、B2B <code>decision=L1—L2</code> 默认 <code>true</code>）；Marketplace MAY 进一步按类目与商户等级收紧。<code>amend_price_allowed = false</code> 时 <code>amend_price</code> MUST 返回 <code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code>。</li>
       <li><code>decided_by = policy_auto</code> 时 MUST 提供 <code>policy_ref</code>（命中的定价策略与版本），供决策审计追溯（见 <a href="../../merchant-agent.html#s-m116">M11.6</a>）。</li>
       <li>本动作与 <code>amend_leadtime</code> 共用 <code>AMEND_PROPOSED</code> 状态。同一受理任务上二者 MUST NOT 并存未决提议——存在未决提议时新提议 MUST 返回 <code>ACCEPTANCE.STATE_CONFLICT</code>。</li>
     </ul>
 
-    <h3 id="s-m6124">M6.12.4 与 MP3 报价的关系</h3>
+    <h3 id="s-m6125">M6.12.5 与 MP3 报价的关系</h3>
     <p>若订购前已走过询盘报价（MP3），<code>accept</code> MUST NOT 偏离已绑定条款。此时 <strong>改价是对已绑定报价的重新协商</strong>，SHOULD 优先在报价阶段完成（<code>utp.quote.revise</code>），受理阶段改价 SHOULD 仅用于报价无法预见的因素（实际运费、税费政策）。原因码为 <code>quotation_superseded</code> 时 MUST 在 <code>reason_note</code> 中引用新的 <code>quote_id</code>。</p>
 
-    <h3 id="s-m6125">M6.12.5 示例</h3>
+    <h3 id="s-m6126">M6.12.6 示例</h3>
 <pre class="highlight"><code class="language-json">// 供应商提出运费重算提议
-POST /utp/v1/acceptance/routings/rt-4471/amend-price
+POST /utp/m/v1/acceptances/rt-4471/amend-price
 { "idempotency_key": "rt-4471-amendprice-1",
   "base_terms_hash": "a91f…3c07",
   "reason_code": "freight_recalculation",
@@ -398,3 +425,4 @@ POST /utp/v1/acceptance/routings/rt-4471/amend-price
 </code></pre>
 
     <p class="note"><strong>逐行改价示例（规格差价）</strong>：<code>line_adjustments</code> 中给出 <code>line_no</code>、<code>original_unit_price</code>、<code>proposed_unit_price</code> 与适用 <code>quantity</code>；未列出的订单行 MUST 视为不调整。</p>
+    <p class="note"><strong>B2C 对比。</strong>同一运费重算若发生在 <code>decision=L0</code> 闪购订单且差额超过平台封顶，卖方 MUST NOT 走 <code>amend_price</code>（将返回 <code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code>），而应以 <code>reject</code>（<code>reason_code = price_stale</code>）结束，由买方 Agent 重新寻源。</p>

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "review_result_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/review_result_payload.json",
   "version": "2026-07-30",
   "title": "ReviewResultPayload",
   "description": "商品审核结论（M3.4）。驳回 MUST 附结构化原因。",

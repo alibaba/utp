@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "prepare_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/prepare_input.json",
   "version": "2026-07-01",
   "title": "PrepareInput",
   "description": "utp.delivery.prepare：备货申报（可选动作；不触发买方可观测状态迁移，M7.1.2）。",

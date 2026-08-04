@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "event.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/event.json",
   "version": "2026-07-01",
   "title": "Event",
   "description": "ShipmentEvent（M7.9.3）：存档实体 = 业务载荷 + 服务端标识。只可追加，不可覆盖既有事实。",

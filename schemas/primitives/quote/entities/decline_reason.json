@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "decline_reason.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/quote/entities/decline_reason.json",
   "version": "2026-07-30",
   "title": "DeclineReason",
   "description": "DeclineReason（M5.10.2）。code=other 时 MUST 附 detail。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "shipping_fee_policy.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/shipping_fee_policy.json",
   "version": "2026-07-01",
   "title": "ShippingFeePolicy",
   "type": "object",

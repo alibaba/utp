@@ -2,8 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json",
   "name": "utp.acceptance",
-  "version": "2026-07-01",
-  "status": "release-candidate",
+  "version": "2026-07-31",
   "title": "MP4 Acceptance Primitive Definition",
   "description": "订单受理原语定义文件（UTP-M M6）。声明操作、角色绑定、传输绑定与受理任务状态机。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/acceptance.json。",
   "service": "dev.utp.merchant",
@@ -23,6 +22,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/acceptances/{routing_id}/accept"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.acceptance.accept"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.acceptance.accept"
         }
       ]
     },
@@ -41,6 +48,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/acceptances/{routing_id}/reject"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.acceptance.reject"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.acceptance.reject"
         }
       ]
     },
@@ -59,6 +74,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/acceptances/{routing_id}/hold"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.acceptance.hold"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.acceptance.hold"
         }
       ]
     },
@@ -77,13 +100,19 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/acceptances/{routing_id}/amendments"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.acceptance.amend_leadtime"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.acceptance.amend_leadtime"
         }
       ]
     },
     "amend_price": {
       "description": "卖方提出价格调整提议（运费重算、规格差价、阶梯价变化等），进入 AMEND_PROPOSED 等待买方确认。改价 MUST NOT 单方生效：买方确认后 proposed_terms_hash 成为订购权威条款哈希，卖方需在新条款下完成 accept；买方拒绝则任务按 AMEND_PROPOSED 的既有收敛规则处置。",
-      "idempotent": true,
-      "authorization": null,
       "input_schema": {
         "$ref": "entities/amend_price_input.json"
       },
@@ -94,7 +123,7 @@
         {
           "type": "rest",
           "method": "POST",
-          "path": "/utp/v1/acceptance/routings/{routing_id}/amend-price"
+          "path": "/utp/m/v1/acceptances/{routing_id}/amend-price"
         },
         {
           "type": "mcp",
@@ -104,15 +133,6 @@
           "type": "a2a",
           "action": "utp.acceptance.amend_price"
         }
-      ],
-      "errors": [
-        "ACCEPTANCE.NOT_FOUND",
-        "ACCEPTANCE.STATE_CONFLICT",
-        "ACCEPTANCE.DEADLINE_PASSED",
-        "ACCEPTANCE.TERMS_MISMATCH",
-        "ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH",
-        "ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED",
-        "ACCEPTANCE.SIGNATURE_INVALID"
       ]
     },
     "query": {
@@ -128,6 +148,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/m/v1/acceptances/{routing_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.acceptance.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.acceptance.query"
         }
       ]
     },
@@ -146,6 +174,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/m/v1/acceptances"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.acceptance.list"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.acceptance.list"
         }
       ]
     }
@@ -178,53 +214,45 @@
       {
         "from": null,
         "event": "order_routed",
-        "to": "PENDING_ACCEPT",
-        "by": "Marketplace"
+        "to": "PENDING_ACCEPT"
       },
       {
         "from": "PENDING_ACCEPT",
         "action": "utp.acceptance.accept",
         "to": "ACCEPTED",
-        "by": "Seller",
         "condition": "卖方签名验证通过"
       },
       {
         "from": "PENDING_ACCEPT",
         "action": "utp.acceptance.reject",
-        "to": "REJECTED",
-        "by": "Seller"
+        "to": "REJECTED"
       },
       {
         "from": "PENDING_ACCEPT",
         "action": "utp.acceptance.hold",
-        "to": "ON_HOLD",
-        "by": "Seller"
+        "to": "ON_HOLD"
       },
       {
         "from": "PENDING_ACCEPT",
         "action": "utp.acceptance.amend_leadtime",
-        "to": "AMEND_PROPOSED",
-        "by": "Seller"
+        "to": "AMEND_PROPOSED"
       },
       {
         "from": "ON_HOLD",
         "action": "utp.acceptance.accept",
         "to": "ACCEPTED",
-        "by": "Seller",
         "condition": "deadline 内"
       },
       {
         "from": "ON_HOLD",
         "action": "utp.acceptance.reject",
         "to": "REJECTED",
-        "by": "Seller",
         "condition": "deadline 内"
       },
       {
         "from": "ON_HOLD",
         "action": "utp.acceptance.amend_leadtime",
         "to": "AMEND_PROPOSED",
-        "by": "Seller",
         "condition": "deadline 内"
       },
       {
@@ -242,48 +270,41 @@
       {
         "from": "AMEND_PROPOSED",
         "event": "buyer_confirm_amendment",
-        "to": "ACCEPTED",
-        "by": "Buyer"
+        "to": "ACCEPTED"
       },
       {
         "from": "AMEND_PROPOSED",
         "event": "buyer_reject_amendment",
-        "to": "REJECTED",
-        "by": "Buyer"
+        "to": "REJECTED"
       },
       {
         "from": "PENDING_ACCEPT",
         "event": "deadline_expired",
         "to": "ACCEPTED",
-        "by": "Marketplace",
         "condition": "timeout_policy = auto_accept（arrived_via = timeout_auto）"
       },
       {
         "from": "PENDING_ACCEPT",
         "event": "deadline_expired",
         "to": "REJECTED",
-        "by": "Marketplace",
         "condition": "timeout_policy = auto_reject（arrived_via = timeout_auto）"
       },
       {
         "from": "ON_HOLD",
         "event": "deadline_expired",
         "to": "ACCEPTED",
-        "by": "Marketplace",
         "condition": "timeout_policy = auto_accept（arrived_via = timeout_auto）"
       },
       {
         "from": "ON_HOLD",
         "event": "deadline_expired",
         "to": "REJECTED",
-        "by": "Marketplace",
         "condition": "timeout_policy = auto_reject（arrived_via = timeout_auto）"
       },
       {
         "from": "AMEND_PROPOSED",
         "event": "deadline_expired",
         "to": "REJECTED",
-        "by": "Marketplace",
         "condition": "买方确认超时按拒绝收敛（arrived_via = timeout_auto）"
       }
     ]

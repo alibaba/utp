@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "inspection_result.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/inspection_result.json",
   "version": "2026-08-04",
   "title": "InspectionResult",
   "description": "退货验货结论。",

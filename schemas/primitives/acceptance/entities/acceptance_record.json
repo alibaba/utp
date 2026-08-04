@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "acceptance_record.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/acceptance_record.json",
   "version": "2026-07-01",
   "title": "AcceptanceRecord",
   "description": "AcceptanceRecord（M6.10.1）：签名的受理结论，MUST 纳入 Evidence Bundle。条件必填以 if/then 表达。",

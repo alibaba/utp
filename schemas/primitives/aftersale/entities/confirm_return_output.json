@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "confirm_return_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/confirm_return_output.json",
   "version": "2026-08-04",
   "title": "ConfirmReturnOutput",
   "description": "utp.aftersale.confirm_return 的响应。退款由 Marketplace 后续执行，本响应不代表退款已完成。",

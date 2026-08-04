@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "hold_query_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/hold_query_input.json",
   "version": "2026-07-01",
   "title": "HoldQueryInput",
   "description": "utp.inventory.hold.query：按 SKU / 交易 / 状态筛选占用明细（只读核验与对账）。",

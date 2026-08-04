@@ -24,11 +24,14 @@ format: html
 
     <p><strong>原语身份</strong></p>
 <pre class="highlight"><code>primitive_id:   utp.aftersale
-version:        2026-08-04
-stability:      Experimental
-handler_role:   seller
-invoker_role:   marketplace
-state_scope:    resource（aftersale_id）
+version:        2026-07-31
+initiator_role: Seller
+handler_role:   Marketplace
+intent:         对买方售后请求（退款/退货退款/换货/补发/维修）给出结构化处置结论，并确认退货收货与验货结果
+state_delta:    aftersale_request → aftersale_record（资源作用域：aftersale_id）
+actions:        approve, reject, propose, confirm_return, query, list
+compensation:   处置超时 → 按 timeout_policy 自动收敛（auto_approve / auto_reject），推送 utp.aftersale.closed
+service:        dev.utp.merchant
 </code></pre>
 
     <p><strong>职责边界（本原语不做什么）</strong></p>
@@ -110,7 +113,7 @@ state_scope:    resource（aftersale_id）
       </tbody>
     </table>
 
-    <p class="note"><strong>确定性保证。</strong>同一状态下同一触发 MUST 只有一条可用迁移。<code>deadline_expired</code> 的多目标迁移由互斥的 <code>timeout_policy</code> 条件区分（见 <a href="../../overview.html#s-m110">M1.10</a> 通用规则）。状态机 <code>action</code> 字段的命名约定：<strong>供应商可调用动作用全限定名</strong>（<code>utp.aftersale.*</code>），<strong>回调与系统触发用裸名</strong>（<code>request_routed</code> / <code>refund_completed</code>），二者 MUST NOT 混用。</p>
+    <p class="note"><strong>确定性保证。</strong>同一状态下同一触发 MUST 只有一条可用迁移。<code>deadline_expired</code> 的多目标迁移由互斥的 <code>timeout_policy</code> 条件区分（见 <a href="../../overview.html#s-m110">M1.10</a> 通用规则）。状态机迁移触发器的载体约定（与其余 MP 原语及主规范 P1—P6 一致）：<strong>供应商可调用动作置于 <code>action</code> 字段并用全限定名</strong>（<code>utp.aftersale.*</code>），<strong>回调与系统触发置于 <code>event</code> 字段并用裸名</strong>（<code>request_routed</code> / <code>refund_completed</code> / <code>deadline_expired</code>），二者 MUST NOT 混用。</p>
 
     <p><strong>轮次上限。</strong>协商轮次上限由 Marketplace 受理策略声明。超限后 Marketplace MUST 拒绝新的 <code>propose</code> 并返回 <code>AFTERSALE.MAX_ROUNDS</code>，售后单停留在 <code>REQUESTED</code>——<strong>本原语不因轮次超限自动迁移，供应商无需为此 <code>reject</code></strong>。</p>
 
@@ -219,14 +222,14 @@ state_scope:    resource（aftersale_id）
     <h2 id="s-m89">M8.9 Transport Bindings（传输绑定）</h2>
 
     <table>
-      <thead><tr><th>Action</th><th>REST</th><th>MCP / A2A</th></tr></thead>
+      <thead><tr><th>Action</th><th>REST</th><th>MCP Tool</th><th>A2A Task</th></tr></thead>
       <tbody>
-        <tr><td><code>approve</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/approve</code></td><td><code>utp.aftersale.approve</code></td></tr>
-        <tr><td><code>reject</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/reject</code></td><td><code>utp.aftersale.reject</code></td></tr>
-        <tr><td><code>propose</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/proposals</code></td><td><code>utp.aftersale.propose</code></td></tr>
-        <tr><td><code>confirm_return</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/return-receipt</code></td><td><code>utp.aftersale.confirm_return</code></td></tr>
-        <tr><td><code>query</code></td><td><code>GET /utp/m/v1/aftersales/{aftersale_id}</code></td><td><code>utp.aftersale.query</code></td></tr>
-        <tr><td><code>list</code></td><td><code>GET /utp/m/v1/aftersales</code></td><td><code>utp.aftersale.list</code></td></tr>
+        <tr><td><code>approve</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/approve</code></td><td><code>utp_aftersale_approve</code></td><td><code>utp:aftersale:approve</code></td></tr>
+        <tr><td><code>reject</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/reject</code></td><td><code>utp_aftersale_reject</code></td><td><code>utp:aftersale:reject</code></td></tr>
+        <tr><td><code>propose</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/proposals</code></td><td><code>utp_aftersale_propose</code></td><td><code>utp:aftersale:propose</code></td></tr>
+        <tr><td><code>confirm_return</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/return-receipt</code></td><td><code>utp_aftersale_confirm_return</code></td><td><code>utp:aftersale:confirm_return</code></td></tr>
+        <tr><td><code>query</code></td><td><code>GET /utp/m/v1/aftersales/{aftersale_id}</code></td><td><code>utp_aftersale_query</code></td><td><code>utp:aftersale:query</code></td></tr>
+        <tr><td><code>list</code></td><td><code>GET /utp/m/v1/aftersales</code></td><td><code>utp_aftersale_list</code></td><td><code>utp:aftersale:list</code></td></tr>
       </tbody>
     </table>
 

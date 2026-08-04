@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "hold.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/hold.json",
   "version": "2026-07-01",
   "title": "Hold",
   "description": "InventoryHold（M4.9.3）：交易性占用记录（P3 触发，Seller 只读）。HELD 态 MUST 有 expires_at。",

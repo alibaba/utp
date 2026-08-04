@@ -24,12 +24,12 @@ format: html
     <hr />
     <h2 id="s-m3-identity">原语身份</h2>
 <pre class="highlight"><code>primitive_id:   utp.listing
-version:        2026-07-01
+version:        2026-07-31
 initiator_role: Seller
 handler_role:   Marketplace
 intent:         供应商发布、更新并控制商品在 UTP 网络中的可交易状态
 state_delta:    ∅ → listing(LISTED)（资源作用域，不产生全局交易状态）
-actions:        publish, update, list, delist, query, archive
+actions:        publish, update, list, delist, query, archive, batch
 compensation:   delist（使商品退出可交易范围，不影响已成立订单）
 service:        dev.utp.merchant
 </code></pre>
@@ -278,6 +278,7 @@ service:        dev.utp.merchant
         <tr><td><code>delist</code></td><td><code>utp_listing_delist</code></td><td><code>utp:listing:delist</code></td></tr>
         <tr><td><code>query</code></td><td><code>utp_listing_query</code></td><td><code>utp:listing:query</code></td></tr>
         <tr><td><code>archive</code></td><td><code>utp_listing_archive</code></td><td><code>utp:listing:archive</code></td></tr>
+        <tr><td><code>batch</code></td><td><code>utp_listing_batch</code></td><td><code>utp:listing:batch</code></td></tr>
       </tbody>
     </table>
     <p>批量模式在 A2A 下 MUST 使用异步 Task，通过 Artifact 返回逐条结果。</p>

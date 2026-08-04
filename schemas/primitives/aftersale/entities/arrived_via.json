@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "arrived_via.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/arrived_via.json",
   "version": "2026-08-04",
   "title": "ArrivedVia",
   "description": "状态到达方式，用于区分主动决策与自动收敛，供审计与统计使用。",

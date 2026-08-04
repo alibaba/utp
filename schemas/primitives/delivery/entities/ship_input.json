@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ship_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/ship_input.json",
   "version": "2026-07-01",
   "title": "ShipInput",
   "description": "utp.delivery.ship：提交发货凭证（M7.8.1）。幂等：对已 SHIPPED 批次返回既有凭证。",

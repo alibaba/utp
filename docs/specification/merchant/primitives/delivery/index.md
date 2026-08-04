@@ -24,7 +24,7 @@ format: html
     <hr />
     <h2 id="s-m7-identity">原语身份</h2>
 <pre class="highlight"><code>primitive_id:   utp.delivery
-version:        2026-07-01
+version:        2026-07-31
 initiator_role: Seller
 handler_role:   Marketplace
 intent:         供应商以协议动作完成备货申报、发货、拆单与履约异常申报

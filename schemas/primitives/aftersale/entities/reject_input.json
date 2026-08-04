@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "reject_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/reject_input.json",
   "version": "2026-08-04",
   "title": "RejectInput",
   "description": "utp.aftersale.reject：拒绝售后请求。原因码为 no_defect_found / buyer_damage / used_or_altered 时 SHOULD 附举证。",

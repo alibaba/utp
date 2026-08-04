@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "batch_write_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/batch_write_input.json",
   "version": "2026-07-01",
   "title": "BatchWriteInput",
   "description": "批量 set/adjust（M4.8.2）：单批 ≤ 500 条，逐条独立成败；异步执行时响应返回 batch_id，按 M3.7.2 规则轮询。",

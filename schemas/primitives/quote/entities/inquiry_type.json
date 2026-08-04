@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "inquiry_type.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/quote/entities/inquiry_type.json",
   "version": "2026-07-30",
   "title": "InquiryType",
   "description": "询盘类型：标准询盘 / 招投标（附 bid_window，窗口关闭前平台 MUST NOT 披露投标内容）。",

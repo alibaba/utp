@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "propose_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/propose_input.json",
   "version": "2026-08-04",
   "title": "ProposeInput",
   "description": "utp.aftersale.propose：提出替代方案，等待买方回应。签名 MUST 覆盖 resolution_hash。",

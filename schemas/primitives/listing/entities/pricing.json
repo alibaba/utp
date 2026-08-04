@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "pricing.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/pricing.json",
   "version": "2026-07-01",
   "title": "Pricing",
   "description": "ListingPricing（M3.9.3）。条件必填以 if/then 表达：L0→unit_price；L1/L2/L3→pricing_tiers；L3→竞价字段。",

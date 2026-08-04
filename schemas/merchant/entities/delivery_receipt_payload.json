@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "delivery_receipt_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/delivery_receipt_payload.json",
   "version": "2026-07-30",
   "title": "DeliveryReceiptPayload",
   "description": "物流妥投/买方验收结论（M7.7）。receipt 结论来自 P5（FulfillmentReceipt/RejectionConfirmation 的镜像要素）。",

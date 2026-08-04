@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "adjustment.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/adjustment.json",
   "version": "2026-07-01",
   "title": "Adjustment",
   "description": "InventoryAdjustment（M4.9.2）：增量调整记录。delta 非零。",

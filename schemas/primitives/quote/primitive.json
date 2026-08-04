@@ -2,8 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ut-protocol.com/schemas/primitives/quote/primitive.json",
   "name": "utp.quote",
-  "version": "2026-07-30",
-  "status": "draft",
+  "version": "2026-07-31",
   "title": "MP3 Quote — 询盘响应原语定义（utp-m M5）",
   "description": "供应商对路由到达的买方 P2 询盘给出可核验的报价/应答（平台托管拓扑）。与主线 utp.negotiate 的关系是【串联两跳】而非并列通道：平台托管拓扑下供应商既无买方 callback_base 也无与买方的直接会话，第一跳 utp.quote.quote（Seller → Marketplace，本原语）提交报价事实，第二跳 utp.negotiate.quote（direction = seller_to_buyer，由 Marketplace 以 Seller 侧 handler 身份执行）将同一份 Quote 交付买方；两跳承载同一 Quote 实体与同一 terms_hash，Marketplace MUST NOT 改写报价内容。自托管拓扑下本原语不适用，供应商 Endpoint 直接执行 utp.negotiate.quote 回调。报价体复用主线权威实体 negotiate/entities/quote.json；本原语补充其 terms_hash 计算规则（JCS + SHA-256，见 entities/quote_input.json）。MAY 级能力：pricing_mode = L0 的供应商可不声明。",
   "service": "dev.utp.merchant",
@@ -23,6 +22,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/quotes/{inquiry_id}/quote"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.quote.quote"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.quote.quote"
         }
       ]
     },
@@ -41,6 +48,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/quotes/{inquiry_id}/revisions"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.quote.revise"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.quote.revise"
         }
       ]
     },
@@ -59,6 +74,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/quotes/{inquiry_id}/bid"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.quote.bid"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.quote.bid"
         }
       ]
     },
@@ -77,6 +100,14 @@
           "type": "rest",
           "method": "POST",
           "path": "/utp/m/v1/quotes/{inquiry_id}/decline"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.quote.decline"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.quote.decline"
         }
       ]
     },
@@ -93,6 +124,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/m/v1/quotes/{inquiry_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.quote.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.quote.query"
         }
       ]
     },
@@ -109,6 +148,14 @@
           "type": "rest",
           "method": "GET",
           "path": "/utp/m/v1/quotes"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.quote.list"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.quote.list"
         }
       ]
     }
@@ -145,95 +192,81 @@
       {
         "from": null,
         "event": "inquiry_routed",
-        "to": "INQUIRY_PENDING",
-        "by": "Marketplace"
+        "to": "INQUIRY_PENDING"
       },
       {
         "from": "INQUIRY_PENDING",
         "action": "utp.quote.quote",
         "to": "QUOTED",
-        "by": "Seller",
         "condition": "签名覆盖 quote_hash 且 valid_until > now()"
       },
       {
         "from": "INQUIRY_PENDING",
         "action": "utp.quote.bid",
         "to": "QUOTED",
-        "by": "Seller",
         "condition": "inquiry_type = rfq_bid 且投标窗口内"
       },
       {
         "from": "INQUIRY_PENDING",
         "action": "utp.quote.decline",
-        "to": "DECLINED",
-        "by": "Seller"
+        "to": "DECLINED"
       },
       {
         "from": "INQUIRY_PENDING",
         "event": "timeout",
         "to": "DECLINED",
-        "by": "system",
         "condition": "deadline 到期，quote_policy.on_timeout = auto_decline（decided_by = policy_auto）"
       },
       {
         "from": "QUOTED",
         "action": "utp.quote.revise",
         "to": "QUOTED",
-        "by": "Seller",
         "condition": "仅 quote 产生的 QUOTED；bid 产生的密封报价不可修订"
       },
       {
         "from": "QUOTED",
         "event": "buyer_countered",
         "to": "BUYER_COUNTERED",
-        "by": "Buyer(P2)",
         "condition": "round_no 递增"
       },
       {
         "from": "QUOTED",
         "event": "buyer_accepted",
         "to": "BOUND",
-        "by": "Buyer(P2)",
         "condition": "valid_until 内接受且 P2 绑定核查通过"
       },
       {
         "from": "QUOTED",
         "action": "utp.quote.decline",
-        "to": "DECLINED",
-        "by": "Seller"
+        "to": "DECLINED"
       },
       {
         "from": "QUOTED",
         "event": "quote_expired",
         "to": "EXPIRED",
-        "by": "system",
         "condition": "valid_until 到期未接受"
       },
       {
         "from": "BUYER_COUNTERED",
         "action": "utp.quote.quote",
         "to": "QUOTED",
-        "by": "Seller",
         "condition": "新一轮报价，重新签名"
       },
       {
         "from": "BUYER_COUNTERED",
         "action": "utp.quote.decline",
-        "to": "DECLINED",
-        "by": "Seller"
+        "to": "DECLINED"
       },
       {
         "from": "INQUIRY_PENDING",
         "event": "inquiry_withdrawn",
         "to": "EXPIRED",
-        "by": "Buyer(P2)",
         "condition": "询盘撤回，在途报价作废"
       },
       {
         "from": "QUOTED",
         "event": "inquiry_withdrawn",
-        "to": "EXPIRED",
-        "by": "Buyer(P2)"
+        "to": "EXPIRED"
       }
     ]
   }

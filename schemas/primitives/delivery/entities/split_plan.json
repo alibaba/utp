@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "split_plan.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/entities/split_plan.json",
   "version": "2026-07-01",
   "title": "SplitPlan",
   "description": "SplitPlan（M7.9.4）：分批交付计划。批次数量合计 MUST 等于订单数量（业务规则，由 Marketplace 校验）；计划变更以新版本追加。",

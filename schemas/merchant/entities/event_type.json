@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "event_type.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/event_type.json",
   "version": "2026-08-04",
   "title": "EventType",
   "enum": [

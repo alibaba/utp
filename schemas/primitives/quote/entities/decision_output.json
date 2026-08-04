@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "decision_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/quote/entities/decision_output.json",
   "version": "2026-07-30",
   "title": "DecisionOutput",
   "description": "写操作标准响应（含 valid_next_actions 自描述，M1.10）。",

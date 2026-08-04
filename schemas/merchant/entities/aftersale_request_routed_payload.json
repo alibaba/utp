@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "aftersale_request_routed_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/aftersale_request_routed_payload.json",
   "version": "2026-08-04",
   "title": "AftersaleRequestRoutedPayload",
   "description": "售后请求路由载荷。完整请求结构见 MP6 AftersaleRequest。",

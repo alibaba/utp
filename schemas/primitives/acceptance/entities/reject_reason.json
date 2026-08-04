@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "reject_reason.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/reject_reason.json",
   "version": "2026-07-01",
   "title": "RejectReason",
   "description": "RejectReason（M6.10.2）。code=other 时 MUST 附 detail。",

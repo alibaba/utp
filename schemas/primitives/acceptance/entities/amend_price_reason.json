@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "amend_price_reason.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/amend_price_reason.json",
   "version": "2026-08-04",
   "title": "AmendPriceReason",
   "description": "改价原因码。买方 Agent MAY 依据原因码自动判定可接受性（如 freight_recalculation 可自动接受、cost_fluctuation 需人工确认）。",

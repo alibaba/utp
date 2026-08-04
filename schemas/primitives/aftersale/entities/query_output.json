@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "query_output.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/query_output.json",
   "version": "2026-08-04",
   "title": "QueryOutput",
   "description": "utp.aftersale.query 的响应。",

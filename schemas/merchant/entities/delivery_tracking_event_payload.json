@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "delivery_tracking_event_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/delivery_tracking_event_payload.json",
   "version": "2026-08-04",
   "title": "DeliveryTrackingEventPayload",
   "description": "承运商轨迹事件载荷（可选订阅）。轨迹由承运商产生并经 Marketplace 汇聚，供应商是消费方——本事件 MUST NOT 被视为交付事实的来源（发货事实由 utp.delivery.ship 建立，妥投由 utp.delivery.receipt 建立）。",

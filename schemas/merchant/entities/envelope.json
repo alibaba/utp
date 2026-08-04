@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "envelope.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/envelope.json",
   "version": "2026-08-04",
   "title": "Envelope",
   "description": "回调事件统一信封。event → payload 结构强绑定；未知 event 类型接收方 MUST 忽略并 2xx 确认（向前兼容）。",

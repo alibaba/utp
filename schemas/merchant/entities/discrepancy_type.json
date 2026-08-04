@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "discrepancy_type.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/discrepancy_type.json",
   "version": "2026-07-01",
   "title": "DiscrepancyType",
   "description": "差异类型（M8.5/M8.6.3）。",

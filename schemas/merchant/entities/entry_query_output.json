@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "entry_query_output.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/entry_query_output.json",
   "version": "2026-07-01",
   "title": "EntryQueryOutput",
   "type": "object",

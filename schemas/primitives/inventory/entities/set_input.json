@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "set_input.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/set_input.json",
   "version": "2026-07-01",
   "title": "SetInput",
   "description": "utp.inventory.set：绝对值覆盖 available（全量校准）。MUST 携带 expected_revision（M4.8.1）。",

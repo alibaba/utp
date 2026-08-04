@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "source_materials.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/source_materials.json",
   "version": "2026-07-01",
   "title": "SourceMaterials",
   "description": "SourceMaterials（M3.9.7，仅请求侧）：AI 辅助录入素材，MUST NOT 作为商品语义存储。三字段至少其一。",

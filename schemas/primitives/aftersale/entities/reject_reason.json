@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "reject_reason.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/reject_reason.json",
   "version": "2026-08-04",
   "title": "AftersaleRejectReason",
   "description": "供应商拒绝售后的原因码。主张买方责任或无质量问题时 SHOULD 附举证。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "media_item.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/listing/entities/media_item.json",
   "version": "2026-07-01",
   "title": "MediaItem",
   "description": "ListingMedia（M3.9.5）。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "statement_detail_output.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/statement_detail_output.json",
   "version": "2026-07-01",
   "title": "StatementDetailOutput",
   "type": "object",

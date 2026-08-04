@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "contact.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/contact.json",
   "version": "2026-07-30",
   "title": "Contact",
   "description": "运营联系人。",

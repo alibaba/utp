@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "adjust_payload.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/inventory/entities/adjust_payload.json",
   "version": "2026-07-01",
   "title": "AdjustPayload",
   "description": "adjust 操作业务载荷（不含幂等键）。MUST 携带 expected_revision 或声明 commutative=true。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "aftersale_record.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/entities/aftersale_record.json",
   "version": "2026-08-04",
   "title": "AftersaleRecord",
   "description": "售后单权威档案。Marketplace 维护，供应商通过 query / list 读取。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "discrepancy_submit_input.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/discrepancy_submit_input.json",
   "version": "2026-07-01",
   "title": "DiscrepancySubmitInput",
   "description": "utp.pay.settlement.discrepancy.submit：登记账单异议（唯一写操作；资金后果走 P4/P6）。",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "aftersale_closed_payload.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/aftersale_closed_payload.json",
   "version": "2026-08-04",
   "title": "AftersaleClosedPayload",
   "description": "售后关闭载荷。close_reason 用于区分 CLOSED 的多种来源。",

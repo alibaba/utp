@@ -25,8 +25,7 @@ format: html
     <hr />
     <h2 id="s-m5-identity">原语身份</h2>
 <pre class="highlight"><code>primitive_id:   utp.quote
-version:        2026-07-30
-status:         draft（本原语为 2026-07-30 草案新增；既有四原语 MP1/MP2/MP4/MP5 的稳定性承诺不受影响）
+version:        2026-07-31
 initiator_role: Seller
 handler_role:   Marketplace
 intent:         供应商对路由到达的买方询盘给出可核验的报价/应答（报价/修订/投标/谢绝）

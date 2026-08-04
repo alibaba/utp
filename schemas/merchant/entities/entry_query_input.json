@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "entry_query_input.json",
+  "$id": "https://ut-protocol.com/schemas/merchant/entities/entry_query_input.json",
   "version": "2026-07-01",
   "title": "EntryQueryInput",
   "description": "utp.pay.settlement.entry.query：按交易维度查结算条目。",

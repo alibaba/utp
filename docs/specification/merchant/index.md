@@ -41,7 +41,7 @@ format: html
         <tr><td>M3</td><td><a href="primitives/listing/index.html">MP1 商品管理</a></td><td><code>utp.listing</code></td><td>Seller → Marketplace</td><td><code>publish</code>, <code>update</code>, <code>list</code>, <code>delist</code>, <code>query</code>, <code>archive</code>, <code>batch</code></td></tr>
         <tr><td>M4</td><td><a href="primitives/inventory/index.html">MP2 库存管理</a></td><td><code>utp.inventory</code></td><td>Seller → Marketplace</td><td><code>set</code>, <code>adjust</code>, <code>query</code>, <code>hold.query</code>, <code>batch</code></td></tr>
         <tr><td>M5</td><td><a href="primitives/quote/index.html">MP3 询盘响应（草案新增）</a></td><td><code>utp.quote</code></td><td>Seller → Marketplace</td><td><code>quote, revise, bid, decline, query, list</code></td></tr>
-        <tr><td>M6</td><td><a href="primitives/acceptance/index.html">MP4 订单受理</a></td><td><code>utp.acceptance</code></td><td>Seller → Marketplace</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>amend_leadtime</code>, <code>query</code>, <code>list</code></td></tr>
+        <tr><td>M6</td><td><a href="primitives/acceptance/index.html">MP4 接单</a></td><td><code>utp.acceptance</code></td><td>Seller → Marketplace</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>amend_leadtime</code>, <code>amend_price</code>, <code>query</code>, <code>list</code></td></tr>
         <tr><td>M7</td><td><a href="primitives/delivery/index.html">MP5 交付原语</a></td><td><code>utp.delivery</code></td><td>Seller → Marketplace</td><td><code>prepare</code>, <code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td></tr>
         <tr><td>M8</td><td><a href="primitives/aftersale/index.html">MP6 售后原语</a></td><td><code>utp.aftersale</code></td><td>Seller → Marketplace</td><td><code>approve</code>, <code>reject</code>, <code>propose</code>, <code>confirm_return</code>, <code>query</code>, <code>list</code></td></tr>
       </tbody>
@@ -77,17 +77,17 @@ format: html
     <table>
       <thead><tr><th>级别</th><th>范围</th><th>承诺</th></tr></thead>
       <tbody>
-        <tr><td><strong>Stable</strong></td><td>MP1、MP2、MP4、MP5（商品/库存/接单/交付）操作集与 REST 路径、请求/响应 Schema、资源状态机、错误码、回调事件、签名规则（JCS+SHA-256+JWS ES256）、幂等契约、批量协议、五步入驻流程（MP3 询盘响应为 2026-07-30 草案新增，暂列 Experimental，不在本行承诺内）</td><td>正式版 MUST NOT 做破坏性变更；新增字段一律 OPTIONAL；SDK 可直接按本版本实现</td></tr>
+        <tr><td><strong>Stable</strong></td><td>MP1、MP2、MP4、MP5（商品/库存/接单/交付）操作集与 REST 路径、请求/响应 Schema、资源状态机、错误码、回调事件、签名规则（JCS+SHA-256+JWS ES256）、幂等契约、批量协议、五步入驻流程（MP3 报价、MP6 售后为本轮新增，列 Experimental，不在本行承诺内）</td><td>正式版 MUST NOT 做破坏性变更；新增字段一律 OPTIONAL；SDK 可直接按本版本实现</td></tr>
         <tr><td><strong>Stable-with-dependency</strong></td><td>Profile 结构（随主规范 3.3）、MessageEnvelope、Mode 超时配置、MP4↔P3 / MP5↔P5 / MP6↔P6 衔接引用</td><td>自身语义稳定；若主规范对应章节变更，本规范同步修订引用（不改变本侧行为）</td></tr>
-        <tr><td>MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；<MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；sMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；tMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；rMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；oMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；nMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；gMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；>MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；EMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；xMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；pMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；eMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；rMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；iMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；mMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；eMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；nMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；tMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；aMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；lMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；<MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；/MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；sMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；tMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；rMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；oMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；nMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；gMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；>MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；<MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；/MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；tMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；dMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；>MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；<MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；tMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；dMP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；>MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；<code>utp.pay.settlement</code> 扩展、<code>delegation_policy</code> 透传模式（询盘/争议）、AI 辅助录入 <code>source_materials</code>、多仓库存投影</td><td>MAY 在后续版本调整；生产依赖前应跟踪附录 MF 开放问题</td></tr>
+        <tr><td><strong>Experimental</strong></td><td>MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；<code>utp.pay.settlement</code> 扩展、<code>delegation_policy</code> 透传模式（询盘/争议）、AI 辅助录入 <code>source_materials</code>、多仓库存投影</td><td>MAY 在后续版本调整；生产依赖前应跟踪附录 MF 开放问题</td></tr>
       </tbody>
     </table>
 
     <h2 id="s-doc-meta">文档信息</h2>
     <ul>
-      <li><strong>版本：</strong> 2026-07-30（日期版本，Draft；按上述稳定性分级承诺发布，稳定后随主规范按季度发布正式版）</li>
+      <li><strong>版本：</strong> 2026-08-04（日期版本，Draft；按上述稳定性分级承诺发布，稳定后随主规范按季度发布正式版）</li>
       <li><strong>基础：</strong> UTP Protocol Specification v1.0（2026-07-03）</li>
-      <li><strong>原语版本基线：</strong> 2026-07-01（与主规范 P1—P6 对齐）</li>
+      <li><strong>原语版本基线：</strong> 2026-07-31（MP1—MP6 统一取值，与主规范 P1—P6 的原语版本对齐）</li>
       <li><strong>状态：</strong> Release Candidate——Stable 面冻结；转正式版前待办：Marketplace 角色 RFC 流程（附录 ME 第 2 项）与主规范引用冻结点后的一致性复扫</li>
       <li><strong>机读契约：</strong> 实体 Schema、原语定义文件与状态机见<a href="appendices.html#s-md">附录 MD</a>；一致性校验工具（validate_schemas / test_fixtures）随本规范同源发布</li>
     </ul>

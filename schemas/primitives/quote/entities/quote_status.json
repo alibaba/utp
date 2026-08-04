@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "quote_status.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/quote/entities/quote_status.json",
   "version": "2026-07-30",
   "title": "QuoteStatus",
   "description": "应答任务状态机（M5.2.2）。BOUND/DECLINED/EXPIRED 为终态。",

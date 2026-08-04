@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "price_adjustment.json",
+  "$id": "https://ut-protocol.com/schemas/primitives/acceptance/entities/price_adjustment.json",
   "version": "2026-08-04",
   "title": "PriceAdjustment",
   "description": "单个订单行的价格调整。原价与新价 MUST 同币种。",
