@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aftersale_reason.json",
+  "version": "2026-08-04",
+  "title": "AftersaleReason",
+  "description": "买方申请售后的原因码，由 Marketplace 在路由时透传。供应商 Agent MAY 据此自动决策。",
+  "type": "string",
+  "enum": [
+    "quality_defect",
+    "wrong_item",
+    "damaged_in_transit",
+    "missing_items",
+    "spec_mismatch",
+    "delivery_delay",
+    "quantity_shortage",
+    "buyer_remorse",
+    "other"
+  ],
+  "enumDescriptions": {
+    "quality_defect": "商品存在质量缺陷。",
+    "wrong_item": "发错商品。",
+    "damaged_in_transit": "运输途中损坏。",
+    "missing_items": "缺件或漏发。",
+    "spec_mismatch": "实物规格与订单不符。",
+    "delivery_delay": "交付逾期导致买方拒收。",
+    "quantity_shortage": "数量短少。",
+    "buyer_remorse": "买方原因（非质量问题）。",
+    "other": "其他原因，MUST 在 reason_note 中说明。"
+  }
+}

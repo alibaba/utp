@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "amend_price_input.json",
+  "version": "2026-08-04",
+  "title": "AmendPriceInput",
+  "description": "utp.acceptance.amend_price：卖方提出价格调整提议，进入 AMEND_PROPOSED 等待买方确认。改价 MUST NOT 单方生效——买方确认后新条款方成立并产出新 terms_hash。逐行调整与整单调整至少其一；两者同时给出时，line_adjustments 优先，order_adjustments 仅表达非商品项（运费、包装费等）。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "base_terms_hash",
+    "reason_code",
+    "proposed_terms_hash",
+    "seller_signature",
+    "decided_by"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "幂等键。同键重复提交 MUST 返回首次结果。"
+    },
+    "base_terms_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "被调整的原条款哈希（来自 OrderRouting）。与当前订购条款快照不一致时 MUST 返回 ACCEPTANCE.TERMS_MISMATCH。"
+    },
+    "reason_code": {
+      "$ref": "amend_price_reason.json",
+      "description": "改价原因码。MUST 为结构化枚举，便于买方 Agent 自动判定是否可接受。"
+    },
+    "reason_note": {
+      "type": "string",
+      "maxLength": 512,
+      "description": "原因补充说明。"
+    },
+    "line_adjustments": {
+      "type": "array",
+      "minItems": 1,
+      "description": "逐行价格调整。未列出的订单行 MUST 视为不调整。",
+      "items": {
+        "$ref": "price_adjustment.json"
+      }
+    },
+    "order_adjustments": {
+      "type": "array",
+      "description": "整单级调整项（运费、包装费、批量折扣等非商品项）。",
+      "items": {
+        "type": "object",
+        "required": [
+          "category",
+          "amount"
+        ],
+        "properties": {
+          "category": {
+            "enum": [
+              "freight",
+              "packaging",
+              "insurance",
+              "volume_discount",
+              "surcharge",
+              "other"
+            ],
+            "description": "调整项类别。"
+          },
+          "amount": {
+            "$ref": "../../common/entities/money.json",
+            "description": "调整金额。负值表示减让。"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "proposed_total": {
+      "$ref": "../../common/entities/money.json",
+      "description": "调整后订单应付总额。MUST 与逐行及整单调整的累加结果一致，否则返回 ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH。"
+    },
+    "proposed_terms_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "调整后条款快照哈希（SHA-256 hex，对 JCS 规范化后的条款快照计算）。买方确认后此哈希成为订购的权威 terms_hash。"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json",
+      "description": "卖方业务签名，MUST 覆盖 proposed_terms_hash。买方 MUST 在确认前验签。"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "提议有效期。未给出时以受理任务 deadline 为界。超期未确认按 timeout_policy 收敛。"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ],
+      "description": "决策来源。policy_auto MUST 附带命中的定价策略标识以供审计。"
+    },
+    "policy_ref": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "命中的定价策略标识与版本（decided_by = policy_auto 时 MUST 提供）。"
+    }
+  },
+  "additionalProperties": true,
+  "anyOf": [
+    {
+      "required": [
+        "line_adjustments"
+      ]
+    },
+    {
+      "required": [
+        "order_adjustments"
+      ]
+    }
+  ]
+}

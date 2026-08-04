@@ -1,5 +1,5 @@
 ---
-title: M5 MP3 询盘响应原语
+title: M5 MP3 报价原语
 section: merchant
 owner: merchant-team
 status: review
@@ -7,7 +7,7 @@ version: 2026-07-30
 format: html
 ---
 
-<h1 id="s-m5">M5 · MP3 询盘响应原语（Quote）</h1>
+<h1 id="s-m5">M5 · MP3 报价原语（Quote）</h1>
     <h2 id="s-m5-toc">目录</h2>
     <ul>
       <li><a href="#s-m51">M5.1 Overview（概述）</a></li>
@@ -139,7 +139,7 @@ service:        dev.utp.merchant
         <tr><td><code>quote:query</code></td><td>Action Scope</td><td>查询应答任务与历史记录。</td><td>Marketplace</td><td>Seller 角色</td></tr>
       </tbody>
     </table>
-    <p><strong>约束：</strong><code>quote</code>/<code>bid</code> 的签名主体 MUST 是 Seller 的 Profile 公钥对应私钥。Merchant Agent 代签时 MUST 满足 M10.4 授权链要求（operation Mandate 覆盖 <code>quote:quote</code>，且报价金额在授权限额内）。</p>
+    <p><strong>约束：</strong><code>quote</code>/<code>bid</code> 的签名主体 MUST 是 Seller 的 Profile 公钥对应私钥。Merchant Agent 代签时 MUST 满足 M11.4 授权链要求（operation Mandate 覆盖 <code>quote:quote</code>，且报价金额在授权限额内）。</p>
 
     <hr />
     <h2 id="s-m55">M5.5 Guidelines（角色职责指引）</h2>
@@ -274,7 +274,7 @@ service:        dev.utp.merchant
         <tr><td><code>seller_signature</code></td><td>Signature</td><td>条件</td><td>Seller 业务签名（<code>primitives/common/entities/signature.json</code>，<code>algorithm</code> MUST 为 <code>ES256</code>），覆盖 <code>quote.terms_hash</code>。<code>status == QUOTED</code> 时必填。</td></tr>
         <tr><td><code>decline_reason</code></td><td>DeclineReason</td><td>条件</td><td><code>status == DECLINED</code> 时必填（M5.10.2）。</td></tr>
         <tr><td><code>quote_note</code></td><td>string</td><td>否</td><td>补充说明（贸易术语、单证费用归属、替代建议等）。</td></tr>
-        <tr><td><code>decided_by</code></td><td>enum</td><td>是</td><td><code>human</code> / <code>agent</code> / <code>policy_auto</code>（审计维度，M10.5）。</td></tr>
+        <tr><td><code>decided_by</code></td><td>enum</td><td>是</td><td><code>human</code> / <code>agent</code> / <code>policy_auto</code>（审计维度，M11.5）。</td></tr>
         <tr><td><code>decided_at</code></td><td>ISO-8601</td><td>是</td><td>应答时间。</td></tr>
       </tbody>
     </table>

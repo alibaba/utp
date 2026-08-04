@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aftersale_request.json",
+  "version": "2026-08-04",
+  "title": "AftersaleRequest",
+  "description": "买方售后请求，由 Marketplace 校验售后窗口与订单状态后路由至供应商。供应商 MUST 在 deadline 内给出处置结论。",
+  "type": "object",
+  "required": [
+    "aftersale_id",
+    "purchase_id",
+    "transaction_id",
+    "aftersale_type",
+    "reason_code",
+    "lines",
+    "deadline",
+    "timeout_policy"
+  ],
+  "properties": {
+    "aftersale_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "售后单标识，本原语所有动作的幂等锚点。"
+    },
+    "purchase_id": {
+      "type": "string",
+      "description": "关联订购标识。"
+    },
+    "transaction_id": {
+      "type": "string",
+      "description": "关联交易标识（全局作用域，只读引用）。"
+    },
+    "delivery_ref": {
+      "type": "string",
+      "description": "关联交付单标识（MP5 shipment_id），退货与验货据此核对批次。"
+    },
+    "aftersale_type": {
+      "$ref": "aftersale_type.json"
+    },
+    "reason_code": {
+      "$ref": "aftersale_reason.json"
+    },
+    "reason_note": {
+      "type": "string",
+      "maxLength": 1024,
+      "description": "买方补充说明。"
+    },
+    "lines": {
+      "type": "array",
+      "minItems": 1,
+      "description": "涉及的订单行与数量。",
+      "items": {
+        "type": "object",
+        "required": [
+          "line_no",
+          "quantity"
+        ],
+        "properties": {
+          "line_no": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "订单行号，MUST 与订购条款快照一致。"
+          },
+          "sku_id": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "涉及数量，MUST NOT 超过该行已交付数量。"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "requested_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "买方诉求金额上限。供应商方案的退款金额 MUST NOT 超过此值。"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "../../common/entities/evidence_reference.json"
+      },
+      "description": "买方举证材料（照片、检测报告、验收单）。"
+    },
+    "buyer_ref": {
+      "type": "string",
+      "description": "买方脱敏标识。MUST NOT 包含可直接识别的联系方式。"
+    },
+    "round_no": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "协商回合序号，随买方再议递增。"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "处置截止时间。"
+    },
+    "timeout_policy": {
+      "enum": [
+        "auto_approve",
+        "auto_reject"
+      ],
+      "description": "超时处置策略，由 Marketplace 按类目与商户等级预置。"
+    },
+    "return_window_days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "方案成立后买方寄回的时限（需退货类方案适用）。"
+    }
+  },
+  "additionalProperties": true
+}

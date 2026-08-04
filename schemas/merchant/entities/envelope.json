@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "envelope.json",
-  "version": "2026-07-30",
+  "version": "2026-08-04",
   "title": "Envelope",
   "description": "回调事件统一信封。event → payload 结构强绑定；未知 event 类型接收方 MUST 忽略并 2xx 确认（向前兼容）。",
   "type": "object",
@@ -152,7 +152,7 @@
       "if": {
         "properties": {
           "event": {
-            "const": "utp.shipment.delivery_receipt"
+            "const": "utp.delivery.receipt"
           }
         },
         "required": [
@@ -258,6 +258,120 @@
         "properties": {
           "payload": {
             "$ref": "settlement_paid_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.request_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_request_routed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.proposal_result"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_proposal_result_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.return_shipped"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_return_shipped_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.refund_completed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_refund_completed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.closed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_closed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.delivery.tracking_event"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "delivery_tracking_event_payload.json"
           }
         }
       }

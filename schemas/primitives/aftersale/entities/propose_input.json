@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "propose_input.json",
+  "version": "2026-08-04",
+  "title": "ProposeInput",
+  "description": "utp.aftersale.propose：提出替代方案，等待买方回应。签名 MUST 覆盖 resolution_hash。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "resolution",
+    "seller_signature",
+    "decided_by"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "幂等键。同键重复提交 MUST 返回首次结果。"
+    },
+    "resolution": {
+      "$ref": "resolution.json",
+      "description": "替代方案。MAY 与买方请求的类型或金额不同。"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json",
+      "description": "卖方业务签名，MUST 覆盖 resolution_hash。"
+    },
+    "rationale": {
+      "type": "string",
+      "maxLength": 1024,
+      "description": "提议依据（如检测结论、行业惯例），面向买方 Agent 的可判定说明。"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "../../common/entities/evidence_reference.json"
+      }
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "提议有效期。缺省以售后单 deadline 为界。"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ],
+      "description": "决策来源。policy_auto MUST 附带命中的策略标识以供审计（见 M11 决策审计）。"
+    },
+    "policy_ref": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "命中的策略标识与版本（decided_by = policy_auto 时 MUST 提供）。"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/primitives/aftersale/primitive.json",
+  "version": "2026-08-04",
+  "name": "utp.aftersale",
+  "title": "MP6 售后原语（Aftersale Primitive）",
+  "description": "供应商侧售后处置原语：对买方提出的退款、退货退款、换货、补发、维修请求作出结构化处置结论，并在需要退货的方案下确认退货收货与验货结果。本原语定义的是买卖双方在协议层的售后协商与执行，MUST NOT 与主规范 P6 Resolve 混同——P6 是第三方（Arbiter）介入的争议裁决，本原语是双方合意的售后处置；售后 MUST 先行，协商不成才由买方升级 P6。退款资金动作由 Marketplace（代收代付方）执行，本原语不定义资金指令；换货与补发的发货复用 MP5 交付原语的 ship（携带 aftersale_ref 关联），不重复定义。",
+  "spec": "/documentation/specification/merchant/primitives/aftersale/index.html",
+  "handler_role": "seller",
+  "invoker_role": "marketplace",
+  "stability": "experimental",
+  "actions": {
+    "approve": {
+      "description": "同意售后请求并给出最终处置方案（方案类型、退款金额、是否需要退货、运费责任）。方案 MUST 不超出买方请求的范围（退款金额 MUST NOT 大于 requested_amount）；需要更优/更差方案时使用 propose。签名 MUST 覆盖 resolution_hash。",
+      "idempotent": true,
+      "authorization": {
+        "mandate_type": "operation",
+        "scope": "aftersale:write"
+      },
+      "input_schema": {
+        "$ref": "entities/approve_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/aftersales/{aftersale_id}/approve"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.aftersale.approve"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.aftersale.approve"
+        }
+      ],
+      "errors": [
+        "AFTERSALE.NOT_FOUND",
+        "AFTERSALE.STATE_CONFLICT",
+        "AFTERSALE.DEADLINE_PASSED",
+        "AFTERSALE.RESOLUTION_EXCEEDS_REQUEST",
+        "AFTERSALE.SIGNATURE_INVALID"
+      ]
+    },
+    "reject": {
+      "description": "拒绝售后请求。MUST 提供结构化拒绝原因码；主张商品无质量问题或买方使用不当时 SHOULD 附举证材料（EvidenceReference）。拒绝为本售后单的终态；买方不服 MUST 通过 P6 Resolve 发起争议（新的 dispute 资源），本原语不承接。",
+      "idempotent": true,
+      "authorization": {
+        "mandate_type": "operation",
+        "scope": "aftersale:write"
+      },
+      "input_schema": {
+        "$ref": "entities/reject_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/decision_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/aftersales/{aftersale_id}/reject"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.aftersale.reject"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.aftersale.reject"
+        }
+      ],
+      "errors": [
+        "AFTERSALE.NOT_FOUND",
+        "AFTERSALE.STATE_CONFLICT",
+        "AFTERSALE.DEADLINE_PASSED",
+        "AFTERSALE.REASON_REQUIRED"
+      ]
+    },
+    "propose": {
+      "description": "提出替代处置方案（如买方申请退货退款，卖方提议保留货物并部分退款）。进入 PROPOSED 等待买方回应：买方接受则方案成立，买方再议则回到 REQUESTED 并递增 round_no，买方拒绝或撤回则售后关闭。协商轮次上限由 Marketplace 受理策略约束，超限后 MUST 拒绝新的 propose 并返回 AFTERSALE.MAX_ROUNDS。",
+      "idempotent": true,
+      "authorization": {
+        "mandate_type": "operation",
+        "scope": "aftersale:write"
+      },
+      "input_schema": {
+        "$ref": "entities/propose_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/propose_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/aftersales/{aftersale_id}/proposals"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.aftersale.propose"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.aftersale.propose"
+        }
+      ],
+      "errors": [
+        "AFTERSALE.NOT_FOUND",
+        "AFTERSALE.STATE_CONFLICT",
+        "AFTERSALE.DEADLINE_PASSED",
+        "AFTERSALE.MAX_ROUNDS",
+        "AFTERSALE.SIGNATURE_INVALID"
+      ]
+    },
+    "confirm_return": {
+      "description": "确认退货收货并给出验货结论（收货数量、验货结果、差异说明与举证）。仅适用于方案 return_required = true 的售后单。验货结果为 pass 或 partial 时，Marketplace 据此执行退款；为 fail 时供应商 MAY 通过 P6 Resolve 提出异议，本售后单按关闭收敛。",
+      "idempotent": true,
+      "authorization": {
+        "mandate_type": "operation",
+        "scope": "aftersale:write"
+      },
+      "input_schema": {
+        "$ref": "entities/confirm_return_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/confirm_return_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/m/v1/aftersales/{aftersale_id}/return-receipt"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.aftersale.confirm_return"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.aftersale.confirm_return"
+        }
+      ],
+      "errors": [
+        "AFTERSALE.NOT_FOUND",
+        "AFTERSALE.STATE_CONFLICT",
+        "AFTERSALE.RETURN_NOT_REQUIRED",
+        "AFTERSALE.QUANTITY_EXCEEDS_RETURN",
+        "AFTERSALE.SIGNATURE_INVALID"
+      ]
+    },
+    "query": {
+      "description": "查询单个售后单的权威档案（状态、方案、协商回合、退货与退款进展、时间线）。作为回调推送丢失时的兜底通道，MUST 始终可用。",
+      "idempotent": true,
+      "authorization": {
+        "mandate_type": "operation",
+        "scope": "aftersale:read"
+      },
+      "input_schema": {
+        "$ref": "entities/query_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/query_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/aftersales/{aftersale_id}"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.aftersale.query"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.aftersale.query"
+        }
+      ],
+      "errors": [
+        "AFTERSALE.NOT_FOUND"
+      ]
+    },
+    "list": {
+      "description": "按状态、类型、时间范围与关联订单筛选售后单，游标分页。用于供应商侧待处理队列拉取与轮询降级。",
+      "idempotent": true,
+      "authorization": {
+        "mandate_type": "operation",
+        "scope": "aftersale:read"
+      },
+      "input_schema": {
+        "$ref": "entities/list_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/list_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "GET",
+          "path": "/utp/m/v1/aftersales"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.aftersale.list"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.aftersale.list"
+        }
+      ],
+      "errors": [
+        "AFTERSALE.INVALID_CURSOR"
+      ]
+    }
+  },
+  "state_machine": {
+    "scope": "resource",
+    "resource": "aftersale",
+    "resource_key": "aftersale_id",
+    "initial_state": "REQUESTED",
+    "description": "售后单资源状态机。作用域为 resource，MUST NOT 与主规范全局状态机（transaction 作用域）混同：售后的执行结果通过退款事实与结算冲销影响交易，不新增全局状态。",
+    "states": {
+      "REQUESTED": {
+        "terminal": false,
+        "description": "买方售后请求已路由至供应商，等待处置结论。deadline 内 MUST 给出 approve / reject / propose 之一，否则按 timeout_policy 自动收敛。"
+      },
+      "PROPOSED": {
+        "terminal": false,
+        "description": "供应商已提出替代方案，等待买方回应。本状态下供应商仅可 query；买方回应结果经回调送达。"
+      },
+      "APPROVED": {
+        "terminal": false,
+        "description": "处置方案已成立（供应商同意或买方接受提议）。方案需退货时等待买方寄回，不需退货时等待 Marketplace 执行退款。"
+      },
+      "RETURNING": {
+        "terminal": false,
+        "description": "买方退货在途。供应商收货后 MUST 通过 confirm_return 给出验货结论。买方逾期未寄回时按关闭收敛。"
+      },
+      "RETURN_RECEIVED": {
+        "terminal": false,
+        "description": "退货已收且验货结论已提交，等待 Marketplace 执行退款或处理供应商异议。"
+      },
+      "COMPLETED": {
+        "terminal": true,
+        "description": "售后完成（退款到账、换货已发或补发已完成）。终态后写操作 MUST 返回 AFTERSALE.STATE_CONFLICT。"
+      },
+      "REJECTED": {
+        "terminal": true,
+        "description": "供应商拒绝售后请求，本售后单终结。买方不服时通过 P6 Resolve 另行发起争议，不在本状态机内表达。"
+      },
+      "CLOSED": {
+        "terminal": true,
+        "description": "售后关闭：买方撤回、买方回应超时、退货逾期未寄回，或已升级 P6 争议由裁决接管。"
+      }
+    },
+    "transitions": [
+      {
+        "from": null,
+        "action": "request_routed",
+        "to": "REQUESTED",
+        "condition": "Marketplace 校验售后窗口与订单状态后路由请求（回调事件，非供应商动作）"
+      },
+      {
+        "from": "REQUESTED",
+        "action": "utp.aftersale.approve",
+        "to": "APPROVED",
+        "condition": "方案未超出买方请求范围且签名覆盖 resolution_hash"
+      },
+      {
+        "from": "REQUESTED",
+        "action": "utp.aftersale.reject",
+        "to": "REJECTED",
+        "condition": "已提供结构化拒绝原因码"
+      },
+      {
+        "from": "REQUESTED",
+        "action": "utp.aftersale.propose",
+        "to": "PROPOSED",
+        "condition": "未超出协商轮次上限"
+      },
+      {
+        "from": "REQUESTED",
+        "action": "buyer_withdraw",
+        "to": "CLOSED",
+        "condition": "买方主动撤回售后申请（回调事件）"
+      },
+      {
+        "from": "REQUESTED",
+        "action": "deadline_expired",
+        "to": "APPROVED",
+        "condition": "timeout_policy = auto_approve（arrived_via = timeout_auto，方案取买方请求原样）"
+      },
+      {
+        "from": "REQUESTED",
+        "action": "deadline_expired",
+        "to": "REJECTED",
+        "condition": "timeout_policy = auto_reject（arrived_via = timeout_auto）"
+      },
+      {
+        "from": "PROPOSED",
+        "action": "buyer_accept_proposal",
+        "to": "APPROVED",
+        "condition": "买方接受替代方案（回调事件）"
+      },
+      {
+        "from": "PROPOSED",
+        "action": "buyer_counter_proposal",
+        "to": "REQUESTED",
+        "condition": "买方再议，round_no 递增（回调事件）"
+      },
+      {
+        "from": "PROPOSED",
+        "action": "buyer_reject_proposal",
+        "to": "CLOSED",
+        "condition": "买方拒绝方案并撤回或升级 P6（回调事件）"
+      },
+      {
+        "from": "PROPOSED",
+        "action": "deadline_expired",
+        "to": "CLOSED",
+        "condition": "买方回应超时按关闭收敛（arrived_via = timeout_auto）"
+      },
+      {
+        "from": "APPROVED",
+        "action": "buyer_return_shipped",
+        "to": "RETURNING",
+        "condition": "方案 return_required = true 且买方已寄回（回调事件）"
+      },
+      {
+        "from": "APPROVED",
+        "action": "refund_completed",
+        "to": "COMPLETED",
+        "condition": "方案 return_required = false，Marketplace 已完成退款或换货/补发已发出（回调事件）"
+      },
+      {
+        "from": "APPROVED",
+        "action": "return_window_expired",
+        "to": "CLOSED",
+        "condition": "方案 return_required = true 但买方在退货窗口内未寄回（回调事件）"
+      },
+      {
+        "from": "RETURNING",
+        "action": "utp.aftersale.confirm_return",
+        "to": "RETURN_RECEIVED",
+        "condition": "退货已收并已提交验货结论"
+      },
+      {
+        "from": "RETURNING",
+        "action": "return_window_expired",
+        "to": "CLOSED",
+        "condition": "退货逾期未达（回调事件）"
+      },
+      {
+        "from": "RETURN_RECEIVED",
+        "action": "refund_completed",
+        "to": "COMPLETED",
+        "condition": "验货结果 pass 或 partial，Marketplace 已按结论执行退款（回调事件）"
+      },
+      {
+        "from": "RETURN_RECEIVED",
+        "action": "dispute_escalated",
+        "to": "CLOSED",
+        "condition": "验货结果 fail 且供应商已通过 P6 Resolve 提出异议，由裁决接管（回调事件）"
+      }
+    ],
+    "constraints": {
+      "determinism": "同一状态下同一触发 MUST 只有一条可用迁移；deadline_expired 的多目标迁移已由互斥的 timeout_policy 条件区分。",
+      "round_limit_policy": "协商轮次上限由 Marketplace 受理策略声明。超限后 Marketplace MUST 拒绝新的 propose 并返回 AFTERSALE.MAX_ROUNDS，售后单停留在 REQUESTED，本原语不因轮次超限自动迁移。",
+      "escalation_boundary": "本原语 MUST NOT 表达裁决过程与裁决结果。升级 P6 后售后单收敛至 CLOSED，争议在 dispute 资源上独立演进；裁决产出的补偿通过结算调整项落地。",
+      "refund_authority": "退款资金动作 MUST 由 Marketplace（代收代付方）执行。供应商侧无退款 Action，只通过 refund_completed 回调观测结果。",
+      "trigger_convention": "状态机 action 字段的命名约定：供应商可调用动作使用全限定名（utp.aftersale.*），回调事件与系统触发使用裸名（request_routed / refund_completed / deadline_expired 等），二者 MUST NOT 混用，以免实现方误将回调当作可调用 Action。"
+    }
+  },
+  "callbacks": [
+    "utp.aftersale.request_routed",
+    "utp.aftersale.proposal_result",
+    "utp.aftersale.return_shipped",
+    "utp.aftersale.refund_completed",
+    "utp.aftersale.closed"
+  ],
+  "notes": [
+    "换货与补发的发货动作复用 MP5 交付原语的 utp.delivery.ship，请求中 MUST 携带 aftersale_ref 以建立关联，本原语不重复定义发货动作（原语正交性）。",
+    "本原语的写操作 MUST 先完成主规范第 5 章操作准入判定，并持有 operation Mandate。",
+    "AftersaleRecord 是售后处置的权威档案，MUST 支持按 aftersale_id 幂等重放。"
+  ]
+}

@@ -80,6 +80,41 @@
         }
       ]
     },
+    "amend_price": {
+      "description": "卖方提出价格调整提议（运费重算、规格差价、阶梯价变化等），进入 AMEND_PROPOSED 等待买方确认。改价 MUST NOT 单方生效：买方确认后 proposed_terms_hash 成为订购权威条款哈希，卖方需在新条款下完成 accept；买方拒绝则任务按 AMEND_PROPOSED 的既有收敛规则处置。",
+      "idempotent": true,
+      "authorization": null,
+      "input_schema": {
+        "$ref": "entities/amend_price_input.json"
+      },
+      "output_schema": {
+        "$ref": "entities/amend_price_output.json"
+      },
+      "transport_bindings": [
+        {
+          "type": "rest",
+          "method": "POST",
+          "path": "/utp/v1/acceptance/routings/{routing_id}/amend-price"
+        },
+        {
+          "type": "mcp",
+          "tool": "utp.acceptance.amend_price"
+        },
+        {
+          "type": "a2a",
+          "action": "utp.acceptance.amend_price"
+        }
+      ],
+      "errors": [
+        "ACCEPTANCE.NOT_FOUND",
+        "ACCEPTANCE.STATE_CONFLICT",
+        "ACCEPTANCE.DEADLINE_PASSED",
+        "ACCEPTANCE.TERMS_MISMATCH",
+        "ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH",
+        "ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED",
+        "ACCEPTANCE.SIGNATURE_INVALID"
+      ]
+    },
     "query": {
       "description": "无",
       "initiator_role": "Seller",
@@ -128,7 +163,7 @@
         "description": "供应商挂起（内部审批中，时限不延长）"
       },
       "AMEND_PROPOSED": {
-        "description": "交期变更待买方确认"
+        "description": "卖方已提出变更提议（交期或价格），等待买方确认。改价提议下 MUST NOT 视为条款已变更——订购条款以买方确认后的 proposed_terms_hash 为准。本状态下卖方仅可 query。"
       },
       "ACCEPTED": {
         "description": "已接受（卖方签名事实不可回滚）",
@@ -191,6 +226,18 @@
         "to": "AMEND_PROPOSED",
         "by": "Seller",
         "condition": "deadline 内"
+      },
+      {
+        "from": "PENDING_ACCEPT",
+        "action": "utp.acceptance.amend_price",
+        "to": "AMEND_PROPOSED",
+        "condition": "受理策略允许改价（Marketplace 侧 amend_price_allowed = true）；签名覆盖 proposed_terms_hash"
+      },
+      {
+        "from": "ON_HOLD",
+        "action": "utp.acceptance.amend_price",
+        "to": "AMEND_PROPOSED",
+        "condition": "deadline 内且受理策略允许改价"
       },
       {
         "from": "AMEND_PROPOSED",

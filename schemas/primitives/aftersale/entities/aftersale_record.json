@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aftersale_record.json",
+  "version": "2026-08-04",
+  "title": "AftersaleRecord",
+  "description": "售后单权威档案。Marketplace 维护，供应商通过 query / list 读取。",
+  "type": "object",
+  "required": [
+    "aftersale_id",
+    "status",
+    "aftersale_type",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "aftersale_id": {
+      "type": "string"
+    },
+    "purchase_id": {
+      "type": "string"
+    },
+    "transaction_id": {
+      "type": "string"
+    },
+    "delivery_ref": {
+      "type": "string"
+    },
+    "status": {
+      "$ref": "aftersale_status.json"
+    },
+    "aftersale_type": {
+      "$ref": "aftersale_type.json"
+    },
+    "reason_code": {
+      "$ref": "aftersale_reason.json"
+    },
+    "lines": {
+      "type": "array",
+      "minItems": 1,
+      "description": "涉及的订单行与数量。",
+      "items": {
+        "type": "object",
+        "required": [
+          "line_no",
+          "quantity"
+        ],
+        "properties": {
+          "line_no": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "订单行号，MUST 与订购条款快照一致。"
+          },
+          "sku_id": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "涉及数量，MUST NOT 超过该行已交付数量。"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "requested_amount": {
+      "$ref": "../../common/entities/money.json"
+    },
+    "resolution": {
+      "$ref": "resolution.json",
+      "description": "已成立的处置方案（状态达 APPROVED 后 MUST 存在）。"
+    },
+    "proposals": {
+      "type": "array",
+      "description": "历史提议记录（含每轮方案与买方回应）。",
+      "items": {
+        "type": "object",
+        "properties": {
+          "round_no": {
+            "type": "integer"
+          },
+          "proposed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolution": {
+            "$ref": "resolution.json"
+          },
+          "buyer_response": {
+            "enum": [
+              "accepted",
+              "countered",
+              "rejected",
+              "expired"
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "return_receipt": {
+      "$ref": "return_receipt.json",
+      "description": "退货验货结论（状态达 RETURN_RECEIVED 后 MUST 存在）。"
+    },
+    "refund_ref": {
+      "type": "string",
+      "description": "平台退款凭据标识（退款完成后回填），用于结算冲销核对。"
+    },
+    "reject_reason": {
+      "$ref": "reject_reason.json"
+    },
+    "reason_note": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "round_no": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "arrived_via": {
+      "$ref": "arrived_via.json"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ],
+      "description": "最近一次供应商决策的来源。"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "closed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "终态时间（COMPLETED / REJECTED / CLOSED）。"
+    },
+    "close_reason": {
+      "enum": [
+        "completed",
+        "seller_rejected",
+        "buyer_withdrawn",
+        "buyer_response_timeout",
+        "return_window_expired",
+        "escalated_to_dispute"
+      ],
+      "description": "关闭原因，用于区分 CLOSED 的多种来源。"
+    },
+    "dispute_ref": {
+      "type": "string",
+      "description": "升级 P6 后的争议标识（close_reason = escalated_to_dispute 时 MUST 提供）。"
+    }
+  },
+  "additionalProperties": true
+}

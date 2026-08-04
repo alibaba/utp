@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "amend_price_reason.json",
+  "version": "2026-08-04",
+  "title": "AmendPriceReason",
+  "description": "改价原因码。买方 Agent MAY 依据原因码自动判定可接受性（如 freight_recalculation 可自动接受、cost_fluctuation 需人工确认）。",
+  "type": "string",
+  "enum": [
+    "freight_recalculation",
+    "spec_difference",
+    "volume_tier_change",
+    "cost_fluctuation",
+    "tax_or_duty_change",
+    "promotion_expired",
+    "quotation_superseded",
+    "other"
+  ],
+  "enumDescriptions": {
+    "freight_recalculation": "按实际重量/体积/目的地重算运费。",
+    "spec_difference": "实际可供规格与下单规格存在差异导致的价差。",
+    "volume_tier_change": "实际数量落入不同阶梯价区间。",
+    "cost_fluctuation": "原材料或采购成本波动。",
+    "tax_or_duty_change": "税费或关税政策变化。",
+    "promotion_expired": "下单时引用的促销价已失效。",
+    "quotation_superseded": "引用的报价已被新报价取代（MUST 引用新 quote_id）。",
+    "other": "其他原因，MUST 在 reason_note 中说明。"
+  }
+}

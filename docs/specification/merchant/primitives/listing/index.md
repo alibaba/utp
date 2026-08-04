@@ -1,5 +1,5 @@
 ---
-title: M3 MP1 商品管理原语
+title: M3 MP1 商品原语
 section: merchant
 owner: merchant-team
 status: review
@@ -7,7 +7,7 @@ version: 2026-07-30
 format: html
 ---
 
-<h1 id="s-m3">M3 · MP1 商品管理原语（Listing）</h1>
+<h1 id="s-m3">M3 · MP1 商品原语（Listing）</h1>
     <h2 id="s-m3-toc">目录</h2>
     <ul>
       <li><a href="#s-m31">M3.1 Overview（概述）</a></li>
@@ -244,7 +244,7 @@ service:        dev.utp.merchant
       </tbody>
     </table>
     <h3 id="s-m372">M3.7.2 批量模式（Batch Mode）</h3>
-    <p>面向 ERP 全量/增量同步场景（<a href="../../erp-bridge.html#s-m94">M9.4</a>），<code>publish</code> 与 <code>update</code> MUST 支持批量提交：</p>
+    <p>面向 ERP 全量/增量同步场景（<a href="../../erp-bridge.html#s-m104">M10.4</a>），<code>publish</code> 与 <code>update</code> MUST 支持批量提交：</p>
     <ul>
       <li>批量请求为条目数组（单批 MUST ≤ 500 条），整批共享一个 <code>idempotency_key</code>，逐条独立校验、独立成败。</li>
       <li>响应 MUST 逐条返回 <code>{index, listing_id | error}</code>；部分失败不影响其余条目（部分成功语义）。</li>
@@ -320,7 +320,7 @@ service:        dev.utp.merchant
         <tr><td><code>spec</code></td><td>object</td><td>是</td><td>规格键值对（如 <code>{"color": "黑色", "size": "L"}</code>）。</td></tr>
         <tr><td><code>price_offset</code></td><td>Money</td><td>否</td><td>相对 <code>pricing.unit_price</code> 的差价；缺省为零差价。</td></tr>
         <tr><td><code>barcode</code></td><td>string</td><td>否</td><td>商品条码（EAN/UPC）。</td></tr>
-        <tr><td><code>external_ref</code></td><td>string</td><td>否</td><td>供应商内部编码（ERP 物料号），用于 M9 ID 映射；平台 MUST 原样保存并在订单路由中回传。</td></tr>
+        <tr><td><code>external_ref</code></td><td>string</td><td>否</td><td>供应商内部编码（ERP 物料号），用于 M10 ID 映射；平台 MUST 原样保存并在订单路由中回传。</td></tr>
         <tr><td><code>status</code></td><td>enum</td><td>是</td><td><code>active</code> / <code>inactive</code>（SKU 级停售，不影响其它 SKU）。</td></tr>
       </tbody>
     </table>
@@ -373,7 +373,7 @@ service:        dev.utp.merchant
         <tr><td><code>spreadsheet_url</code></td><td>string</td><td>否</td><td>供应商自维护的货品信息表格 URI（Excel/CSV）。</td></tr>
       </tbody>
     </table>
-    <p>约束：三个字段 MUST 至少提供其一；解析产出与请求中显式提交的字段冲突时，显式字段 MUST 优先；解析置信度信息 SHOULD 随响应返回供供应商/Agent 复核（对应 M10.5 控制点：价格类解析结果 SHOULD 经确认后生效）。</p>
+    <p>约束：三个字段 MUST 至少提供其一；解析产出与请求中显式提交的字段冲突时，显式字段 MUST 优先；解析置信度信息 SHOULD 随响应返回供供应商/Agent 复核（对应 M11.5 控制点：价格类解析结果 SHOULD 经确认后生效）。</p>
 
     <hr />
     <h2 id="s-m310">M3.10 Use Case Walkthroughs（用例演练）</h2>

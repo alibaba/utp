@@ -3,7 +3,7 @@
   "$id": "split_input.json",
   "version": "2026-07-01",
   "title": "SplitInput",
-  "description": "utp.shipment.split：登记分批计划（需 listing 声明 splittable 且 fulfillment_structure ≥ L2）。plan_id 由服务端生成。",
+  "description": "utp.delivery.split：登记分批计划（需 listing 声明 splittable 且 fulfillment_structure ≥ L2）。plan_id 由服务端生成。",
   "type": "object",
   "required": [
     "idempotency_key",

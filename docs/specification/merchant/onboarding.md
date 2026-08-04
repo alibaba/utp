@@ -27,7 +27,7 @@ format: html
     <p>供应商 MUST 在自己的 Endpoint 上按主规范 <a href="/documentation/specification/protocol-core/discovery-negotiation.html#s-331">3.3.1</a> 发布 Profile（<code>GET {utp_endpoint}/.well-known/utp</code>）。UTP-M 对 Profile 的增量要求：</p>
     <ul>
       <li><code>utp.primitives</code> MUST 声明其支持的 MP 原语及版本；<code>utp.supported_mode_range</code> MUST 声明适用于全部 Role 与 Primitive 的六维 Mode 范围（六维均必须存在且非空，主规范 3.3.2）。Profile 只声明能力事实，不声明调用方向；方向由原语定义文件的 <code>initiator_role=Seller</code> 固定（主规范 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023-action-definition-format">10.2.3</a>）。</li>
-      <li>供应商若需接收订单路由与结算账单推送（M6.7、M8.4），MUST 在 <code>utp.services</code> 中声明自己的回调 Service（<code>dev.utp.merchant_callback</code>）。</li>
+      <li>供应商若需接收订单路由与结算账单推送（M6.7、M9.4），MUST 在 <code>utp.services</code> 中声明自己的回调 Service（<code>dev.utp.merchant_callback</code>）。</li>
     </ul>
     <p><strong>供应商 Profile 示例（仅示 UTP-M 增量部分，结构遵循主规范 3.3.2）：</strong></p>
 <pre class="highlight"><code class="language-json">{
@@ -59,12 +59,12 @@ format: html
       "utp.listing":    [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/listing", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
       "utp.inventory":  [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/inventory", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
       "utp.acceptance": [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/acceptance", "schema": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json", "authorization": { "scope": "acceptance", "required": true } } ],
-      "utp.shipment":   [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/shipment", "schema": "https://ut-protocol.com/schemas/primitives/shipment/primitive.json", "authorization": { "scope": "shipment", "required": true } } ],
+      "utp.delivery":   [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/delivery", "schema": "https://ut-protocol.com/schemas/primitives/delivery/primitive.json", "authorization": { "scope": "delivery", "required": true } } ],
       "utp.quote":      [ { "version": "2026-07-30", "spec": "https://utp.dev/2026-07-30/primitives/quote", "schema": "https://ut-protocol.com/schemas/primitives/quote/primitive.json", "authorization": { "scope": "quote", "required": true } } ]
     },
     "roles": {
       "seller": {
-        "primitives": ["utp.listing", "utp.inventory", "utp.acceptance", "utp.shipment", "utp.quote"]
+        "primitives": ["utp.listing", "utp.inventory", "utp.acceptance", "utp.delivery", "utp.aftersale", "utp.quote"]
       }
     }
   },
@@ -119,12 +119,12 @@ format: html
       "utp.listing":    [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/listing", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
       "utp.inventory":  [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/inventory", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
       "utp.acceptance": [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/acceptance", "schema": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json", "authorization": { "scope": "acceptance", "required": true } } ],
-      "utp.shipment":   [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/shipment", "schema": "https://ut-protocol.com/schemas/primitives/shipment/primitive.json", "authorization": { "scope": "shipment", "required": true } } ],
+      "utp.delivery":   [ { "version": "2026-07-01", "spec": "https://utp.dev/2026-07-01/primitives/delivery", "schema": "https://ut-protocol.com/schemas/primitives/delivery/primitive.json", "authorization": { "scope": "delivery", "required": true } } ],
       "utp.quote":      [ { "version": "2026-07-30", "spec": "https://utp.dev/2026-07-30/primitives/quote", "schema": "https://ut-protocol.com/schemas/primitives/quote/primitive.json", "authorization": { "scope": "quote", "required": true } } ]
     },
     "roles": {
       "marketplace": {
-        "primitives": ["utp.listing", "utp.inventory", "utp.acceptance", "utp.shipment", "utp.quote"]
+        "primitives": ["utp.listing", "utp.inventory", "utp.acceptance", "utp.delivery", "utp.aftersale", "utp.quote"]
       },
       "seller": {
         "primitives": ["utp.source", "utp.negotiate", "utp.purchase", "utp.pay", "utp.fulfill", "utp.resolve"]
@@ -140,7 +140,7 @@ format: html
     <table>
       <thead><tr><th>Service</th><th>提供方</th><th>承载内容</th><th>绑定要求</th><th>定义位置</th></tr></thead>
       <tbody>
-        <tr><td><code>dev.utp.merchant</code></td><td>Marketplace</td><td>MP1—MP5 全部操作 + M8 结算扩展只读操作（供应商 → 平台方向）</td><td>REST MUST；MCP/A2A MAY（M1.10）</td><td>各原语章传输绑定小节；机读定义见附录 MD 原语定义文件</td></tr>
+        <tr><td><code>dev.utp.merchant</code></td><td>Marketplace</td><td>MP1—MP6 全部操作 + M9 结算扩展只读操作（供应商 → 平台方向）</td><td>REST MUST；MCP/A2A MAY（M1.10）</td><td>各原语章传输绑定小节；机读定义见附录 MD 原语定义文件</td></tr>
         <tr><td><code>dev.utp.merchant_callback</code></td><td>Seller（供应商自己部署）</td><td>M2.6.1 全部回调事件（平台 → 供应商方向），信封/签名/重试同主规范 4.3.1</td><td>REST MUST（单一 webhook 端点即可，事件类型在信封内区分）</td><td>M2.6.1 事件表；事件 Schema 见 merchant/events.json</td></tr>
       </tbody>
     </table>
@@ -157,8 +157,8 @@ format: html
         <tr><td><code>legal_name</code></td><td>string</td><td>是</td><td>法人名称，MUST 与资质文件一致。</td></tr>
         <tr><td><code>contact</code></td><td>object</td><td>是</td><td>运营联系人（<code>name</code>、<code>email</code>、<code>phone</code>）。</td></tr>
         <tr><td><code>categories</code></td><td>array</td><td>是</td><td>申请经营的类目标识列表。</td></tr>
-        <tr><td><code>settlement_account</code></td><td>object</td><td>是</td><td>结算收款账户引用（脱敏形式，详见 M8.2）。</td></tr>
-        <tr><td><code>erp_integration_mode</code></td><td>enum</td><td>否</td><td><code>none</code> / <code>bridge</code> / <code>native</code> / <code>agent_embedded</code>，声明 ERP 集成形态（与 M9.2 四种部署形态一一对应）。</td></tr>
+        <tr><td><code>settlement_account</code></td><td>object</td><td>是</td><td>结算收款账户引用（脱敏形式，详见 M9.2）。</td></tr>
+        <tr><td><code>erp_integration_mode</code></td><td>enum</td><td>否</td><td><code>none</code> / <code>bridge</code> / <code>native</code> / <code>agent_embedded</code>，声明 ERP 集成形态（与 M10.2 四种部署形态一一对应）。</td></tr>
         <tr><td><code>delegation_policy</code></td><td>object</td><td>否</td><td>按原语声明 Handler 侧执行模式：键为原语 ID（<code>utp.negotiate</code> / <code>utp.resolve</code>），值为 <code>{mode: direct|passthrough, on_timeout: direct_fallback|structured_timeout}</code>；缺省全部为 <code>direct</code>。语义见 <a href="overview.html#s-m144">M1.4.4</a>。</td></tr>
       </tbody>
     </table>
@@ -171,7 +171,7 @@ Content-Type: application/json
     <p>Marketplace 在注册受理时 MUST：验证 <code>utp_endpoint</code> 可达且 Profile 结构与发布 Domain 满足主规范 <a href="/documentation/specification/protocol-core/discovery-negotiation.html#s-351">3.5.1</a> 的验证规则；对同一 <code>agent_id</code> 的重复注册返回既有 <code>merchant_id</code>（幂等）。</p>
     <h3 id="s-m243">M2.4.3 注册边界与访问凭证</h3>
     <ul>
-      <li><strong>注册不可委托：</strong>平台账号注册与商户协议签署 MUST 由商家主体（Principal）自行完成，MUST NOT 委托给 Agent（对应 <a href="merchant-agent.html#s-m105">M10.5</a> 控制点）；注册完成后的资料提交、资质维护等操作 MAY 在授权下由 Agent 代办（M2.5）。</li>
+      <li><strong>注册不可委托：</strong>平台账号注册与商户协议签署 MUST 由商家主体（Principal）自行完成，MUST NOT 委托给 Agent（对应 <a href="merchant-agent.html#s-m115">M11.5</a> 控制点）；注册完成后的资料提交、资质维护等操作 MAY 在授权下由 Agent 代办（M2.5）。</li>
       <li><strong>身份复用：</strong>同一 <code>agent_id</code> MAY 同时承担买方与卖方身份——在 Profile 的 <code>utp.roles</code> 中同时声明 <code>buyer</code> 与 <code>seller</code>（复用主规范 <a href="/documentation/specification/protocol-core/discovery-negotiation.html#s-332">3.3.2</a>“同一 Business Domain MAY 承担多个 Role，共用同一份版本化 Profile”）；入驻仅叠加 Seller 侧能力，不要求独立账号。</li>
       <li><strong>访问凭证：</strong>商户状态进入 <code>ACTIVE</code> 后，按主规范<a href="/documentation/specification/protocol-core/identity-authorization.html">第 6 章</a>的身份与授权框架颁发访问凭证；后续全部 MP 原语调用 MUST 携带有效凭证。凭证的吊销与失效是 <code>RESTRICTED</code>/<code>TERMINATED</code>（M2.7）的技术执行手段。</li>
     </ul>
@@ -180,13 +180,13 @@ Content-Type: application/json
     <ul>
       <li><strong>资质内容不进协议：</strong>具体需要哪些资质文件由 Marketplace 按类目与商业场景公示（平台策略域，各平台对商家要求不同）；协议层只标准化资质的<strong>提交通道、审核状态与引用结构</strong>（复用主规范 SupplierCredentials 实体与 <code>credential_id</code> 引用，<a href="/documentation/specification/primitives/source/index.html#s-1195-suppliercredentials">11.9.5</a>）。供应商 MUST 按平台公示清单提交。</li>
       <li>Marketplace MUST 审核资质并给出结论：<code>QUALIFIED</code> / <code>REJECTED</code>（附结构化原因码）。审核期间状态为 <code>PENDING_QUALIFICATION</code>。</li>
-      <li><strong>资质维护是持续义务：</strong>资质的更新、补充与到期换证与首次提交使用同一提交通道与状态机；在商家授权下 MAY 由 Merchant Agent 代办（M10.2），但账号注册与商户协议签署除外（M2.4.3）。</li>
+      <li><strong>资质维护是持续义务：</strong>资质的更新、补充与到期换证与首次提交使用同一提交通道与状态机；在商家授权下 MAY 由 Merchant Agent 代办（M11.2），但账号注册与商户协议签署除外（M2.4.3）。</li>
       <li>当交易 <code>compliance_level ≥ L1</code> 时，Marketplace 在 P1 Source 响应中返回的供应商资质摘要 MUST 来自本步骤审核通过的文件；过期或吊销的资质 MUST 触发对应商品自动下架（M3.5 的 <code>SUSPENDED_BY_PLATFORM</code> 路径）。</li>
       <li>资质有效期到期前 30 天，Marketplace SHOULD 通过回调通知供应商换证。</li>
     </ul>
 
     <h2 id="s-m26">M2.6 Step 5：回调登记与连通性验收（Callback &amp; Readiness）</h2>
-    <p>订单路由（M6.7）、结算账单（M8.4）、审核结论（M3.4）等 Marketplace → Seller 的异步通知，统一通过供应商声明的 <code>dev.utp.merchant_callback</code> Service 推送，遵循主规范 <a href="/documentation/specification/protocol-core/transport-communication.html#s-431">4.3.1 Push Notification</a> 的信封、签名与重试规则。</p>
+    <p>订单路由（M6.7）、结算账单（M9.4）、审核结论（M3.4）等 Marketplace → Seller 的异步通知，统一通过供应商声明的 <code>dev.utp.merchant_callback</code> Service 推送，遵循主规范 <a href="/documentation/specification/protocol-core/transport-communication.html#s-431">4.3.1 Push Notification</a> 的信封、签名与重试规则。</p>
     <h3 id="s-m261">M2.6.1 回调事件类型注册表</h3>
     <table>
       <thead><tr><th>事件类型</th><th>触发方</th><th>触发时机</th><th>对应章节</th></tr></thead>
@@ -199,9 +199,9 @@ Content-Type: application/json
         <tr><td><code>utp.quote.expired</code></td><td>Marketplace</td><td>询盘应答超时自动谢绝</td><td>M5.3</td></tr>
         <tr><td><code>utp.quote.withdrawn</code></td><td>Marketplace</td><td>买方撤回询盘，在途报价作废</td><td>M5.1.5</td></tr>
         <tr><td><code>utp.resolve.dispute_routed</code></td><td>Marketplace</td><td>争议答辩透传路由（同上）</td><td>M1.4.4</td></tr>
-        <tr><td><code>utp.shipment.delivery_receipt</code></td><td>Marketplace</td><td>物流妥投/买方收货回执</td><td>M7.7</td></tr>
-        <tr><td><code>utp.settlement.statement_issued</code></td><td>Marketplace</td><td>结算账单出具</td><td>M8.4</td></tr>
-        <tr><td><code>utp.settlement.paid</code></td><td>Marketplace</td><td>账单打款成功（条目 BILLED → PAID_OUT）</td><td>M8.9</td></tr>
+        <tr><td><code>utp.delivery.receipt</code></td><td>Marketplace</td><td>物流妥投/买方收货回执</td><td>M7.7</td></tr>
+        <tr><td><code>utp.settlement.statement_issued</code></td><td>Marketplace</td><td>结算账单出具</td><td>M9.4</td></tr>
+        <tr><td><code>utp.settlement.paid</code></td><td>Marketplace</td><td>账单打款成功（条目 BILLED → PAID_OUT）</td><td>M9.9</td></tr>
       </tbody>
     </table>
     <p>接收方 MUST 返回 <code>2xx</code> 确认；推送失败按主规范指数退避重试（最多 5 次）后转入轮询降级——供应商可通过各原语的 <code>query</code>/<code>list</code> 操作主动拉取，保证推送丢失不阻塞业务（与主规范 4.3.2 一致）。</p>
@@ -214,7 +214,7 @@ Content-Type: application/json
         <tr><td>2</td><td>商品发布</td><td><code>listing.publish → list</code> 全流程成功，商品在沙箱 Source 可搜索</td></tr>
         <tr><td>3</td><td>库存同步</td><td><code>inventory.set/adjust</code> 生效且 <code>query</code> 一致</td></tr>
         <tr><td>4</td><td>接单闭环</td><td>模拟订单路由 → <code>acceptance.accept</code> → 沙箱订购成立</td></tr>
-        <tr><td>5</td><td>发货闭环</td><td><code>shipment.ship</code> → 沙箱买方收到 <code>fulfill.notify(SHIPPED)</code></td></tr>
+        <tr><td>5</td><td>发货闭环</td><td><code>delivery.ship</code> → 沙箱买方收到 <code>fulfill.notify(SHIPPED)</code></td></tr>
         <tr><td>6</td><td>回调可达</td><td>全部 M2.6.1 事件推送返回 <code>2xx</code>，验签通过</td></tr>
         <tr><td>7</td><td>幂等</td><td>重复 <code>idempotency_key</code> 返回缓存结果，无重复副作用</td></tr>
         <tr><td>8</td><td>询盘应答闭环（条件项）</td><td>仅声明 <code>utp.quote</code> 的商户 MUST 通过：模拟询盘路由 → <code>quote.quote</code>（附覆盖 <code>terms_hash</code> 的签名）→ 沙箱买方收到报价；未声明该原语的商户本项不适用（M5.1.2）</td></tr>

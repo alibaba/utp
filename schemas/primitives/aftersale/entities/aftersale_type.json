@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aftersale_type.json",
+  "version": "2026-08-04",
+  "title": "AftersaleType",
+  "description": "售后类型。决定方案是否需要退货与是否触发重新发货。",
+  "type": "string",
+  "enum": [
+    "refund_only",
+    "return_refund",
+    "exchange",
+    "replenish",
+    "repair"
+  ],
+  "enumDescriptions": {
+    "refund_only": "仅退款，不退货（如少量破损协商折让）。",
+    "return_refund": "退货退款，需买方寄回后验货。",
+    "exchange": "换货，需买方寄回后由卖方重新发货（复用 utp.delivery.ship）。",
+    "replenish": "补发，不需退货，卖方补发缺失或损坏部分（复用 utp.delivery.ship）。",
+    "repair": "维修，货物寄回维修后返还，适用于工业品与设备类。"
+  }
+}

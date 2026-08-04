@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "resolution.json",
+  "version": "2026-08-04",
+  "title": "AftersaleResolution",
+  "description": "售后处置方案。方案一旦成立即构成双方合意，退款执行与退货义务以此为准。",
+  "type": "object",
+  "required": [
+    "aftersale_type",
+    "return_required"
+  ],
+  "properties": {
+    "aftersale_type": {
+      "$ref": "aftersale_type.json",
+      "description": "最终处置类型，MAY 与买方请求类型不同（如请求退货退款、方案为仅退款）。"
+    },
+    "refund_amount": {
+      "$ref": "../../common/entities/money.json",
+      "description": "退款金额。MUST NOT 大于 AftersaleRequest.requested_amount。"
+    },
+    "return_required": {
+      "type": "boolean",
+      "description": "是否需要买方寄回货物。exchange 与 repair 恒为 true。"
+    },
+    "replacement_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "是否需要卖方重新发货。为 true 时 MUST 通过 utp.delivery.ship 携带 aftersale_ref 执行。"
+    },
+    "freight_responsibility": {
+      "$ref": "freight_responsibility.json"
+    },
+    "return_address": {
+      "$ref": "../../common/entities/address.json",
+      "description": "退货收货地址（return_required = true 时 MUST 提供）。"
+    },
+    "compensation_note": {
+      "type": "string",
+      "maxLength": 512,
+      "description": "非资金补偿说明（如下次订单折扣）。"
+    },
+    "resolution_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "方案快照哈希（SHA-256 hex，对 JCS 规范化后的方案计算）。签名 MUST 覆盖此值。"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ut-protocol.com/schemas/primitives/shipment/primitive.json",
-  "name": "utp.shipment",
+  "$id": "https://ut-protocol.com/schemas/primitives/delivery/primitive.json",
+  "name": "utp.delivery",
   "version": "2026-07-01",
   "status": "release-candidate",
-  "title": "MP5 Shipment Primitive Definition",
-  "description": "发货执行原语定义文件（UTP-M M7）。声明操作、角色绑定、传输绑定与 Shipment 资源状态机（分批交付时每个批次独立走本状态机）。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/shipment.json。",
+  "title": "MP5 交付原语（Delivery Primitive）",
+  "description": "供应商侧交付执行原语：申报备货、发货、分批交付计划与运输异常，产生可核验的履约事实。本原语覆盖履约的卖方执行面（备货 → 发货 → 运输 → 妥投），MUST NOT 定义验收动作——验收（receive / reject / inspect）始终归买方侧 P5 履约原语。",
   "service": "dev.utp.merchant",
   "actions": {
     "prepare": {
@@ -22,7 +22,7 @@
         {
           "type": "rest",
           "method": "POST",
-          "path": "/utp/m/v1/shipments/preparations"
+          "path": "/utp/m/v1/deliveries/preparations"
         }
       ]
     },
@@ -40,7 +40,7 @@
         {
           "type": "rest",
           "method": "POST",
-          "path": "/utp/m/v1/shipments/split-plans"
+          "path": "/utp/m/v1/deliveries/split-plans"
         }
       ]
     },
@@ -58,7 +58,7 @@
         {
           "type": "rest",
           "method": "POST",
-          "path": "/utp/m/v1/shipments"
+          "path": "/utp/m/v1/deliveries"
         }
       ]
     },
@@ -76,7 +76,7 @@
         {
           "type": "rest",
           "method": "POST",
-          "path": "/utp/m/v1/shipments/{shipment_id}/events"
+          "path": "/utp/m/v1/deliveries/{shipment_id}/events"
         }
       ]
     },
@@ -94,7 +94,7 @@
         {
           "type": "rest",
           "method": "GET",
-          "path": "/utp/m/v1/shipments"
+          "path": "/utp/m/v1/deliveries"
         }
       ]
     }
@@ -128,7 +128,7 @@
     "transitions": [
       {
         "from": null,
-        "action": "utp.shipment.prepare",
+        "action": "utp.delivery.prepare",
         "to": "PREPARING",
         "by": "Seller"
       },
@@ -140,33 +140,33 @@
       },
       {
         "from": null,
-        "action": "utp.shipment.ship",
+        "action": "utp.delivery.ship",
         "to": "SHIPPED",
         "by": "Seller",
         "condition": "跳过备货申报直接发货"
       },
       {
         "from": "PREPARING",
-        "action": "utp.shipment.ship",
+        "action": "utp.delivery.ship",
         "to": "SHIPPED",
         "by": "Seller"
       },
       {
         "from": "READY",
-        "action": "utp.shipment.ship",
+        "action": "utp.delivery.ship",
         "to": "SHIPPED",
         "by": "Seller"
       },
       {
         "from": "SHIPPED",
-        "action": "utp.shipment.update",
+        "action": "utp.delivery.update",
         "to": "EXCEPTION",
         "by": "Seller",
         "condition": "type = delay | exception"
       },
       {
         "from": "EXCEPTION",
-        "action": "utp.shipment.update",
+        "action": "utp.delivery.update",
         "to": "SHIPPED",
         "by": "Seller",
         "condition": "更正 / 重发"

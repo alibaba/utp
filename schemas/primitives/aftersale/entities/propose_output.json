@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "propose_output.json",
+  "version": "2026-08-04",
+  "title": "ProposeOutput",
+  "description": "utp.aftersale.propose 的响应。提议已登记但未成立——MUST 等待买方回应。",
+  "type": "object",
+  "required": [
+    "aftersale_id",
+    "status",
+    "round_no",
+    "resolution_hash",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "aftersale_id": {
+      "type": "string"
+    },
+    "status": {
+      "const": "PROPOSED",
+      "description": "登记成功后状态恒为 PROPOSED。"
+    },
+    "round_no": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "本次提议所属回合。"
+    },
+    "resolution_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "buyer_confirmation_required": {
+      "const": true,
+      "description": "恒为 true——替代方案 MUST NOT 单方生效。"
+    },
+    "valid_next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "后续可执行动作的全限定名（PROPOSED 下通常仅 utp.aftersale.query）。"
+    }
+  },
+  "additionalProperties": true
+}

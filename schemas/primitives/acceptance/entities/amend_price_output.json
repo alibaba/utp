@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "amend_price_output.json",
+  "version": "2026-08-04",
+  "title": "AmendPriceOutput",
+  "description": "utp.acceptance.amend_price 的响应。提议已登记但未生效——MUST 等待买方确认。",
+  "type": "object",
+  "required": [
+    "routing_id",
+    "amendment_id",
+    "status",
+    "proposed_terms_hash",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "routing_id": {
+      "type": "string",
+      "description": "受理任务标识。"
+    },
+    "amendment_id": {
+      "type": "string",
+      "description": "本次改价提议的标识，买方确认结果回调 MUST 回传该值。"
+    },
+    "status": {
+      "const": "AMEND_PROPOSED",
+      "description": "登记成功后任务状态恒为 AMEND_PROPOSED。"
+    },
+    "proposed_terms_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "待买方确认的条款哈希。确认后成为订购权威 terms_hash。"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "提议有效期。"
+    },
+    "buyer_confirmation_required": {
+      "const": true,
+      "description": "恒为 true——改价 MUST NOT 单方生效，此字段用于 Agent 自描述。"
+    },
+    "valid_next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "后续可执行动作的全限定名（AMEND_PROPOSED 下通常仅 utp.acceptance.query）。"
+    }
+  },
+  "additionalProperties": true
+}

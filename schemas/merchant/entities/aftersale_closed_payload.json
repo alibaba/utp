@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aftersale_closed_payload.json",
+  "version": "2026-08-04",
+  "title": "AftersaleClosedPayload",
+  "description": "售后关闭载荷。close_reason 用于区分 CLOSED 的多种来源。",
+  "type": "object",
+  "required": [
+    "aftersale_id",
+    "close_reason",
+    "closed_at"
+  ],
+  "properties": {
+    "aftersale_id": {
+      "type": "string"
+    },
+    "close_reason": {
+      "enum": [
+        "buyer_withdrawn",
+        "buyer_response_timeout",
+        "return_window_expired",
+        "escalated_to_dispute"
+      ],
+      "description": "关闭原因。escalated_to_dispute 时 MUST 提供 dispute_ref。"
+    },
+    "dispute_ref": {
+      "type": "string",
+      "description": "升级后的 P6 争议标识。"
+    },
+    "note": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "closed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "price_adjustment.json",
+  "version": "2026-08-04",
+  "title": "PriceAdjustment",
+  "description": "单个订单行的价格调整。原价与新价 MUST 同币种。",
+  "type": "object",
+  "required": [
+    "line_no",
+    "original_unit_price",
+    "proposed_unit_price"
+  ],
+  "properties": {
+    "line_no": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "订单行号，MUST 与 OrderRouting.order_summary 中的行号对应。"
+    },
+    "sku_id": {
+      "type": "string",
+      "description": "SKU 标识，用于交叉校验。"
+    },
+    "original_unit_price": {
+      "$ref": "../../common/entities/money.json",
+      "description": "原单价。"
+    },
+    "proposed_unit_price": {
+      "$ref": "../../common/entities/money.json",
+      "description": "调整后单价。"
+    },
+    "quantity": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "适用数量。缺省为该行全部数量。"
+    },
+    "note": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "additionalProperties": true
+}

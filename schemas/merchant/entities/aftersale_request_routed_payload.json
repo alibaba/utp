@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aftersale_request_routed_payload.json",
+  "version": "2026-08-04",
+  "title": "AftersaleRequestRoutedPayload",
+  "description": "售后请求路由载荷。完整请求结构见 MP6 AftersaleRequest。",
+  "type": "object",
+  "required": [
+    "aftersale_id",
+    "purchase_id",
+    "aftersale_type",
+    "reason_code",
+    "deadline",
+    "timeout_policy"
+  ],
+  "properties": {
+    "aftersale_id": {
+      "type": "string"
+    },
+    "purchase_id": {
+      "type": "string"
+    },
+    "transaction_id": {
+      "type": "string"
+    },
+    "delivery_ref": {
+      "type": "string",
+      "description": "关联交付单标识。"
+    },
+    "aftersale_type": {
+      "$ref": "../../primitives/aftersale/entities/aftersale_type.json"
+    },
+    "reason_code": {
+      "$ref": "../../primitives/aftersale/entities/aftersale_reason.json"
+    },
+    "requested_amount": {
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "evidence_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "买方举证材料数量，明细通过 query 获取。"
+    },
+    "round_no": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timeout_policy": {
+      "enum": [
+        "auto_approve",
+        "auto_reject"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

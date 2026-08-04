@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aftersale_status.json",
+  "version": "2026-08-04",
+  "title": "AftersaleStatus",
+  "description": "售后单状态。语义见原语状态机。",
+  "type": "string",
+  "enum": [
+    "REQUESTED",
+    "PROPOSED",
+    "APPROVED",
+    "RETURNING",
+    "RETURN_RECEIVED",
+    "COMPLETED",
+    "REJECTED",
+    "CLOSED"
+  ],
+  "enumDescriptions": {
+    "REQUESTED": "待供应商处置。",
+    "PROPOSED": "已提替代方案，待买方回应。",
+    "APPROVED": "方案成立，待执行。",
+    "RETURNING": "退货在途。",
+    "RETURN_RECEIVED": "退货已收，待退款或异议处理。",
+    "COMPLETED": "终态：售后完成。",
+    "REJECTED": "终态：供应商拒绝。",
+    "CLOSED": "终态：撤回、超时或升级争议后关闭。"
+  }
+}

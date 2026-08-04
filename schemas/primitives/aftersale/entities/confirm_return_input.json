@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "confirm_return_input.json",
+  "version": "2026-08-04",
+  "title": "ConfirmReturnInput",
+  "description": "utp.aftersale.confirm_return：确认退货收货与验货结论。验货结果非 pass 时 MUST 提供差异说明。",
+  "type": "object",
+  "required": [
+    "idempotency_key",
+    "return_receipt",
+    "seller_signature",
+    "decided_by"
+  ],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "幂等键。同键重复提交 MUST 返回首次结果。"
+    },
+    "return_receipt": {
+      "$ref": "return_receipt.json"
+    },
+    "seller_signature": {
+      "$ref": "../../common/entities/signature.json",
+      "description": "卖方业务签名，MUST 覆盖验货结论快照哈希。"
+    },
+    "decided_by": {
+      "enum": [
+        "human",
+        "agent",
+        "policy_auto"
+      ],
+      "description": "决策来源。policy_auto MUST 附带命中的策略标识以供审计（见 M11 决策审计）。"
+    },
+    "policy_ref": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "命中的策略标识与版本（decided_by = policy_auto 时 MUST 提供）。"
+    }
+  },
+  "additionalProperties": true
+}

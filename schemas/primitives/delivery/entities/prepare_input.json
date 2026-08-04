@@ -3,7 +3,7 @@
   "$id": "prepare_input.json",
   "version": "2026-07-01",
   "title": "PrepareInput",
-  "description": "utp.shipment.prepare：备货申报（可选动作；不触发买方可观测状态迁移，M7.1.2）。",
+  "description": "utp.delivery.prepare：备货申报（可选动作；不触发买方可观测状态迁移，M7.1.2）。",
   "type": "object",
   "required": [
     "idempotency_key",

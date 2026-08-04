@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "inspection_result.json",
+  "version": "2026-08-04",
+  "title": "InspectionResult",
+  "description": "退货验货结论。",
+  "type": "string",
+  "enum": [
+    "pass",
+    "partial",
+    "fail"
+  ],
+  "enumDescriptions": {
+    "pass": "退回货物与方案一致，可全额执行退款。",
+    "partial": "部分符合（数量短少或轻微损耗），按 accepted_amount 执行退款。",
+    "fail": "退回货物与方案严重不符，供应商 MAY 升级 P6 提出异议。"
+  }
+}

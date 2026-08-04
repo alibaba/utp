@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "list_output.json",
+  "version": "2026-08-04",
+  "title": "ListOutput",
+  "description": "utp.aftersale.list 的响应。",
+  "type": "object",
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "aftersale_record.json"
+      }
+    },
+    "next_cursor": {
+      "type": "string",
+      "description": "下一页游标。无更多数据时 MUST 省略或为 null。"
+    },
+    "total_hint": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "总数估计值，MAY 提供。"
+    }
+  },
+  "additionalProperties": true
+}

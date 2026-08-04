@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "arrived_via.json",
+  "version": "2026-08-04",
+  "title": "ArrivedVia",
+  "description": "状态到达方式，用于区分主动决策与自动收敛，供审计与统计使用。",
+  "type": "string",
+  "enum": [
+    "seller_action",
+    "buyer_action",
+    "timeout_auto",
+    "platform_action"
+  ],
+  "enumDescriptions": {
+    "seller_action": "供应商主动动作。",
+    "buyer_action": "买方动作触发。",
+    "timeout_auto": "超时自动处置。",
+    "platform_action": "平台代为处置。"
+  }
+}

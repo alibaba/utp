@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "freight_responsibility.json",
+  "version": "2026-08-04",
+  "title": "FreightResponsibility",
+  "description": "退货运费责任方。质量问题类 SHOULD 由卖方承担，买方原因类 SHOULD 由买方承担。",
+  "type": "string",
+  "enum": [
+    "buyer",
+    "seller",
+    "platform",
+    "shared"
+  ],
+  "enumDescriptions": {
+    "buyer": "买方承担退货运费。",
+    "seller": "卖方承担退货运费。",
+    "platform": "平台承担（营销或体验补贴）。",
+    "shared": "双方分摊，比例在 note 中说明。"
+  }
+}

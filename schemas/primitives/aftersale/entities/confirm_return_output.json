@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "confirm_return_output.json",
+  "version": "2026-08-04",
+  "title": "ConfirmReturnOutput",
+  "description": "utp.aftersale.confirm_return 的响应。退款由 Marketplace 后续执行，本响应不代表退款已完成。",
+  "type": "object",
+  "required": [
+    "aftersale_id",
+    "status",
+    "inspection_result",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "aftersale_id": {
+      "type": "string"
+    },
+    "status": {
+      "const": "RETURN_RECEIVED"
+    },
+    "inspection_result": {
+      "$ref": "inspection_result.json"
+    },
+    "refund_amount_to_execute": {
+      "$ref": "../../common/entities/money.json",
+      "description": "Marketplace 将据此执行的退款金额（pass 取方案金额，partial 取 accepted_amount）。"
+    },
+    "refund_execution_owner": {
+      "const": "marketplace",
+      "description": "退款执行方恒为 Marketplace——供应商侧无退款 Action。"
+    },
+    "valid_next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

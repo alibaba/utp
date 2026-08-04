@@ -1,5 +1,5 @@
 ---
-title: M6 MP4 订单受理原语
+title: M6 MP4 接单原语
 section: merchant
 owner: merchant-team
 status: review
@@ -7,7 +7,7 @@ version: 2026-07-30
 format: html
 ---
 
-<h1 id="s-m6">M6 · MP4 订单受理原语（Acceptance）</h1>
+<h1 id="s-m6">M6 · MP4 接单原语（Acceptance）</h1>
     <h2 id="s-m6-toc">目录</h2>
     <ul>
       <li><a href="#s-m61">M6.1 Overview（概述）</a></li>
@@ -28,9 +28,9 @@ format: html
 version:        2026-07-01
 initiator_role: Seller
 handler_role:   Marketplace
-intent:         供应商对路由到达的订购请求给出可核验的受理结论（接受/拒绝/挂起/交期变更）
+intent:         供应商对路由到达的订购请求给出可核验的受理结论（接受/拒绝/挂起/交期变更/价格调整提议）
 state_delta:    order_routed → acceptance_record（资源作用域）
-actions:        accept, reject, hold, amend_leadtime, query, list
+actions:        accept, reject, hold, amend_leadtime, amend_price, query, list
 compensation:   受理超时 → 按 acceptance_policy 自动处置并通知双方
 service:        dev.utp.merchant
 </code></pre>
@@ -62,6 +62,8 @@ service:        dev.utp.merchant
         <tr><td><code>purchase.status ∈ {DRAFT, SIGNING}</code></td><td>MUST</td><td>受理窗口仅存在于订购成立之前。</td></tr>
         <tr><td><code>merchant.status ∈ {ACTIVE, RESTRICTED}</code></td><td>MUST</td><td><code>RESTRICTED</code> 商户 MUST 仍可履行既有路由订单的受理义务。</td></tr>
         <tr><td><code>acceptance.deadline > now()</code></td><td>MUST</td><td>受理时限内。</td></tr>
+        <tr><td><code>ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH</code></td><td>error</td><td>422</td><td><code>proposed_total</code> 与逐行及整单调整的累加结果不一致</td><td>重算总额；确认逐行与整单调整未重复计入同一项</td></tr>
+        <tr><td><code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code></td><td>error</td><td>403</td><td>受理策略禁止本类目或本商户改价（<code>amend_price_allowed = false</code>）</td><td>改用 <code>accept</code> 或 <code>reject</code>；如需改价能力联系平台调整受理策略</td></tr>
       </tbody>
     </table>
     <h3 id="s-m615">M6.1.5 后置条件与语义契约</h3>
@@ -136,7 +138,7 @@ service:        dev.utp.merchant
         <tr><td><code>acceptance:query</code></td><td>Action Scope</td><td>查询受理任务与历史结论。</td><td>Marketplace</td><td>Seller 角色</td></tr>
       </tbody>
     </table>
-    <p><strong>约束：</strong><code>accept</code> 的签名主体 MUST 是 Seller 的 Profile 公钥对应私钥。Merchant Agent 代签时 MUST 满足 M10.4 的授权链要求（Agent 持有覆盖 <code>acceptance:accept</code> 的有效授权）。</p>
+    <p><strong>约束：</strong><code>accept</code> 的签名主体 MUST 是 Seller 的 Profile 公钥对应私钥。Merchant Agent 代签时 MUST 满足 M11.4 的授权链要求（Agent 持有覆盖 <code>acceptance:accept</code> 的有效授权）。</p>
 
     <hr />
     <h2 id="s-m65">M6.5 Guidelines（角色职责指引）</h2>
@@ -148,7 +150,7 @@ service:        dev.utp.merchant
         <tr><td>接受前核验</td><td>MUST</td><td><code>accept</code> 前 MUST 确认库存充足、交期可行、Trade Method 可执行（对应主规范 13.5.2"确认可行性"）。</td></tr>
         <tr><td>结构化拒绝</td><td>MUST</td><td><code>reject</code> MUST 携带 M6.10.2 原因码；SHOULD 附替代建议（如可供替代 SKU、预计到货时间）。</td></tr>
         <tr><td>低拒单率</td><td>SHOULD</td><td>SHOULD 通过 MP2 及时同步库存降低拒单率；持续高拒单率是平台治理依据。</td></tr>
-        <tr><td>订单映射</td><td>MUST（实现层）</td><td>ACCEPTED 后 MUST 在业务层生成订单/合同记录并建立 <code>purchase_id ↔ 内部单号</code> 映射（M9.3）。</td></tr>
+        <tr><td>订单映射</td><td>MUST（实现层）</td><td>ACCEPTED 后 MUST 在业务层生成订单/合同记录并建立 <code>purchase_id ↔ 内部单号</code> 映射（M10.3）。</td></tr>
       </tbody>
     </table>
     <h3 id="s-m652">M6.5.2 Marketplace 角色职责</h3>
@@ -169,7 +171,7 @@ service:        dev.utp.merchant
       <li>买方 <code>purchase.complete</code> 通过第 5 章 Mandate 操作准入后，P3 进入 <code>SIGNING</code>；平台托管拓扑下，协议引擎 MUST 生成受理任务并路由给供应商（M6.7）。</li>
       <li>MP4 <code>accept</code> 请求 MUST 携带卖方 ES256 签名（JWS），签名内容 MUST 覆盖该订购的 <code>terms_hash</code>。主规范未规定"卖方承诺处理"的具体形式（13.2.3 留白）；<strong>本规范将带签名的 <code>accept</code> 定义为平台托管拓扑下承诺处理的规范形式</strong>，AcceptanceRecord 即其可审计凭证。</li>
       <li>协议引擎确认卖方承诺处理完成后，按主规范 13.2.3 执行 <code>SIGNING → PURCHASED</code> 原子迁移（承诺处理完成、最终库存锁定、terms_hash 与条款快照一致）；任一失败按 13.3.2 补偿链处理，MP4 侧受理任务保持 ACCEPTED（签名事实不回滚，重试由引擎负责）。</li>
-      <li>B2C 全 L0 模式的"自动承诺处理"（主规范 13.6.2）在本模型中实现为：<code>acceptance_policy.mode == "auto"</code> 时由 Merchant Agent 或平台代理组件按预授权策略即时调用 <code>accept</code>（M10.3），协议语义完全一致，无特殊路径。</li>
+      <li>B2C 全 L0 模式的"自动承诺处理"（主规范 13.6.2）在本模型中实现为：<code>acceptance_policy.mode == "auto"</code> 时由 Merchant Agent 或平台代理组件按预授权策略即时调用 <code>accept</code>（M11.3），协议语义完全一致，无特殊路径。</li>
       <li><code>amend_leadtime</code> 被买方确认后，协议引擎 MUST 以 <code>purchase.update</code> 语义刷新履约条款（交期属于可变履约信息），再走签名收集；买方拒绝则视同 REJECTED。</li>
     </ol>
 
@@ -212,10 +214,11 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>操作</th><th>适用状态</th><th>状态影响</th><th><code>valid_next_actions</code></th><th>关键约束</th></tr></thead>
       <tbody>
-        <tr><td><code>utp.acceptance.accept</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>ACCEPTED</code> 终态；卖方签名注入 P3</td><td><code>query</code>, <code>utp.shipment.prepare</code></td><td>Seller；签名 MUST 覆盖 <code>terms_hash</code>；接受前 MUST 完成可行性核验。</td></tr>
+        <tr><td><code>utp.acceptance.accept</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>ACCEPTED</code> 终态；卖方签名注入 P3</td><td><code>query</code>, <code>utp.delivery.prepare</code></td><td>Seller；签名 MUST 覆盖 <code>terms_hash</code>；接受前 MUST 完成可行性核验。</td></tr>
         <tr><td><code>utp.acceptance.reject</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>REJECTED</code> 终态；触发 P3 补偿</td><td><code>query</code></td><td>Seller；MUST 携带结构化原因码。</td></tr>
         <tr><td><code>utp.acceptance.hold</code></td><td><code>PENDING_ACCEPT</code></td><td>进入 <code>ON_HOLD</code>；不延长 deadline</td><td><code>accept</code>, <code>reject</code>, <code>amend_leadtime</code>, <code>query</code></td><td>Seller；每单至多一次；MUST 声明 <code>expected_reply_at</code>。</td></tr>
         <tr><td><code>utp.acceptance.amend_leadtime</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>AMEND_PROPOSED</code>，等待买方确认</td><td><code>query</code></td><td>Seller；新交期 MUST 在平台允许幅度内；MUST 提供 <code>amended_leadtime_days</code>（相对交期）或 <code>promised_ship_at</code>（绝对发货时间）至少其一；买方确认后视同 ACCEPTED。</td></tr>
+        <tr><td><code>utp.acceptance.amend_price</code></td><td><code>PENDING_ACCEPT</code>, <code>ON_HOLD</code></td><td>进入 <code>AMEND_PROPOSED</code>，等待买方确认</td><td><code>query</code></td><td>Seller；新交期 MUST 在平台允许幅度内；MUST 提供 <code>amended_leadtime_days</code>（相对交期）或 <code>promised_ship_at</code>（绝对发货时间）至少其一；买方确认后视同 ACCEPTED。</td></tr>
         <tr><td><code>utp.acceptance.query</code></td><td>任意</td><td>无</td><td>当前状态下可执行动作</td><td>Seller；按 <code>routing_id</code>/<code>purchase_id</code> 查询。</td></tr>
         <tr><td><code>utp.acceptance.list</code></td><td>—</td><td>无</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>query</code></td><td>Seller；按状态/时间筛选，分页；轮询降级通道。</td></tr>
       </tbody>
@@ -251,7 +254,7 @@ service:        dev.utp.merchant
         <tr><td><code>amended_leadtime_days</code></td><td>integer</td><td>条件</td><td>交期变更申报值（相对交期，自然日）。</td></tr>
         <tr><td><code>promised_ship_at</code></td><td>ISO-8601</td><td>条件</td><td>承诺发货时间（绝对时间）。<code>conclusion == LEADTIME_AMENDED</code> 时，本字段与 <code>amended_leadtime_days</code> MUST 至少提供其一；两者同时存在时 MUST 语义一致。</td></tr>
         <tr><td><code>acceptance_note</code></td><td>string</td><td>否</td><td>补充说明（单证时线、替代建议等）。</td></tr>
-        <tr><td><code>decided_by</code></td><td>enum</td><td>是</td><td><code>human</code> / <code>agent</code> / <code>policy_auto</code>（审计维度，见 M10.5）。</td></tr>
+        <tr><td><code>decided_by</code></td><td>enum</td><td>是</td><td><code>human</code> / <code>agent</code> / <code>policy_auto</code>（审计维度，见 M11.5）。</td></tr>
         <tr><td><code>decided_at</code></td><td>ISO-8601</td><td>是</td><td>结论时间。</td></tr>
       </tbody>
     </table>
@@ -305,7 +308,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
   "record_id": "acc-20260722-0335",
   "conclusion": "ACCEPTED",
   "purchase_status": "PURCHASED",        // SIGNING → PURCHASED 原子迁移完成
-  "valid_next_actions": ["utp.acceptance.query", "utp.shipment.prepare"]
+  "valid_next_actions": ["utp.acceptance.query", "utp.delivery.prepare"]
 }
 </code></pre>
     <h3 id="s-m6112">M6.11.2 缺货拒单与超时兜底</h3>
@@ -316,3 +319,82 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
 超时：deadline 到期未答复 → 按 timeout_policy=auto_reject 自动 REJECTED，
       arrived_via=timeout_auto，推送 utp.acceptance.expired 给供应商
 </code></pre>
+
+    <hr />
+    <h2 id="s-m612">M6.12 改价提议（Price Amendment）</h2>
+
+    <p><code>utp.acceptance.amend_price</code> 允许供应商在受理阶段提出价格调整。<strong>本动作是提议，不是变更</strong>——这是本节最重要的约束。</p>
+
+    <h3 id="s-m6121">M6.12.1 为什么改价必须是提议</h3>
+
+    <p>订购条款一旦被买方签署，其哈希（<code>terms_hash</code>）就是 P3 原子迁移三条件之一（主规范 <a href="/documentation/specification/primitives/purchase/index.html#s-1323">13.2.3</a>）。若允许卖方单方改价：</p>
+    <ul>
+      <li>已签条款与实际条款不一致，<strong>双签机制失效</strong>——买方 Agent 无法确认自己同意的是什么；</li>
+      <li>价格证据链断裂——<code>quote.terms_hash</code> → 订购 <code>terms_hash</code> 的链条被中途替换；</li>
+      <li>买方 Agent 无法自动化——因为"下单价"不再可信。</li>
+    </ul>
+    <p>因此协议规定：<code>amend_price</code> MUST NOT 单方生效。供应商提出提议后任务进入 <code>AMEND_PROPOSED</code>，<strong>买方确认后新条款方成立</strong>，此时 <code>proposed_terms_hash</code> 成为订购的权威条款哈希，供应商需在新条款下完成 <code>accept</code>。</p>
+
+    <h3 id="s-m6122">M6.12.2 适用场景与原因码</h3>
+
+    <table>
+      <thead><tr><th>原因码</th><th>典型场景</th><th>买方 Agent 自动处置建议</th></tr></thead>
+      <tbody>
+        <tr><td><code>freight_recalculation</code></td><td>按实际重量/体积/目的地重算运费</td><td>在阈值内 MAY 自动接受</td></tr>
+        <tr><td><code>spec_difference</code></td><td>实际可供规格与下单规格有差异</td><td>SHOULD 人工确认（涉及货品实质）</td></tr>
+        <tr><td><code>volume_tier_change</code></td><td>实际数量落入不同阶梯价区间</td><td>可按阶梯价规则自动校验后接受</td></tr>
+        <tr><td><code>cost_fluctuation</code></td><td>原材料或采购成本波动</td><td>SHOULD 人工确认</td></tr>
+        <tr><td><code>tax_or_duty_change</code></td><td>税费或关税政策变化</td><td>核对政策依据后处置</td></tr>
+        <tr><td><code>promotion_expired</code></td><td>下单时引用的促销价已失效</td><td>SHOULD 人工确认（可能触发重新寻源）</td></tr>
+        <tr><td><code>quotation_superseded</code></td><td>引用的报价已被新报价取代</td><td>MUST 核对新 <code>quote_id</code>（见 <a href="../../primitives/quote/index.html">M5</a>）</td></tr>
+        <tr><td><code>other</code></td><td>其他</td><td>MUST 提供 <code>reason_note</code>，人工处置</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="s-m6123">M6.12.3 约束（MUST / MUST NOT）</h3>
+    <ul>
+      <li>请求 MUST 携带 <code>base_terms_hash</code>（被调整的原条款）。与当前订购条款快照不一致时 MUST 返回 <code>ACCEPTANCE.TERMS_MISMATCH</code>——防止基于过期条款提议。</li>
+      <li>MUST 提供 <code>proposed_terms_hash</code>，且 <code>seller_signature</code> MUST 覆盖该值。买方 MUST 在确认前验签。</li>
+      <li>逐行调整（<code>line_adjustments</code>）与整单调整（<code>order_adjustments</code>）<strong>至少其一</strong>。<code>proposed_total</code> MUST 与调整累加结果一致，否则返回 <code>ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH</code>。</li>
+      <li>Marketplace MAY 按类目与商户等级禁止改价（受理策略 <code>amend_price_allowed = false</code>），此时返回 <code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code>。</li>
+      <li><code>decided_by = policy_auto</code> 时 MUST 提供 <code>policy_ref</code>（命中的定价策略与版本），供决策审计追溯（见 <a href="../../merchant-agent.html#s-m116">M11.6</a>）。</li>
+      <li>本动作与 <code>amend_leadtime</code> 共用 <code>AMEND_PROPOSED</code> 状态。同一受理任务上二者 MUST NOT 并存未决提议——存在未决提议时新提议 MUST 返回 <code>ACCEPTANCE.STATE_CONFLICT</code>。</li>
+    </ul>
+
+    <h3 id="s-m6124">M6.12.4 与 MP3 报价的关系</h3>
+    <p>若订购前已走过询盘报价（MP3），<code>accept</code> MUST NOT 偏离已绑定条款。此时 <strong>改价是对已绑定报价的重新协商</strong>，SHOULD 优先在报价阶段完成（<code>utp.quote.revise</code>），受理阶段改价 SHOULD 仅用于报价无法预见的因素（实际运费、税费政策）。原因码为 <code>quotation_superseded</code> 时 MUST 在 <code>reason_note</code> 中引用新的 <code>quote_id</code>。</p>
+
+    <h3 id="s-m6125">M6.12.5 示例</h3>
+<pre class="highlight"><code class="language-json">// 供应商提出运费重算提议
+POST /utp/v1/acceptance/routings/rt-4471/amend-price
+{ "idempotency_key": "rt-4471-amendprice-1",
+  "base_terms_hash": "a91f…3c07",
+  "reason_code": "freight_recalculation",
+  "reason_note": "实际抛重 380kg（下单估重 260kg），按承运商抛重规则重算干线运费。",
+  "order_adjustments": [
+    { "category": "freight",
+      "amount": { "amount": "420.00", "currency": "CNY" },
+      "note": "抛重差额 120kg × 3.5 元/kg" } ],
+  "proposed_total": { "amount": "18420.00", "currency": "CNY" },
+  "proposed_terms_hash": "d55b…9a12",
+  "seller_signature": { "algorithm": "ES256", "key_id": "sup-key-01", "value": "eyJhbGc…" },
+  "valid_until": "2026-08-05T12:00:00Z",
+  "decided_by": "policy_auto", "policy_ref": "freight-policy-v7" }
+
+→ 200 { "routing_id": "rt-4471", "amendment_id": "amd-8830",
+        "status": "AMEND_PROPOSED",
+        "proposed_terms_hash": "d55b…9a12",
+        "buyer_confirmation_required": true,
+        "valid_until": "2026-08-05T12:00:00Z",
+        "valid_next_actions": ["utp.acceptance.query"] }
+
+// 买方确认（回调）→ 新 terms_hash 生效，供应商在新条款下 accept
+{ "event": "utp.acceptance.amendment_result",
+  "payload": { "routing_id": "rt-4471", "amendment_id": "amd-8830",
+               "buyer_response": "accepted",
+               "effective_terms_hash": "d55b…9a12" } }
+
+// 买方拒绝 → 回到待受理，供应商可按原价 accept 或 reject
+</code></pre>
+
+    <p class="note"><strong>逐行改价示例（规格差价）</strong>：<code>line_adjustments</code> 中给出 <code>line_no</code>、<code>original_unit_price</code>、<code>proposed_unit_price</code> 与适用 <code>quantity</code>；未列出的订单行 MUST 视为不调整。</p>

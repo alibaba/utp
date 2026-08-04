@@ -3,7 +3,7 @@
   "$id": "update_input.json",
   "version": "2026-07-01",
   "title": "UpdateInput",
-  "description": "utp.shipment.update：追加履约事件（delay/exception/customs/document/correction）。event_id 由服务端生成。",
+  "description": "utp.delivery.update：追加履约事件（delay/exception/customs/document/correction）。event_id 由服务端生成。",
   "type": "object",
   "required": [
     "idempotency_key",

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="880px" height="470px" viewBox="-0.5 -0.5 880 470" font-family="Helvetica">
+<defs>
+<marker id="mAsArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
+<marker id="mAsArrowG" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#666"/></marker>
+</defs>
+<g>
+<text x="440" y="24" text-anchor="middle" font-size="14" font-weight="bold">M8.3.1 售后单状态机（资源作用域：aftersale_id · 退款由 Marketplace 执行）</text>
+
+<!-- entry -->
+<text x="108" y="60" text-anchor="middle" font-size="11" fill="#666">售后请求路由</text>
+<text x="108" y="73" text-anchor="middle" font-size="10" fill="#666">(request_routed 回调)</text>
+<path d="M 108 80 L 108 100" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+
+<!-- REQUESTED -->
+<rect x="28" y="104" width="160" height="44" rx="6" fill="#fff2cc" stroke="#d6b656"/>
+<text x="108" y="123" text-anchor="middle" font-size="12" font-weight="bold">REQUESTED</text>
+<text x="108" y="139" text-anchor="middle" font-size="10">待处置（deadline 计时）</text>
+
+<!-- PROPOSED -->
+<rect x="28" y="212" width="160" height="44" rx="6" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="108" y="231" text-anchor="middle" font-size="12" font-weight="bold">PROPOSED</text>
+<text x="108" y="247" text-anchor="middle" font-size="10">替代方案待买方回应</text>
+
+<!-- REQUESTED → PROPOSED -->
+<path d="M 80 148 L 80 212" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+<text x="76" y="182" text-anchor="end" font-size="10">propose</text>
+<!-- PROPOSED → REQUESTED（再议回合） -->
+<path d="M 140 212 L 140 148" fill="none" stroke="#666" stroke-dasharray="4 3" marker-end="url(#mAsArrowG)"/>
+<text x="146" y="176" font-size="10" fill="#666">买方再议</text>
+<text x="146" y="188" font-size="10" fill="#666">round_no++</text>
+
+<!-- APPROVED -->
+<rect x="290" y="104" width="160" height="44" rx="6" fill="#d5e8d4" stroke="#82b366"/>
+<text x="370" y="123" text-anchor="middle" font-size="12" font-weight="bold">APPROVED</text>
+<text x="370" y="139" text-anchor="middle" font-size="10">方案成立，待执行</text>
+
+<!-- REQUESTED → APPROVED -->
+<path d="M 188 120 L 290 120" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+<text x="239" y="113" text-anchor="middle" font-size="10">approve</text>
+<text x="239" y="99" text-anchor="middle" font-size="9" fill="#666">或超时 auto_approve</text>
+<!-- PROPOSED → APPROVED -->
+<path d="M 188 228 L 250 228 L 250 140 L 290 140" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+<text x="256" y="196" font-size="10">买方接受</text>
+
+<!-- RETURNING -->
+<rect x="290" y="212" width="160" height="44" rx="6" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="370" y="231" text-anchor="middle" font-size="12" font-weight="bold">RETURNING</text>
+<text x="370" y="247" text-anchor="middle" font-size="10">买方退货在途</text>
+<path d="M 370 148 L 370 212" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+<text x="376" y="172" font-size="10">return_required</text>
+<text x="376" y="184" font-size="10">= true</text>
+<text x="376" y="198" font-size="9" fill="#666">(买方已寄回)</text>
+
+<!-- RETURN_RECEIVED -->
+<rect x="290" y="320" width="160" height="44" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="370" y="339" text-anchor="middle" font-size="12" font-weight="bold">RETURN_RECEIVED</text>
+<text x="370" y="355" text-anchor="middle" font-size="10">已收货并出验货结论</text>
+<path d="M 370 256 L 370 320" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+<text x="376" y="284" font-size="10" font-weight="bold">confirm_return</text>
+<text x="376" y="298" font-size="9" fill="#666">pass / partial / fail</text>
+
+<!-- COMPLETED -->
+<rect x="560" y="104" width="160" height="48" rx="6" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+<text x="640" y="124" text-anchor="middle" font-size="12" font-weight="bold">COMPLETED</text>
+<text x="640" y="140" text-anchor="middle" font-size="10">终态 · 售后完成</text>
+<!-- APPROVED → COMPLETED（免退货） -->
+<path d="M 450 120 L 560 120" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+<text x="505" y="113" text-anchor="middle" font-size="10">refund_completed</text>
+<text x="505" y="99" text-anchor="middle" font-size="9" fill="#666">(免退货类方案)</text>
+<!-- RETURN_RECEIVED → COMPLETED -->
+<path d="M 450 336 L 505 336 L 505 152 L 560 140" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+<text x="511" y="250" font-size="10">验货 pass/partial</text>
+<text x="511" y="262" font-size="9" fill="#666">平台执行退款</text>
+
+<!-- REJECTED -->
+<rect x="560" y="212" width="160" height="48" rx="6" fill="#f8cecc" stroke="#b85450" stroke-width="2"/>
+<text x="640" y="232" text-anchor="middle" font-size="12" font-weight="bold">REJECTED</text>
+<text x="640" y="248" text-anchor="middle" font-size="10">终态 · 供应商拒绝</text>
+<path d="M 188 108 L 230 96 L 540 96 L 560 216" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAsArrow)"/>
+<text x="385" y="90" text-anchor="middle" font-size="10">reject（MUST 附原因码 · SHOULD 附举证）／超时 auto_reject</text>
+
+<!-- CLOSED -->
+<rect x="560" y="320" width="160" height="48" rx="6" fill="#e1d5e7" stroke="#9673a6" stroke-width="2"/>
+<text x="640" y="340" text-anchor="middle" font-size="12" font-weight="bold">CLOSED</text>
+<text x="640" y="356" text-anchor="middle" font-size="10">终态 · 撤回/超时/升级</text>
+<path d="M 450 348 L 560 348" fill="none" stroke="#666" stroke-dasharray="4 3" marker-end="url(#mAsArrowG)"/>
+<text x="505" y="341" text-anchor="middle" font-size="10" fill="#666">验货 fail</text>
+<text x="505" y="368" text-anchor="middle" font-size="9" fill="#666">供应商升级 P6</text>
+<path d="M 108 256 L 108 400 L 560 368" fill="none" stroke="#666" stroke-dasharray="4 3" marker-end="url(#mAsArrowG)"/>
+<text x="300" y="414" text-anchor="middle" font-size="10" fill="#666">买方撤回／买方回应超时／退货逾期未达</text>
+
+<!-- 关键约束说明 -->
+<rect x="748" y="104" width="120" height="264" rx="6" fill="#f5f5f5" stroke="#ccc"/>
+<text x="808" y="124" text-anchor="middle" font-size="11" font-weight="bold">关键约束</text>
+<text x="758" y="146" font-size="9">· 退款资金动作由</text>
+<text x="758" y="158" font-size="9">　Marketplace 执行，</text>
+<text x="758" y="170" font-size="9">　供应商无退款 Action</text>
+<text x="758" y="190" font-size="9">· 换货/补发的重发</text>
+<text x="758" y="202" font-size="9">　复用 MP5 交付原语</text>
+<text x="758" y="214" font-size="9">　（携 aftersale_ref）</text>
+<text x="758" y="234" font-size="9">· 轮次超限由平台拒绝</text>
+<text x="758" y="246" font-size="9">　新 propose，本原语</text>
+<text x="758" y="258" font-size="9">　不自动迁移</text>
+<text x="758" y="278" font-size="9">· 终态后写操作 MUST</text>
+<text x="758" y="290" font-size="9">　返回 STATE_CONFLICT</text>
+<text x="758" y="310" font-size="9">· 升级 P6 后本单收敛</text>
+<text x="758" y="322" font-size="9">　CLOSED，裁决在</text>
+<text x="758" y="334" font-size="9">　dispute 资源演进</text>
+<text x="758" y="354" font-size="9">· 资源作用域，不新增</text>
+<text x="758" y="366" font-size="9">　任何全局状态</text>
+
+<!-- 图例 -->
+<rect x="28" y="430" width="14" height="12" fill="#fff2cc" stroke="#d6b656"/>
+<text x="48" y="440" font-size="10">待处置</text>
+<rect x="108" y="430" width="14" height="12" fill="#ffe6cc" stroke="#d79b00"/>
+<text x="128" y="440" font-size="10">进行中</text>
+<rect x="188" y="430" width="14" height="12" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="208" y="440" font-size="10">待平台处理</text>
+<rect x="288" y="430" width="14" height="12" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+<text x="308" y="440" font-size="10">终态（成功）</text>
+<rect x="396" y="430" width="14" height="12" fill="#f8cecc" stroke="#b85450" stroke-width="2"/>
+<text x="416" y="440" font-size="10">终态（拒绝）</text>
+<rect x="504" y="430" width="14" height="12" fill="#e1d5e7" stroke="#9673a6" stroke-width="2"/>
+<text x="524" y="440" font-size="10">终态（关闭）</text>
+<path d="M 620 436 L 650 436" fill="none" stroke="#666" stroke-dasharray="4 3"/>
+<text x="656" y="440" font-size="10">非常规路径（撤回/超时/异议）</text>
+</g>
+</svg>

@@ -1,5 +1,5 @@
 ---
-title: M4 MP2 库存管理原语
+title: M4 MP2 库存原语
 section: merchant
 owner: merchant-team
 status: review
@@ -7,7 +7,7 @@ version: 2026-07-30
 format: html
 ---
 
-<h1 id="s-m4">M4 · MP2 库存管理原语（Inventory）</h1>
+<h1 id="s-m4">M4 · MP2 库存原语（Inventory）</h1>
     <h2 id="s-m4-toc">目录</h2>
     <ul>
       <li><a href="#s-m41">M4.1 Overview（概述）</a></li>
@@ -43,7 +43,7 @@ service:        dev.utp.merchant
       <li><strong>数量与信息分离：</strong>Inventory 只管数量，商品信息属于 MP1。二者可独立变更、独立授权、独立限流（库存变更频率通常比商品信息高 2—3 个数量级）。</li>
       <li><strong>供应商是数量的唯一权威写入方：</strong><code>available</code> 只能由 Seller 通过 <code>set</code>/<code>adjust</code> 写入；Marketplace MUST NOT 主动修改 <code>available</code>，只能在其上叠加交易性占用。</li>
       <li><strong>交易性占用是 P3 的副作用，不是 MP2 的 Action：</strong>hold（临时占用）与 lock（最终锁定）由主规范 <code>purchase.create</code>/<code>complete</code> 触发（<a href="/documentation/specification/primitives/purchase/index.html#s-1352-seller">13.5.2 Seller 职责"锁定库存"</a>），MP2 提供 <code>hold.query</code> 让供应商核验占用明细。这保持了 P3 与 MP2 的正交：P3 消费库存，MP2 供给库存。</li>
-      <li><strong>乐观并发：</strong>写操作 MUST 携带 <code>expected_revision</code>（乐观锁）或声明 <code>commutative: true</code>（纯增量可交换模式，仅 <code>adjust</code>），防止 ERP 回写与平台扣减的并发丢失更新（M9.5 的防超卖基础）。<strong>最简接入路径：</strong>日常同步只用 <code>adjust + commutative: true</code>（无需维护版本号、天然抗乱序重试），仅在盘点校准时用 <code>set + expected_revision</code>——两个操作、两个场景，足以覆盖全部库存需求。</li>
+      <li><strong>乐观并发：</strong>写操作 MUST 携带 <code>expected_revision</code>（乐观锁）或声明 <code>commutative: true</code>（纯增量可交换模式，仅 <code>adjust</code>），防止 ERP 回写与平台扣减的并发丢失更新（M10.5 的防超卖基础）。<strong>最简接入路径：</strong>日常同步只用 <code>adjust + commutative: true</code>（无需维护版本号、天然抗乱序重试），仅在盘点校准时用 <code>set + expected_revision</code>——两个操作、两个场景，足以覆盖全部库存需求。</li>
     </ul>
     <h3 id="s-m413">M4.1.3 前置条件与后置条件</h3>
     <table>
@@ -94,7 +94,7 @@ service:        dev.utp.merchant
         <tr><td><code>available</code></td><td>Seller</td><td><code>set</code>（绝对值覆盖）/ <code>adjust</code>（增量）；发货核销时系统扣减</td></tr>
         <tr><td><code>hold</code>（临时占用）</td><td>协议引擎（P3）</td><td><code>purchase.create</code> 创建（带 TTL）；草案取消/过期释放</td></tr>
         <tr><td><code>lock</code>（最终锁定）</td><td>协议引擎（P3）</td><td><code>purchase.complete</code> 原子成立；P3 补偿链释放</td></tr>
-        <tr><td><code>consumed</code>（已核销）</td><td>协议引擎（MP5）</td><td><code>shipment.ship</code> 确认后由 lock 转入</td></tr>
+        <tr><td><code>consumed</code>（已核销）</td><td>协议引擎（MP5）</td><td><code>delivery.ship</code> 确认后由 lock 转入</td></tr>
         <tr><td><code>sellable</code></td><td>派生</td><td>只读，= <code>available - Σ(active_holds)</code></td></tr>
       </tbody>
     </table>
@@ -106,7 +106,7 @@ service:        dev.utp.merchant
       <thead><tr><th>错误码</th><th>严重级别</th><th>HTTP 映射</th><th>描述</th><th>建议处理</th></tr></thead>
       <tbody>
         <tr><td><code>INVENTORY.SKU_NOT_FOUND</code></td><td>error</td><td>404</td><td><code>listing_id + sku_id</code> 不存在或不属于调用方。</td><td>校验标识。</td></tr>
-        <tr><td><code>INVENTORY.REVISION_CONFLICT</code></td><td>error</td><td>409</td><td><code>expected_revision</code> 与当前不一致（并发写入）。</td><td><code>query</code> 重读后重试；Bridge 场景见 M9.5。</td></tr>
+        <tr><td><code>INVENTORY.REVISION_CONFLICT</code></td><td>error</td><td>409</td><td><code>expected_revision</code> 与当前不一致（并发写入）。</td><td><code>query</code> 重读后重试；Bridge 场景见 M10.5。</td></tr>
         <tr><td><code>INVENTORY.NEGATIVE_RESULT</code></td><td>error</td><td>422</td><td>操作将导致 <code>available &lt; Σ(active_holds)</code> 或负值。</td><td>下调幅度不得低于当前占用量；先待占用释放。</td></tr>
         <tr><td><code>INVENTORY.LISTING_ARCHIVED</code></td><td>error</td><td>409</td><td>商品已归档，库存不可写。</td><td>无需操作。</td></tr>
         <tr><td><code>INVENTORY.MERCHANT_RESTRICTED</code></td><td>error</td><td>403</td><td><code>RESTRICTED</code> 商户尝试上调库存。</td><td>仅允许下调；联系平台。</td></tr>
@@ -135,7 +135,7 @@ service:        dev.utp.merchant
       <thead><tr><th>职责</th><th>级别</th><th>说明</th></tr></thead>
       <tbody>
         <tr><td>数量真实</td><td>MUST</td><td><code>available</code> MUST 反映真实可履约数量；系统性虚高导致的高拒单率是平台治理（M2.7 <code>RESTRICTED</code>）的依据。</td></tr>
-        <tr><td>及时同步</td><td>MUST</td><td>线下渠道或多平台销售导致实际库存变化时，MUST 及时下调；SHOULD 通过 Bridge 事件驱动同步（M9.4）。</td></tr>
+        <tr><td>及时同步</td><td>MUST</td><td>线下渠道或多平台销售导致实际库存变化时，MUST 及时下调；SHOULD 通过 Bridge 事件驱动同步（M10.4）。</td></tr>
         <tr><td>使用 adjust 而非 set</td><td>SHOULD</td><td>并发环境下 SHOULD 优先使用增量 <code>adjust</code>（交换律成立，冲突率低）；<code>set</code> 仅用于全量校准。</td></tr>
         <tr><td>预警配置</td><td>SHOULD</td><td>SHOULD 配置 <code>low_stock_threshold</code>，在低库存预警时补货或主动 <code>delist</code>。</td></tr>
       </tbody>
@@ -171,7 +171,7 @@ service:        dev.utp.merchant
       <li><strong>hold 映射：</strong><code>purchase.create</code> 创建的临时库存 hold（主规范 13.5.2）MUST 生成 MP2 InventoryHold 记录（状态 <code>HELD</code>，含 <code>transaction_id</code>、TTL）。</li>
       <li><strong>lock 映射：</strong><code>purchase.complete</code> 的原子迁移条件之一"最终库存锁定成功"（主规范 13.2.3）在 MP2 侧表现为对应 hold 状态 <code>HELD → LOCKED</code>；若无先行 hold，则直接创建 <code>LOCKED</code> 记录。</li>
       <li><strong>释放映射：</strong>P3 补偿链（主规范 13.3.2"释放已锁库存"）执行时，MP2 侧对应记录 MUST 迁移至 <code>RELEASED</code> 并推送 <code>hold_released</code> 回调。</li>
-      <li><strong>核销映射：</strong>MP5 <code>shipment.ship</code> 确认后，对应 <code>LOCKED</code> 数量迁移至 <code>CONSUMED</code>，<code>available</code> 同步扣减（M4.2）。</li>
+      <li><strong>核销映射：</strong>MP5 <code>delivery.ship</code> 确认后，对应 <code>LOCKED</code> 数量迁移至 <code>CONSUMED</code>，<code>available</code> 同步扣减（M4.2）。</li>
       <li><strong>证据：</strong>P3 要求的 <code>inventory_receipt</code> / <code>inventory_release_receipt</code>（主规范状态机 T5 与 C-PURCHASE-FAILURE 的 required_evidence）由 Marketplace 基于 InventoryHold 状态迁移记录生成，供应商可通过 <code>hold.query</code> 获取同一记录用于对账。</li>
     </ol>
     <p>自托管拓扑下，上述契约退化为供应商 Endpoint 的内部实现义务（其对买方承诺的 13.5.2 职责不变）。</p>
@@ -229,7 +229,7 @@ service:        dev.utp.merchant
         <tr><td><code>delta</code></td><td>integer</td><td>是</td><td>调整量（正为补货，负为核减）。</td></tr>
         <tr><td><code>reason_code</code></td><td>enum</td><td>是</td><td><code>restock</code> / <code>offline_sale</code> / <code>damage</code> / <code>correction</code> / <code>channel_sync</code>。</td></tr>
         <tr><td><code>expected_revision</code></td><td>integer</td><td>否</td><td>乐观锁版本；<code>commutative: true</code> 时可省略。</td></tr>
-        <tr><td><code>source_ref</code></td><td>string</td><td>否</td><td>来源单据引用（ERP 出入库单号，供 M9 对账）。</td></tr>
+        <tr><td><code>source_ref</code></td><td>string</td><td>否</td><td>来源单据引用（ERP 出入库单号，供 M10 对账）。</td></tr>
         <tr><td><code>adjusted_at</code></td><td>ISO-8601</td><td>是</td><td>调整时间。</td></tr>
       </tbody>
     </table>
@@ -276,7 +276,7 @@ PUT /utp/m/v1/inventory/item-BT-NC-001/sku-X3-BLK
 // 3. purchase.complete 成功 → hold 转 LOCKED；此时数量视图：
 { "available": 500, "held": 0, "locked": 100, "sellable": 400, "revision": 1 }
 
-// 4. shipment.ship 确认 100 件 → LOCKED 转 CONSUMED，available 核销：
+// 4. delivery.ship 确认 100 件 → LOCKED 转 CONSUMED，available 核销：
 { "available": 400, "held": 0, "locked": 0, "sellable": 400, "revision": 2 }
 </code></pre>
     <h3 id="s-m4102">M4.10.2 ERP 增量同步（并发安全）</h3>
@@ -286,5 +286,5 @@ POST /utp/m/v1/inventory/item-BT-NC-001/sku-X3-BLK/adjustments
   "source_ref": "ERP-OUT-20260722-118" }
 
 同一时刻平台侧 lock 扣减并发发生 → 增量语义无冲突，
-最终 available 一致收敛；对账以 revision 流水 + source_ref 核对（M9.6）。
+最终 available 一致收敛；对账以 revision 流水 + source_ref 核对（M10.6）。
 </code></pre>

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query_output.json",
+  "version": "2026-08-04",
+  "title": "QueryOutput",
+  "description": "utp.aftersale.query 的响应。",
+  "type": "object",
+  "required": [
+    "record",
+    "valid_next_actions"
+  ],
+  "properties": {
+    "record": {
+      "$ref": "aftersale_record.json"
+    },
+    "valid_next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "当前状态下可执行的动作全限定名。"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,5 +1,5 @@
 ---
-title: M7 MP5 发货执行原语
+title: M7 MP5 交付原语
 section: merchant
 owner: merchant-team
 status: review
@@ -7,7 +7,7 @@ version: 2026-07-30
 format: html
 ---
 
-<h1 id="s-m7">M7 · MP5 发货执行原语（Shipment）</h1>
+<h1 id="s-m7">M7 · MP5 交付原语（Delivery）</h1>
     <h2 id="s-m7-toc">目录</h2>
     <ul>
       <li><a href="#s-m71">M7.1 Overview（概述）</a></li>
@@ -23,12 +23,12 @@ format: html
     </ul>
     <hr />
     <h2 id="s-m7-identity">原语身份</h2>
-<pre class="highlight"><code>primitive_id:   utp.shipment
+<pre class="highlight"><code>primitive_id:   utp.delivery
 version:        2026-07-01
 initiator_role: Seller
 handler_role:   Marketplace
 intent:         供应商以协议动作完成备货申报、发货、拆单与履约异常申报
-state_delta:    purchase_credential → shipment(SHIPPED)（资源作用域）
+state_delta:    purchase_credential → delivery(SHIPPED)（资源作用域）
 actions:        prepare, ship, split, update, query
 compensation:   异常申报（update: exception/delay）→ 传导为买方侧 DELAYED；
                 拒收/争议由 P5/P6 处理，MP5 不定义逆向物流原语
@@ -38,7 +38,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m71">M7.1 Overview（概述）</h2>
     <h3 id="s-m711">M7.1.1 意图</h3>
-    <p>Shipment 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商以标准协议动作申报<strong>履约执行事实</strong>：备货进度、发货（运单）、分批拆单、延迟与异常。主规范 P5 Fulfill 是"采购方可观测"的履约原语（<a href="/documentation/specification/primitives/fulfill/index.html#s-1531">15.3.1</a>），其 <code>notify</code> 推送的事实来源在主规范中留白——MP5 正式定义这些事实的产生方式，闭合"供应商发货 → 买方感知"的链路。</p>
+    <p>Delivery 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商以标准协议动作申报<strong>履约执行事实</strong>：备货进度、发货（运单）、分批拆单、延迟与异常。主规范 P5 Fulfill 是"采购方可观测"的履约原语（<a href="/documentation/specification/primitives/fulfill/index.html#s-1531">15.3.1</a>），其 <code>notify</code> 推送的事实来源在主规范中留白——MP5 正式定义这些事实的产生方式，闭合"供应商发货 → 买方感知"的链路。</p>
     <h3 id="s-m712">M7.1.2 关键设计原则</h3>
     <ul>
       <li><strong>MP5 产生事实，P5 消费事实。</strong>MP5 的每个生效动作 MUST 由 Marketplace 转换为买方侧 <code>fulfill.notify</code> 推送与 <code>fulfill.query</code> 可查询的 TrackingEvent（M7.7）。买方可观测状态机（SHIPPED/DELAYED/DELIVERED）的驱动源即 MP5。</li>
@@ -65,9 +65,9 @@ service:        dev.utp.merchant
     </table>
     <h3 id="s-m715">M7.1.5 后置条件与语义契约</h3>
 <pre class="highlight"><code class="language-json">{
-  "primitive": "utp.shipment",
+  "primitive": "utp.delivery",
   "postconditions": [
-    "shipment.shipment_id != null（ship 成功后）",
+    "delivery.shipment_id != null（ship 成功后）",
     "shipment.status == 'SHIPPED' → 买方收到 fulfill.notify(SHIPPED)",
     "inventory.lock(对应数量) → CONSUMED（M4.7 核销映射）",
     "shipment ∈ evidence_bundle（含运单、签名、时间戳）"
@@ -93,7 +93,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m72">M7.2 Lifecycle / State Machine（生命周期 / 状态机）</h2>
     <h3 id="s-m721">M7.2.1 Shipment 资源状态机（供应商视角）</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-shipment-state-machine.svg" alt="Shipment 资源状态机：PREPARING/READY/SHIPPED/EXCEPTION/DELIVERED/CLOSED 及买方可观测映射" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="/documentation/assets/diagrams/m-delivery-state-machine.svg" alt="Shipment 资源状态机：PREPARING/READY/SHIPPED/EXCEPTION/DELIVERED/CLOSED 及买方可观测映射" style="max-width: 100%; height: auto;"></div>
     <p>分批交付时，每个批次（<code>batch_id</code>）独立走上述状态机；订单级视图是全部批次状态的聚合。</p>
     <h3 id="s-m722">M7.2.2 状态定义与迁移规则</h3>
     <table>
@@ -114,14 +114,14 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>错误码</th><th>严重级别</th><th>HTTP 映射</th><th>描述</th><th>建议处理</th></tr></thead>
       <tbody>
-        <tr><td><code>SHIPMENT.ORDER_NOT_PURCHASED</code></td><td>error</td><td>409</td><td>订购未成立（非 <code>PURCHASED</code>）即尝试发货。</td><td>等待 MP4 受理与 P3 成立。</td></tr>
-        <tr><td><code>SHIPMENT.PAYMENT_PRECONDITION</code></td><td>error</td><td>409</td><td>TradeMethod 约定的支付前置条件未满足（如定金未确认）。</td><td>等待 PaymentConfirmation。</td></tr>
-        <tr><td><code>SHIPMENT.QUANTITY_MISMATCH</code></td><td>error</td><td>422</td><td>批次数量合计与订单数量不一致（超发/漏发）。</td><td>校正包裹明细。</td></tr>
-        <tr><td><code>SHIPMENT.SPLIT_NOT_ALLOWED</code></td><td>error</td><td>403</td><td>商品未声明 <code>splittable</code>，或已锁定交易条款不允许分批交付。</td><td>整单发货或与买方协商变更条款。</td></tr>
-        <tr><td><code>SHIPMENT.TRACKING_INVALID</code></td><td>error</td><td>422</td><td>运单号格式无效或承运商不可识别。</td><td>校验 <code>carrier_code</code> 与运单号。</td></tr>
-        <tr><td><code>SHIPMENT.ALREADY_SHIPPED</code></td><td>warning</td><td>409</td><td>批次已发货。</td><td>幂等返回既有 Shipment 凭证。</td></tr>
-        <tr><td><code>SHIPMENT.OVERDUE</code></td><td>warning</td><td>200</td><td>发货已超过承诺交期（响应内警示，非拒绝）。</td><td>立即发货或 <code>update(delay)</code> 申报延迟。</td></tr>
-        <tr><td><code>SHIPMENT.NOT_FOUND</code></td><td>error</td><td>404</td><td>发货单/批次不存在或不属于调用方。</td><td>校验标识。</td></tr>
+        <tr><td><code>DELIVERY.ORDER_NOT_PURCHASED</code></td><td>error</td><td>409</td><td>订购未成立（非 <code>PURCHASED</code>）即尝试发货。</td><td>等待 MP4 受理与 P3 成立。</td></tr>
+        <tr><td><code>DELIVERY.PAYMENT_PRECONDITION</code></td><td>error</td><td>409</td><td>TradeMethod 约定的支付前置条件未满足（如定金未确认）。</td><td>等待 PaymentConfirmation。</td></tr>
+        <tr><td><code>DELIVERY.QUANTITY_MISMATCH</code></td><td>error</td><td>422</td><td>批次数量合计与订单数量不一致（超发/漏发）。</td><td>校正包裹明细。</td></tr>
+        <tr><td><code>DELIVERY.SPLIT_NOT_ALLOWED</code></td><td>error</td><td>403</td><td>商品未声明 <code>splittable</code>，或已锁定交易条款不允许分批交付。</td><td>整单发货或与买方协商变更条款。</td></tr>
+        <tr><td><code>DELIVERY.TRACKING_INVALID</code></td><td>error</td><td>422</td><td>运单号格式无效或承运商不可识别。</td><td>校验 <code>carrier_code</code> 与运单号。</td></tr>
+        <tr><td><code>DELIVERY.ALREADY_SHIPPED</code></td><td>warning</td><td>409</td><td>批次已发货。</td><td>幂等返回既有 Shipment 凭证。</td></tr>
+        <tr><td><code>DELIVERY.OVERDUE</code></td><td>warning</td><td>200</td><td>发货已超过承诺交期（响应内警示，非拒绝）。</td><td>立即发货或 <code>update(delay)</code> 申报延迟。</td></tr>
+        <tr><td><code>DELIVERY.NOT_FOUND</code></td><td>error</td><td>404</td><td>发货单/批次不存在或不属于调用方。</td><td>校验标识。</td></tr>
       </tbody>
     </table>
 
@@ -130,11 +130,11 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>Scope</th><th>类型</th><th>描述</th><th>授予方</th><th>默认分配</th></tr></thead>
       <tbody>
-        <tr><td><code>shipment:prepare</code></td><td>Action Scope</td><td>申报备货进度。</td><td>Marketplace</td><td>Seller 角色（仅本方订单）</td></tr>
-        <tr><td><code>shipment:ship</code></td><td>Action Scope</td><td>提交发货凭证。</td><td>Marketplace</td><td>Seller 角色</td></tr>
-        <tr><td><code>shipment:split</code></td><td>Action Scope</td><td>声明分批交付计划。</td><td>Marketplace</td><td>Seller 角色（Listing 与已锁定交易条款允许时）</td></tr>
-        <tr><td><code>shipment:update</code></td><td>Action Scope</td><td>申报延迟/异常/更正事件。</td><td>Marketplace</td><td>Seller 角色</td></tr>
-        <tr><td><code>shipment:query</code></td><td>Action Scope</td><td>查询发货单与批次状态。</td><td>Marketplace</td><td>Seller 角色；Shipper 对其承运批次可读</td></tr>
+        <tr><td><code>delivery:prepare</code></td><td>Action Scope</td><td>申报备货进度。</td><td>Marketplace</td><td>Seller 角色（仅本方订单）</td></tr>
+        <tr><td><code>delivery:ship</code></td><td>Action Scope</td><td>提交发货凭证。</td><td>Marketplace</td><td>Seller 角色</td></tr>
+        <tr><td><code>delivery:split</code></td><td>Action Scope</td><td>声明分批交付计划。</td><td>Marketplace</td><td>Seller 角色（Listing 与已锁定交易条款允许时）</td></tr>
+        <tr><td><code>delivery:update</code></td><td>Action Scope</td><td>申报延迟/异常/更正事件。</td><td>Marketplace</td><td>Seller 角色</td></tr>
+        <tr><td><code>delivery:query</code></td><td>Action Scope</td><td>查询发货单与批次状态。</td><td>Marketplace</td><td>Seller 角色；Shipper 对其承运批次可读</td></tr>
       </tbody>
     </table>
     <p><strong>约束：</strong><code>ship</code> 的 Shipment 凭证 MUST 携带 Seller ES256 签名；当某段履约责任由独立物流方承担时，承运段的轨迹事实由 Shipper 按主规范 <code>Fulfill.track</code> 义务提交，MP5 不代替 Shipper 签名。</p>
@@ -159,7 +159,7 @@ service:        dev.utp.merchant
         <tr><td>事实转换</td><td>MUST</td><td>MP5 生效事件 MUST 在声明时限（SHOULD ≤ 60s）内转换为买方侧 <code>fulfill.notify</code> 推送与 TrackingEvent（M7.7 映射表）。</td></tr>
         <tr><td>回执汇聚</td><td>MUST</td><td>MUST 汇聚承运商/Shipper 回执，驱动 <code>DELIVERED</code> 镜像状态，并向供应商推送 <code>delivery_receipt</code> 回调（M2.6.1）。</td></tr>
         <tr><td>凭证归档</td><td>MUST</td><td>Shipment 凭证、异常事件、回执 MUST 纳入 Evidence Bundle，保存期不低于争议时效期。</td></tr>
-        <tr><td>时效监控</td><td>SHOULD</td><td>SHOULD 监控发货时效并在临近超期时预警供应商（<code>SHIPMENT.OVERDUE</code> 警示）。</td></tr>
+        <tr><td>时效监控</td><td>SHOULD</td><td>SHOULD 监控发货时效并在临近超期时预警供应商（<code>DELIVERY.OVERDUE</code> 警示）。</td></tr>
       </tbody>
     </table>
 
@@ -193,7 +193,7 @@ service:        dev.utp.merchant
     <ul>
       <li><code>shipment_id</code>、<code>batch_id</code>、<code>tracking_number</code> 在两侧 MUST 同值——买方 <code>track</code> 查到的与供应商 <code>query</code> 查到的 是同一记录的两个投影（字段可见性按角色权限裁剪）。</li>
       <li>转换生成的 TrackingEvent MUST 符合主规范 <a href="/documentation/specification/primitives/fulfill/index.html#s-1591">15.9.1 TrackingEvent</a> 实体定义并携带 <code>transaction_id</code>。</li>
-      <li>买方 <code>receive</code> 生成的 FulfillmentReceipt、<code>reject</code> 生成的 RejectionConfirmation MUST 经回调 <code>utp.shipment.delivery_receipt</code> 通知供应商（M2.6.1），驱动 MP5 侧 <code>CLOSED</code>。</li>
+      <li>买方 <code>receive</code> 生成的 FulfillmentReceipt、<code>reject</code> 生成的 RejectionConfirmation MUST 经回调 <code>utp.delivery.receipt</code> 通知供应商（M2.6.1），驱动 MP5 侧 <code>CLOSED</code>。</li>
       <li>全部批次 <code>CLOSED</code> 且其他义务完成后，全局状态是否迁移 <code>SETTLED</code> 由全局状态机决定（主规范 15.3.2），MP5 不参与该判定。</li>
     </ul>
 
@@ -203,22 +203,22 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>操作</th><th>适用状态</th><th>状态影响</th><th><code>valid_next_actions</code></th><th>关键约束</th></tr></thead>
       <tbody>
-        <tr><td><code>utp.shipment.prepare</code></td><td>（订购成立后）, <code>PREPARING</code></td><td>进入/更新 <code>PREPARING</code>；<code>completed</code> 时进入 <code>READY</code></td><td><code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td><td>Seller；可选动作；不触发买方状态迁移。</td></tr>
-        <tr><td><code>utp.shipment.split</code></td><td><code>PREPARING</code>, <code>READY</code></td><td>登记批次计划（不发货）</td><td><code>ship</code>, <code>update</code>, <code>query</code></td><td>Seller；MUST 满足 Listing 的 <code>splittable</code> 声明与已锁定交易条款；批次数量合计 == 订单数量。</td></tr>
-        <tr><td><code>utp.shipment.ship</code></td><td><code>PREPARING</code>, <code>READY</code>（或直接首次调用）</td><td>批次进入 <code>SHIPPED</code>；生成签名凭证；库存核销；触发买方 notify</td><td><code>update</code>, <code>query</code></td><td>Seller；MUST 附运单与包裹明细；MUST 携带 Seller 签名；幂等。</td></tr>
-        <tr><td><code>utp.shipment.update</code></td><td><code>PREPARING</code>, <code>READY</code>, <code>SHIPPED</code>, <code>EXCEPTION</code></td><td>追加事件（delay/exception/customs/correction）；delay 使买方侧 <code>DELAYED</code></td><td><code>ship</code>（重发）, <code>query</code></td><td>Seller；事件 MUST 附结构化类型与说明；不可覆盖既有事实，只可追加。</td></tr>
-        <tr><td><code>utp.shipment.query</code></td><td>任意</td><td>无</td><td>当前状态可执行动作</td><td>Seller；按 <code>transaction_id</code>/<code>shipment_id</code>/<code>batch_id</code> 查询，含回执与买方验收结论镜像。</td></tr>
+        <tr><td><code>utp.delivery.prepare</code></td><td>（订购成立后）, <code>PREPARING</code></td><td>进入/更新 <code>PREPARING</code>；<code>completed</code> 时进入 <code>READY</code></td><td><code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td><td>Seller；可选动作；不触发买方状态迁移。</td></tr>
+        <tr><td><code>utp.delivery.split</code></td><td><code>PREPARING</code>, <code>READY</code></td><td>登记批次计划（不发货）</td><td><code>ship</code>, <code>update</code>, <code>query</code></td><td>Seller；MUST 满足 Listing 的 <code>splittable</code> 声明与已锁定交易条款；批次数量合计 == 订单数量。</td></tr>
+        <tr><td><code>utp.delivery.ship</code></td><td><code>PREPARING</code>, <code>READY</code>（或直接首次调用）</td><td>批次进入 <code>SHIPPED</code>；生成签名凭证；库存核销；触发买方 notify</td><td><code>update</code>, <code>query</code></td><td>Seller；MUST 附运单与包裹明细；MUST 携带 Seller 签名；幂等。</td></tr>
+        <tr><td><code>utp.delivery.update</code></td><td><code>PREPARING</code>, <code>READY</code>, <code>SHIPPED</code>, <code>EXCEPTION</code></td><td>追加事件（delay/exception/customs/correction）；delay 使买方侧 <code>DELAYED</code></td><td><code>ship</code>（重发）, <code>query</code></td><td>Seller；事件 MUST 附结构化类型与说明；不可覆盖既有事实，只可追加。</td></tr>
+        <tr><td><code>utp.delivery.query</code></td><td>任意</td><td>无</td><td>当前状态可执行动作</td><td>Seller；按 <code>transaction_id</code>/<code>shipment_id</code>/<code>batch_id</code> 查询，含回执与买方验收结论镜像。</td></tr>
       </tbody>
     </table>
     <h3 id="s-m782">M7.8.2 传输绑定</h3>
     <table>
       <thead><tr><th>操作</th><th>REST</th><th>MCP Tool</th><th>A2A Task</th></tr></thead>
       <tbody>
-        <tr><td><code>prepare</code></td><td><code>POST /utp/m/v1/shipments/preparations</code></td><td><code>utp_shipment_prepare</code></td><td><code>utp:shipment:prepare</code></td></tr>
-        <tr><td><code>split</code></td><td><code>POST /utp/m/v1/shipments/split-plans</code></td><td><code>utp_shipment_split</code></td><td><code>utp:shipment:split</code></td></tr>
-        <tr><td><code>ship</code></td><td><code>POST /utp/m/v1/shipments</code></td><td><code>utp_shipment_ship</code></td><td><code>utp:shipment:ship</code></td></tr>
-        <tr><td><code>update</code></td><td><code>POST /utp/m/v1/shipments/{shipment_id}/events</code></td><td><code>utp_shipment_update</code></td><td><code>utp:shipment:update</code></td></tr>
-        <tr><td><code>query</code></td><td><code>GET /utp/m/v1/shipments?transaction_id=&amp;shipment_id=</code></td><td><code>utp_shipment_query</code></td><td><code>utp:shipment:query</code></td></tr>
+        <tr><td><code>prepare</code></td><td><code>POST /utp/m/v1/deliveries/preparations</code></td><td><code>utp_delivery_prepare</code></td><td><code>utp:delivery:prepare</code></td></tr>
+        <tr><td><code>split</code></td><td><code>POST /utp/m/v1/deliveries/split-plans</code></td><td><code>utp_delivery_split</code></td><td><code>utp:delivery:split</code></td></tr>
+        <tr><td><code>ship</code></td><td><code>POST /utp/m/v1/deliveries</code></td><td><code>utp_delivery_ship</code></td><td><code>utp:delivery:ship</code></td></tr>
+        <tr><td><code>update</code></td><td><code>POST /utp/m/v1/deliveries/{shipment_id}/events</code></td><td><code>utp_delivery_update</code></td><td><code>utp:delivery:update</code></td></tr>
+        <tr><td><code>query</code></td><td><code>GET /utp/m/v1/deliveries?transaction_id=&amp;shipment_id=</code></td><td><code>utp_delivery_query</code></td><td><code>utp:delivery:query</code></td></tr>
       </tbody>
     </table>
     <p>标识符与参数一律置于请求体（与主规范 15.8.1 的 Fulfill REST 风格一致）；全部写操作 MUST 携带 <code>idempotency_key</code>。</p>
@@ -240,7 +240,7 @@ service:        dev.utp.merchant
         <tr><td><code>estimated_delivery_at</code></td><td>ISO-8601</td><td>否</td><td>预计送达时间（ETA）。</td></tr>
         <tr><td><code>shipped_at</code></td><td>ISO-8601</td><td>是</td><td>交运时间。</td></tr>
         <tr><td><code>document_refs</code></td><td>array</td><td>否</td><td>单证引用（发货单、报关单、原产地证等）；<code>compliance_level ≥ L2</code> 时按要求必附。</td></tr>
-        <tr><td><code>seller_signature</code></td><td>string</td><td>是</td><td>Seller ES256 签名（JWS），覆盖 <code>shipment_hash</code>。<strong>shipment_hash 定义（规范性）：</strong>对对象 <code>{transaction_id, batch_id, carrier_code, tracking_number, packages, ships_from, shipped_at}</code>（缺省字段省略键）按 RFC 8785（JCS）规范化后的 UTF-8 字节串计算 SHA-256，十六进制小写串作为 JWS payload（统一规则见 M1.10）。Marketplace MUST 重算并验证，不一致返回 <code>SHIPMENT.TRACKING_INVALID</code>。</td></tr>
+        <tr><td><code>seller_signature</code></td><td>string</td><td>是</td><td>Seller ES256 签名（JWS），覆盖 <code>shipment_hash</code>。<strong>shipment_hash 定义（规范性）：</strong>对对象 <code>{transaction_id, batch_id, carrier_code, tracking_number, packages, ships_from, shipped_at}</code>（缺省字段省略键）按 RFC 8785（JCS）规范化后的 UTF-8 字节串计算 SHA-256，十六进制小写串作为 JWS payload（统一规则见 M1.10）。Marketplace MUST 重算并验证，不一致返回 <code>DELIVERY.TRACKING_INVALID</code>。</td></tr>
       </tbody>
     </table>
     <h3 id="s-m792">M7.9.2 Package</h3>
@@ -274,7 +274,7 @@ service:        dev.utp.merchant
     <h2 id="s-m710">M7.10 Use Case Walkthroughs（用例演练）</h2>
     <h3 id="s-m7101">M7.10.1 标准发货与买方感知</h3>
 <pre class="highlight"><code class="language-json">// Seller 发货
-POST /utp/m/v1/shipments
+POST /utp/m/v1/deliveries
 {
   "idempotency_key": "idem-ship-20260723-001",
   "transaction_id": "utp-txn-01J4X7K9M2P5Q8R3V6W0YZ",
@@ -299,7 +299,7 @@ POST /utp/m/v1/shipments
   "shipment_id": "shp-20260723-0442",
   "status": "SHIPPED",
   "inventory_effect": { "sku-X3-BLK": { "locked_consumed": 100 } },
-  "valid_next_actions": ["utp.shipment.update", "utp.shipment.query"]
+  "valid_next_actions": ["utp.delivery.update", "utp.delivery.query"]
 }
 
 // Marketplace 同步转换为买方侧 fulfill.notify（主规范 15.7.1）：
@@ -308,7 +308,7 @@ POST /utp/m/v1/shipments
 //   "status": "SHIPPED", "tracking_number": "SF1234567890123", ... }
 </code></pre>
     <h3 id="s-m7102">M7.10.2 延迟申报与分批发货</h3>
-<pre class="highlight"><code>延迟：POST /utp/m/v1/shipments/{id}/events
+<pre class="highlight"><code>延迟：POST /utp/m/v1/deliveries/{id}/events
       { "type": "delay", "reason_code": "stockout_delay",
         "new_eta": "2026-07-30T18:00:00Z" }
       → 买方可观测状态 → DELAYED；买方可依约发起 Resolve 或等待

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reject_reason.json",
+  "version": "2026-08-04",
+  "title": "AftersaleRejectReason",
+  "description": "供应商拒绝售后的原因码。主张买方责任或无质量问题时 SHOULD 附举证。",
+  "type": "string",
+  "enum": [
+    "no_defect_found",
+    "buyer_damage",
+    "out_of_window",
+    "evidence_insufficient",
+    "used_or_altered",
+    "not_our_product",
+    "other"
+  ],
+  "enumDescriptions": {
+    "no_defect_found": "经核未发现所述质量问题。",
+    "buyer_damage": "损坏由买方使用不当造成。",
+    "out_of_window": "超出约定售后时效。",
+    "evidence_insufficient": "举证材料不足以支持诉求。",
+    "used_or_altered": "商品已使用或经改装，不符合退换条件。",
+    "not_our_product": "非本供应商供货（批次/标识不符）。",
+    "other": "其他原因，MUST 在 reason_note 中说明。"
+  }
+}
