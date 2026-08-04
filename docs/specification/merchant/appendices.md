@@ -87,14 +87,14 @@ format: html
         <tr><td>MP2 库存管理</td><td><code>primitives/inventory/primitive.json</code> + <code>entities/</code></td><td>InventoryRecord、Adjustment、Hold 与 set/adjust/query/batch 输入输出（M4）</td></tr>
         <tr><td>MP3 询盘响应（草案）</td><td><code>primitives/quote/primitive.json</code> + <code>entities/</code></td><td>QuoteRecord、DeclineReason 与 quote/decline 输入输出；<strong>报价体复用 <code>primitives/negotiate/entities/quote.json</code>（主规范权威 Quote 实体）</strong>（M5）</td></tr>
         <tr><td>MP4 订单受理</td><td><code>primitives/acceptance/primitive.json</code> + <code>entities/</code></td><td>OrderRouting、AcceptanceRecord、RejectReason 与 accept/reject/hold/amend 输入输出（M6）</td></tr>
-        <tr><td>MP5 发货执行</td><td><code>primitives/delivery/primitive.json</code> + <code>entities/</code></td><td>Shipment、Package、SplitPlan、Event 与 prepare/ship/split/update 输入输出（M7；与主规范 Fulfill 侧 Shipment 的合并见 ME 第 7 项）</td></tr>
+        <tr><td>MP5 交付</td><td><code>primitives/delivery/primitive.json</code> + <code>entities/</code></td><td>Shipment、Package、SplitPlan、Event 与 prepare/ship/split/update 输入输出（M7；与主规范 Fulfill 侧 Shipment 的合并见 ME 第 7 项）</td></tr>
         <tr><td>入驻与回调、结算（非原语）</td><td><code>merchant/entities/</code></td><td>MerchantRegistration、DelegationPolicy、AcceptancePolicy、回调 Envelope 与各事件载荷（M2.6）、SettlementStatement/Entry/Discrepancy（M9）——非原语能力，与 <code>discovery/</code>、<code>transport/</code> 同级安置</td></tr>
       </tbody>
     </table>
     <p>状态机的机器可读定义内嵌于各 <code>primitive.json</code> 的 <code>state_machine</code>（<code>scope: resource</code>，以 <code>listing_id</code>/<code>inquiry_id</code>/<code>routing_id</code>/<code>shipment_id</code> 为资源键），与正文各章状态机表逐条一致；Action 迁移以全限定名（<code>utp.acceptance.accept</code>）表达，外部与系统事件以 <code>event</code> 字段表达。</p>
 
     <h2 id="s-me">附录 ME：与主规范的章节对应与整合路线（Integration Map，资料性）</h2>
-    <p>本附录为<strong>资料性（Informative）</strong>：给出商家侧分册各章与主规范章节体系的对应位置，以及 MP 原语升入主规范正式章节序列（需 RFC 治理流程）时的联动修改清单。对应关系的落地与否不影响本分册条款的规范效力；若执行整合，MUST 遵循主规范 README 第 3 节新增章节流程与第 4 节全局一致性检查。</p>
+    <p>本附录为<strong>资料性（Informative）</strong>：给出本规范（UTP-M 独立并行协议）各章与主规范 UTPB 章节体系的对应位置，以及 MP 原语升入主规范正式章节序列（需 RFC 治理流程）时的联动修改清单。对应关系的落地与否不影响本规范条款的规范效力；若执行整合，MUST 遵循主规范 README 第 3 节新增章节流程与第 4 节全局一致性检查。</p>
     <table>
       <thead><tr><th>#</th><th>本规范内容</th><th>整合目标</th><th>联动修改</th></tr></thead>
       <tbody>
@@ -103,7 +103,7 @@ format: html
         <tr><td>3</td><td>M2 入驻与能力声明</td><td>新章节（建议插在 Ch.3 发现与协商之后，作为"商户接入"章）</td><td>全部 26 个页面 sidebar + 编号 +1 联动；discovery.html 3.3 Profile 增补 <code>dev.utp.merchant_callback</code> Service 说明</td></tr>
         <tr><td>4</td><td>M3 MP1 / M4 MP2 / M5 MP3 / M6 MP4 / M7 MP5 六个原语章</td><td>交易原语组新增五章（P0 通用框架之后、或独立"供应商原语"分组）</td><td>index.html 目录表与统计；治理侧发布五个 <code>PrimitiveDefinition</code>；MessageEnvelope <code>primitive</code> 枚举扩展（transport.html 4.1.1 + schemas.html 24.4 两处）</td></tr>
         <tr><td>4a</td><td>MP3 与 P2 对偶（M5.6）</td><td>primitive-negotiate.html 增补"卖方侧应答经 utp.quote 完成"的规范通道说明（平台托管拓扑）</td><td>negotiation_id 上下文共享、Quote 实体复用与 terms_hash 计算规则（M5.10.1.1）的双向交叉引用</td></tr>
-        <tr><td>4b</td><td>MP3 <code>revise</code> 的第二跳表达（M5.6.3 第 4 项）</td><td><code>primitives/negotiate/state_machine.json</code> 增补 <code>QUOTED --utp.negotiate.quote--&gt; QUOTED</code> 自环（修订报价的重复交付），或在 <code>constraints</code> 中明确“同一 inquiry 的后续 quote 视为版本更新、不改变协商状态”</td><td>本分册 M5.6.3 已声明当前处理方式；主规范补充后引用即可，MP3 语义不变</td></tr>
+        <tr><td>4b</td><td>MP3 <code>revise</code> 的第二跳表达（M5.6.3 第 4 项）</td><td><code>primitives/negotiate/state_machine.json</code> 增补 <code>QUOTED --utp.negotiate.quote--&gt; QUOTED</code> 自环（修订报价的重复交付），或在 <code>constraints</code> 中明确“同一 inquiry 的后续 quote 视为版本更新、不改变协商状态”</td><td>本规范 M5.6.3 已声明当前处理方式；主规范补充后引用即可，MP3 语义不变</td></tr>
         <tr><td>5</td><td>MP4 与 P3 衔接（M6.6）</td><td>primitive-purchase.html 13.5.2 / 13.8.1 增补"卖方承诺处理经 utp.acceptance 完成"的规范通道说明</td><td>13.6.2 自动承诺处理脚注指向 AcceptancePolicy</td></tr>
         <tr><td>6</td><td>MP2 与 P3 库存契约（M4.7）</td><td>primitive-purchase.html 13.5.2（锁定库存职责）与 state-machine.html required_evidence 说明处增加交叉引用</td><td>inventory_receipt / inventory_release_receipt 的生成来源注明 InventoryHold</td></tr>
         <tr><td>7</td><td>MP5 与 P5 事实传导（M7.7）</td><td>primitive-fulfill.html 15.7.1（notify 的事实来源）增加交叉引用。<strong>历史不一致已修复</strong>：主规范早期版本中 topology/scenarios 引用的未定义操作 <code>fulfill.ship</code> 已全部清除，发货事实的唯一产生通道即 <code>utp.delivery.ship</code>（MP5），Ch.15 保持纯买方视角</td><td>fulfill/shipment 两个 Shipment Schema 合并为单一权威定义</td></tr>
@@ -128,7 +128,7 @@ format: html
         <tr><td>5</td><td>竞价商品（pricing L3）的供应商侧竞价管理动作</td><td>未覆盖（Listing 仅承载起拍价与截止时间）</td><td>后续版本</td></tr>
         <tr><td>6</td><td>逆向物流（退货执行）的供应商侧原语化</td><td>本版由 P6 CompensationOrder 驱动、实现层执行；不原语化</td><td>视 P6 演进</td></tr>
         <tr><td>7</td><td>Marketplace 联邦（一个供应商多平台分发）的目录同步标准</td><td>由供应商 Bridge 自行多路复用 MP 原语；不定义平台间同步</td><td>生态成熟后评估</td></tr>
-        <tr><td>8</td><td>履约卖家视角（妥投确认响应、拒收处理、逆向物流协同）扩展 MP5 还是独立原语？</td><td>2026-07-30 会议：M 侧目标六原语（四个 + 询盘 + 履约）；本分册立场为扩展 MP5（发货即履约的卖家半边，硬拆违反正交性），MP3 询盘响应已本版落地</td><td>M 侧专项会</td></tr>
+        <tr><td>8</td><td>履约卖家视角（妥投确认响应、拒收处理、逆向物流协同）扩展 MP5 还是独立原语？</td><td>2026-07-30 会议：M 侧目标六原语（四个 + 询盘 + 履约）；本规范立场为扩展 MP5（发货即履约的卖家半边，硬拆违反正交性），MP3 询盘响应已本版落地</td><td>M 侧专项会</td></tr>
         <tr><td>9</td><td>入驻（M2）与结算（M9）是否原语化？</td><td>2026-07-30 会议结论：均不原语化——入驻是准入基础设施（Profile 自指悖论），结算是协议事实的簿记视图；打款作为 P4 结算扩展内的平台驱动 Action 已补定义（M9.9）</td><td>已裁决（M 侧专项会可复议）</td></tr>
       </tbody>
     </table>

@@ -68,6 +68,6 @@
 <rect x="300" y="240" width="430" height="72" rx="6" fill="none" stroke="#b85450" stroke-dasharray="4 3"/>
 <text x="515" y="260" text-anchor="middle" font-size="10" fill="#b85450">终态后写操作 MUST 返回 QUOTE.STATE_CONFLICT（幂等重放除外）</text>
 <text x="515" y="277" text-anchor="middle" font-size="10" fill="#b85450">quote 签名 MUST 覆盖主线 Quote.terms_hash（JCS，M5.10.1.1）· 同一 inquiry 在途有效报价至多一份</text>
-<text x="515" y="294" text-anchor="middle" font-size="10" fill="#b85450">轮次上限由 P2 引擎执行（拒 counter_offer，不产生本图迁移）· BOUND 后 MP4 accept MUST NOT 偏离已绑定条款</text>
+<text x="515" y="294" text-anchor="middle" font-size="10" fill="#b85450">轮次上限由 P2 引擎执行（拒 counter-offer，不产生本图迁移）· BOUND 后 MP4 accept MUST NOT 偏离已绑定条款</text>
 </g>
 </svg>

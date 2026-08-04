@@ -10,12 +10,12 @@ format: html
 <h1 id="s-utp-m-specification">UTP-M Specification — 2026-07-30（Draft）</h1>
     <h2 id="s-merchant-side">UTP 供应商侧规范（Merchant-Side Specification）— Release Candidate 1</h2>
     <blockquote>
-      <p>本规范定义 UTP（Universal Trade Protocol）v1.0 的<strong>供应商侧能力</strong>：商品发布与上下架、库存管理、订单受理、发货执行、结算对账、ERP 集成与供应商 Agent。本规范是 UTP v1.0 的<strong>商家侧分册（Merchant-Side Volume）</strong>，与主规范（买方侧各章）共同构成同一部协议：MP 原语与 P1—P6 遵守同一 P0 原语框架，术语、错误码与 Schema 共用同一注册表体系。与主规范章节体系的对应关系及治理路线见<a href="appendices.html#s-me">附录 E</a>（资料性）。</p>
+      <p>本规范定义 UTP（Universal Trade Protocol）v1.0 的<strong>供应商侧能力</strong>：商品、库存、报价、接单、交付、售后，以及结算对账、ERP 集成与供应商 Agent。本规范是与主规范 UTPB（买方侧）<strong>并列的独立协议（Parallel Protocol）</strong>，面向平台托管（Market–Merchant）场景：它<strong>复用</strong> UTP 的通用底层能力（商业场景、商业拓扑、发现协商、通信认证、P0 原语框架、通用实体与错误码格式），但<strong>不依赖</strong> UTPB 专属的三项高级能力——采购模式、全局状态机、路径编排（2026-08-03 分层解耦裁决）。UTPB 与本规范是两套独立的 DAG 与 trade context，通过 Marketplace 双面枢纽衔接，而非合并为一。与主规范章节体系的对应关系及治理路线见<a href="appendices.html#s-me">附录 E</a>（资料性）。</p>
     </blockquote>
 
     <h2 id="s-positioning">定位与阅读方式</h2>
     <p>主规范 UTP 定义的六大交易原语（P1—P6）以采购方（Buyer）为主要发起方，回答"交易如何执行"。本规范回答其前置与对偶问题：<strong>商品从哪里来、订单如何被供应商受理与履行、货款如何回到供应商</strong>。二者合起来构成完整的商业闭环：</p>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-volume-map.svg" alt="商家侧分册与主规范的章节对偶：M2→L0 发现、MP1→P1、MP3↔P2 询盘、MP2/MP4↔P3、MP5→P5、M8←P4 打款" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="/documentation/assets/diagrams/m-volume-map.svg" alt="UTP-M 与 UTPB 的章节对偶：M2→L0 发现、MP1→P1、MP3↔P2 询盘、MP2/MP4↔P3、MP5→P5、M8←P4 打款" style="max-width: 100%; height: auto;"></div>
     <p>本规范所有原语遵守主规范 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023-action-definition-format">10.2.3 操作定义格式</a>的角色绑定规则：每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>。"UTP-M"仅是编辑与阅读上的分组名称，发现与协商流程 MUST NOT 据此推断角色方向。</p>
 
     <h2 id="s-toc-tables">章节目录</h2>
