@@ -10,25 +10,25 @@ version: 2026-07-29
 
 UTP 中，Agent 代理 Principal（人类委托人）经 Agent 接口调用业务原语推进交易。**人机协同交互控制**解决的不是界面体验问题，而是 Agent 交易中的**控制权边界**问题：哪些 Action 可由 Agent 自主推进，哪些 Action 必须保持 Principal 可观察、可中断，哪些 Action 必须等待 Principal 明确确认后再执行。协议以**执行门**（`interaction_level`）、**HAI 信封**与**挂起凭证**（`suspend_id`）约束上述边界：Agent 发起调用为默认路径；当执行门要求人工确认时，Agent 首次调用 MUST 返回 HAI 信封并挂起执行，Platform 代表 Principal 确认续跑 MUST 调用与该挂起绑定的 `suspended_action` 并携带对应 `suspend_id`（见 确认后续跑）。各 Action 的控制等级由**实现方**在其原语定义文件中静态声明。敏感数据 MUST NOT 进入 Agent 推理链路，关键交易事实 MUST 来自权威数据源，并在最终执行前完成一致性校验。
 
-本章定义执行门、HAI 信封、挂起凭证（`suspend_id`）、数据可见性、权威数据读取、一致性校验及其与证据和安全要求的绑定关系。Mandate 范围、信任策略等分别由[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)、[风控与审计](/documentation/specification/protocol-core/risk-audit.html)在 Action 执行前校验；本章不定义上述策略求值规则，只规定各 `interaction_level` 下的执行与约束语义。业务 Action 的 input 语义、UI 技术栈及渲染机制不属于本章规范性要求。
+本章定义执行门、HAI 信封、挂起凭证（`suspend_id`）、数据可见性、权威数据读取、一致性校验及其与证据和安全要求的绑定关系。Mandate 范围、信任策略等分别由[认证与授权](identity-authorization.md)、[风控与审计](risk-audit.md)在 Action 执行前校验；本章不定义上述策略求值规则，只规定各 `interaction_level` 下的执行与约束语义。业务 Action 的 input 语义、UI 技术栈及渲染机制不属于本章规范性要求。
 
 ---
 
 ## 总览（Overview） {#s-19-1}
 
-HAI 规定 Action 执行前后的**可观察控制语义**：如何组合**执行门**、**HAI 信封**与**挂起凭证**，以约束 Agent 执行权并保证关键决策可审计、可验证。路径编排步骤见[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)。
+HAI 规定 Action 执行前后的**可观察控制语义**：如何组合**执行门**、**HAI 信封**与**挂起凭证**，以约束 Agent 执行权并保证关键决策可审计、可验证。路径编排步骤见[全局状态机](global-state-machine.md)。
 
 ### HAI 控制剖面（HAI Control Profile） {#s-19-1-1}
 
 对具有 HAI 语义的 Action，交互控制剖面由下列三个要素组成：
 
 - **执行门（execution gate）**：规定 Agent 能否在无 Principal 介入下推进当前 Action；由 Action 在原语定义文件的人机协同扩展中声明的 `interaction_level` 表达（见 交互控制等级）。
-- **HAI 信封（HAI envelope）**：Action 响应中承载 Suspend Record、动作承接界面（Action Surface，本章简称 Surface）与 Data Source 等并行协议对象的出站对象（见本节、[Agent友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html)）。
+- **HAI 信封（HAI envelope）**：Action 响应中承载 Suspend Record、动作承接界面（Action Surface，本章简称 Surface）与 Data Source 等并行协议对象的出站对象（见本节、[Agent友好接口](agent-friendly-interface.md)）。
 - **挂起凭证（suspend credential）**：`suspend_id` 及其关联 Suspend Record，用于鉴别 Principal 的确认续跑（见 挂起记录）。身份、授权、证据和完整性要求分别适用相关章节及 Action/Profile 规则。
 
 `data_visibility` 是适用于所有 Action 的顶层静态声明，取值 `V0` / `V1` / `V2`。它不属于 `hai` 对象，也不构成交互控制剖面。HAI 信封、Surface、Data Source 与 Agent 可见响应处理数据时 MUST 遵守 数据可见性规范。运行时 Surface 的 `data_visibility` MUST NOT 高于其所服务 Action 的声明值；若使用 V2，权威读取、`data_source` 与适用的完整性校验仍必须满足 Data Source 的规则。
 
-`interaction_level` 为 Action 级声明：**未声明 `hai` 的 Action 视为 `AUTONOMOUS`**；Action 在原语定义文件携带 `hai` 时 MUST 声明 `interaction_level`（取值 `AUTONOMOUS` / `SUPERVISED` / `CONFIRMED`）。具体配置由**实现方**决定，协议正文不作逐 Action 规定。显式声明 `AUTONOMOUS` 表示该 Action 支持**非阻断 UI 交互**（MAY 返回 HAI 信封供 Surface 或 `submission`，见 AUTONOMOUS 控制语义），但不改变其不以人工确认为继续执行前提的执行门语义。处理方 MUST 按适用的 `interaction_level` 及各控制等级应用相应控制语义。各参与方 MAY 通过最低控制要求所列来源声明 Action 的最低控制要求；若 Action 静态声明严格度低于适用最低要求，处理方 MUST 拒绝执行或返回能力不匹配错误（见能力求值与差异处理）。Mandate 校验以[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)为准；Mandate 通过或拒绝不改变该 Action 所适用的 `interaction_level` 控制语义。
+`interaction_level` 为 Action 级声明：**未声明 `hai` 的 Action 视为 `AUTONOMOUS`**；Action 在原语定义文件携带 `hai` 时 MUST 声明 `interaction_level`（取值 `AUTONOMOUS` / `SUPERVISED` / `CONFIRMED`）。具体配置由**实现方**决定，协议正文不作逐 Action 规定。显式声明 `AUTONOMOUS` 表示该 Action 支持**非阻断 UI 交互**（MAY 返回 HAI 信封供 Surface 或 `submission`，见 AUTONOMOUS 控制语义），但不改变其不以人工确认为继续执行前提的执行门语义。处理方 MUST 按适用的 `interaction_level` 及各控制等级应用相应控制语义。各参与方 MAY 通过最低控制要求所列来源声明 Action 的最低控制要求；若 Action 静态声明严格度低于适用最低要求，处理方 MUST 拒绝执行或返回能力不匹配错误（见能力求值与差异处理）。Mandate 校验以[认证与授权](identity-authorization.md)为准；Mandate 通过或拒绝不改变该 Action 所适用的 `interaction_level` 控制语义。
 
 ### 交互控制等级（interaction_level） {#s-19-1-2}
 
@@ -44,7 +44,7 @@ UTP 定义三级 `interaction_level`，严格度排序：`AUTONOMOUS < SUPERVISE
 
 ### HAI 信封（HAI Envelope） {#s-19-1-3}
 
-HAI 信封是 Action 响应中承载 UI 承接与控制状态的并行对象（见 [Agent友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html)）。
+HAI 信封是 Action 响应中承载 UI 承接与控制状态的并行对象（见 [Agent友好接口](agent-friendly-interface.md)）。
 
 HAI 信封 MUST 至少包含下列语义元素：
 
@@ -161,8 +161,8 @@ Data Source 请求 MUST 能够引用对应原语中已声明的 Action，并绑�
 | --- | --- | --- | --- | --- |
 | `action_ref` | string | 是 | 直接引用对应原语中已声明的完整 Action，而非实现操作接口或 Endpoint。该 Action MUST 可供 Surface 或 Platform 读取或取得权威数据。 | `utp.purchase.get_details` |
 | `session_id` | string | 是 | 关联的 UTP 会话标识。 | `utp-session-abc123` |
-| `trade_context_id` | string | 条件必填 | 关联的交易上下文锚点；当读取对象属于 `SOURCING` 或 `NEGOTIATING` 阶段，或需要按上下文谱系校验归属时提供（见[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)）。 | `utp-ctx-xyz789` |
-| `transaction_id` | string | 条件必填 | 关联的交易级锚点；当读取对象属于 `PURCHASING` 及后续交易事务语义，或需要按交易分支校验归属时提供（见[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)）。 | `utp-txn-xyz789` |
+| `trade_context_id` | string | 条件必填 | 关联的交易上下文锚点；当读取对象属于 `SOURCING` 或 `NEGOTIATING` 阶段，或需要按上下文谱系校验归属时提供（见[全局状态机](global-state-machine.md)）。 | `utp-ctx-xyz789` |
+| `transaction_id` | string | 条件必填 | 关联的交易级锚点；当读取对象属于 `PURCHASING` 及后续交易事务语义，或需要按交易分支校验归属时提供（见[全局状态机](global-state-machine.md)）。 | `utp-txn-xyz789` |
 | `parameters` | object | 否 | 对该 Action 读取或取得数据时的附加参数。其字段由对应原语定义，MAY 承担搜索条件、筛选、分页、对象定位辅助参数或同一协议级 Surface 的初始化上下文；MUST NOT 替代 `session_id`、`trade_context_id` 或 `transaction_id` 的业务锚点职责。 | `{ "purchase_id": "pur-001", "view": "confirmation" }` |
 
 Data Source 采用非网络承载方式时，逻辑上 MUST 保持等价的资源定位、会话绑定与鉴权语义。
@@ -209,8 +209,8 @@ Data Source 读取失败时，协议层 MUST 可观察语义错误码及对应�
 | 资源不存在 | `RESOURCE_NOT_FOUND` | 中止当前确认读取；MAY 触发挂起取消或重新发起操作 | 404 |
 | 认证失败 | `UNAUTHORIZED` | 重新认证或中止当前确认流程 | 401 |
 | 数据已过期 | `DATA_EXPIRED` | 重新获取权威数据并重新进入确认流程 | 410 |
-| Data Source 不可用 | `DATA_SOURCE_UNAVAILABLE` | 重试或中止当前确认流程（见[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)） | 503 |
-| 提供方错误 | `INTERNAL_ERROR` | 重试（遵循[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)超时与重试规则） | 500 |
+| Data Source 不可用 | `DATA_SOURCE_UNAVAILABLE` | 重试或中止当前确认流程（见[全局状态机](global-state-machine.md)） | 503 |
+| 提供方错误 | `INTERNAL_ERROR` | 重试（遵循[全局状态机](global-state-machine.md)超时与重试规则） | 500 |
 
 ---
 
@@ -220,7 +220,7 @@ Data Source 读取失败时，协议层 MUST 可观察语义错误码及对应�
 
 动作承接界面（Action Surface，下文简称 Surface）是协议与客户端之间的共同契约，用于表达**可渲染、可验证、可映射**的业务交互语义。HAI 信封中的 `surface` 字段承载该对象（见 HAI 信封）。协议 MUST 约束其语义与安全字段。Action Surface 适用于全部 `interaction_level`：`AUTONOMOUS` 下 MAY 用于非阻断 UI 展示与 `submission` 收集（见 AUTONOMOUS 控制语义）；`SUPERVISED` 下 MAY 承载观察、预执行提示与中断入口（见 SUPERVISED 控制语义）；关联活跃 Suspend Record 的 Action Surface 称为**确认界面（Confirmation Surface）**，其特化约束见 确认界面。
 
-Action Surface 表达 UI 承接语义，本身 MUST NOT 触发状态迁移或产生业务副作用；Surface 上会改变协议状态或推进交易状态的交互，MUST 通过对应原语 action 进入后续链路（见 AUTONOMOUS 协议行为、确认后续跑）。Action Surface 在适用时声明该 Surface 所服务的 UTP action（见 协议互操作要素）；其数据读取上下文由同一 HAI 信封中的 `data_source` 权威定义。Agent 可见链 MAY 省略 `surface` 对象；Platform / Host MUST 自 Surface 存储或注册表解析完整对象，Surface 与活跃挂起的关联由 Suspend Record 的 `surface_id` 字段表达（见 挂起记录）。Agent MUST NOT 依赖 Surface 内部 UI 结构、sections 或组件树做执行决策；Agent 行为仅由 HAI 信封、`suspended_action`、[Agent友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html) `valid_next_actions` 及本章控制规则决定。
+Action Surface 表达 UI 承接语义，本身 MUST NOT 触发状态迁移或产生业务副作用；Surface 上会改变协议状态或推进交易状态的交互，MUST 通过对应原语 action 进入后续链路（见 AUTONOMOUS 协议行为、确认后续跑）。Action Surface 在适用时声明该 Surface 所服务的 UTP action（见 协议互操作要素）；其数据读取上下文由同一 HAI 信封中的 `data_source` 权威定义。Agent 可见链 MAY 省略 `surface` 对象；Platform / Host MUST 自 Surface 存储或注册表解析完整对象，Surface 与活跃挂起的关联由 Suspend Record 的 `surface_id` 字段表达（见 挂起记录）。Agent MUST NOT 依赖 Surface 内部 UI 结构、sections 或组件树做执行决策；Agent 行为仅由 HAI 信封、`suspended_action`、[Agent友好接口](agent-friendly-interface.md) `valid_next_actions` 及本章控制规则决定。
 
 ### 协议互操作要素（Normative） {#s-19-4-2}
 
@@ -309,7 +309,7 @@ Submission 的最小语义 MUST 满足以下要求：
 }
 ```
 
-Submission MUST 由代表 Principal 的已认证承载方提交；Agent MUST NOT 伪造或代发该受控结果（见[Agent友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html)）。
+Submission MUST 由代表 Principal 的已认证承载方提交；Agent MUST NOT 伪造或代发该受控结果（见[Agent友好接口](agent-friendly-interface.md)）。
 
 ---
 
@@ -361,7 +361,7 @@ Submission MUST 由代表 Principal 的已认证承载方提交；Agent MUST NOT
 1. 处理方 MAY 在前序 Action 的响应中为后续 `CONFIRMED` Action 创建活跃 Suspend Record 并返回 HAI 信封。Agent 无有效 `suspend_id` 调用 `CONFIRMED` Action 时，处理方 MUST 在状态推进前创建或返回活跃 Suspend Record，并阻止该 Action 产生业务副作用；挂起响应中 StateView 的 `state` 与 `state_version` MUST 保持不变。
 2. Principal 的确认 **MUST** 由 Platform 代表 Principal 调用 Suspend Record 中的 `suspended_action`，并携带匹配的 `suspend_id` 完成（见 确认后续跑）；界面展示所依赖的权威读取与数据隔离要求分别见 Data Source 与 数据可见性规范。
 3. 存在活跃挂起控制时，Agent 发起调用 MUST 被阻断；仅确认续跑业务 Action 或窄语义 control action（见 窄语义 Resume / Cancel）MAY 改变当前控制门状态。
-4. 确认续跑执行业务 Action 前，处理方 MUST 完成本章的挂起校验，并应用该 Action 适用的完整性、身份、授权、证据与 Mandate 校验（见[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)、[风控与审计](/documentation/specification/protocol-core/risk-audit.html)）；取消、超时或校验失败时 MUST 返回可审计的协议结果。
+4. 确认续跑执行业务 Action 前，处理方 MUST 完成本章的挂起校验，并应用该 Action 适用的完整性、身份、授权、证据与 Mandate 校验（见[认证与授权](identity-authorization.md)、[风控与审计](risk-audit.md)）；取消、超时或校验失败时 MUST 返回可审计的协议结果。
 
 ### 挂起记录（Suspend Record） {#s-19-7-2}
 
@@ -496,11 +496,11 @@ Principal 在 Confirmation Surface 中完成确认后，Platform MUST 代表 Pri
 | 挂起凭证 | `hai.suspend_id` MUST 有效、未过期，且与当前会话、Suspend Record 及 `suspended_action` 匹配 |
 | Input 约束 | 业务 input MUST 符合挂起 `suspended_action` 在原语章定义的 input schema |
 | 完整性 | 适用完整性 Profile 时，处理方 MUST 按其规则验证 Principal 确认时所见数据与当前权威数据的一致性（所见即所签） |
-| 证据绑定 | 适用的身份、授权、Mandate 与证据要求 MUST 按 Action、`SecurityRequirement` 与相应章节处理（见[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)、[风控与审计](/documentation/specification/protocol-core/risk-audit.html)） |
+| 证据绑定 | 适用的身份、授权、Mandate 与证据要求 MUST 按 Action、`SecurityRequirement` 与相应章节处理（见[认证与授权](identity-authorization.md)、[风控与审计](risk-audit.md)） |
 
-处理方收到确认续跑业务 Action 后，MUST 在执行业务 Action 并触发状态迁移前完成：`suspend_id` 与 `suspended_action` 匹配校验、最新 StateView 与交易上下文重读、Action 合法性复验、input schema 校验，以及该 Action 适用的完整性、身份、授权、证据和 Mandate 校验；通过后 MUST 解除活跃挂起控制。具体业务状态迁移语义见[全局状态机](/documentation/specification/protocol-core/global-state-machine.html)。
+处理方收到确认续跑业务 Action 后，MUST 在执行业务 Action 并触发状态迁移前完成：`suspend_id` 与 `suspended_action` 匹配校验、最新 StateView 与交易上下文重读、Action 合法性复验、input schema 校验，以及该 Action 适用的完整性、身份、授权、证据和 Mandate 校验；通过后 MUST 解除活跃挂起控制。具体业务状态迁移语义见[全局状态机](global-state-machine.md)。
 
-确认续跑采用[原语框架](/documentation/specification/protocol-core/primitive-framework.html)定义的标准请求与响应语义。Agent 侧后续可执行 Action 仍由[Agent友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html) `valid_next_actions` 表达；挂起期间 Agent 仅见只读 Action，与 Platform 续跑所用 `suspended_action` 职责分离。
+确认续跑采用[原语框架](primitive-framework.md)定义的标准请求与响应语义。Agent 侧后续可执行 Action 仍由[Agent友好接口](agent-friendly-interface.md) `valid_next_actions` 表达；挂起期间 Agent 仅见只读 Action，与 Platform 续跑所用 `suspended_action` 职责分离。
 
 若会话 HAI 快照（见 会话 HAI 快照）不含 `CONFIRMED`，Agent 无凭证调用 `CONFIRMED` Action 时处理方 MUST 返回 `HAI_CHANNEL_DENIED` 或 `HAI_CAPABILITY_UNSUPPORTED`。
 
@@ -576,7 +576,7 @@ Principal 或 Platform 决定放弃当前挂起时，控制通道 MUST 发送 Ca
 Cancel 触发后，处理方 MUST：
 
 1. 将对应活跃 Suspend Record 标记为 `CANCELLED` 并解除该挂起控制；
-2. 根据当前全局状态判断是否需要触发补偿链（参见 [全局状态机的 Saga 补偿链](/documentation/specification/protocol-core/global-state-machine.html)）；
+2. 根据当前全局状态判断是否需要触发补偿链（参见 [全局状态机的 Saga 补偿链](global-state-machine.md)）；
 3. 返回标准自描述响应（见 控制结果与 Agent 可见响应）。
 
 #### Resume/Cancel 约束 {#s-19-7-5-4}
@@ -586,11 +586,11 @@ Cancel 触发后，处理方 MUST：
 3. 已超时的活跃挂起收到 Resume 时，MUST 返回 `SUSPEND_EXPIRED` 错误。
 4. 当 Resume 提供 `decision.timestamp` 时，其与 `created_at` 之差 MUST 小于 `timeout_ms`。
 5. Cancel 与 Resume 互斥，同一 suspend_id 只能接受其中之一（否则 `RESUME_CONFLICT`）。
-6. Mandate 覆盖的操作在 Resume 或实际执行前 MUST 按[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)重新校验 Mandate；失败时返回 `MANDATE_SCOPE_EXCEEDED` 或重新创建新的 CONFIRMED Suspend Record。
+6. Mandate 覆盖的操作在 Resume 或实际执行前 MUST 按[认证与授权](identity-authorization.md)重新校验 Mandate；失败时返回 `MANDATE_SCOPE_EXCEEDED` 或重新创建新的 CONFIRMED Suspend Record。
 
 ### 控制结果与 Agent 可见响应 {#s-19-7-6}
 
-确认续跑业务 Action 或 narrow Resume/Cancel 成功后，HAI MUST 记录人工决策已被接受、解除活跃挂起控制，并将经校验的结果交回后续执行链。成功响应属于[Agent友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html)定义的状态迁移响应链；MUST 至少含可用于定位业务资源的稳定引用（见下列规则）。若服务端已知下一步动作的权威默认参数，SHOULD 在响应链中内联 `default_input`（见[Agent友好接口](/documentation/specification/protocol-core/agent-friendly-interface.html)）。
+确认续跑业务 Action 或 narrow Resume/Cancel 成功后，HAI MUST 记录人工决策已被接受、解除活跃挂起控制，并将经校验的结果交回后续执行链。成功响应属于[Agent友好接口](agent-friendly-interface.md)定义的状态迁移响应链；MUST 至少含可用于定位业务资源的稳定引用（见下列规则）。若服务端已知下一步动作的权威默认参数，SHOULD 在响应链中内联 `default_input`（见[Agent友好接口](agent-friendly-interface.md)）。
 
 以下示例仅用于说明控制门解除后的 Agent 可见最小语义，不构成唯一合法格式：
 
@@ -624,7 +624,7 @@ Cancel 触发后，处理方 MUST：
 
 ### 定位 {#s-19-8-1}
 
-在 HAI 的确认控制点上，确认续跑业务 Action 或 narrow Resume 执行前 MUST 满足该 Action 适用的身份、授权、Mandate 与证据要求。相关机制与对象定义分别见[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)与[风控与审计](/documentation/specification/protocol-core/risk-audit.html)。本节规定 HAI 对这些要求的衔接，不定义确认续跑 `hai` attachment 的平行字段体系。
+在 HAI 的确认控制点上，确认续跑业务 Action 或 narrow Resume 执行前 MUST 满足该 Action 适用的身份、授权、Mandate 与证据要求。相关机制与对象定义分别见[认证与授权](identity-authorization.md)与[风控与审计](risk-audit.md)。本节规定 HAI 对这些要求的衔接，不定义确认续跑 `hai` attachment 的平行字段体系。
 
 ### 绑定内容 {#s-19-8-2}
 
@@ -644,7 +644,7 @@ Cancel 触发后，处理方 MUST：
 
 ### 强度要求的来源 {#s-19-8-3}
 
-- Action 静态声明、原语风险等级、[信任准入评估](/documentation/specification/protocol-core/security-trust.html) `SecurityRequirement`、[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)、Handler 的 `operation_requirements` 及会话协商结果决定本次确认所需的认证与授权强度。
+- Action 静态声明、原语风险等级、[信任准入评估](security-trust.md) `SecurityRequirement`、[认证与授权](identity-authorization.md)、Handler 的 `operation_requirements` 及会话协商结果决定本次确认所需的认证与授权强度。
 - 这些强度要求 MUST 引用第 6 章及相关原语章的既有定义。
 - 参与方 MUST 在 Profile 或 `operation_requirements` 中显式声明所需强度，MUST NOT 仅依赖 UI 表达层暗示。
 - HAI Resume 与确认续跑业务 Action 只消费并绑定"本次确认已经满足所需认证/授权要求"的验证结果。
@@ -657,7 +657,7 @@ Cancel 触发后，处理方 MUST：
 
 ### 引用式数据传递（Reference-by-ID） {#s-19-9-1}
 
-跨推理步骤的数据关联 MUST 通过不可变资源标识符引用，MUST NOT 通过数据结构复制。此规则与 [传输与通信](/documentation/specification/protocol-core/transport-communication.html) 消息信封幂等键及 [全局状态机](/documentation/specification/protocol-core/global-state-machine.html) 状态一致性保障互补。
+跨推理步骤的数据关联 MUST 通过不可变资源标识符引用，MUST NOT 通过数据结构复制。此规则与 [传输与通信](transport-communication.md) 消息信封幂等键及 [全局状态机](global-state-machine.md) 状态一致性保障互补。
 
 1. 原语响应中用于后续步骤引用的业务数据，MUST 以资源标识符形式提供。
 2. Agent 后续操作中 MUST 通过 ID 引用资源，MUST NOT 传递来自先前上下文的业务数据值。
@@ -724,13 +724,13 @@ Platform / Host MUST 在 `session.init` 中声明 HAI 快照，并在该会话�
 
 ### 最低控制要求 {#s-19-10-2}
 
-除 Action 在原语定义文件中的静态 `interaction_level` 外，UTP 商业拓扑中的**各参与方**（如 Buyer、Seller、Payer、Payee、PaymentProcessor、Escrow、Inspector、Arbiter 等，见[商业拓扑](/documentation/specification/protocol-core/business-topology.html)）MAY 对特定 Action 声明最低控制严格度。处理方 MUST 在 Action 合法后、执行 HAI 控制语义前，按能力求值与差异处理求出**生效控制等级**（`effective_interaction_level`），并据此选择各控制等级的控制路径。
+除 Action 在原语定义文件中的静态 `interaction_level` 外，UTP 商业拓扑中的**各参与方**（如 Buyer、Seller、Payer、Payee、PaymentProcessor、Escrow、Inspector、Arbiter 等，见[商业拓扑](business-topology.md)）MAY 对特定 Action 声明最低控制严格度。处理方 MUST 在 Action 合法后、执行 HAI 控制语义前，按能力求值与差异处理求出**生效控制等级**（`effective_interaction_level`），并据此选择各控制等级的控制路径。
 
 最低控制要求 MAY 来自下列来源；对同一 Action，处理方 MUST 取各来源中的**最严格**等级作为 `required_minimum_level`（严格度排序见 交互控制等级）：
 
-1. **Handler 要求**：执行该 Action 的 Endpoint 所属角色（handler role）在其 UTPProfile、角色绑定 Profile 或签名的 `operation_requirements` 端点（见[信任准入评估中的 SecurityRequirement](/documentation/specification/protocol-core/security-trust.html)）中声明的 `minimum_interaction_level`。Handler 不限于 Seller；例如 `utp.pay.initiate` 的 handler 可能是 PaymentProcessor 或 Seller，相应 Profile 发布方 MAY 声明最低等级。
+1. **Handler 要求**：执行该 Action 的 Endpoint 所属角色（handler role）在其 UTPProfile、角色绑定 Profile 或签名的 `operation_requirements` 端点（见[信任准入评估中的 SecurityRequirement](security-trust.md)）中声明的 `minimum_interaction_level`。Handler 不限于 Seller；例如 `utp.pay.initiate` 的 handler 可能是 PaymentProcessor 或 Seller，相应 Profile 发布方 MAY 声明最低等级。
 2. **会话锁定要求**：`session.init` 握手冻结的 `hai.minimum_interaction_level`，表达本会话各参与方已协商的控制底线（如买方组织策略、托管方条件等）。
-3. **SecurityRequirement**：[信任准入评估](/documentation/specification/protocol-core/security-trust.html) 对受保护操作给出的 `human_confirmation` 等准入约束；若其语义等价于要求人工确认门，处理方 MUST 将其映射为不低于 `CONFIRMED` 的最低要求并纳入求值。
+3. **SecurityRequirement**：[信任准入评估](security-trust.md) 对受保护操作给出的 `human_confirmation` 等准入约束；若其语义等价于要求人工确认门，处理方 MUST 将其映射为不低于 `CONFIRMED` 的最低要求并纳入求值。
 
 下列示例仅说明 `minimum_interaction_level` 的最小语义要素；MAY 出现在 Handler Profile、`operation_requirements` 响应或 `session.init` 快照中，不构成唯一合法格式：
 
@@ -768,13 +768,13 @@ Action 静态声明的 `interaction_level` MUST NOT 低于本会话适用的 `re
 | 依赖 Submission `submission`，快照中 `execution_support.AUTONOMOUS.submission` 不为 `true` | 非阻断提交 MUST NOT 成为必要前提；MAY 改由显式 Agent 动作或本地内部状态处理 |
 | 参与方声明的 HAI 要求当前实现不具备 | MUST 返回 `HAI_CAPABILITY_UNSUPPORTED` |
 
-要求更高认证或授权强度的确认流程，MUST 按[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)与相关原语章转入具备相应能力的确认环境；该要求不改变 `effective_interaction_level` 所适用的控制语义。
+要求更高认证或授权强度的确认流程，MUST 按[认证与授权](identity-authorization.md)与相关原语章转入具备相应能力的确认环境；该要求不改变 `effective_interaction_level` 所适用的控制语义。
 
 ### 与 Mandate 机制的关联 {#s-19-10-4}
 
-Mandate 的签发、验证与适用范围以[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)为准。HAI 仅在确认续跑执行业务 Action 或 narrow Resume 前消费 Mandate 校验结果，不定义 Mandate 求值规则，亦不定义 `interaction_level` 求值规则。
+Mandate 的签发、验证与适用范围以[认证与授权](identity-authorization.md)为准。HAI 仅在确认续跑执行业务 Action 或 narrow Resume 前消费 Mandate 校验结果，不定义 Mandate 求值规则，亦不定义 `interaction_level` 求值规则。
 
-确认续跑执行业务 Action 或 narrow Resume 前，Mandate 覆盖的操作 MUST 按[认证与授权](/documentation/specification/protocol-core/identity-authorization.html)重新校验 Mandate；校验失败时 MUST NOT 继续执行，并 MUST 返回相应错误（例如 `MANDATE_SCOPE_EXCEEDED`）。
+确认续跑执行业务 Action 或 narrow Resume 前，Mandate 覆盖的操作 MUST 按[认证与授权](identity-authorization.md)重新校验 Mandate；校验失败时 MUST NOT 继续执行，并 MUST 返回相应错误（例如 `MANDATE_SCOPE_EXCEEDED`）。
 
 ### 最小互操作剖面 {#s-19-10-5}
 

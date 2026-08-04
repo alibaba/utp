@@ -10,7 +10,7 @@ version: 2026-07-30
 
 UTP 协议假设调用方 100% 是 AI Agent。所有原本由人类隐式承担的认知负荷——理解前置条件、推断下一步动作、处理异常恢复、协调多方——MUST 被显式编码进协议本身。本章规定协议层面的 Agent 友好**设计原则**与**合规等级（L4）要求**，用于指导传输层、P0 原语框架、各原语章节及人机协同章节的字段与行为设计。
 
-**章节边界**：本章不定义具体的请求/响应字段、Action Object 结构、错误对象字段或传输信封字段；这些字段分别由[第 4 章 传输与通信](/documentation/specification/protocol-core/transport-communication.html)、[第 10 章 原语通用框架](/documentation/specification/protocol-core/primitive-framework.html)、各原语章节及[第 20 章 人机协同交互控制](/documentation/specification/protocol-core/human-agent-interaction.html)定义。本章只规定上述章节在面向 Agent 暴露接口时必须遵循的设计原则与判定标准。
+**章节边界**：本章不定义具体的请求/响应字段、Action Object 结构、错误对象字段或传输信封字段；这些字段分别由[第 4 章 传输与通信](transport-communication.md)、[第 10 章 原语通用框架](primitive-framework.md)、各原语章节及[第 20 章 人机协同交互控制](human-agent-interaction.md)定义。本章只规定上述章节在面向 Agent 暴露接口时必须遵循的设计原则与判定标准。
 
 接口设计遵循三条元原则：
 
@@ -28,8 +28,8 @@ UTP 协议假设调用方 100% 是 AI Agent。所有原本由人类隐式承担�
 
 自描述信息由传输层、原语响应骨架与各原语业务输出共同承载：
 
-- 响应信封层的会话标识、时间基准、状态版本、快照引用等由[第 4 章](/documentation/specification/protocol-core/transport-communication.html)定义。
-- 动作标识、执行结果、当前原语状态及后续动作名称列表由[第 10 章 P0 响应骨架](/documentation/specification/protocol-core/primitive-framework.html#s-1023-action-definition-format)定义。
+- 响应信封层的会话标识、时间基准、状态版本、快照引用等由[第 4 章](transport-communication.md)定义。
+- 动作标识、执行结果、当前原语状态及后续动作名称列表由[第 10 章 P0 响应骨架](primitive-framework.md#s-1023-action-definition-format)定义。
 - 面向 Agent 的动作自然语言说明、输入提示、前置/后置条件、风险、确认、授权与恢复语义由各原语章节及本章设计原则共同约束。
 
 协议实现方 MUST 保证：Agent 仅凭当前会话上下文、响应中的自描述字段和已协商的静态快照，即可决定下一步安全动作。
@@ -157,9 +157,9 @@ UTP 协议通过以下机制支持 Agent 自主决策：
 
 | 设计主题 | 原则来源 | 字段与行为定义来源 |
 | --- | --- | --- |
-| 响应信封、快照引用、传输封装、去重与投递 | 第 19 章 | [第 4 章 传输与通信](/documentation/specification/protocol-core/transport-communication.html) |
-| ActionRequest / ActionResponse 骨架、`valid_next_actions` 编码、幂等键位置、错误响应基础格式 | 第 19 章 | [第 10 章 原语通用框架](/documentation/specification/protocol-core/primitive-framework.html) |
+| 响应信封、快照引用、传输封装、去重与投递 | 第 19 章 | [第 4 章 传输与通信](transport-communication.md) |
+| ActionRequest / ActionResponse 骨架、`valid_next_actions` 编码、幂等键位置、错误响应基础格式 | 第 19 章 | [第 10 章 原语通用框架](primitive-framework.md) |
 | 各原语的具体 Action 语义、输入/输出 Schema、状态影响、业务错误与恢复动作 | 第 19 章 | 各原语章节 |
-| 人机协同控制、HAI 信封、`suspend_id`、执行门与数据可见性 | 第 19 章 | [第 20 章 人机协同交互控制](/documentation/specification/protocol-core/human-agent-interaction.html) |
+| 人机协同控制、HAI 信封、`suspend_id`、执行门与数据可见性 | 第 19 章 | [第 20 章 人机协同交互控制](human-agent-interaction.md) |
 
 各章节在定义具体字段时，MUST 以本章的 L4 要求为合规判定依据；本章在描述原则时，所举的字段名仅作说明性示例，不具有新增字段的规范性效力。

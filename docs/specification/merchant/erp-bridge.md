@@ -3,14 +3,14 @@ title: M10 ERP 集成与 Bridge
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
 <h1 id="s-m10">M10 · ERP 集成与 Bridge（ERP Integration &amp; Merchant Bridge）</h1>
 
     <h2 id="s-m101">M10.1 定位（Positioning）</h2>
-    <p>绝大多数供应商的商品、库存、订单、发货与财务事实的权威系统是其内部 ERP/WMS/OMS。本章定义 <strong>Merchant Bridge</strong>：把供应商内部系统与 UTP-M 原语连接起来的集成规范。Bridge 是主规范存量兼容思想（<a href="/documentation/specification/guides/legacy-migration.html">Ch.22</a> 的 Bridge/Adapter 模式）在供应商侧的具体化——主规范定义了"传统系统如何映射 UTP 语义"，本章定义"供应商内部单据如何映射 MP 原语"。</p>
+    <p>绝大多数供应商的商品、库存、订单、发货与财务事实的权威系统是其内部 ERP/WMS/OMS。本章定义 <strong>Merchant Bridge</strong>：把供应商内部系统与 UTP-M 原语连接起来的集成规范。Bridge 是主规范存量兼容思想（<a href="../guides/legacy-migration.md">Ch.22</a> 的 Bridge/Adapter 模式）在供应商侧的具体化——主规范定义了"传统系统如何映射 UTP 语义"，本章定义"供应商内部单据如何映射 MP 原语"。</p>
     <p>本章内容是<strong>实现指引 + 少量互操作约束</strong>：ID 映射（M10.3）与幂等/一致性规则（M10.5）为规范性要求（RFC 关键词有效）；同步模式与部署形态为最佳实践。</p>
 
     <h2 id="s-m102">M10.2 部署形态（Deployment Patterns）</h2>
@@ -24,7 +24,7 @@ format: html
       </tbody>
     </table>
     <p>入驻时以 <code>erp_integration_mode</code> 声明形态（M2.4.1），供 Marketplace 评估时效预期（如自动接单可达性）。无论何种形态，协议交互面完全相同——这是"传输无关性"约束在集成层的延伸。</p>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-bridge-architecture.svg" alt="Merchant Bridge 架构：北向协议面（MP 调用/回调/签名幂等）与南向集成面（单据订阅/DB/API/MQ），中部 ID 映射表与同步游标" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-bridge-architecture.svg" alt="Merchant Bridge 架构：北向协议面（MP 调用/回调/签名幂等）与南向集成面（单据订阅/DB/API/MQ），中部 ID 映射表与同步游标" style="max-width: 100%; height: auto;"></div>
 
     <h2 id="s-m103">M10.3 ID 映射规范（Identifier Mapping）</h2>
     <p>Bridge MUST 维护双向 ID 映射表并保证映射持久、唯一、可审计：</p>
@@ -32,7 +32,7 @@ format: html
       <thead><tr><th>UTP-M 标识</th><th>ERP 侧典型单据</th><th>映射建立时机</th><th>协议承载字段</th></tr></thead>
       <tbody>
         <tr><td><code>listing_id</code> + <code>sku_id</code></td><td>物料/商品主数据（Item Master）</td><td><code>listing.publish</code> 成功时</td><td><code>skus[].external_ref</code>（M3.9.2）：发布时写入 ERP 物料号，平台在订单路由中原样回传</td></tr>
-        <tr><td><code>purchase_id</code> / <code>transaction_id</code></td><td>销售订单（SO）</td><td><code>acceptance.accept</code> 后创建 SO 时</td><td>AcceptanceRecord 与 SO 号在 Bridge 映射表内关联（<code>transaction_id</code> 是交易边界的唯一公共锚点，主规范 <a href="/documentation/specification/primitives/purchase/index.html#s-1325">13.2.5</a>；内部单据号与它的映射属 Bridge 私有状态，对应第 22 章 Bridge/Adapter 模式的卖方侧）</td></tr>
+        <tr><td><code>purchase_id</code> / <code>transaction_id</code></td><td>销售订单（SO）</td><td><code>acceptance.accept</code> 后创建 SO 时</td><td>AcceptanceRecord 与 SO 号在 Bridge 映射表内关联（<code>transaction_id</code> 是交易边界的唯一公共锚点，主规范 <a href="../primitives/purchase/index.md#s-1325">13.2.5</a>；内部单据号与它的映射属 Bridge 私有状态，对应第 22 章 Bridge/Adapter 模式的卖方侧）</td></tr>
         <tr><td><code>shipment_id</code> / <code>batch_id</code></td><td>出库单 / 发货单</td><td>ERP 出库确认 → <code>delivery.ship</code></td><td>Shipment.packages[].items[].external_ref 回传物料号；出库单号存于映射表</td></tr>
         <tr><td><code>hold_id</code></td><td>库存预留单（Reservation）</td><td><code>hold_created</code> 回调时</td><td>InventoryHold.transaction_id 关联</td></tr>
         <tr><td><code>statement_id</code> / <code>entry_id</code></td><td>应收对账单</td><td><code>statement_issued</code> 回调时</td><td>SettlementEntry.transaction_id 关联 SO 收款核销</td></tr>

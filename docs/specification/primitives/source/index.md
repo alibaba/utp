@@ -36,15 +36,15 @@ Source 覆盖以下场景：
 - **商品详情查询（Item Lookup）**：查询单个商品/服务的完整交易条件。
 - **多维筛选（Qualification Filtering）**：基于认证、价格区间、MOQ、交期等多条件过滤。
 
-Source 不覆盖参与方身份发现（属于 Layer 0 Discovery Infrastructure，参见[发现与协商](/documentation/specification/protocol-core/discovery-negotiation.html)）和能力发现（属于 Profile Discovery，`/.well-known/utp`）。Source 在 Layer D3（商品/服务发现层）工作，假设 D1/D2 层已完成。
+Source 不覆盖参与方身份发现（属于 Layer 0 Discovery Infrastructure，参见[发现与协商](../../protocol-core/discovery-negotiation.md)）和能力发现（属于 Profile Discovery，`/.well-known/utp`）。Source 在 Layer D3（商品/服务发现层）工作，假设 D1/D2 层已完成。
 
 ### 前置条件 {#s-1113}
 
 | 条件 | 必需？ | 说明 |
 | --- | --- | --- |
 | `session.state ∈ {INIT, SOURCING}` | MUST | 会话处于初始或发现阶段。 |
-| `session.topology.locked == true` | MUST | 商业拓扑已锁定（参见[商业拓扑](/documentation/specification/protocol-core/business-topology.html)）。 |
-| `session.mode != null` | MUST | Transaction Mode 已协商确定（参见[采购模式](/documentation/specification/protocol-core/procurement-models.html)）。 |
+| `session.topology.locked == true` | MUST | 商业拓扑已锁定（参见[商业拓扑](../../protocol-core/business-topology.md)）。 |
+| `session.mode != null` | MUST | Transaction Mode 已协商确定（参见[采购模式](../../protocol-core/procurement-models.md)）。 |
 | `buyer.identity.verified == true` | SHOULD | 采购方身份已验证。部分供应商 MAY 在未验证身份时返回降级结果。 |
 
 ### 后置条件 {#s-1114}
@@ -91,7 +91,7 @@ Source 不覆盖参与方身份发现（属于 Layer 0 Discovery Infrastructure�
 
 ### Source 原语内部状态机 {#s-1121-source}
 
-![Source 原语内部状态机](/documentation/assets/diagrams/source-state-machine.svg)
+![Source 原语内部状态机](../../../assets/diagrams/source-state-machine.svg)
 
 ### 状态定义与迁移规则 {#s-1122}
 
@@ -115,7 +115,7 @@ Source 对应全局状态 `SOURCING`。采购方完成详情查看后 MAY 直接
 
 ## 错误处理（Error Handling） {#s-113-error-handling}
 
-Source 错误响应 MUST 使用原语通用框架定义的[标准错误响应格式](/documentation/specification/protocol-core/primitive-framework.html#s-1043-standard-error-response)。本节仅定义 Source 原语特有错误码。
+Source 错误响应 MUST 使用原语通用框架定义的[标准错误响应格式](../../protocol-core/primitive-framework.md#s-1043-standard-error-response)。本节仅定义 Source 原语特有错误码。
 
 ### 错误码定义 {#s-1131}
 

@@ -102,7 +102,7 @@ Negotiate 不覆盖商品、服务或供应商寻源（属于 Source 原语）�
 
 ### Negotiate 原语内部状态机 {#s-1221-negotiate}
 
-![Negotiate 原语内部状态机](/documentation/assets/diagrams/negotiate-state-machine.svg)
+![Negotiate 原语内部状态机](../../../assets/diagrams/negotiate-state-machine.svg)
 
 ### 状态定义与迁移规则 {#s-1222}
 

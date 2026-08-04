@@ -3,7 +3,7 @@
   "$id": "https://ut-protocol.com/schemas/primitives/common/entities/time_range.json",
   "version": "2026-07-29",
   "title": "TimeRange",
-  "description": "一个生效、交付或有效时间区间。",
+  "description": "一个生效、交付或有效时间区间。当 start_at 与 end_at 同时存在时，end_at 必须晚于或等于 start_at。",
   "type": "object",
   "properties": {
     "start_at": {
@@ -14,7 +14,7 @@
     "end_at": {
       "type": "string",
       "format": "date-time",
-      "description": "区间结束时间。采用 RFC 3339 date-time 格式。"
+      "description": "区间结束时间，必须晚于或等于 start_at。采用 RFC 3339 date-time 格式。"
     }
   },
   "additionalProperties": true

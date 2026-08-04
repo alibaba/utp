@@ -3,7 +3,7 @@ title: M6 MP4 接单原语
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
@@ -39,7 +39,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m61">M6.1 Overview（概述）</h2>
     <h3 id="s-m611a">M6.1.1 意图</h3>
-    <p>Acceptance 是 UTP-M 第四个供应商原语（MP4），其意图是让供应商对买方发起的订购给出<strong>显式、签名、可审计的受理结论</strong>。主规范 P3 将卖方接受抽象为"卖方完成自身承诺处理"（<a href="/documentation/specification/primitives/purchase/index.html#s-1323">13.2.3</a>），并要求卖方在 complete 前"确认可行性"（<a href="/documentation/specification/primitives/purchase/index.html#s-1352-seller">13.5.2</a>），但未定义承诺处理的产生机制，拒绝只能以错误码被动表达。MP4 将这一留白定义为显式协议动作，使供应商 Agent、ERP 审批流和人工后台都能以统一接口参与接单决策。</p>
+    <p>Acceptance 是 UTP-M 第四个供应商原语（MP4），其意图是让供应商对买方发起的订购给出<strong>显式、签名、可审计的受理结论</strong>。主规范 P3 将卖方接受抽象为"卖方完成自身承诺处理"（<a href="../../../primitives/purchase/index.md#s-1323">13.2.3</a>），并要求卖方在 complete 前"确认可行性"（<a href="../../../primitives/purchase/index.md#s-1352-seller">13.5.2</a>），但未定义承诺处理的产生机制，拒绝只能以错误码被动表达。MP4 将这一留白定义为显式协议动作，使供应商 Agent、ERP 审批流和人工后台都能以统一接口参与接单决策。</p>
     <h3 id="s-m612">M6.1.2 关键设计原则</h3>
     <ul>
       <li><strong>MP4 不替代 P3，而是喂给 P3。</strong>订购成立的唯一路径仍然是主规范 <code>purchase.complete</code> 的原子迁移（<code>SIGNING → PURCHASED</code>）；MP4 <code>accept</code> 即 13.2.3 所要求的"卖方承诺处理"在平台托管拓扑下的规范化实现，其产出（卖方 ES256 签名，覆盖 <code>terms_hash</code>）是承诺处理完成的可审计证据。MP4 <code>reject</code> 则触发 P3 既有补偿链（释放库存 → <code>CANCELLED</code>）。</li>
@@ -96,7 +96,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m62">M6.2 Lifecycle / State Machine（生命周期 / 状态机）</h2>
     <h3 id="s-m621">M6.2.1 受理任务状态机</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-acceptance-state-machine.svg" alt="受理任务状态机：PENDING_ACCEPT/ON_HOLD/AMEND_PROPOSED 收敛至 ACCEPTED/REJECTED，超时按 timeout_policy 兜底" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../../../assets/diagrams/m-acceptance-state-machine.svg" alt="受理任务状态机：PENDING_ACCEPT/ON_HOLD/AMEND_PROPOSED 收敛至 ACCEPTED/REJECTED，超时按 timeout_policy 兜底" style="max-width: 100%; height: auto;"></div>
     <h3 id="s-m622">M6.2.2 状态定义与迁移规则</h3>
     <table>
       <thead><tr><th>状态</th><th>含义</th><th>进入条件</th><th>允许的操作</th></tr></thead>
@@ -108,7 +108,7 @@ service:        dev.utp.merchant
         <tr><td><code>REJECTED</code></td><td>已拒绝（终态）</td><td><code>reject</code>；或买方拒绝交期/价格变更；或超时策略 auto_reject</td><td><code>query</code>（只读）</td></tr>
       </tbody>
     </table>
-    <p><strong>确定性约束：</strong>终态到达后任何写操作 MUST 返回 <code>ACCEPTANCE.STATE_CONFLICT</code>（幂等重放同一 <code>idempotency_key</code> 除外）。<code>deadline</code> 由订单路由时的 Mode 超时配置决定（主规范 <a href="/documentation/specification/protocol-core/transport-communication.html#s-424">4.2.4</a> Mode 协商确定的超时配置），挂起不延长时限；延时需求 MUST 走 <code>amend_leadtime</code> 或买方侧 HAI 超时扩展。</p>
+    <p><strong>确定性约束：</strong>终态到达后任何写操作 MUST 返回 <code>ACCEPTANCE.STATE_CONFLICT</code>（幂等重放同一 <code>idempotency_key</code> 除外）。<code>deadline</code> 由订单路由时的 Mode 超时配置决定（主规范 <a href="../../../protocol-core/transport-communication.md#s-424">4.2.4</a> Mode 协商确定的超时配置），挂起不延长时限；延时需求 MUST 走 <code>amend_leadtime</code> 或买方侧 HAI 超时扩展。</p>
 
     <hr />
     <h2 id="s-m63">M6.3 Error Handling（错误处理）</h2>
@@ -169,7 +169,7 @@ service:        dev.utp.merchant
 
     <hr />
     <h2 id="s-m66">M6.6 与 P3 Purchase 签名流程的衔接（Interlock with P3）</h2>
-    <p>本节是闭环不变式 3（<a href="../../overview.html#s-m16">M1.6</a>）的规范定义：</p>
+    <p>本节是闭环不变式 3（<a href="../../overview.md#s-m16">M1.6</a>）的规范定义：</p>
     <ol>
       <li>买方 <code>purchase.complete</code> 通过第 5 章 Mandate 操作准入后，P3 进入 <code>SIGNING</code>；平台托管拓扑下，协议引擎 MUST 生成受理任务并路由给供应商（M6.7）。</li>
       <li>MP4 <code>accept</code> 请求 MUST 携带卖方 ES256 签名（JWS），签名内容 MUST 覆盖该订购的 <code>terms_hash</code>。主规范未规定"卖方承诺处理"的具体形式（13.2.3 留白）；<strong>本规范将带签名的 <code>accept</code> 定义为平台托管拓扑下承诺处理的规范形式</strong>，AcceptanceRecord 即其可审计凭证。</li>
@@ -332,7 +332,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
 
     <h3 id="s-m6121">M6.12.1 为什么改价必须是提议</h3>
 
-    <p>订购条款一旦被买方签署，其哈希（<code>terms_hash</code>）就是 P3 原子迁移三条件之一（主规范 <a href="/documentation/specification/primitives/purchase/index.html#s-1323">13.2.3</a>）。若允许卖方单方改价：</p>
+    <p>订购条款一旦被买方签署，其哈希（<code>terms_hash</code>）就是 P3 原子迁移三条件之一（主规范 <a href="../../../primitives/purchase/index.md#s-1323">13.2.3</a>）。若允许卖方单方改价：</p>
     <ul>
       <li>已签条款与实际条款不一致，<strong>双签机制失效</strong>——买方 Agent 无法确认自己同意的是什么；</li>
       <li>价格证据链断裂——<code>quote.terms_hash</code> → 订购 <code>terms_hash</code> 的链条被中途替换；</li>
@@ -342,7 +342,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
 
     <h3 id="s-m6122">M6.12.2 B2B 与 B2C 场景的改价策略</h3>
 
-    <p>改价<strong>是否被允许</strong>、买方<strong>如何确认</strong>，不是两套独立规则，而是沿主规范<a href="/documentation/specification/protocol-core/procurement-models.html">交易模式频谱</a>（第 8 章）<code>decision</code> 维度参数化的同一机制——<code>amend_price_allowed</code>（受理策略字段）与买方侧确认阈值随模式取值不同。“B2C” 与 “B2B” 是 <code>decision=L0</code> 与 <code>decision=L1—L2</code> 两类常见取值的通俗称呼，协议 MUST NOT 为它们硬编码特例。</p>
+    <p>改价<strong>是否被允许</strong>、买方<strong>如何确认</strong>，不是两套独立规则，而是沿主规范<a href="../../../protocol-core/procurement-models.md">交易模式频谱</a>（第 8 章）<code>decision</code> 维度参数化的同一机制——<code>amend_price_allowed</code>（受理策略字段）与买方侧确认阈值随模式取值不同。“B2C” 与 “B2B” 是 <code>decision=L0</code> 与 <code>decision=L1—L2</code> 两类常见取值的通俗称呼，协议 MUST NOT 为它们硬编码特例。</p>
 
     <table>
       <thead><tr><th>维度</th><th>B2C（<code>decision=L0</code> 闪购/即时零售）</th><th>B2B（<code>decision=L1—L2</code> 标准采购/大宗）</th></tr></thead>
@@ -351,7 +351,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
         <tr><td>语义定位</td><td>受限例外，非常态</td><td>常态议价环节</td></tr>
         <tr><td>典型合法场景</td><td>仅偏远/超尺寸目的地的 <code>freight_recalculation</code>，且 MUST 在平台公示封顶内</td><td><code>freight_recalculation</code>、<code>volume_tier_change</code>、<code>spec_difference</code>、<code>cost_fluctuation</code>、<code>tax_or_duty_change</code></td></tr>
         <tr><td>价格不符时首选动作</td><td><code>reject</code>（<code>price_stale</code>）→ 买方重新寻源</td><td><code>amend_price</code> 提议 → 买方评估</td></tr>
-        <tr><td>买方确认方式</td><td>Agent 在极小阈值内 MAY 自动确认，超阈值 → 自动拒绝（即时零售通常无人工在环）</td><td>Agent 按采购授权容差评估：容差内 MAY 自动确认，超容差 → 升级人工（<a href="../../merchant-agent.html">HAI</a>）</td></tr>
+        <tr><td>买方确认方式</td><td>Agent 在极小阈值内 MAY 自动确认，超阈值 → 自动拒绝（即时零售通常无人工在环）</td><td>Agent 按采购授权容差评估：容差内 MAY 自动确认，超容差 → 升级人工（<a href="../../merchant-agent.md">HAI</a>）</td></tr>
         <tr><td>底层理由</td><td>消费者“所见即所得”信任；买方 Agent 授权低值且窄</td><td>采购 Agent 持议价授权、金额容差与审批链</td></tr>
       </tbody>
     </table>
@@ -373,7 +373,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
         <tr><td><code>cost_fluctuation</code></td><td>原材料或采购成本波动</td><td>SHOULD 人工确认</td></tr>
         <tr><td><code>tax_or_duty_change</code></td><td>税费或关税政策变化</td><td>核对政策依据后处置</td></tr>
         <tr><td><code>promotion_expired</code></td><td>下单时引用的促销价已失效</td><td>SHOULD 人工确认（可能触发重新寻源）</td></tr>
-        <tr><td><code>quotation_superseded</code></td><td>引用的报价已被新报价取代</td><td>MUST 核对新 <code>quote_id</code>（见 <a href="../../primitives/quote/index.html">M5</a>）</td></tr>
+        <tr><td><code>quotation_superseded</code></td><td>引用的报价已被新报价取代</td><td>MUST 核对新 <code>quote_id</code>（见 <a href="../../primitives/quote/index.md">M5</a>）</td></tr>
         <tr><td><code>other</code></td><td>其他</td><td>MUST 提供 <code>reason_note</code>，人工处置</td></tr>
       </tbody>
     </table>
@@ -384,7 +384,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
       <li>MUST 提供 <code>proposed_terms_hash</code>，且 <code>seller_signature</code> MUST 覆盖该值。买方 MUST 在确认前验签。</li>
       <li>逐行调整（<code>line_adjustments</code>）与整单调整（<code>order_adjustments</code>）<strong>至少其一</strong>。<code>proposed_total</code> MUST 与调整累加结果一致，否则返回 <code>ACCEPTANCE.AMEND_PRICE.TOTAL_MISMATCH</code>。</li>
       <li>改价可用性 MUST 由受理策略 <code>amend_price_allowed</code> 声明，其默认值随 <code>decision</code> 模式取值（B2C <code>decision=L0</code> 默认 <code>false</code>、B2B <code>decision=L1—L2</code> 默认 <code>true</code>）；Marketplace MAY 进一步按类目与商户等级收紧。<code>amend_price_allowed = false</code> 时 <code>amend_price</code> MUST 返回 <code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code>。</li>
-      <li><code>decided_by = policy_auto</code> 时 MUST 提供 <code>policy_ref</code>（命中的定价策略与版本），供决策审计追溯（见 <a href="../../merchant-agent.html#s-m116">M11.6</a>）。</li>
+      <li><code>decided_by = policy_auto</code> 时 MUST 提供 <code>policy_ref</code>（命中的定价策略与版本），供决策审计追溯（见 <a href="../../merchant-agent.md#s-m116">M11.6</a>）。</li>
       <li>本动作与 <code>amend_leadtime</code> 共用 <code>AMEND_PROPOSED</code> 状态。同一受理任务上二者 MUST NOT 并存未决提议——存在未决提议时新提议 MUST 返回 <code>ACCEPTANCE.STATE_CONFLICT</code>。</li>
     </ul>
 

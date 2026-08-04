@@ -3,7 +3,7 @@ title: M7 MP5 交付原语
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
@@ -38,10 +38,10 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m71">M7.1 Overview（概述）</h2>
     <h3 id="s-m711">M7.1.1 意图</h3>
-    <p>Delivery 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商以标准协议动作申报<strong>履约执行事实</strong>：备货进度、发货（运单）、分批拆单、延迟与异常。主规范 P5 Fulfill 是"采购方可观测"的履约原语（<a href="/documentation/specification/primitives/fulfill/index.html#s-1531">15.3.1</a>），其 <code>notify</code> 推送的事实来源在主规范中留白——MP5 正式定义这些事实的产生方式，闭合"供应商发货 → 买方感知"的链路。</p>
+    <p>Delivery 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商以标准协议动作申报<strong>履约执行事实</strong>：备货进度、发货（运单）、分批拆单、延迟与异常。主规范 P5 Fulfill 是"采购方可观测"的履约原语（<a href="../../../primitives/fulfill/index.md#s-1531">15.3.1</a>），其 <code>notify</code> 推送的事实来源在主规范中留白——MP5 正式定义这些事实的产生方式，闭合"供应商发货 → 买方感知"的链路。</p>
     <h3 id="s-m712">M7.1.2 关键设计原则</h3>
     <ul>
-      <li><strong>MP5 产生事实，P5 消费事实。</strong>MP5 的每个生效动作 MUST 由 Marketplace 转换为买方侧 <code>fulfill.notify</code> 推送与 <code>fulfill.query</code> 可查询的 TrackingEvent（M7.7）。买方可观测状态机（SHIPPED/DELAYED/DELIVERED）的驱动源即 MP5。</li>
+      <li><strong>MP5 产生事实，P5 消费事实。</strong>MP5 的每个生效动作 MUST 由 Marketplace 转换为买方侧 <code>fulfill.notify</code> 推送（载荷 <code>FulfillNotifyInput</code>）与 <code>fulfill.query</code> 可查询的履约事件（<code>FulfillmentEvent</code>，M7.7）。买方可观测状态机（SHIPPED/DELAYED/DELIVERED）的驱动源即 MP5。</li>
       <li><strong>备货态是供应商内部状态的最小外露。</strong>主规范明确"备货、待发等供应方内部状态不在（买方可观测）状态机范围内"（15.3.1）。MP5 的 <code>prepare</code> 仅用于供应商向平台申报备货进度（供 <code>leadtime</code> 查询参考与延迟预警），MUST NOT 触发买方可观测状态迁移。</li>
       <li><strong>验收永远在买方。</strong><code>receive</code>/<code>reject</code>/<code>inspect</code> 是 P5 的买方/检验方动作；MP5 不定义任何验收或逆向物流动作，退换货走 P6 Resolve 的补偿指令。</li>
     </ul>
@@ -93,7 +93,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m72">M7.2 Lifecycle / State Machine（生命周期 / 状态机）</h2>
     <h3 id="s-m721">M7.2.1 Shipment 资源状态机（供应商视角）</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-delivery-state-machine.svg" alt="Shipment 资源状态机：PREPARING/READY/SHIPPED/EXCEPTION/DELIVERED/CLOSED 及买方可观测映射" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../../../assets/diagrams/m-delivery-state-machine.svg" alt="Shipment 资源状态机：PREPARING/READY/SHIPPED/EXCEPTION/DELIVERED/CLOSED 及买方可观测映射" style="max-width: 100%; height: auto;"></div>
     <p>分批交付时，每个批次（<code>batch_id</code>）独立走上述状态机；订单级视图是全部批次状态的聚合。</p>
     <h3 id="s-m722">M7.2.2 状态定义与迁移规则</h3>
     <table>
@@ -102,7 +102,7 @@ service:        dev.utp.merchant
         <tr><td><code>PREPARING</code></td><td>备货中（内部状态外露）</td><td><code>prepare</code> 申报</td><td><code>prepare</code>, <code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td><td>无（不迁移买方状态；供 leadtime 参考）</td></tr>
         <tr><td><code>READY</code></td><td>备货完成待交运</td><td><code>prepare(completed)</code></td><td><code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td><td>无</td></tr>
         <tr><td><code>SHIPPED</code></td><td>已交运（凭证已生成）</td><td><code>ship</code> 成功（运单校验通过）</td><td><code>update</code>, <code>query</code></td><td><code>fulfill.notify → SHIPPED</code></td></tr>
-        <tr><td><code>EXCEPTION</code></td><td>履约异常（延迟/破损/丢件）</td><td><code>update(type=delay|exception)</code></td><td><code>update</code>（更正/重发）, <code>query</code></td><td><code>fulfill.notify → DELAYED</code>（发货前延迟）或异常 TrackingEvent</td></tr>
+        <tr><td><code>EXCEPTION</code></td><td>履约异常（延迟/破损/丢件）</td><td><code>update(type=delay|exception)</code></td><td><code>update</code>（更正/重发）, <code>query</code></td><td><code>fulfill.notify → DELAYED</code>（发货前延迟）或异常履约事件</td></tr>
         <tr><td><code>DELIVERED</code></td><td>已妥投（物流回执镜像，只读）</td><td>承运商妥投回执经 Marketplace 确认</td><td><code>query</code></td><td><code>fulfill.notify → DELIVERED</code></td></tr>
         <tr><td><code>CLOSED</code></td><td>批次履约事实闭合（终态）</td><td>买方 <code>receive</code>（或 <code>reject</code> 进入 Resolve 后裁决完毕）</td><td><code>query</code>（只读）</td><td><code>RECEIVED / FULFILLED</code>（P5 内部）</td></tr>
       </tbody>
@@ -156,7 +156,7 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>职责</th><th>级别</th><th>说明</th></tr></thead>
       <tbody>
-        <tr><td>事实转换</td><td>MUST</td><td>MP5 生效事件 MUST 在声明时限（SHOULD ≤ 60s）内转换为买方侧 <code>fulfill.notify</code> 推送与 TrackingEvent（M7.7 映射表）。</td></tr>
+        <tr><td>事实转换</td><td>MUST</td><td>MP5 生效事件 MUST 在声明时限（SHOULD ≤ 60s）内转换为买方侧 <code>fulfill.notify</code> 推送与履约事件流（M7.7 映射表）。</td></tr>
         <tr><td>回执汇聚</td><td>MUST</td><td>MUST 汇聚承运商/Shipper 回执，驱动 <code>DELIVERED</code> 镜像状态，并向供应商推送 <code>delivery_receipt</code> 回调（M2.6.1）。</td></tr>
         <tr><td>凭证归档</td><td>MUST</td><td>Shipment 凭证、异常事件、回执 MUST 纳入 Evidence Bundle，保存期不低于争议时效期。</td></tr>
         <tr><td>时效监控</td><td>SHOULD</td><td>SHOULD 监控发货时效并在临近超期时预警供应商（<code>DELIVERY.OVERDUE</code> 警示）。</td></tr>
@@ -171,7 +171,7 @@ service:        dev.utp.merchant
         <tr><td>fulfillment=L0（直接履约）</td><td>Seller 自行配送：<code>ship</code> 的 <code>carrier_code</code> MAY 为 <code>self_delivery</code>；轨迹事件由 Seller 经 <code>update</code> 自行申报。</td></tr>
         <tr><td>fulfillment=L1（标准委托）</td><td><code>ship</code> MUST 携带承运商与运单号；轨迹由承运商数据源汇聚。</td></tr>
         <tr><td>fulfillment=L2（分阶段履约）</td><td>阶段性发货事实和凭证 MUST 可关联到所属履约阶段；<code>split</code> 仅在交易条款允许时可用；某阶段要求独立检验时，<code>INSPECTED</code> 结论由 Inspector 提交（P5），MP5 只读。</td></tr>
-        <tr><td>fulfillment=L3（跨境）</td><td><code>update</code> 事件类型扩展 <code>customs</code>/<code>document</code>；清关事实经 <code>fulfill.notify</code> 进入买方可观测履约事件流（TrackingEvent，主规范 15.9.1）。</td></tr>
+        <tr><td>fulfillment=L3（跨境）</td><td><code>update</code> 事件类型扩展 <code>customs</code>/<code>document</code>；清关事实经 <code>fulfill.notify</code> 进入买方可观测履约事件流（<code>FulfillNotifyInput.event_type = CUSTOMS</code>）。</td></tr>
         <tr><td>payment=L1+（分期/里程碑）</td><td><code>ship</code>/<code>DELIVERED</code>/检验合格等事实按 TradeMethod 子步骤 MAY 触发下一期支付条件；MP5 响应 MUST 回显所触发的子步骤标识。</td></tr>
         <tr><td>type=service/digital（服务/虚拟）</td><td>物流状态跳过：<code>ship</code> 语义为"服务激活/交付物开通"，<code>tracking</code> 字段以激活凭证替代（主规范 15.6 虚拟商品条款的供给侧对应）。</td></tr>
       </tbody>
@@ -179,9 +179,9 @@ service:        dev.utp.merchant
 
     <hr />
     <h2 id="s-m77">M7.7 与 P5 Fulfill 的事实传导契约（Interlock with P5）</h2>
-    <p>本节是闭环不变式 4（<a href="../../overview.html#s-m16">M1.6</a>）的规范定义。Marketplace MUST 按下表执行 MP5 → P5 的事实转换：</p>
+    <p>本节是闭环不变式 4（<a href="../../overview.md#s-m16">M1.6</a>）的规范定义。Marketplace MUST 按下表执行 MP5 → P5 的事实转换：</p>
     <table>
-      <thead><tr><th>MP5 事件</th><th>买方侧 <code>fulfill.notify</code></th><th>TrackingEvent.status</th><th>买方可观测状态</th></tr></thead>
+      <thead><tr><th>MP5 事件</th><th>买方侧 <code>fulfill.notify</code></th><th><code>FulfillNotifyInput.status</code></th><th>买方可观测状态</th></tr></thead>
       <tbody>
         <tr><td><code>ship</code> 成功</td><td>发货通知（含运单、批次、ETA）</td><td><code>SHIPPED</code></td><td><code>SHIPPED</code></td></tr>
         <tr><td><code>update(type=delay)</code>（发货前）</td><td>延迟通知（含新 ETA 与原因）</td><td><code>DELAYED</code></td><td><code>DELAYED</code></td></tr>
@@ -192,8 +192,8 @@ service:        dev.utp.merchant
     </table>
     <ul>
       <li><code>shipment_id</code>、<code>batch_id</code>、<code>tracking_number</code> 在两侧 MUST 同值——买方 <code>track</code> 查到的与供应商 <code>query</code> 查到的 是同一记录的两个投影（字段可见性按角色权限裁剪）。</li>
-      <li>转换生成的 TrackingEvent MUST 符合主规范 <a href="/documentation/specification/primitives/fulfill/index.html#s-1591">15.9.1 TrackingEvent</a> 实体定义并携带 <code>transaction_id</code>。</li>
-      <li>买方 <code>receive</code> 生成的 FulfillmentReceipt、<code>reject</code> 生成的 RejectionConfirmation MUST 经回调 <code>utp.delivery.receipt</code> 通知供应商（M2.6.1），驱动 MP5 侧 <code>CLOSED</code>。</li>
+      <li>转换生成的通知载荷 MUST 符合主规范 <a href="../../../primitives/fulfill/index.md#s-1571">订单履约事件通知（notify）</a>定义的 <code>FulfillNotifyInput</code> 结构并携带 <code>transaction_id</code>。</li>
+      <li>买方 <code>receive</code> 生成的收货凭证（<code>FulfillReceiveOutput</code>）、<code>reject</code> 生成的拒收凭证（<code>FulfillRejectOutput</code>，含 <code>RejectionConfirmation</code>）MUST 经回调 <code>utp.delivery.receipt</code> 通知供应商（M2.6.1），驱动 MP5 侧 <code>CLOSED</code>。</li>
       <li>全部批次 <code>CLOSED</code> 且其他义务完成后，全局状态是否迁移 <code>SETTLED</code> 由全局状态机决定（主规范 15.3.2），MP5 不参与该判定。</li>
     </ul>
 
@@ -229,7 +229,7 @@ service:        dev.utp.merchant
     <table>
       <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
       <tbody>
-        <tr><td><code>shipment_id</code></td><td>string</td><td>是</td><td>发货单唯一标识；与主规范 15.9.1 TrackingEvent 的 <code>shipment_id</code> 同值。</td></tr>
+        <tr><td><code>shipment_id</code></td><td>string</td><td>是</td><td>发货单唯一标识；与主规范 P5 履约事件与 <code>Shipment</code> 实体的 <code>shipment_id</code> 同值。</td></tr>
         <tr><td><code>transaction_id</code> / <code>purchase_id</code></td><td>string</td><td>是</td><td>关联全局事务与订购标识。</td></tr>
         <tr><td><code>batch_id</code></td><td>string</td><td>条件</td><td>批次标识；分批交付时必填，整单发货可省略。</td></tr>
         <tr><td><code>status</code></td><td>enum</td><td>是</td><td>M7.2.2 状态枚举。</td></tr>

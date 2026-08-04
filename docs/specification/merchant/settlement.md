@@ -3,7 +3,7 @@ title: M9 结算与对账
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
@@ -14,7 +14,7 @@ format: html
     <p><strong>设计选择：结算不是新原语，而是 P4 Pay 的只读扩展域。</strong>理由：</p>
     <ol>
       <li>资金转移的协议语义（支付、确认和退款）已由主规范 P4 Pay 完整定义；供应商结算是这些事实的<strong>汇总视图</strong>，不产生新的资金转移语义。</li>
-      <li>本章按主规范原语扩展规范（<a href="/documentation/specification/protocol-core/primitive-framework.html#s-105-extension-spec">10.5</a>）挂载 <code>utp.pay.settlement</code> 扩展：命名遵循 10.5.2（<code>utp.{primitive}.{extension_domain}</code>），Marketplace 在 Profile 的 <code>utp.primitives["utp.pay"][].extensions</code> 中声明 <code>{ "name": "utp.pay.settlement" }</code>（同主规范 3.3.3 示例中 <code>utp.source.cart</code> 的声明方式）；双方声明兼容版本后扩展生效（10.5.6）。扩展只新增只读操作，不改变 P4 核心语义与状态迁移（10.5.1）。</li>
+      <li>本章按主规范原语扩展规范（<a href="../protocol-core/primitive-framework.md#s-105-extension-spec">10.5</a>）挂载 <code>utp.pay.settlement</code> 扩展：命名遵循 10.5.2（<code>utp.{primitive}.{extension_domain}</code>），Marketplace 在 Profile 的 <code>utp.primitives["utp.pay"][].extensions</code> 中声明 <code>{ "name": "utp.pay.settlement" }</code>（同主规范 3.3.3 示例中 <code>utp.source.cart</code> 的声明方式）；双方声明兼容版本后扩展生效（10.5.6）。扩展只新增只读操作，不改变 P4 核心语义与状态迁移（10.5.1）。</li>
       <li>差异申报（M9.5）虽是写操作，但其语义是"对账异议登记"，不改变任何支付状态；异议的资金后果 MUST 经 P4 <code>refund</code> 或 P6 Resolve 产生。</li>
     </ol>
     <p>扩展动作：<code>settlement.statement.list</code>、<code>settlement.statement.detail</code>、<code>settlement.entry.query</code>、<code>settlement.discrepancy.submit</code>。调用方向：caller=Seller（Payee），handler=Marketplace（或其 PaymentProcessor）。</p>
@@ -27,7 +27,7 @@ format: html
         <tr><td>结算账户</td><td>供应商收款账户引用（脱敏），入驻时登记（M2.4.1 <code>settlement_account</code>）</td><td>入驻；变更需重新验证</td></tr>
         <tr><td>结算周期</td><td><code>T+n</code>（确认收货后 n 日）/ 半月结 / 月结</td><td>入驻时从 Marketplace 公示的账期选项中选择；MUST 在商户协议中签署并可查询</td></tr>
         <tr><td>佣金与费用</td><td>平台佣金率（类目维度）、支付通道费、增值服务费</td><td>商户协议 + 账单逐笔明示</td></tr>
-        <tr><td>结算触发条件</td><td>默认：买方 <code>fulfill.receive</code> 确认收货 + 无未决争议；Escrow 拓扑下等价于 Escrow 释放条件（Escrow 角色见主规范 <a href="/documentation/specification/protocol-core/business-topology.html#s-922-standard-roles">9.2.2</a>；释放约束见第 14 章 P4，Seller MUST NOT 直接触发资金释放）</td><td>Mode/拓扑锁定时</td></tr>
+        <tr><td>结算触发条件</td><td>默认：买方 <code>fulfill.receive</code> 确认收货 + 无未决争议；Escrow 拓扑下等价于 Escrow 释放条件（Escrow 角色见主规范 <a href="../protocol-core/business-topology.md#s-922-standard-roles">9.2.2</a>；释放约束见第 14 章 P4，Seller MUST NOT 直接触发资金释放）</td><td>Mode/拓扑锁定时</td></tr>
       </tbody>
     </table>
     <h3 id="s-m922">M9.2.2 结算金额构成不变式</h3>
@@ -45,7 +45,7 @@ format: html
 </code></pre>
 
     <h2 id="s-m93">M9.3 结算条目生命周期（Entry Lifecycle）</h2>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-entry-lifecycle.svg" alt="结算条目生命周期：SETTLEABLE 经账单出账至 BILLED、确认后 PAID_OUT；争议冻结 FROZEN 裁决后回归；打款失败 PAYOUT_FAILED 重试" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-entry-lifecycle.svg" alt="结算条目生命周期：SETTLEABLE 经账单出账至 BILLED、确认后 PAID_OUT；争议冻结 FROZEN 裁决后回归；打款失败 PAYOUT_FAILED 重试" style="max-width: 100%; height: auto;"></div>
     <table>
       <thead><tr><th>状态</th><th>含义</th><th>进入条件</th></tr></thead>
       <tbody>
@@ -77,7 +77,7 @@ format: html
     <p>A2A Task 命名遵循 <code>utp:pay:settlement:{...}</code>。查询类操作 MUST NOT 改变任何状态；<code>discrepancy.submit</code> 仅登记异议，资金后果走 P4/P6。</p>
 
     <h2 id="s-m95">M9.5 对账闭环与差异处理（Reconciliation Loop）</h2>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-reconciliation-loop.svg" alt="对账闭环：三方核对后一致确认、不一致逐条差异申报，平台 SLA 内答复更正或维持，仍有异议升级 P6 Resolve" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-reconciliation-loop.svg" alt="对账闭环：三方核对后一致确认、不一致逐条差异申报，平台 SLA 内答复更正或维持，仍有异议升级 P6 Resolve" style="max-width: 100%; height: auto;"></div>
     <p>差异申报 MUST 引用具体 <code>entry_id</code> 并附证据引用（ERP 单据、收货凭证等）；Marketplace 的答复与更正 MUST 生成新账单版本（旧版本保留），全部过程纳入审计记录。</p>
 
     <h2 id="s-m96">M9.6 实体定义（Entities）</h2>

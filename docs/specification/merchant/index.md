@@ -3,64 +3,64 @@ title: UTP-M 供应商侧规范 · 目录总览
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
 <h1 id="s-utp-m-specification">UTP-M Specification — 2026-07-30（Draft）</h1>
     <h2 id="s-merchant-side">UTP 供应商侧规范（Merchant-Side Specification）— Release Candidate 1</h2>
     <blockquote>
-      <p>本规范定义 UTP（Universal Trade Protocol）v1.0 的<strong>供应商侧能力</strong>：商品、库存、报价、接单、交付、售后，以及结算对账、ERP 集成与供应商 Agent。本规范是与主规范 UTPB（买方侧）<strong>并列的独立协议（Parallel Protocol）</strong>，面向平台托管（Market–Merchant）场景：它<strong>复用</strong> UTP 的通用底层能力（商业场景、商业拓扑、发现协商、通信认证、P0 原语框架、通用实体与错误码格式），但<strong>不依赖</strong> UTPB 专属的三项高级能力——采购模式、全局状态机、路径编排（2026-08-03 分层解耦裁决）。UTPB 与本规范是两套独立的 DAG 与 trade context，通过 Marketplace 双面枢纽衔接，而非合并为一。与主规范章节体系的对应关系及治理路线见<a href="appendices.html#s-me">附录 E</a>（资料性）。</p>
+      <p>本规范定义 UTP（Universal Trade Protocol）v1.0 的<strong>供应商侧能力</strong>：商品、库存、报价、接单、交付、售后，以及结算对账、ERP 集成与供应商 Agent。本规范是与主规范 UTPB（买方侧）<strong>并列的独立协议（Parallel Protocol）</strong>，面向平台托管（Market–Merchant）场景：它<strong>复用</strong> UTP 的通用底层能力（商业场景、商业拓扑、发现协商、通信认证、P0 原语框架、通用实体与错误码格式），但<strong>不依赖</strong> UTPB 专属的三项高级能力——采购模式、全局状态机、路径编排（2026-08-03 分层解耦裁决）。UTPB 与本规范是两套独立的 DAG 与 trade context，通过 Marketplace 双面枢纽衔接，而非合并为一。与主规范章节体系的对应关系及治理路线见<a href="appendices.md#s-me">附录 E</a>（资料性）。</p>
     </blockquote>
 
     <h2 id="s-positioning">定位与阅读方式</h2>
     <p>主规范 UTP 定义的六大交易原语（P1—P6）以采购方（Buyer）为主要发起方，回答"交易如何执行"。本规范回答其前置与对偶问题：<strong>商品从哪里来、订单如何被供应商受理与履行、货款如何回到供应商</strong>。二者合起来构成完整的商业闭环：</p>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-volume-map.svg" alt="UTP-M 与 UTPB 的章节对偶：M2→L0 发现、MP1→P1、MP3↔P2 询盘、MP2/MP4↔P3、MP5→P5、M8←P4 打款" style="max-width: 100%; height: auto;"></div>
-    <p>本规范所有原语遵守主规范 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023-action-definition-format">10.2.3 操作定义格式</a>的角色绑定规则：每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>。"UTP-M"仅是编辑与阅读上的分组名称，发现与协商流程 MUST NOT 据此推断角色方向。</p>
+<div class="diagram"><img src="../../assets/diagrams/m-volume-map.svg" alt="UTP-M 与 UTPB 的章节对偶：M2→L0 发现、MP1→P1、MP3↔P2 询盘、MP2/MP4↔P3、MP5→P5、M8←P4 打款" style="max-width: 100%; height: auto;"></div>
+    <p>本规范所有原语遵守主规范 <a href="../protocol-core/primitive-framework.md#s-1023-action-definition-format">10.2.3 操作定义格式</a>的角色绑定规则：每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>。"UTP-M"仅是编辑与阅读上的分组名称，发现与协商流程 MUST NOT 据此推断角色方向。</p>
 
     <h2 id="s-toc-tables">章节目录</h2>
     <h3 id="s-part-0">导读</h3>
     <table>
       <thead><tr><th>页面</th><th>标题</th><th>内容概要</th></tr></thead>
       <tbody>
-        <tr><td>Quickstart</td><td><a href="quickstart.html">供应商接入快速开始</a></td><td>非规范性导读：最小实现面（REST 客户端 + Webhook）、入驻→铺货→日常循环三阶段、Agent/Bridge 选型指引</td></tr>
+        <tr><td>Quickstart</td><td><a href="quickstart.md">供应商接入快速开始</a></td><td>非规范性导读：最小实现面（REST 客户端 + Webhook）、入驻→铺货→日常循环三阶段、Agent/Bridge 选型指引</td></tr>
       </tbody>
     </table>
     <h3 id="s-part-1">总纲</h3>
     <table>
       <thead><tr><th>章节</th><th>标题</th><th>内容概要</th></tr></thead>
       <tbody>
-        <tr><td>M1</td><td><a href="overview.html">供应商侧架构总览</a></td><td>设计原则、角色模型（新增 Marketplace）、两种拓扑（平台托管/自托管）、MP 原语总表、商品—交易闭环、与主规范的衔接矩阵</td></tr>
-        <tr><td>M2</td><td><a href="onboarding.html">入驻与能力声明</a></td><td>供应商入驻五步流程：身份与密钥、Profile 发布、Registry 登记、资质合规、回调登记与连通性验收</td></tr>
+        <tr><td>M1</td><td><a href="overview.md">供应商侧架构总览</a></td><td>设计原则、角色模型（新增 Marketplace）、两种拓扑（平台托管/自托管）、MP 原语总表、商品—交易闭环、与主规范的衔接矩阵</td></tr>
+        <tr><td>M2</td><td><a href="onboarding.md">入驻与能力声明</a></td><td>供应商入驻五步流程：身份与密钥、Profile 发布、Registry 登记、资质合规、回调登记与连通性验收</td></tr>
       </tbody>
     </table>
     <h3 id="s-part-2">供应商原语（MP 系列）</h3>
     <table>
       <thead><tr><th>章节</th><th>原语</th><th>原语 ID</th><th>方向</th><th>核心 Action</th></tr></thead>
       <tbody>
-        <tr><td>M3</td><td><a href="primitives/listing/index.html">MP1 商品管理</a></td><td><code>utp.listing</code></td><td>Seller → Marketplace</td><td><code>publish</code>, <code>update</code>, <code>list</code>, <code>delist</code>, <code>query</code>, <code>archive</code>, <code>batch</code></td></tr>
-        <tr><td>M4</td><td><a href="primitives/inventory/index.html">MP2 库存管理</a></td><td><code>utp.inventory</code></td><td>Seller → Marketplace</td><td><code>set</code>, <code>adjust</code>, <code>query</code>, <code>hold.query</code>, <code>batch</code></td></tr>
-        <tr><td>M5</td><td><a href="primitives/quote/index.html">MP3 询盘响应（草案新增）</a></td><td><code>utp.quote</code></td><td>Seller → Marketplace</td><td><code>quote, revise, bid, decline, query, list</code></td></tr>
-        <tr><td>M6</td><td><a href="primitives/acceptance/index.html">MP4 接单</a></td><td><code>utp.acceptance</code></td><td>Seller → Marketplace</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>amend_leadtime</code>, <code>amend_price</code>, <code>query</code>, <code>list</code></td></tr>
-        <tr><td>M7</td><td><a href="primitives/delivery/index.html">MP5 交付原语</a></td><td><code>utp.delivery</code></td><td>Seller → Marketplace</td><td><code>prepare</code>, <code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td></tr>
-        <tr><td>M8</td><td><a href="primitives/aftersale/index.html">MP6 售后原语</a></td><td><code>utp.aftersale</code></td><td>Seller → Marketplace</td><td><code>approve</code>, <code>reject</code>, <code>propose</code>, <code>confirm_return</code>, <code>query</code>, <code>list</code></td></tr>
+        <tr><td>M3</td><td><a href="primitives/listing/index.md">MP1 商品管理</a></td><td><code>utp.listing</code></td><td>Seller → Marketplace</td><td><code>publish</code>, <code>update</code>, <code>list</code>, <code>delist</code>, <code>query</code>, <code>archive</code>, <code>batch</code></td></tr>
+        <tr><td>M4</td><td><a href="primitives/inventory/index.md">MP2 库存管理</a></td><td><code>utp.inventory</code></td><td>Seller → Marketplace</td><td><code>set</code>, <code>adjust</code>, <code>query</code>, <code>hold.query</code>, <code>batch</code></td></tr>
+        <tr><td>M5</td><td><a href="primitives/quote/index.md">MP3 询盘响应（草案新增）</a></td><td><code>utp.quote</code></td><td>Seller → Marketplace</td><td><code>quote, revise, bid, decline, query, list</code></td></tr>
+        <tr><td>M6</td><td><a href="primitives/acceptance/index.md">MP4 接单</a></td><td><code>utp.acceptance</code></td><td>Seller → Marketplace</td><td><code>accept</code>, <code>reject</code>, <code>hold</code>, <code>amend_leadtime</code>, <code>amend_price</code>, <code>query</code>, <code>list</code></td></tr>
+        <tr><td>M7</td><td><a href="primitives/delivery/index.md">MP5 交付原语</a></td><td><code>utp.delivery</code></td><td>Seller → Marketplace</td><td><code>prepare</code>, <code>ship</code>, <code>split</code>, <code>update</code>, <code>query</code></td></tr>
+        <tr><td>M8</td><td><a href="primitives/aftersale/index.md">MP6 售后原语</a></td><td><code>utp.aftersale</code></td><td>Seller → Marketplace</td><td><code>approve</code>, <code>reject</code>, <code>propose</code>, <code>confirm_return</code>, <code>query</code>, <code>list</code></td></tr>
       </tbody>
     </table>
     <h3 id="s-part-3">经营与集成</h3>
     <table>
       <thead><tr><th>章节</th><th>标题</th><th>内容概要</th></tr></thead>
       <tbody>
-        <tr><td>M8</td><td><a href="settlement.html">结算与对账</a></td><td>结算模型（佣金/分账/回款周期）、只读扩展 <code>utp.pay.settlement</code>（账单列表/明细/差异申报）、对账闭环</td></tr>
-        <tr><td>M9</td><td><a href="erp-bridge.html">ERP 集成与 Bridge</a></td><td>Bridge 部署形态、ID 映射规范、上行/下行同步模式、库存防超卖、幂等与容错、对账钩子</td></tr>
-        <tr><td>M10</td><td><a href="merchant-agent.html">供应商 Agent 与人机协同</a></td><td>Merchant Agent 职责边界、自动接单/报价策略（AcceptancePolicy）、HAI 控制点与挂起语义衔接、Agent 授权</td></tr>
+        <tr><td>M8</td><td><a href="settlement.md">结算与对账</a></td><td>结算模型（佣金/分账/回款周期）、只读扩展 <code>utp.pay.settlement</code>（账单列表/明细/差异申报）、对账闭环</td></tr>
+        <tr><td>M9</td><td><a href="erp-bridge.md">ERP 集成与 Bridge</a></td><td>Bridge 部署形态、ID 映射规范、上行/下行同步模式、库存防超卖、幂等与容错、对账钩子</td></tr>
+        <tr><td>M10</td><td><a href="merchant-agent.md">供应商 Agent 与人机协同</a></td><td>Merchant Agent 职责边界、自动接单/报价策略（AcceptancePolicy）、HAI 控制点与挂起语义衔接、Agent 授权</td></tr>
       </tbody>
     </table>
     <h3 id="s-part-4">场景与整合</h3>
     <table>
       <thead><tr><th>章节</th><th>标题</th><th>内容概要</th></tr></thead>
       <tbody>
-        <tr><td>M11</td><td><a href="walkthrough.html">供应商全链路演练</a></td><td>入驻 → 发布 → 上架 → 被寻源 → 接单 → 发货 → 结算的端到端 JSON 序列演练，与买方视角对照</td></tr>
-        <tr><td>附录</td><td><a href="appendices.html">附录</a></td><td>MA 术语表、MB 错误码总表、MC Scope 总表、MD Schema 索引、ME 章节对应与整合路线、MF 开放问题</td></tr>
+        <tr><td>M11</td><td><a href="walkthrough.md">供应商全链路演练</a></td><td>入驻 → 发布 → 上架 → 被寻源 → 接单 → 发货 → 结算的端到端 JSON 序列演练，与买方视角对照</td></tr>
+        <tr><td>附录</td><td><a href="appendices.md">附录</a></td><td>MA 术语表、MB 错误码总表、MC Scope 总表、MD Schema 索引、ME 章节对应与整合路线、MF 开放问题</td></tr>
       </tbody>
     </table>
 
@@ -69,7 +69,7 @@ format: html
       <li>本规范沿用主规范 README 第 4 节的全部行文规范：RFC 2119 关键词、实体四列表格（字段名/类型/必填/描述）、<code>snake_case</code> 字段、JSON 示例与实体定义严格一致。</li>
       <li>章节编号使用 <code>M{n}</code> 前缀，小节使用 <code>M{n}.{x}</code>；锚点格式 <code>id="s-m{编号去点}"</code>，如 <code>s-m31</code>、<code>s-m311</code>，避免与主规范 <code>s-*</code> 冲突。</li>
       <li>凡引用主规范内容，一律使用相对链接 <code>../{file}.html#s-xxx</code> 并注明章节号；本规范 MUST NOT 复制主规范定义，只做引用。</li>
-      <li>与主规范章节体系的对应关系与联动清单以<a href="appendices.html#s-me">附录 E</a>为准（资料性）。</li>
+      <li>与主规范章节体系的对应关系与联动清单以<a href="appendices.md#s-me">附录 E</a>为准（资料性）。</li>
     </ul>
 
     <h2 id="s-stability">稳定性分级承诺（Stability Levels）</h2>
@@ -89,5 +89,5 @@ format: html
       <li><strong>基础：</strong> UTP Protocol Specification v1.0（2026-07-03）</li>
       <li><strong>原语版本基线：</strong> 2026-07-31（MP1—MP6 统一取值，与主规范 P1—P6 的原语版本对齐）</li>
       <li><strong>状态：</strong> Release Candidate——Stable 面冻结；转正式版前待办：Marketplace 角色 RFC 流程（附录 ME 第 2 项）与主规范引用冻结点后的一致性复扫</li>
-      <li><strong>机读契约：</strong> 实体 Schema、原语定义文件与状态机见<a href="appendices.html#s-md">附录 MD</a>；一致性校验工具（validate_schemas / test_fixtures）随本规范同源发布</li>
+      <li><strong>机读契约：</strong> 实体 Schema、原语定义文件与状态机见<a href="appendices.md#s-md">附录 MD</a>；一致性校验工具（validate_schemas / test_fixtures）随本规范同源发布</li>
     </ul>

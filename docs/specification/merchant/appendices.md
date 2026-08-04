@@ -3,7 +3,7 @@ title: UTP-M 附录（MA—MF）
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
@@ -40,9 +40,9 @@ format: html
         <tr><td>资源作用域</td><td>Resource Scope</td><td>与交易上下文/交易生命周期并列的第三个状态作用域，以资源标识（listing_id 等）为生命周期锚点。</td><td>M1.9</td></tr>
         <tr><td>Handler 执行模式</td><td>Delegation Mode</td><td>平台托管拓扑下卖方应答义务（P2/P6）的两种执行方式：<code>direct</code>（平台代答）与 <code>passthrough</code>（透传商家回调）；对买方透明，超时必有兜底。</td><td>M1.4.4</td></tr>
         <tr><td>商品级 Mode 收窄</td><td>mode_constraints</td><td>Listing 上对商户 Profile Mode 范围的商品级子集声明，驱动 Source 搜索可见性过滤（“能被搜到即可被履约”）。</td><td>M3.9.1 / M3.6</td></tr>
-        <tr><td>售后单（Aftersale Order）</td><td>以 <code>aftersale_id</code> 为锚点的售后处置资源，记录诉求、方案、协商回合、退货验货与退款凭据。</td><td><a href="primitives/aftersale/index.html#s-m85">M8.5</a></td></tr>
-        <tr><td>处置方案（AftersaleResolution）</td><td>售后的双方合意结论，含类型、退款金额、是否退货与运费责任；<code>resolution_hash</code> 为签名对象。</td><td><a href="primitives/aftersale/index.html#s-m85">M8.5</a></td></tr>
-        <tr><td>改价提议（Price Amendment）</td><td>受理阶段卖方提出的价格调整提议。MUST NOT 单方生效，买方确认后 <code>proposed_terms_hash</code> 成为权威条款哈希。</td><td><a href="primitives/acceptance/index.html#s-m612">M6.12</a></td></tr>
+        <tr><td>售后单（Aftersale Order）</td><td>以 <code>aftersale_id</code> 为锚点的售后处置资源，记录诉求、方案、协商回合、退货验货与退款凭据。</td><td><a href="primitives/aftersale/index.md#s-m85">M8.5</a></td></tr>
+        <tr><td>处置方案（AftersaleResolution）</td><td>售后的双方合意结论，含类型、退款金额、是否退货与运费责任；<code>resolution_hash</code> 为签名对象。</td><td><a href="primitives/aftersale/index.md#s-m85">M8.5</a></td></tr>
+        <tr><td>改价提议（Price Amendment）</td><td>受理阶段卖方提出的价格调整提议。MUST NOT 单方生效，买方确认后 <code>proposed_terms_hash</code> 成为权威条款哈希。</td><td><a href="primitives/acceptance/index.md#s-m612">M6.12</a></td></tr>
       </tbody>
     </table>
 
@@ -51,13 +51,13 @@ format: html
     <table>
       <thead><tr><th>错误码空间</th><th>数量</th><th>定义位置</th><th>代表条目</th></tr></thead>
       <tbody>
-        <tr><td><code>LISTING.*</code></td><td>15</td><td><a href="primitives/listing/index.html#s-m33">M3.3</a></td><td><code>LISTING.PUBLISH.MERCHANT_NOT_ACTIVE</code>、<code>LISTING.PUBLISH.INGEST_FAILED</code>、<code>LISTING.UPDATE.VERSION_CONFLICT</code>、<code>LISTING.LIST.NOT_REVIEWED</code>、<code>LISTING.ARCHIVE.OPEN_ORDERS</code></td></tr>
-        <tr><td><code>INVENTORY.*</code></td><td>7</td><td><a href="primitives/inventory/index.html#s-m43">M4.3</a></td><td><code>INVENTORY.REVISION_CONFLICT</code>、<code>INVENTORY.NEGATIVE_RESULT</code>、<code>INVENTORY.HOLD_NOT_FOUND</code></td></tr>
-        <tr><td><code>QUOTE.*</code></td><td>8</td><td><a href="primitives/quote/index.html#s-m53">M5.3</a></td><td><code>QUOTE.SIGNATURE_INVALID</code>、<code>QUOTE.PRICE_OUT_OF_POLICY</code>、<code>QUOTE.BID.WINDOW_CLOSED</code>、<code>QUOTE.DECLINE.REASON_REQUIRED</code></td></tr>
-        <tr><td><code>ACCEPTANCE.*</code></td><td>11</td><td><a href="primitives/acceptance/index.html#s-m63">M6.3</a></td><td><code>ACCEPTANCE.EXPIRED</code>、<code>ACCEPTANCE.SIGNATURE_INVALID</code>、<code>ACCEPTANCE.TERMS_MISMATCH</code>、<code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code></td></tr>
-        <tr><td><code>DELIVERY.*</code></td><td>8</td><td><a href="primitives/delivery/index.html#s-m73">M7.3</a></td><td><code>DELIVERY.PAYMENT_PRECONDITION</code>、<code>DELIVERY.QUANTITY_MISMATCH</code>、<code>DELIVERY.SPLIT_NOT_ALLOWED</code></td></tr>
-        <tr><td><code>AFTERSALE.*</code></td><td>10</td><td><a href="primitives/aftersale/index.html#s-m86">M8.6</a></td><td><code>AFTERSALE.RESOLUTION_EXCEEDS_REQUEST</code>、<code>AFTERSALE.MAX_ROUNDS</code>、<code>AFTERSALE.QUANTITY_EXCEEDS_RETURN</code></td></tr>
-        <tr><td><code>SETTLEMENT.*</code></td><td>5</td><td><a href="settlement.html#s-m97">M9.7</a></td><td><code>SETTLEMENT.DISCREPANCY_WINDOW_CLOSED</code>、<code>SETTLEMENT.STATEMENT_NOT_FOUND</code></td></tr>
+        <tr><td><code>LISTING.*</code></td><td>15</td><td><a href="primitives/listing/index.md#s-m33">M3.3</a></td><td><code>LISTING.PUBLISH.MERCHANT_NOT_ACTIVE</code>、<code>LISTING.PUBLISH.INGEST_FAILED</code>、<code>LISTING.UPDATE.VERSION_CONFLICT</code>、<code>LISTING.LIST.NOT_REVIEWED</code>、<code>LISTING.ARCHIVE.OPEN_ORDERS</code></td></tr>
+        <tr><td><code>INVENTORY.*</code></td><td>7</td><td><a href="primitives/inventory/index.md#s-m43">M4.3</a></td><td><code>INVENTORY.REVISION_CONFLICT</code>、<code>INVENTORY.NEGATIVE_RESULT</code>、<code>INVENTORY.HOLD_NOT_FOUND</code></td></tr>
+        <tr><td><code>QUOTE.*</code></td><td>8</td><td><a href="primitives/quote/index.md#s-m53">M5.3</a></td><td><code>QUOTE.SIGNATURE_INVALID</code>、<code>QUOTE.PRICE_OUT_OF_POLICY</code>、<code>QUOTE.BID.WINDOW_CLOSED</code>、<code>QUOTE.DECLINE.REASON_REQUIRED</code></td></tr>
+        <tr><td><code>ACCEPTANCE.*</code></td><td>11</td><td><a href="primitives/acceptance/index.md#s-m63">M6.3</a></td><td><code>ACCEPTANCE.EXPIRED</code>、<code>ACCEPTANCE.SIGNATURE_INVALID</code>、<code>ACCEPTANCE.TERMS_MISMATCH</code>、<code>ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED</code></td></tr>
+        <tr><td><code>DELIVERY.*</code></td><td>8</td><td><a href="primitives/delivery/index.md#s-m73">M7.3</a></td><td><code>DELIVERY.PAYMENT_PRECONDITION</code>、<code>DELIVERY.QUANTITY_MISMATCH</code>、<code>DELIVERY.SPLIT_NOT_ALLOWED</code></td></tr>
+        <tr><td><code>AFTERSALE.*</code></td><td>10</td><td><a href="primitives/aftersale/index.md#s-m86">M8.6</a></td><td><code>AFTERSALE.RESOLUTION_EXCEEDS_REQUEST</code>、<code>AFTERSALE.MAX_ROUNDS</code>、<code>AFTERSALE.QUANTITY_EXCEEDS_RETURN</code></td></tr>
+        <tr><td><code>SETTLEMENT.*</code></td><td>5</td><td><a href="settlement.md#s-m97">M9.7</a></td><td><code>SETTLEMENT.DISCREPANCY_WINDOW_CLOSED</code>、<code>SETTLEMENT.STATEMENT_NOT_FOUND</code></td></tr>
       </tbody>
     </table>
     <p><strong>与主规范既有错误码的触发闭环：</strong><code>SOURCE.LOOKUP.ITEM_NOT_FOUND</code> 与 <code>PURCHASE.CREATE.INVALID_ITEMS</code>（"商品已下架"）的触发源由 MP1 <code>delist</code>/<code>archive</code> 正式定义（M3.2.3）；<code>PURCHASE.COMPLETE.INVENTORY_UNAVAILABLE</code> 的供给侧对应为 <code>ACCEPTANCE.INVENTORY_INSUFFICIENT</code>。</p>

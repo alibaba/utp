@@ -337,9 +337,9 @@ Resolve.raise -&gt; Escrow.freeze
 
 <span id="s-931"></span>
 <h3 id="s-923-governance-overview">治理模型概述</h3>
-<p>与 Mode 维度治理类似（参见<a href="/documentation/specification/protocol-core/procurement-models.html#s-84-dimension-governance">第 8 章 8.4 节</a>），角色集合 R 采用三层治理模型（R1 / R2 / R3）。其中 R1 是判断角色能否成立的元规则，不是 <code>RoleDefinition.governance_layer</code> 的实例取值；可注册的角色实体只属于 R2 或 R3，在通用性与领域适应性之间取得平衡。</p>
+<p>与 Mode 维度治理类似（参见<a href="procurement-models.md#s-84-dimension-governance">第 8 章 8.4 节</a>），角色集合 R 采用三层治理模型（R1 / R2 / R3）。其中 R1 是判断角色能否成立的元规则，不是 <code>RoleDefinition.governance_layer</code> 的实例取值；可注册的角色实体只属于 R2 或 R3，在通用性与领域适应性之间取得平衡。</p>
 <div class="state-machine-diagram" style="width: 100%; max-width: 900px; border: 1px solid #e5e7eb; border-radius: 8px;">
-<img src="/documentation/assets/diagrams/role-governance.svg" alt="R 角色治理三层模型 R1/R2/R3：R3 领域角色扩展由行业联盟注册，R2 核心角色集需 RFC 治理，R1 角色元规则是极难变更的协议宪法" style="width: 100%; display: block;">
+<img src="../../assets/diagrams/role-governance.svg" alt="R 角色治理三层模型 R1/R2/R3：R3 领域角色扩展由行业联盟注册，R2 核心角色集需 RFC 治理，R1 角色元规则是极难变更的协议宪法" style="width: 100%; display: block;">
 </div>
 
 
@@ -381,7 +381,7 @@ Resolve.raise -&gt; Escrow.freeze
 <span id="s-94-role-edges"></span>
 <h2 id="s-93-role-relationships">Role Relationships（角色关系）</h2>
 <div class="state-machine-diagram" style="width: 100%; max-width: 1120px; border: 1px solid #e5e7eb; border-radius: 8px;">
-<img src="/documentation/assets/diagrams/utp-role-relationship-topology.png" alt="UTP 无向角色关系矩阵：以 Buyer、Seller、Payer、Payee、PaymentProcessor、Escrow、Shipper、Inspector、Arbiter 为行列，其中 Buyer、Seller、Payer、Payee、PaymentProcessor 始终显式声明，并使用 data_flow、authorization（职责授权关系）、payment、fulfillment 四种封闭类型标记允许的直接关系类型上界" style="width: 100%; display: block; border-radius: 8px;">
+<img src="../../assets/diagrams/utp-role-relationship-topology.png" alt="UTP 无向角色关系矩阵：以 Buyer、Seller、Payer、Payee、PaymentProcessor、Escrow、Shipper、Inspector、Arbiter 为行列，其中 Buyer、Seller、Payer、Payee、PaymentProcessor 始终显式声明，并使用 data_flow、authorization（职责授权关系）、payment、fulfillment 四种封闭类型标记允许的直接关系类型上界" style="width: 100%; display: block; border-radius: 8px;">
 </div>
 
 <span id="s-941"></span>

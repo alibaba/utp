@@ -34,13 +34,13 @@ format: html
 
           <h2 id="primitive-map">P0–P6 原语地图</h2>
           <div class="primitive-grid">
-            <a class="primitive-card" href="/documentation/specification/protocol-core/primitive-framework.html"><span class="primitive-id">P0</span><strong>Primitive Commons</strong><small>所有原语共享的信封、状态、错误和安全规则。</small></a>
-            <a class="primitive-card" href="/documentation/specification/primitives/source/index.html"><span class="primitive-id">P1</span><strong>Source 寻源</strong><small>发现商品、供应商、服务和可交易资源。</small></a>
-            <a class="primitive-card" href="/documentation/specification/primitives/negotiate/index.html"><span class="primitive-id">P2</span><strong>Negotiate 询盘</strong><small>询价、报价、还价与条款确认。</small></a>
-            <a class="primitive-card" href="/documentation/specification/primitives/purchase/index.html"><span class="primitive-id">P3</span><strong>Purchase 订购</strong><small>形成购买承诺并提交交易意图。</small></a>
-            <a class="primitive-card" href="/documentation/specification/primitives/pay/index.html"><span class="primitive-id">P4</span><strong>Pay 支付</strong><small>建立、确认和追踪资金处理。</small></a>
-            <a class="primitive-card" href="/documentation/specification/primitives/fulfill/index.html"><span class="primitive-id">P5</span><strong>Fulfill 履约</strong><small>准备、交付、跟踪、验收与收货。</small></a>
-            <a class="primitive-card" href="/documentation/specification/primitives/resolve/index.html"><span class="primitive-id">P6</span><strong>Resolve 争议解决</strong><small>发起、协商、裁决与补偿争议。</small></a>
+            <a class="primitive-card" href="protocol-core/primitive-framework.md"><span class="primitive-id">P0</span><strong>Primitive Commons</strong><small>所有原语共享的信封、状态、错误和安全规则。</small></a>
+            <a class="primitive-card" href="primitives/source/index.md"><span class="primitive-id">P1</span><strong>Source 寻源</strong><small>发现商品、供应商、服务和可交易资源。</small></a>
+            <a class="primitive-card" href="primitives/negotiate/index.md"><span class="primitive-id">P2</span><strong>Negotiate 询盘</strong><small>询价、报价、还价与条款确认。</small></a>
+            <a class="primitive-card" href="primitives/purchase/index.md"><span class="primitive-id">P3</span><strong>Purchase 订购</strong><small>形成购买承诺并提交交易意图。</small></a>
+            <a class="primitive-card" href="primitives/pay/index.md"><span class="primitive-id">P4</span><strong>Pay 支付</strong><small>建立、确认和追踪资金处理。</small></a>
+            <a class="primitive-card" href="primitives/fulfill/index.md"><span class="primitive-id">P5</span><strong>Fulfill 履约</strong><small>准备、交付、跟踪、验收与收货。</small></a>
+            <a class="primitive-card" href="primitives/resolve/index.md"><span class="primitive-id">P6</span><strong>Resolve 争议解决</strong><small>发起、协商、裁决与补偿争议。</small></a>
           </div>
 
           <h2 id="composition">原语组合</h2>

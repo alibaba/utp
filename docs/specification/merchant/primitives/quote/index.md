@@ -3,7 +3,7 @@ title: M5 MP3 报价原语
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
@@ -38,7 +38,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m51">M5.1 Overview（概述）</h2>
     <h3 id="s-m511a">M5.1.1 意图</h3>
-    <p>Quote 是 UTP-M 第三个供应商原语（MP3），其意图是让供应商对买方发起的询盘给出<strong>显式、签名、可审计的报价与应答</strong>。主规范 <a href="/documentation/specification/primitives/negotiate/index.html">P2 询盘原语</a>的 <code>utp.negotiate.quote</code> 方向为 <code>seller_to_buyer</code>（回调至买方 <code>{callback_base}</code>）。平台托管拓扑下供应商既无买方回调地址、也无与买方的直接会话，报价交付因此是<strong>串联两跳</strong>：<code>utp.quote.quote</code>（供应商 → Marketplace，本原语）→ <code>utp.negotiate.quote</code>（Marketplace → 买方，主规范 P2）。本原语标准化第一跳，使供应商报价成为显式、签名、可审计的协议动作；<strong>报价内容复用主规范权威 Quote 实体，Action 集按卖方任务视角独立命名</strong>（与 P2 不复用命名，两侧各自声明、互不混淆）。衔接细节见 <a href="#s-m56">M5.6</a>。</p>
+    <p>Quote 是 UTP-M 第三个供应商原语（MP3），其意图是让供应商对买方发起的询盘给出<strong>显式、签名、可审计的报价与应答</strong>。主规范 <a href="../../../primitives/negotiate/index.md">P2 询盘原语</a>的 <code>utp.negotiate.quote</code> 方向为 <code>seller_to_buyer</code>（回调至买方 <code>{callback_base}</code>）。平台托管拓扑下供应商既无买方回调地址、也无与买方的直接会话，报价交付因此是<strong>串联两跳</strong>：<code>utp.quote.quote</code>（供应商 → Marketplace，本原语）→ <code>utp.negotiate.quote</code>（Marketplace → 买方，主规范 P2）。本原语标准化第一跳，使供应商报价成为显式、签名、可审计的协议动作；<strong>报价内容复用主规范权威 Quote 实体，Action 集按卖方任务视角独立命名</strong>（与 P2 不复用命名，两侧各自声明、互不混淆）。衔接细节见 <a href="#s-m56">M5.6</a>。</p>
     <h3 id="s-m512">M5.1.2 关键设计原则</h3>
     <ul>
       <li><strong>MP3 不替代 P2，而是 P2 报价交付的第一跳。</strong>协商的权威状态机在 P2（询盘/报价/议价/条款绑定）；MP3 <code>quote</code> 的产出（卖方 ES256 签名，覆盖主规范 <code>Quote.terms_hash</code>）由 Marketplace 以 <code>utp.negotiate.quote</code> 原样交付买方，条款绑定仍由 P2 完成并产出订购 <code>terms_hash</code> 进入 P3。</li>
@@ -95,7 +95,7 @@ service:        dev.utp.merchant
     <hr />
     <h2 id="s-m52">M5.2 Lifecycle / State Machine（生命周期 / 状态机）</h2>
     <h3 id="s-m521">M5.2.1 应答任务状态机</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-quote-state-machine.svg" alt="询盘应答状态机：INQUIRY_PENDING/BUYER_COUNTERED 经 quote 进入 QUOTED，买方接受至 BOUND 终态；decline/超时收敛至 DECLINED/EXPIRED 终态" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../../../assets/diagrams/m-quote-state-machine.svg" alt="询盘应答状态机：INQUIRY_PENDING/BUYER_COUNTERED 经 quote 进入 QUOTED，买方接受至 BOUND 终态；decline/超时收敛至 DECLINED/EXPIRED 终态" style="max-width: 100%; height: auto;"></div>
     <h3 id="s-m522">M5.2.2 状态定义与迁移规则</h3>
     <table>
       <thead><tr><th>状态</th><th>含义</th><th>进入条件</th><th>允许的操作</th></tr></thead>
@@ -171,7 +171,7 @@ service:        dev.utp.merchant
       <li><strong>第一跳（本原语）：</strong>Seller → Marketplace，<code>utp.quote.quote</code> 提交带签名的报价事实。</li>
       <li><strong>第二跳（主规范 P2）：</strong>Marketplace 以 Seller 侧 handler 身份执行 <code>utp.negotiate.quote</code>，把<strong>同一份 Quote 实体</strong>交付买方。Marketplace MUST NOT 改写报价内容（金额、有效期、条款、<code>terms_hash</code> 逐字节保持）；平台加价或补贴 MUST 以独立条目呈现。</li>
     </ol>
-    <p>自托管拓扑（<a href="../../overview.html#s-m142">M1.4.2</a>）下本原语不适用：供应商 Endpoint 直接作为 P2 的 handler 执行 <code>utp.negotiate.quote</code> 回调，本原语是其内部模型的参考。</p>
+    <p>自托管拓扑（<a href="../../overview.md#s-m142">M1.4.2</a>）下本原语不适用：供应商 Endpoint 直接作为 P2 的 handler 执行 <code>utp.negotiate.quote</code> 回调，本原语是其内部模型的参考。</p>
     <h3 id="s-m562">M5.6.2 状态映射（State Correspondence）</h3>
     <p>本原语状态机是同一协商在供应商侧的<strong>任务视图</strong>，与主规范 P2 协商状态机（<code>primitives/negotiate/state_machine.json</code>）逐状态对应：</p>
     <table>

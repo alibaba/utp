@@ -53,7 +53,7 @@ Action:           utp.{primitive}.{action}
 
 每个 Action（操作）的规范定义应聚焦操作语义，而不是重复展开完整业务样例。原语章节 MUST 为每个 Action 使用独立的操作说明块，依次说明角色绑定、执行说明、适用状态、状态影响、可暴露的 `valid_next_actions` 与关键约束；不得将这些信息压缩进宽表。具体请求/响应中的业务字段由对应实体定义和用例演练承载。
 
-**角色绑定：** 每个 Action MUST 恰好声明一个 `initiator_role`（发起角色）和一个 `handler_role`（处理角色）。两者均必须是[标准角色](/documentation/specification/protocol-core/business-topology.html#s-922-standard-roles)或按[领域扩展角色规则](/documentation/specification/protocol-core/business-topology.html#s-925-r3)登记的角色。若不同角色需要发起相近业务，或需要由不同角色处理相近业务，协议 MUST 使用不同 Action，而不得在同一 Action 中声明多个发起角色、多个处理角色或多组角色对。运行时参与方必须按已锁定拓扑将该唯一角色对解析为具体主体。
+**角色绑定：** 每个 Action MUST 恰好声明一个 `initiator_role`（发起角色）和一个 `handler_role`（处理角色）。两者均必须是[标准角色](business-topology.md#s-922-standard-roles)或按[领域扩展角色规则](business-topology.md#s-925-r3)登记的角色。若不同角色需要发起相近业务，或需要由不同角色处理相近业务，协议 MUST 使用不同 Action，而不得在同一 Action 中声明多个发起角色、多个处理角色或多组角色对。运行时参与方必须按已锁定拓扑将该唯一角色对解析为具体主体。
 
 **执行说明：** 应说明发起角色为何触发该 Action、处理角色必须完成的协议处理或校验，以及成功执行后产生的业务结果。执行说明不重复请求/响应字段、传输端点或实体细节。
 
@@ -79,9 +79,9 @@ Action:           utp.{primitive}.{action}
 | --- | --- | --- | --- |
 | `action` | string | MUST | 完整操作标识，格式为 `utp.{primitive}.{action}`；扩展包新增 Action 使用 `{extension_package_name}.{action}`。 |
 | `session_id` | string | MUST | 当前协议会话标识，用于关联原语内状态和上下文。 |
-| `idempotency_key` | string | 写操作 MUST | 幂等键。对产生副作用的写操作 MUST 提供，只读操作 MAY 省略；键格式与幂等行为的完整规则见[幂等性规则](/documentation/specification/protocol-core/agent-friendly-interface.html#s-183)。 |
+| `idempotency_key` | string | 写操作 MUST | 幂等键。对产生副作用的写操作 MUST 提供，只读操作 MAY 省略；键格式与幂等行为的完整规则见[幂等性规则](agent-friendly-interface.md#s-183)。 |
 | `input` | object | MUST | 操作特有输入。字段由所属原语的实体定义、Mode 约束和具体操作语义决定。 |
-| `hai` | object | 条件必需 | Principal 对已挂起的 `CONFIRMED` Action 进行确认续跑时 MUST 包含；该对象在本路径仅包含 `suspend_id`，其语义见[人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html)。 |
+| `hai` | object | 条件必需 | Principal 对已挂起的 `CONFIRMED` Action 进行确认续跑时 MUST 包含；该对象在本路径仅包含 `suspend_id`，其语义见[人机协同交互](human-agent-interaction.md)。 |
 
 所有原语操作共享下列响应体骨架：
 
@@ -113,7 +113,7 @@ Action:           utp.{primitive}.{action}
 | `execution_result` | enum | 执行编排和约束场景 MUST；其他场景 MAY | 本次 Action 的执行结果。取值为 `SUCCESS`、`REJECTED` 或 `FAILURE`；该字段不表示全局状态机是否迁移。 |
 | `output` | object | MUST | 操作特有输出。字段由所属原语的实体定义和当前 Mode 决定。 |
 | `valid_next_actions` | string[] | 执行编排和约束场景 MUST；其他场景按需 | 当前响应可继续执行的后续操作。数组元素 MUST 使用完整 Action 名称，例如 `utp.pay.initiate`；无后续操作时返回空数组。 |
-| `hai` | object | 条件必需 | Action 响应包含人机协同控制语义时使用的 HAI 信封；对象定义见[人机协同交互](/documentation/specification/protocol-core/human-agent-interaction.html)。 |
+| `hai` | object | 条件必需 | Action 响应包含人机协同控制语义时使用的 HAI 信封；对象定义见[人机协同交互](human-agent-interaction.md)。 |
 
 `execution_result` 的取值语义如下：
 
@@ -177,8 +177,8 @@ Action:           utp.{primitive}.{action}
 | `extensions` | MAY | 支持的扩展包声明数组，详见扩展能力声明。 |
 | `authorization` | MAY | 能力提供方的用户授权要求。缺省表示不声明预先授权要求；存在时必须包含稳定的 `scope` 名称与 `required` 标记。 |
 | `actions` | MAY | 对完整核心 Action 集合的逐项特殊声明；MUST NOT 用于裁剪核心 Action。键为相对 Action 名，值可声明 `hai` 与 `mandate`。 |
-| `actions.{action}.hai` | MAY | 该 Action 的人机协同控制声明；存在时 MUST 包含 `interaction_level`，取值与执行语义见[人机协同交互控制](/documentation/specification/protocol-core/human-agent-interaction.html#s-19-1-2)。省略时视为 `AUTONOMOUS`。 |
-| `actions.{action}.mandate` | MAY | 该 Action 所需的 Mandate 类型。取值为 `checkout`、`payment` 或 `operation`；存在时该 Action MUST 携带可验证的对应 Mandate，完整协商、签名与验证规则见[身份与授权](/documentation/specification/protocol-core/identity-authorization.html)。 |
+| `actions.{action}.hai` | MAY | 该 Action 的人机协同控制声明；存在时 MUST 包含 `interaction_level`，取值与执行语义见[人机协同交互控制](human-agent-interaction.md#s-19-1-2)。省略时视为 `AUTONOMOUS`。 |
+| `actions.{action}.mandate` | MAY | 该 Action 所需的 Mandate 类型。取值为 `checkout`、`payment` 或 `operation`；存在时该 Action MUST 携带可验证的对应 Mandate，完整协商、签名与验证规则见[身份与授权](identity-authorization.md)。 |
 
 `authorization.required=true` 表示调用方 MUST 在执行该原语前取得 `authorization.scope`；`false` 表示原语允许未授权访问，但能力提供方 MAY 在具体资源、角色或风控条件不满足时返回结构化授权挑战。运行时挑战 MUST 引用已声明的 `scope`，不得临时引入 Profile 未声明的新 scope。角色、组织、资源归属、字段可见性和风控规则由能力提供方控制，不定义为 UTP 固定 Scope。
 
@@ -223,7 +223,7 @@ Action:           utp.{primitive}.{action}
 
 ### trade_context_id 与 transaction_id 生成规则 {#s-1031-transaction-id}
 
-UTP 使用两个不同作用域的协议标识符。`trade_context_id` 是 INIT、SOURCING 与 NEGOTIATING 阶段的交易上下文锚点；`transaction_id` 是从 PURCHASING 开始的一笔可独立成败、支付、履约、取消和争议的交易生命周期锚点。两者的生成规则以[标识符生成规则](/documentation/specification/protocol-core/global-state-machine.html#s-1715)为权威定义。
+UTP 使用两个不同作用域的协议标识符。`trade_context_id` 是 INIT、SOURCING 与 NEGOTIATING 阶段的交易上下文锚点；`transaction_id` 是从 PURCHASING 开始的一笔可独立成败、支付、履约、取消和争议的交易生命周期锚点。两者的生成规则以[标识符生成规则](global-state-machine.md#s-1715)为权威定义。
 
 | 标识符 | 生成时机 | 生成责任 | 作用域 |
 | --- | --- | --- | --- |
@@ -243,7 +243,7 @@ UUID 后缀 MUST 使用 RFC 9562 定义的 UUID v4 小写标准文本，并由�
 
 产生副作用的写操作（创建、修改、删除等）MUST 携带 `idempotency_key`，携带相同幂等键的重复请求返回相同结果、不产生额外副作用；只读操作 MAY 省略。
 
-幂等机制的完整规则——键格式、有效期、内容判重与 `TRANSPORT.IDEMPOTENCY_CONFLICT` 冲突行为——由[幂等性规则](/documentation/specification/protocol-core/agent-friendly-interface.html#s-183)统一定义，本节不再重复。
+幂等机制的完整规则——键格式、有效期、内容判重与 `TRANSPORT.IDEMPOTENCY_CONFLICT` 冲突行为——由[幂等性规则](agent-friendly-interface.md#s-183)统一定义，本节不再重复。
 
 ### 分页约定 {#s-1033-pagination}
 
@@ -263,7 +263,7 @@ TRANSPORT.{CATEGORY}_{DETAIL}   // 网关与通信错误（由传输与通信定
 UTP.{CATEGORY}_{DETAIL}         // 跨原语通用业务错误（两段式）
 ```
 
-- **TRANSPORT**：传输与通信层的固定命名空间，仅用于网关认证、消息校验、投递、去重和恢复错误；完整类别见[传输与通信](/documentation/specification/protocol-core/transport-communication.html#s-47)。
+- **TRANSPORT**：传输与通信层的固定命名空间，仅用于网关认证、消息校验、投递、去重和恢复错误；完整类别见[传输与通信](transport-communication.md#s-47)。
 - **PRIMITIVE**：原语名称（如 `SOURCE`、`NEGOTIATE`、`PURCHASE`），表示原语特有错误。
 - **ACTION**：触发错误的操作或子域（如 `SEARCH`、`CREATE`、`QUOTE`）。跨操作的通用错误 MAY 省略该段，退化为 `{PRIMITIVE}.{DETAIL}`。
 - **DETAIL**：错误的具体描述标识符。
@@ -319,7 +319,7 @@ UTP 直接错误响应采用统一的 JSON 结构（`ErrorResponse`）：
 | `request_id` | string | MUST | 原始请求的标识符，用于问题追踪。 |
 | `timestamp` | datetime | MUST | 错误发生时间（ISO 8601，UTC）。 |
 
-面向 Agent 的错误恢复语义（`recoverable`、`recovery_actions`、`compensation_log_ref` 等字段）叠加在本结构之上，由[错误恢复语义](/documentation/specification/protocol-core/agent-friendly-interface.html#s-182)定义。
+面向 Agent 的错误恢复语义（`recoverable`、`recovery_actions`、`compensation_log_ref` 等字段）叠加在本结构之上，由[错误恢复语义](agent-friendly-interface.md#s-182)定义。
 
 传输与通信层和原语框架 MUST 复用该结构；两者的边界仅由 `error.code` 的前缀决定。`ActionResponse.execution_result` 与 `messages` 的既有语义不因本规则改变。
 
@@ -486,7 +486,7 @@ Profile 在原语声明的 `extensions` 中声明扩展包。每个声明包含�
 
 ### 版本协商与生效规则 {#s-1056-extension-versioning}
 
-扩展包版本协商与会话生效遵循[按 RoleRelation 协商](/documentation/specification/protocol-core/discovery-negotiation.html#s-36)。扩展包作为已选原语版本的能力声明参与该关系的协商；双方必须在同一宿主原语版本下声明同名、兼容的扩展包，才可在当前会话生效。
+扩展包版本协商与会话生效遵循[按 RoleRelation 协商](discovery-negotiation.md#s-36)。扩展包作为已选原语版本的能力声明参与该关系的协商；双方必须在同一宿主原语版本下声明同名、兼容的扩展包，才可在当前会话生效。
 
 高版本扩展 MUST 向下兼容同名扩展的低版本契约。Profile 中的 `version` 表示实现方支持的最高兼容版本；协商结果确定后，调用方 MUST NOT 发送仅在高于该版本中出现的数据或 Action，所选 `schema` URL MUST 指向对应定义文件。未共同支持的新增 Action 不得出现在 `valid_next_actions` 中；未共同支持的 Schema 叠加字段不得出现在请求或响应中，接收方 MUST NOT 静默忽略。
 

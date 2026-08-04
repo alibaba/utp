@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTP JSON Schema 审查报告</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --success: #059669;
+      --success-bg: #d1fae5;
+      --warn: #d97706;
+      --warn-bg: #fef3c7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --border: #e5e7eb;
+      --code-bg: #f3f4f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 .5rem; font-size: 1.75rem; }
+    header p { margin: 0; color: var(--muted); }
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      gap: .75rem;
+      padding: 1rem;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: .5rem 1rem;
+      border-radius: .375rem;
+      cursor: pointer;
+      font-size: .875rem;
+    }
+    button.secondary { background: var(--muted); }
+    button:hover { opacity: .9; }
+    main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: .5rem;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat strong {
+      display: block;
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+    .stat span { color: var(--muted); font-size: .875rem; }
+    .issue {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: .5rem;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .issue-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .issue-header:hover { background: #fafafa; }
+    .fixed-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: .5rem;
+      overflow: hidden;
+    }
+    .fixed-table th,
+    .fixed-table td {
+      padding: .75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: .875rem;
+    }
+    .fixed-table th {
+      background: var(--code-bg);
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .fixed-table tr:last-child td { border-bottom: none; }
+    .issue-title { font-weight: 600; }
+    .issue-meta { display: flex; align-items: center; gap: .5rem; }
+    .badge {
+      font-size: .75rem;
+      padding: .25rem .5rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-fixed { background: var(--success-bg); color: var(--success); }
+    .badge-pending { background: var(--warn-bg); color: var(--warn); }
+    .badge-critical { background: var(--danger-bg); color: var(--danger); }
+    .issue-body { padding: 1.25rem; display: none; }
+    .issue.open .issue-body { display: block; }
+    .issue-body p { margin-top: 0; }
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .pane {
+      border: 1px solid var(--border);
+      border-radius: .375rem;
+      overflow: hidden;
+    }
+    .pane-header {
+      background: var(--code-bg);
+      padding: .5rem .75rem;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .pane-header.suggested { background: var(--accent-light); color: var(--accent); }
+    pre {
+      margin: 0;
+      padding: .75rem;
+      overflow-x: auto;
+      background: var(--code-bg);
+      font-size: .8125rem;
+      line-height: 1.5;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .toggle-suggested {
+      margin-top: .75rem;
+    }
+    .hidden { display: none; }
+    @media (max-width: 768px) {
+      .compare { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>UTP JSON Schema 审查报告</h1>
+    <p>覆盖 schemas/primitives/、schemas/transport/、schemas/discovery/、schemas/global-state-machine/</p>
+  </header>
+
+  <div class="toolbar">
+    <button onclick="toggleAll(true)">展开全部</button>
+    <button class="secondary" onclick="toggleAll(false)">收起全部</button>
+    <button onclick="showSuggestions(true)">显示所有建议</button>
+    <button class="secondary" onclick="showSuggestions(false)">隐藏所有建议</button>
+  </div>
+
+  <main>
+    <div class="summary">
+      <div class="stat"><strong>156</strong><span>审查文件数</span></div>
+      <div class="stat"><strong>4</strong><span>已修复问题</span></div>
+      <div class="stat"><strong>4</strong><span>待优化项</span></div>
+      <div class="stat"><strong>0</strong><span>剩余 $ref 死链</span></div>
+    </div>
+
+    <section id="fixed">
+      <h2>已修复问题</h2>
+      <table class="fixed-table">
+        <thead>
+          <tr><th>#</th><th>文件</th><th>修复内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>schemas/primitives/fulfill/entities/notify_input.json</td><td>line_items.$ref 指向 ../../common/entities/line_item.json</td></tr>
+          <tr><td>2</td><td>schemas/primitives/fulfill/entities/fulfillment_event.json</td><td>补充 order_id 属性</td></tr>
+          <tr><td>3</td><td>schemas/primitives/fulfill/entities/rejection_confirmation.json</td><td>从 required 移除 evidence_refs、signature</td></tr>
+          <tr><td>8</td><td>schemas/primitives/common/entities/time_range.json</td><td>description 中约定 end_at ≥ start_at</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="pending">
+      <h2>待优化项（交互对比）</h2>
+
+      <div class="issue open">
+        <div class="issue-header" onclick="toggleIssue(this)">
+          <span class="issue-title">4. primitive / extension 命名正则未覆盖下划线与多级扩展</span>
+          <span class="issue-meta"><span class="badge badge-pending">待优化</span></span>
+        </div>
+        <div class="issue-body">
+          <p><code>profile.json</code> 与 <code>negotiation_result.json</code> 中用于校验 primitive 名称的正则仅允许 <code>[a-z0-9-]</code>，但项目已使用 <code>utp.source_cart</code> 这类带下划线的扩展名，未来还可能出现多级扩展（如 <code>utp.xxx.yyy</code>）。</p>
+          <button class="toggle-suggested" onclick="toggleSuggested(this)">显示建议修改</button>
+          <div class="compare suggested-content hidden">
+            <div class="pane">
+              <div class="pane-header">当前正则</div>
+              <pre><code>"^utp\\.[a-z0-9-]+$"</code></pre>
+            </div>
+            <div class="pane">
+              <div class="pane-header suggested">建议正则</div>
+              <pre><code>"^utp\\.[a-z0-9_-]+(?:\\.[a-z0-9_-]+)*$"</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="issue open">
+        <div class="issue-header" onclick="toggleIssue(this)">
+          <span class="issue-title">5. extension 定义字段不一致</span>
+          <span class="issue-meta"><span class="badge badge-pending">待优化</span></span>
+        </div>
+        <div class="issue-body">
+          <p><code>profile.json</code> 与 <code>negotiation_result.json</code> 都定义了 extension，但字段命名与必填项不同，可能导致解析代码重复或数据转换错误。</p>
+          <button class="toggle-suggested" onclick="toggleSuggested(this)">显示建议修改</button>
+          <div class="compare suggested-content hidden">
+            <div class="pane">
+              <div class="pane-header">profile.json 当前定义</div>
+              <pre><code>"extension": {
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "$ref": "#/$defs/version" },
+    "schema": { "type": "string", "format": "uri" }
+  },
+  "required": ["name", "version", "schema"]
+}</code></pre>
+            </div>
+            <div class="pane">
+              <div class="pane-header suggested">建议统一为</div>
+              <pre><code>"extension": {
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "$ref": "#/$defs/version" },
+    "schema": { "type": "string", "format": "uri" },
+    "spec": { "type": "string", "format": "uri" }
+  },
+  "required": ["name", "version", "schema"]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="issue open">
+        <div class="issue-header" onclick="toggleIssue(this)">
+          <span class="issue-title">6. action_response.json 缺少 execution_result 必填约束</span>
+          <span class="issue-meta"><span class="badge badge-pending">待优化</span></span>
+        </div>
+        <div class="issue-body">
+          <p><code>action_response.json</code> 的 <code>required</code> 只有 <code>action</code> 与 <code>session_id</code>，但 <code>execution_result</code> 是状态机分支判断的核心字段，遗漏会导致响应语义不完整。</p>
+          <button class="toggle-suggested" onclick="toggleSuggested(this)">显示建议修改</button>
+          <div class="compare suggested-content hidden">
+            <div class="pane">
+              <div class="pane-header">当前 required</div>
+              <pre><code>"required": [
+  "action",
+  "session_id"
+]</code></pre>
+            </div>
+            <div class="pane">
+              <div class="pane-header suggested">建议 required</div>
+              <pre><code>"required": [
+  "action",
+  "session_id",
+  "execution_result"
+]</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="issue open">
+        <div class="issue-header" onclick="toggleIssue(this)">
+          <span class="issue-title">7. 全局状态机请求 schema 使用非标准关键字 utp_request</span>
+          <span class="issue-meta"><span class="badge badge-pending">待优化</span></span>
+        </div>
+        <div class="issue-body">
+          <p><code>state_notify_request.json</code> 与 <code>state_query_request.json</code> 中使用了 <code>utp_request</code> 字段，它不是 JSON Schema 2020-12 关键字。虽然不会导致校验失败，但可能被自定义代码生成器误解。</p>
+          <button class="toggle-suggested" onclick="toggleSuggested(this)">显示建议修改</button>
+          <div class="compare suggested-content hidden">
+            <div class="pane">
+              <div class="pane-header">当前写法</div>
+              <pre><code>"action_response": {
+  "$ref": "...",
+  "utp_request": "required"
+},
+"state_views": {
+  ...
+  "utp_request": "required"
+}</code></pre>
+            </div>
+            <div class="pane">
+              <div class="pane-header suggested">建议写法</div>
+              <pre><code>"action_response": {
+  "$ref": "...",
+  "description": "action_response 为必填字段。"
+},
+"state_views": {
+  ...
+  "description": "state_views 为必填字段。"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>其他观察</h2>
+      <ul>
+        <li><strong>action_request.json 与 action_response.json 的 HAI 字段不一致：</strong>请求信封中 <code>hai</code> 内联定义，响应信封引用 <code>hai.json</code>。若语义相同，建议统一引用 <code>hai.json</code>。</li>
+        <li><strong>money.json 金额正则可接受前导零：</strong>如 <code>"001.00"</code> 可通过校验。业务若不允许前导零，可收紧正则。</li>
+        <li><strong>所有 $ref 引用已解析通过，无死链、无重复 $id、无无效正则。</strong></li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    function toggleAll(open) {
+      document.querySelectorAll('.issue').forEach(el => {
+        if (open) el.classList.add('open');
+        else el.classList.remove('open');
+      });
+    }
+    function toggleIssue(header) {
+      header.parentElement.classList.toggle('open');
+    }
+    function toggleSuggested(btn) {
+      const content = btn.nextElementSibling;
+      content.classList.toggle('hidden');
+      btn.textContent = content.classList.contains('hidden') ? '显示建议修改' : '隐藏建议修改';
+    }
+    function showSuggestions(show) {
+      document.querySelectorAll('.suggested-content').forEach(el => {
+        if (show) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+      document.querySelectorAll('.toggle-suggested').forEach(btn => {
+        const content = btn.nextElementSibling;
+        if (content && content.classList.contains('suggested-content')) {
+          btn.textContent = show ? '隐藏建议修改' : '显示建议修改';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

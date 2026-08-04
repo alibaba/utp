@@ -10,7 +10,7 @@ version: 2026-07-29
 
 ## 寻源购物车扩展（Source Cart Extension） {#s-1111-source-cart-extension}
 
-Source Cart 是挂载于 `utp.source` 的可选扩展，按照[原语扩展规范](/documentation/specification/protocol-core/primitive-framework.html#s-105-extension-spec)为 Source 状态机增加购物车上下文及相关操作。该扩展用于在寻源阶段临时或持久保存采购候选项，便于采购方在多次 `search`（包括携带筛选条件的细化搜索）和 `lookup` 后统一比较和提交订购。购物车操作复用 Source 的全局阶段、交易上下文及核心状态边界。供应商通过在 Profile 的 `utp.source.extensions` 中声明 `utp.source_cart` 表示支持本扩展。
+Source Cart 是挂载于 `utp.source` 的可选扩展，按照[原语扩展规范](../../../protocol-core/primitive-framework.md#s-105-extension-spec)为 Source 状态机增加购物车上下文及相关操作。该扩展用于在寻源阶段临时或持久保存采购候选项，便于采购方在多次 `search`（包括携带筛选条件的细化搜索）和 `lookup` 后统一比较和提交订购。购物车操作复用 Source 的全局阶段、交易上下文及核心状态边界。供应商通过在 Profile 的 `utp.source.extensions` 中声明 `utp.source_cart` 表示支持本扩展。
 
 ### 意图与范围 {#s-11111}
 
@@ -31,7 +31,7 @@ Source Cart 运行于 `SOURCING` 阶段，扩展状态、操作结果和资源�
 
 Source Cart 会向 Source 内部状态机追加 `CART_ACTIVE` 扩展状态，并新增与该状态相关的迁移。Source 的 `INIT` 初始状态、`RELEASED` 内部终态，以及 `search`、`lookup` 的核心迁移保持不变。
 
-![Source Cart 扩展后的 Source 状态机](/documentation/assets/diagrams/source-cart-state-machine.drawio.svg)
+![Source Cart 扩展后的 Source 状态机](../../../../assets/diagrams/source-cart-state-machine.drawio.svg)
 
 | 扩展状态 | 含义 | 进入条件 | 允许的操作 |
 | --- | --- | --- | --- |

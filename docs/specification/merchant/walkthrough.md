@@ -3,7 +3,7 @@ title: M12 供应商全链路演练
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
@@ -11,7 +11,7 @@ format: html
     <blockquote><p><strong>本章为资料性（Informative）。</strong>演练序列与 JSON 报文示例用于说明各章规范性条款的组合使用方式，不新增任何规范性要求；示例与各章条款或机读 Schema 不一致时，以条款与 Schema 为准。M12.9 验证清单是对 M1.6 闭环不变式（规范性，定义于各引用章节）的检查索引。</p></blockquote>
 
     <h2 id="s-m121">M12.1 场景设定（Scenario Setup）</h2>
-    <p>本章以一家电子产品制造商"上海示例供应链有限公司"接入 Marketplace 为主线，演练<strong>入驻 → 发布 → 上架 → 被寻源 → 报价 → 接单 → 发货 → 结算</strong>的完整闭环。它是主规范<a href="/documentation/specification/guides/procurement-walkthrough.html">第 24 章标准采购全链路</a>的<strong>供应商侧镜像</strong>——主规范第 24 章从买方视角走完同一笔交易，两章互为对照。</p>
+    <p>本章以一家电子产品制造商"上海示例供应链有限公司"接入 Marketplace 为主线，演练<strong>入驻 → 发布 → 上架 → 被寻源 → 报价 → 接单 → 发货 → 结算</strong>的完整闭环。它是主规范<a href="../guides/procurement-walkthrough.md">第 24 章标准采购全链路</a>的<strong>供应商侧镜像</strong>——主规范第 24 章从买方视角走完同一笔交易，两章互为对照。</p>
     <table>
       <thead><tr><th>项目</th><th>设定</th></tr></thead>
       <tbody>
@@ -22,13 +22,13 @@ format: html
       </tbody>
     </table>
     <h3 id="s-m1211">M12.1.1 全链路时序总览</h3>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-e2e-sequence.svg" alt="供应商全链路时序总览：Phase 0—6 从入驻、发布、被寻源、报价、接单、发货到结算的三方交互" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-e2e-sequence.svg" alt="供应商全链路时序总览：Phase 0—6 从入驻、发布、被寻源、报价、接单、发货到结算的三方交互" style="max-width: 100%; height: auto;"></div>
 
     <h2 id="s-m122">M12.2 Phase 0：入驻（Onboarding）</h2>
-    <p>按 M2 五步流程完成：生成 ES256 密钥对 → 发布 Profile（声明 Seller 角色 + MP1—MP6 原语 + <code>dev.utp.merchant_callback</code> Service，示例见 <a href="onboarding.html#s-m23">M2.3</a>）→ 注册获取 <code>merchant_id: mch-sh-00812</code> → 资质审核 <code>QUALIFIED</code> → 沙箱验收 7 项全过 → 状态 <code>ACTIVE</code>。</p>
+    <p>按 M2 五步流程完成：生成 ES256 密钥对 → 发布 Profile（声明 Seller 角色 + MP1—MP6 原语 + <code>dev.utp.merchant_callback</code> Service，示例见 <a href="onboarding.md#s-m23">M2.3</a>）→ 注册获取 <code>merchant_id: mch-sh-00812</code> → 资质审核 <code>QUALIFIED</code> → 沙箱验收 7 项全过 → 状态 <code>ACTIVE</code>。</p>
 
     <h2 id="s-m123">M12.3 Phase 1：发布商品与设置库存</h2>
-    <p>Bridge 从 ERP 物料主数据生成发布请求（完整示例见 <a href="primitives/listing/index.html#s-m3101">M3.10.1</a>）：</p>
+    <p>Bridge 从 ERP 物料主数据生成发布请求（完整示例见 <a href="primitives/listing/index.md#s-m3101">M3.10.1</a>）：</p>
 <pre class="highlight"><code>1. POST /utp/m/v1/listings           → listing_id=item-BT-NC-001, PENDING_REVIEW
 2. 回调 utp.listing.review_result    → APPROVED, auto_list 生效 → LISTED
 3. PUT  /utp/m/v1/inventory/item-BT-NC-001/sku-X3-BLK

@@ -3,7 +3,7 @@ title: 供应商接入快速开始
 section: merchant
 owner: merchant-team
 status: review
-version: 2026-07-30
+version: 2026-07-31
 format: html
 ---
 
@@ -11,7 +11,7 @@ format: html
     <p class="lead">本页是 UTP-M 的非规范性（Informative）导读：用最短路径说明一个供应商从零到"商品可被全网买方 Agent 购买"需要做什么。全部规范性细节以各章正文为准，本页每一步都给出对应章节。</p>
 
     <h2 id="s-mqs1">1. 接入前提：你只需要实现两个东西</h2>
-<div class="diagram"><img src="/documentation/assets/diagrams/m-quickstart-phases.svg" alt="供应商接入三阶段：一次入驻（M2 五步至 ACTIVE）、一次批量铺货（LISTED）、持续事件驱动循环" style="max-width: 100%; height: auto;"></div>
+<div class="diagram"><img src="../../assets/diagrams/m-quickstart-phases.svg" alt="供应商接入三阶段：一次入驻（M2 五步至 ACTIVE）、一次批量铺货（LISTED）、持续事件驱动循环" style="max-width: 100%; height: auto;"></div>
     <p>UTP-M 的最简实现面（M1.10 传输绑定支持要求）：</p>
 <pre class="highlight"><code>① 一个 REST 客户端     → 调用 Marketplace 的 dev.utp.merchant Service（MP1—MP6）
 ② 一个 Webhook 端点    → 接收 dev.utp.merchant_callback 回调（订单路由、审核结论、账单）
@@ -68,4 +68,4 @@ inquiry_routed    → （可选，声明 utp.quote 后）在 deadline 内 quote 
         <tr><td>只想最小接入</td><td>REST 客户端 + Webhook + 人工后台，全部组件皆可后补</td><td>本页第 1 节</td></tr>
       </tbody>
     </table>
-    <p>接入完成的判定标准即 M2.6.2 沙箱验收清单；端到端报文序列与行为对照见 <a href="walkthrough.html">M12 全链路演练</a>；机读契约（JSON Schema 与原语定义文件）索引见<a href="appendices.html#s-md">附录 MD</a>。</p>
+    <p>接入完成的判定标准即 M2.6.2 沙箱验收清单；端到端报文序列与行为对照见 <a href="walkthrough.md">M12 全链路演练</a>；机读契约（JSON Schema 与原语定义文件）索引见<a href="appendices.md#s-md">附录 MD</a>。</p>

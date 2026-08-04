@@ -43,7 +43,7 @@ format: html
 <tr>
 <td>代理层</td>
 <td>Agent 是谁？</td>
-<td>mTLS / API Key / HTTP Message Signatures / WIMSE（WIT/WIC + WPT）</td>
+<td>API Key / mTLS / OAuth 2.0 Client Credentials / HTTP Message Signatures / WIMSE（WIT/WIC + WPT）</td>
 <td>Agent 平台 / Agent Identity Server（AIS）</td>
 </tr>
 <tr>
@@ -80,7 +80,7 @@ format: html
 
 <p>Agent 身份认证回答「哪个 Platform、Agent 或 workload 正在发起请求」。它证明机器身份和密钥控制权，不证明终端用户已授权，也不证明某笔交易已经获准：前者由 <a href="#s-63">6.3 User Authorization</a> 处理，后者由 <a href="#s-64">6.4 Mandate Chain</a> 处理。Business SHOULD 对调用其 API 的 Agent 进行认证，以降低冒充、重放和篡改风险。</p>
 
-<p>UTP 将 Agent 视为可验证的 workload。认证按<strong>传输层</strong>与<strong>应用层</strong>分类：mTLS 在安全通道建立时认证对端；HTTP Message Signatures 与 WIMSE 在请求级保留端到端身份。API Key 保留为兼容性机制，仅适用于明确允许的低风险场景。Profile 的 <code>AgentAuthenticationConfig</code> / <code>AgentAuthenticationMechanism</code> 结构由<a href="/documentation/specification/protocol-core/security-trust.html#s-522">第 5 章 5.2.2 节</a>定义；本节说明其使用边界。</p>
+<p>UTP 将 Agent 视为可验证的 workload。认证机制按<strong>兼容性预共享凭证</strong>、<strong>传输层认证</strong>、<strong>授权服务器签发的机器访问令牌</strong>、<strong>请求级签名</strong>和<strong>workload 证明</strong>依次说明。API Key 仅作为低风险兼容机制；mTLS 在通道建立时认证对端；OAuth 2.0 Client Credentials 面向无用户参与的 M2M 调用；HTTP Message Signatures 与 WIMSE 在请求级保留端到端身份和 Proof of Possession。Profile 的 <code>AgentAuthenticationConfig</code> / <code>AgentAuthenticationMechanism</code> 结构由<a href="security-trust.md#s-522">第 5 章 5.2.2 节</a>定义；本节说明其使用边界。</p>
 
 <p id="s-620"><strong>UTP 支持的机制与标准依据</strong></p>
 
@@ -107,6 +107,12 @@ format: html
 <td><a href="https://www.rfc-editor.org/rfc/rfc8446">RFC 8446</a>（TLS 1.3）、<a href="https://www.rfc-editor.org/rfc/rfc5280">RFC 5280</a>（X.509 PKI）</td>
 </tr>
 <tr>
+<td><code>oauth2_client_credentials</code></td>
+<td>机器到机器认证；Agent 作为 OAuth confidential client，以 <code>grant_type=client_credentials</code> 获取代表自身的 Access Token。</td>
+<td>后台服务、定时任务、企业系统集成、无用户在线的 Agent-to-Service 调用；不表达终端用户授权，不得替代 Mandate Chain。</td>
+<td><a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.4">RFC 6749 §4.4</a>、<a href="https://www.rfc-editor.org/rfc/rfc7523">RFC 7523</a>、<a href="https://modelcontextprotocol.io/extensions/auth/oauth-client-credentials">MCP OAuth Client Credentials</a></td>
+</tr>
+<tr>
 <td><code>http_message_signatures</code></td>
 <td>应用层认证；Agent 用 Profile / JWKS 对应私钥签名请求，接收方按可信 Profile 公钥验签。</td>
 <td>HTTP 基线、回调与异步通知；签名须绑定方法、目标 URI、时间窗和请求摘要。</td>
@@ -124,9 +130,10 @@ format: html
 <p><strong>基本使用方式</strong>：</p>
 <ul>
 <li>响应方在 Profile 的 <code>agent_authentication.supported_mechanisms</code> 中声明可接受的机制；请求方先验证 Profile 与 Trust Anchor，再选择双方可用且满足目标操作准入要求的机制。</li>
-<li>每次受保护请求携带所选机制的凭证或证明；HTTP 请求还须遵循<a href="/documentation/specification/protocol-core/transport-communication.html#s-44">第 4 章 4.4 节</a>的消息签名与防重放规则。</li>
-<li>接收方验证凭证有效期、撤销状态、身份绑定、请求完整性和 nonce / <code>jti</code>；高风险操作应使用 WIMSE，或使用 mTLS 与应用层签名的组合。</li>
-<li>OAuth 客户端认证和 Access Token 属于用户授权流程，不作为 <code>agent_authentication</code> 的机制类型，也不得替代请求级签名或 PoP。</li>
+<li>每次受保护请求携带所选机制的凭证或证明；HTTP 请求还须遵循<a href="transport-communication.md#s-44">第 4 章 4.4 节</a>的消息签名与防重放规则。</li>
+<li>接收方验证凭证有效期、撤销状态、身份绑定、请求完整性和 nonce / <code>jti</code>；高风险操作 SHOULD 使用 WIMSE，或使用 mTLS、OAuth sender-constrained token 与应用层签名的组合。</li>
+<li>OAuth 2.0 Client Credentials 属于 Agent Authentication，因为它没有 Resource Owner 交互，只证明 Agent Client 的机器身份和机器权限；Authorization Code、Device Authorization 等用户参与流程仍属于 <code>user_authorization</code>。</li>
+<li>Client Credentials Access Token 默认是 Bearer 凭证，不等同于请求级 PoP；涉及资金、订单提交或关键状态迁移时，Business SHOULD 要求 mTLS 绑定、DPoP、HTTP Message Signatures 或 WIMSE 请求证明。</li>
 </ul>
 
 <h2 id="s-63">用户授权机制（User Authorization）</h2>
@@ -135,7 +142,7 @@ format: html
 
 <p>用户授权回答「用户是否允许该 Agent 代表自己执行操作」。UTP 将 Agent 映射为 OAuth 2.0 / 2.1 Client，将用户映射为 Resource Owner，将商家（Seller/Business）映射为 Authorization Server 提供方。</p>
 
-<p>Profile 声明层结构（<code>UserAuthorizationConfig</code> / <code>UserAuthorizationMechanism</code>）由<a href="/documentation/specification/protocol-core/security-trust.html#s-523">第 5 章 5.2.3 节</a>定义；本节以 <code>type = oauth2</code> 为默认实现，重点讲解基于 <code>endpoint</code> 的发现、授权流程、Token 验证、Scope 设计与错误处理等技术实现细节。</p>
+<p>Profile 声明层结构（<code>UserAuthorizationConfig</code> / <code>UserAuthorizationMechanism</code>）由<a href="security-trust.md#s-523">第 5 章 5.2.3 节</a>定义；本节以 <code>type = oauth2</code> 为默认实现，重点讲解基于 <code>endpoint</code> 的发现、授权流程、Token 验证、Scope 设计与错误处理等技术实现细节。</p>
 
 <p><strong>关键原则</strong>：</p>
 <ul>
@@ -146,7 +153,7 @@ format: html
 
 <h3 id="s-632">Profile 声明（type = oauth2）</h3>
 
-<p>商家在 Profile 中通过 <code>user_authorization</code> 声明其授权能力。<a href="/documentation/specification/protocol-core/security-trust.html#s-523">第 5 章 5.2.3 节</a>采用 <code>UserAuthorizationConfig</code> / <code>UserAuthorizationMechanism</code> 两层结构；本节展示 <code>type = oauth2</code> 时的 Profile 声明与技术实现要点。Profile 只声明 Authorization Server 入口 <code>endpoint</code>；授权流程、scope 目录与 JWKS 等细节由该入口对应的 RFC 8414 metadata 提供。</p>
+<p>商家在 Profile 中通过 <code>user_authorization</code> 声明其授权能力。<a href="security-trust.md#s-523">第 5 章 5.2.3 节</a>采用 <code>UserAuthorizationConfig</code> / <code>UserAuthorizationMechanism</code> 两层结构；本节展示 <code>type = oauth2</code> 时的 Profile 声明与技术实现要点。Profile 只声明 Authorization Server 入口 <code>endpoint</code>；授权流程、scope 目录与 JWKS 等细节由该入口对应的 RFC 8414 metadata 提供。</p>
 
 <pre><code class="language-json">{
   "user_authorization": {
@@ -200,7 +207,7 @@ format: html
 <p>OAuth 2 授权流程开始前，Platform 买家 Agent MUST 从 Business UTPProfile 的 <code>user_authorization.supported_mechanisms[]</code> 中发现并校验 Authorization Server，具体步骤如下：</p>
 
 <ol>
-<li>获取 Business UTPProfile（参见 <a href="/documentation/specification/protocol-core/discovery-negotiation.html">第 3 章</a>），定位 <code>user_authorization.supported_mechanisms</code> 中 <code>type="oauth2"</code> 的条目；</li>
+<li>获取 Business UTPProfile（参见 <a href="discovery-negotiation.md">第 3 章</a>），定位 <code>user_authorization.supported_mechanisms</code> 中 <code>type="oauth2"</code> 的条目；</li>
 <li>校验该条目的 <code>endpoint</code> 为 HTTPS URL，且其域名与 Profile 发布域同属一个治理登记的信任域，或具备有效的跨域信任锚背书；</li>
 <li>按 RFC 8414 从 <code>endpoint</code> 发现 Authorization Server Metadata：
 <pre><code>GET {endpoint}/.well-known/oauth-authorization-server</code></pre>
@@ -349,7 +356,7 @@ Content-Type: application/json
 
 <p>Mandate 在 UTP 中并非孤立运行。它与 OAuth 委托关系、WIMSE workload 身份共同构成三层可审计信任链，确保从用户委托到 Agent 执行再到具体操作的每一步均可追溯、可验证。UTP 通过 Intent、Checkout 与 Payment 三类凭证，将用户意图、订单确认和支付授权关联为可验证的授权链。</p>
 
-<p>UTP v1.0 的 Mandate 版本范围与完整链路流程详见 <a href="#s-645">§6.4.5</a>。各类型凭证的定义与字段规范详见 <a href="#s-642">§6.4.2</a>，签名与规范化规则详见 <a href="#s-643">§6.4.3</a>，验证规则详见 <a href="#s-644">§6.4.4</a>，审计消费语义与 Evidence Bundle 规范详见 <a href="/documentation/specification/protocol-core/risk-audit.html#s-72-evidence-bundle">§7.2</a>。操作响应中 Mandate 凭证的回传格式详见 <a href="#s-646">§6.4.6</a>。</p>
+<p>UTP v1.0 的 Mandate 版本范围与完整链路流程详见 <a href="#s-645">§6.4.5</a>。各类型凭证的定义与字段规范详见 <a href="#s-642">§6.4.2</a>，签名与规范化规则详见 <a href="#s-643">§6.4.3</a>，验证规则详见 <a href="#s-644">§6.4.4</a>，审计消费语义与 Evidence Bundle 规范详见 <a href="risk-audit.md#s-72-evidence-bundle">§7.2</a>。操作响应中 Mandate 凭证的回传格式详见 <a href="#s-646">§6.4.6</a>。</p>
 
 <h3 id="s-642">凭证分类</h3>
 
@@ -645,9 +652,9 @@ Content-Type: application/json
 
 <p>前文（§6.4.2-§6.4.5）定义了 Mandate 的凭证结构、签名机制、验证规则与完整链路。本节规定这些凭证在 UTP 请求和响应消息中的物理携带位置——即凭证从签发方传递到消费方时，在协议消息信封中的具体嵌入方式。</p>
 
-<p><strong>请求侧：</strong>Mandate 凭证随使用它的原语请求传递。Ch.10 请求骨架（参见 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023">§10.2.3</a>）声明了请求体 <code>mandate</code> 字段的位置；当目标操作的准入要求 Mandate 时 MUST 提供。请求体中可携带完整凭证（JWS / SD-JWT+kb 字符串），也可传递可解析的凭证引用；接收方无法解析引用时，请求方 MUST 提供完整凭证原文。传递位置详见 §6.4.5 传递段。</p>
+<p><strong>请求侧：</strong>Mandate 凭证随使用它的原语请求传递。Ch.10 请求骨架（参见 <a href="primitive-framework.md#s-1023">§10.2.3</a>）声明了请求体 <code>mandate</code> 字段的位置；当目标操作的准入要求 Mandate 时 MUST 提供。请求体中可携带完整凭证（JWS / SD-JWT+kb 字符串），也可传递可解析的凭证引用；接收方无法解析引用时，请求方 MUST 提供完整凭证原文。传递位置详见 §6.4.5 传递段。</p>
 
-<p><strong>响应侧：</strong>当响应涉及 Mandate 的签发、消费或更新时，响应体 MUST 在 <code>mandate</code> 字段回传授权凭证上下文。Ch.10 响应骨架（参见 <a href="/documentation/specification/protocol-core/primitive-framework.html#s-1023">§10.2.3</a>）声明了 <code>mandate</code> 字段的存在位置；其内部凭证结构由本节定义。</p>
+<p><strong>响应侧：</strong>当响应涉及 Mandate 的签发、消费或更新时，响应体 MUST 在 <code>mandate</code> 字段回传授权凭证上下文。Ch.10 响应骨架（参见 <a href="primitive-framework.md#s-1023">§10.2.3</a>）声明了 <code>mandate</code> 字段的存在位置；其内部凭证结构由本节定义。</p>
 
 <p><code>mandate</code> 响应对象按分层结构回传本次操作产出或消费的 Mandate 凭证，每个字段对应一类凭证：</p>
 
@@ -795,30 +802,29 @@ Content-Type: application/json
 </tr>
 </thead>
 <tbody>
-<tr><td><code>type</code></td><td>enum</td><td>是</td><td>机制类型。有效值：<code>"mtls"</code>、<code>"api_keys"</code>、<code>"http_message_signatures"</code>、<code>"wimse"</code>。</td></tr>
+<tr><td><code>type</code></td><td>enum</td><td>是</td><td>机制类型。有效值：<code>"api_keys"</code>、<code>"mtls"</code>、<code>"oauth2_client_credentials"</code>、<code>"http_message_signatures"</code>、<code>"wimse"</code>。</td></tr>
 <tr><td><code>issuer</code></td><td>string</td><td>条件</td><td>凭证签发方标识。除具备跨域信任锚背书外，issuer MUST 与 <code>agent_id</code> 同属一个 trust domain。</td></tr>
 <tr><td><code>config</code></td><td>object</td><td>是</td><td>机制类型特定参数。不同 <code>type</code> 的 <code>config</code> 结构不同，见下表。</td></tr>
 </tbody>
 </table>
 
-<p><strong>AgentAuthenticationMechanism.config 按 type 的结构：</strong></p>
+<p><strong>AgentAuthenticationMechanism.config 按 type 的最小提示：</strong></p>
+<p><code>config</code> 是开放式机制配置 map，只用于声明 Profile 层可安全公开的发现入口或信任提示。完整密钥材料、客户端注册细节、secret、授权策略、scope 判定与运行时挑战 MUST 由对应机制、Authorization Server metadata、Trust Anchor 或带外治理流程提供，MUST NOT 强行内联到 Profile。</p>
 
 <table>
 <thead>
 <tr>
 <th>type</th>
-<th>config 字段</th>
-<th>必填</th>
+<th>典型 config 提示</th>
 <th>描述</th>
 </tr>
 </thead>
 <tbody>
-<tr><td><code>api_keys</code></td><td><code>key_distribution</code></td><td>是</td><td>key 分发方式，如 <code>"out_of_band"</code>。API Key 属于预共享密钥机制，适用于沙箱、内部或低风险调用。</td></tr>
-<tr><td><code>mtls</code></td><td><code>ca_issuer</code></td><td>是</td><td>受信任 CA 的 issuer 或证书分发地址。</td></tr>
-<tr><td><code>http_message_signatures</code></td><td><code>jwks_uri</code></td><td>是</td><td>签名公钥 JWKS 端点（RFC 7517），用于动态拉取当前有效公钥。</td></tr>
-<tr><td><code>http_message_signatures</code></td><td><code>profile</code></td><td>否</td><td>支持的签名 profile 列表，如 <code>["rsa-v1", "ecdsa-v1"]</code>。</td></tr>
-<tr><td><code>http_message_signatures</code></td><td><code>key_protection</code></td><td>否</td><td>私钥保护方式，供实现方判断该机制可满足的操作准入要求。有效值：<code>"software"</code>、<code>"os-keystore"</code>、<code>"tee"</code>、<code>"hsm"</code>；默认 <code>"software"</code>。</td></tr>
-<tr><td><code>wimse</code></td><td><code>workload_identifier_scheme</code></td><td>是</td><td>workload 标识方案，如 <code>"spiffe"</code>、<code>"dns"</code>、<code>"urn"</code> 或 <code>"did"</code>。</td></tr>
+<tr><td><code>api_keys</code></td><td><code>key_distribution</code></td><td>仅声明 key 分发方式或使用约定，如 <code>"out_of_band"</code>。不得在 Profile 中公开 API Key。</td></tr>
+<tr><td><code>mtls</code></td><td><code>ca_issuer</code> / <code>trust_anchor_endpoint</code></td><td>声明可用于证书链验证的 CA issuer 或受背书信任锚发现入口；具体准入、吊销与 federation 细节由运行时信任策略处理。</td></tr>
+<tr><td><code>oauth2_client_credentials</code></td><td><code>metadata_endpoint</code> / <code>issuer</code></td><td>声明 OAuth Authorization Server 的发现入口或 issuer；token endpoint、JWKS、客户端认证方式、scope 与 token 绑定能力 SHOULD 从 RFC 8414 metadata 或双方注册关系中获取。</td></tr>
+<tr><td><code>http_message_signatures</code></td><td><code>jwks_uri</code></td><td>声明签名公钥发现入口；若 Profile 已通过 <code>signing_keys</code> 或等价 Trust Anchor 暴露公钥，可省略该提示。签名覆盖字段、算法、时间窗与防重放规则由请求的 <code>Signature-Input</code>、传输章节和运行时策略约束。</td></tr>
+<tr><td><code>wimse</code></td><td><code>workload_identifier_scheme</code> / <code>issuer</code></td><td>声明 workload 标识方案或 issuer 提示；WIT/WIC/WPT 的签发、绑定、证明字段和撤销检查由 WIMSE issuer、Trust Anchor 与运行时验证流程完成。</td></tr>
 </tbody>
 </table>
 
@@ -880,7 +886,7 @@ Content-Type: application/json
 <li>Agent Authentication 机制详情见 6.2 节；</li>
 <li>User Authorization 流程、Discovery、Token 验证与 Scope 设计见 6.3 节；</li>
 <li>Mandate Chain 字段与示例见 6.4 节；</li>
-<li>Trust Anchor 与 Evidence Bundle 要求见 <a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章</a>。</li>
+<li>Trust Anchor 与 Evidence Bundle 要求见 <a href="risk-audit.md">第 7 章</a>。</li>
 </ul>
 
 <h2 id="s-68">不变约束与反模式（Invariants and Anti-Patterns）</h2>
@@ -892,7 +898,7 @@ Content-Type: application/json
 <li>操作准入结论 MUST 由协议引擎基于目标操作的准入要求独立判定；</li>
 <li>当目标操作要求不可导出私钥时，私钥 MUST 不可导出；</li>
 <li>WPT MUST 绑定当前 HTTP 请求的 <code>aud</code>/<code>ath</code>/<code>tth</code>；</li>
-<li>OAuth Access Token 的作用域 MUST 大于等于 Mandate Chain 的作用域；</li>
+<li>OAuth Access Token 的 scope MUST 覆盖本次操作所需权限；Client Credentials token 只覆盖机器权限，用户委托 token 只覆盖用户授权，二者不得互相替代；</li>
 <li>所有凭证验证事件 MUST 进入 Evidence Bundle；</li>
 <li>新增身份机制 MUST 作为 OPTIONAL 能力声明。</li>
 </ol>
@@ -904,6 +910,7 @@ Content-Type: application/json
 <li>❌ 仅依赖 mTLS 而放弃应用层签名或 WPT；</li>
 <li>❌ 让 LLM / Agent 推理链接触私钥或 Access Token；</li>
 <li>❌ 由请求方自行声明已满足目标操作的准入要求；</li>
+<li>❌ 用 OAuth 2.0 Client Credentials token 冒充用户授权；</li>
 <li>❌ 将 OAuth scope 当作单笔交易授权边界（边界应由 Mandate Chain 定义）。</li>
 </ul>
 
@@ -917,14 +924,16 @@ Content-Type: application/json
 </tr>
 </thead>
 <tbody>
-<tr><td><a href="/documentation/specification/protocol-core/security-trust.html">第 5 章</a></td><td>操作准入语义、Profile 机制声明与信任画像</td></tr>
-<tr><td><a href="/documentation/specification/protocol-core/discovery-negotiation.html">第 3 章</a></td><td>Profile 结构与 <code>/.well-known/utp</code> 获取路径</td></tr>
-<tr><td><a href="/documentation/specification/protocol-core/procurement-models.html">第 8 章</a></td><td>交易模式参与目标操作准入要求的选择</td></tr>
-<tr><td><a href="/documentation/specification/primitives/pay/index.html">第 14 章</a></td><td>支付原语的安全前置条件与 Mandate 要求</td></tr>
-<tr><td><a href="/documentation/specification/protocol-core/human-agent-interaction.html">第 20 章</a></td><td>目标操作需要人工介入时触发 Human Confirmation</td></tr>
-<tr><td><a href="/documentation/specification/protocol-core/risk-audit.html">第 7 章</a></td><td>Evidence Bundle 与审计</td></tr>
+<tr><td><a href="security-trust.md">第 5 章</a></td><td>操作准入语义、Profile 机制声明与信任画像</td></tr>
+<tr><td><a href="discovery-negotiation.md">第 3 章</a></td><td>Profile 结构与 <code>/.well-known/utp</code> 获取路径</td></tr>
+<tr><td><a href="procurement-models.md">第 8 章</a></td><td>交易模式参与目标操作准入要求的选择</td></tr>
+<tr><td><a href="../primitives/pay/index.md">第 14 章</a></td><td>支付原语的安全前置条件与 Mandate 要求</td></tr>
+<tr><td><a href="human-agent-interaction.md">第 20 章</a></td><td>目标操作需要人工介入时触发 Human Confirmation</td></tr>
+<tr><td><a href="risk-audit.md">第 7 章</a></td><td>Evidence Bundle 与审计</td></tr>
 <tr><td><a href="https://datatracker.ietf.org/doc/draft-klrc-aiagent-auth/">IETF draft-klrc-aiagent-auth-03</a></td><td>AI Agent 认证与授权的指导性框架；第 9 节按传输层与应用层说明 mTLS、WPT 与 HTTP Message Signatures。该文档为 Internet-Draft（work in progress），不构成已发布 RFC 标准。</td></tr>
-<tr><td><a href="/documentation/specification/reference/glossary.html">附录</a></td><td>新增术语与错误码需同步更新</td></tr>
+<tr><td><a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.4">RFC 6749 §4.4</a></td><td>OAuth 2.0 Client Credentials Grant，定义无用户交互的客户端自身份授权流程。</td></tr>
+<tr><td><a href="https://modelcontextprotocol.io/extensions/auth/oauth-client-credentials">MCP OAuth Client Credentials</a></td><td>MCP 对 Client Credentials M2M 认证的扩展实践。</td></tr>
+<tr><td><a href="../reference/glossary.md">附录</a></td><td>新增术语与错误码需同步更新</td></tr>
 </tbody>
 </table>
 
@@ -933,7 +942,7 @@ Content-Type: application/json
 <p>UTP 第 6 章通过<strong>三层分离</strong>的设计，将 Agent 身份认证、用户授权与操作级授权清晰解耦：</p>
 
 <ul>
-<li><strong>Agent authentication</strong> 提供从 API Key、mTLS 到 HTTP Message Signatures、WIMSE 的分层机制，由目标操作的准入要求决定采用何种机制；</li>
+<li><strong>Agent authentication</strong> 提供从 API Key、mTLS、OAuth 2.0 Client Credentials 到 HTTP Message Signatures、WIMSE 的分层机制，由目标操作的准入要求决定采用何种机制；</li>
 <li><strong>User authorization</strong> 采用商家提供的 OAuth 2.1 协议，将用户身份与 Agent 身份链接；</li>
 <li><strong>Mandate Chain</strong> 在操作层将通用授权收窄为单笔交易的具体授权。</li>
 </ul>

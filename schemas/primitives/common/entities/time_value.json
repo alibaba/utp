@@ -3,7 +3,7 @@
   "$id": "https://ut-protocol.com/schemas/primitives/common/entities/time_value.json",
   "version": "2026-07-31",
   "title": "TimeValue",
-  "description": "以相对自然日数或绝对日期时间表示的时间值，两种表示方式必须且只能使用一种。",
+  "description": "以相对自然日数或绝对日期时间表示的时间值，至少提供一种表示方式，也可以同时提供。",
   "type": "object",
   "properties": {
     "days": {
@@ -17,7 +17,7 @@
       "description": "绝对日期时间，遵循 RFC 3339。"
     }
   },
-  "oneOf": [
+  "anyOf": [
     {
       "required": [
         "days"
