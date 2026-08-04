@@ -10,7 +10,7 @@ version: 2026-07-30
 
 本章规定 UTP Runtime 如何从商业拓扑、发现与协商结果和原语契约中选择 Mode，并编译为可执行路径；运行时只开放当前上下文允许的 Action。路径编排是发起方的本地 Runtime 能力，可以由调用方 SDK 或平台运行时实现。
 
-路径编排的核心输出是业务语义、调用角色方向与状态机衔接；通信层在每次请求前依据 `service_catalogs`、目标 Action 的 `transport_bindings` 与当前 `HandlerRole` 确认本次投递方式。
+路径编排的核心输出是业务语义、调用角色方向、Domain 绑定、可用 Service 范围与状态机衔接；通信层在每次请求前依据节点中的 Service 引用、目标 Action 的 `transport_bindings` 与当前 `HandlerRole` 确认本次投递方式。
 
 ---
 
@@ -140,17 +140,9 @@ execution_dag
     "compliance_level": "L0"
   },
   "topology_ref": "commerce_topology:topology-001",
-  "negotiation_ref": "NegotiationResult:negotiation-001",
-  "service_catalogs": [
-    {
-      "roles": ["Seller"],
-      "services": [{ "id": "seller-rest", "transport": "rest", "endpoint": "https://seller.example.com/utp" }]
-    },
-    {
-      "roles": ["PaymentProcessor"],
-      "services": [{ "id": "payment-rest", "transport": "rest", "endpoint": "https://payment.example.com/utp" }]
-    }
-  ],
+  "negotiation_result_ref": "NegotiationResult:negotiation-001",
+  "profile_interaction_result_ref": "profile_interaction_result:pir-001",
+  "entry_node_ids": ["P1"],
   "nodes": [
     { "node_id": "P1", "primitive": "utp.source", "actions": ["utp.source.search"], "initiator_role": "Buyer", "handler_role": "Seller" },
     { "node_id": "P3", "primitive": "utp.purchase", "actions": ["utp.purchase.create"], "initiator_role": "Buyer", "handler_role": "Seller" },
@@ -162,10 +154,63 @@ execution_dag
     { "from_node_id": "P3", "to_node_id": "P4" },
     { "from_node_id": "P4", "to_node_id": "P5" }
   ],
-  "entry_node_ids": ["P1"]
+  "exception_edges": [
+    {
+      "from_node_id": "P1",
+      "to_node_id": "P6",
+      "condition": "source_failed_or_dispute_required"
+    },
+    {
+      "from_node_id": "P3",
+      "to_node_id": "P6",
+      "condition": "purchase_failed_or_dispute_required"
+    },
+    {
+      "from_node_id": "P4",
+      "to_node_id": "P6",
+      "condition": "payment_failed_or_dispute_required"
+    },
+    {
+      "from_node_id": "P5",
+      "to_node_id": "P6",
+      "condition": "fulfillment_failed_or_dispute_required"
+    }
+  ]
 }
 ```
 
+字段说明：
+
+| 字段 | 说明 |
+| --- | --- |
+| `schema_version` | `execution_dag` 结构版本。 |
+| `kind` | 对象类型，固定表示该对象为运行期 DAG。 |
+| `dag_id` | 此次编排生成的 DAG 标识。 |
+| `selected_mode` | 本次采购模式六元组的已锁定取值。 |
+| `topology_ref` | 生成该图所依据的商业拓扑引用。 |
+| `negotiation_result_ref` | 生成该图所依据的协商结果引用。 |
+| `profile_interaction_result_ref` | 生成该图所依据的 Profile 交互结果引用。 |
+| `entry_node_ids` | 可开始执行的入口节点；主链入口为 `Source`。 |
+| `nodes` | 本次 DAG 中的 Primitive 节点列表。 |
+| `nodes[].node_id` | 节点在本次 DAG 中的唯一标识。 |
+| `nodes[].primitive` | 该节点对应的 Primitive 名称。 |
+| `nodes[].initiator_role` | 该节点 Action 的发起方角色。 |
+| `nodes[].handler_role` | 该节点 Action 的处理方角色。 |
+| `nodes[].initiator_domain` | 发起方角色绑定的 Domain。 |
+| `nodes[].handler_domain` | 处理方角色绑定的 Domain。 |
+| `nodes[].services` | 该节点可使用的 Service 引用列表。 |
+| `nodes[].services[].service_ref` | 来自协商结果的 Service 引用。 |
+| `nodes[].services[].service_domain` | 该 Service 所属或承接的 Domain。 |
+| `nodes[].actions` | 该节点当前可进入路径编排的完整 Action 名称列表。 |
+| `edges` | 主路径中的节点依赖关系列表。 |
+| `edges[].from_node_id` | 主路径依赖边的起点节点。 |
+| `edges[].to_node_id` | 主路径依赖边的终点节点。 |
+| `exception_edges` | 异常、争议或补偿条件下进入异常节点的依赖关系列表。 |
+| `exception_edges[].from_node_id` | 异常依赖边的起点节点。 |
+| `exception_edges[].to_node_id` | 异常依赖边的终点节点。 |
+| `exception_edges[].condition` | 激活该异常依赖边的条件。 |
+
+通信层应使用节点中的 `handler_role`、`handler_domain`、`services` 与目标 Action 的传输绑定，在每一次请求时确定可用的 Service、Endpoint 和传输方式。
 通信层使用 `execution_dag.service_catalogs`、节点的 `handler_role` 与目标 Action 的传输绑定，在每次请求时确定可用的 Service、Endpoint 和传输方式；该决定不回写 DAG，也不改变其服务目录快照。
 
 ## 状态机初始化 {#s-184}
@@ -186,7 +231,7 @@ dag_id + execution_dag + StateView + available_actions
 
 | 输出 | 含义 | 使用边界 |
 | --- | --- | --- |
-| `execution_dag` | 本次上下文中的 `mode`、节点、结构依赖、角色方向、允许的 Action 范围及冻结的 `service_catalogs`。 | 是执行结构快照，不是网络实体；目录可透传端点声明，但不包含已选定的服务、端点或传输绑定。 |
+| `execution_dag` | 本次上下文中的 `mode`、节点、结构依赖、角色方向、Domain、Service 引用及允许的 Action 范围。 | 是执行结构快照；节点中的 Service 引用来自协商结果。 |
 | `StateView` | 状态机提交的当前协议阶段、标识与版本。 | 是下一次状态校验与路径更新的输入；路径编排不得自行改写。 |
 | `available_actions` | 当前 DAG 中依赖已满足、已通过 Mode、拓扑、协商与状态守卫过滤的候选 Action。 | 调用方只能从此集合提交下一次 Action，且每次执行前仍须完成全部前置校验。 |
 | 控制或恢复结论 | 前置校验的阻止/挂起结果，或状态机给出的补偿、超时结论。 | 决定保持当前路径、激活既有补偿 Action，或等待恢复；不得伪造 ActionResponse。 |
@@ -230,7 +275,7 @@ dag_id + execution_dag + StateView + available_actions
 
 ## 请求发起 {#s-187}
 
-所有前置校验通过后，路径编排将完整 P0 ActionRequest、`handler_role`、`dag_id`、`execution_dag.mode`、拓扑引用及 `execution_dag.service_catalogs` 交给通信层。通信层 MUST 在每次请求前依据目录快照和目标 Action 的传输绑定，确认本次可用的 Service、Endpoint 和传输方式。前置校验拒绝或挂起时，调用链停在本地并保持当前 StateView。
+所有前置校验通过后，路径编排将完整 P0 ActionRequest、`handler_role`、`handler_domain`、`dag_id`、`execution_dag.mode`、拓扑引用及节点中的 `services` 交给通信层。通信层 MUST 在每次请求前依据节点 Service、目标 Action 的传输绑定和当前网络策略，确认本次可用的 Service、Endpoint 和传输方式。前置校验拒绝或挂起时，调用链停在本地并保持当前 StateView。
 
 请求发起的核心输出是一次可由通信层投递的 ActionRequest；它保留调用方提供的 `session_id`、适用的 `idempotency_key` 与 `input`，并关联当前唯一的 `handler_role`。
 
