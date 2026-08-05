@@ -17,10 +17,6 @@
           "path": "protocol-core/business-scenarios.html"
         },
         {
-          "title": "采购模式",
-          "path": "protocol-core/procurement-models.html"
-        },
-        {
           "title": "商业拓扑",
           "path": "protocol-core/business-topology.html"
         },
@@ -31,10 +27,6 @@
         {
           "title": "传输与通信",
           "path": "protocol-core/transport-communication.html"
-        },
-        {
-          "title": "全局状态机",
-          "path": "protocol-core/global-state-machine.html"
         },
         {
           "title": "路径编排",
@@ -67,183 +59,166 @@
       ]
     },
     {
-      "title": "寻源原语",
+      "title": "UTP-B",
       "children": [
         {
-          "title": "概览",
-          "path": "primitives/source/index.html"
+          "title": "采购模式",
+          "path": "protocol-core/procurement-models.html"
         },
         {
-          "title": "传输方式",
+          "title": "全局状态机",
+          "path": "protocol-core/global-state-machine.html"
+        },
+        {
+          "title": "寻源原语",
           "children": [
             {
-              "title": "REST",
+              "title": "概览",
+              "path": "primitives/source/index.html"
+            },
+            {
+              "title": "REST 绑定",
               "path": "primitives/source/transports/rest.html"
             },
             {
-              "title": "MCP",
+              "title": "MCP 绑定",
               "path": "primitives/source/transports/mcp.html"
             },
             {
-              "title": "A2A",
+              "title": "A2A 绑定",
               "path": "primitives/source/transports/a2a.html"
             },
             {
-              "title": "Embedded",
+              "title": "Embedded 绑定",
               "path": "primitives/source/transports/embedded.html"
+            },
+            {
+              "title": "购物车扩展",
+              "path": "primitives/source/extensions/cart.html"
             }
           ]
         },
         {
-          "title": "购物车扩展",
-          "path": "primitives/source/extensions/cart.html"
-        }
-      ]
-    },
-    {
-      "title": "询盘原语",
-      "children": [
-        {
-          "title": "概览",
-          "path": "primitives/negotiate/index.html"
-        },
-        {
-          "title": "传输方式",
+          "title": "询盘原语",
           "children": [
             {
-              "title": "REST",
+              "title": "概览",
+              "path": "primitives/negotiate/index.html"
+            },
+            {
+              "title": "REST 绑定",
               "path": "primitives/negotiate/transports/rest.html"
             },
             {
-              "title": "MCP",
+              "title": "MCP 绑定",
               "path": "primitives/negotiate/transports/mcp.html"
             },
             {
-              "title": "A2A",
+              "title": "A2A 绑定",
               "path": "primitives/negotiate/transports/a2a.html"
             },
             {
-              "title": "Embedded",
+              "title": "Embedded 绑定",
               "path": "primitives/negotiate/transports/embedded.html"
             }
           ]
-        }
-      ]
-    },
-    {
-      "title": "订购原语",
-      "children": [
-        {
-          "title": "概览",
-          "path": "primitives/purchase/index.html"
         },
         {
-          "title": "传输方式",
+          "title": "订购原语",
           "children": [
             {
-              "title": "REST",
+              "title": "概览",
+              "path": "primitives/purchase/index.html"
+            },
+            {
+              "title": "REST 绑定",
               "path": "primitives/purchase/transports/rest.html"
             },
             {
-              "title": "MCP",
+              "title": "MCP 绑定",
               "path": "primitives/purchase/transports/mcp.html"
             },
             {
-              "title": "A2A",
+              "title": "A2A 绑定",
               "path": "primitives/purchase/transports/a2a.html"
             },
             {
-              "title": "Embedded",
+              "title": "Embedded 绑定",
               "path": "primitives/purchase/transports/embedded.html"
             }
           ]
-        }
-      ]
-    },
-    {
-      "title": "支付原语",
-      "children": [
-        {
-          "title": "概览",
-          "path": "primitives/pay/index.html"
         },
         {
-          "title": "传输方式",
+          "title": "支付原语",
           "children": [
             {
-              "title": "REST",
+              "title": "概览",
+              "path": "primitives/pay/index.html"
+            },
+            {
+              "title": "REST 绑定",
               "path": "primitives/pay/transports/rest.html"
             },
             {
-              "title": "MCP",
+              "title": "MCP 绑定",
               "path": "primitives/pay/transports/mcp.html"
             },
             {
-              "title": "A2A",
+              "title": "A2A 绑定",
               "path": "primitives/pay/transports/a2a.html"
             },
             {
-              "title": "Embedded",
+              "title": "Embedded 绑定",
               "path": "primitives/pay/transports/embedded.html"
             }
           ]
-        }
-      ]
-    },
-    {
-      "title": "履约原语",
-      "children": [
-        {
-          "title": "概览",
-          "path": "primitives/fulfill/index.html"
         },
         {
-          "title": "传输方式",
+          "title": "履约原语",
           "children": [
             {
-              "title": "REST",
+              "title": "概览",
+              "path": "primitives/fulfill/index.html"
+            },
+            {
+              "title": "REST 绑定",
               "path": "primitives/fulfill/transports/rest.html"
             },
             {
-              "title": "MCP",
+              "title": "MCP 绑定",
               "path": "primitives/fulfill/transports/mcp.html"
             },
             {
-              "title": "A2A",
+              "title": "A2A 绑定",
               "path": "primitives/fulfill/transports/a2a.html"
             },
             {
-              "title": "Embedded",
+              "title": "Embedded 绑定",
               "path": "primitives/fulfill/transports/embedded.html"
             }
           ]
-        }
-      ]
-    },
-    {
-      "title": "争议解决原语",
-      "children": [
-        {
-          "title": "概览",
-          "path": "primitives/resolve/index.html"
         },
         {
-          "title": "传输方式",
+          "title": "争议解决原语",
           "children": [
             {
-              "title": "REST",
+              "title": "概览",
+              "path": "primitives/resolve/index.html"
+            },
+            {
+              "title": "REST 绑定",
               "path": "primitives/resolve/transports/rest.html"
             },
             {
-              "title": "MCP",
+              "title": "MCP 绑定",
               "path": "primitives/resolve/transports/mcp.html"
             },
             {
-              "title": "A2A",
+              "title": "A2A 绑定",
               "path": "primitives/resolve/transports/a2a.html"
             },
             {
-              "title": "Embedded",
+              "title": "Embedded 绑定",
               "path": "primitives/resolve/transports/embedded.html"
             }
           ]
@@ -251,72 +226,146 @@
       ]
     },
     {
-      "title": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
+      "title": "UTP-M",
       "children": [
         {
-          "title": "总览",
-          "path": "merchant/index.html"
-        },
-        {
-          "title": "接入快速开始",
-          "path": "merchant/quickstart.html"
-        },
-        {
-          "title": "M1 架构总览",
-          "path": "merchant/overview.html"
-        },
-        {
-          "title": "M2 入驻与能力声明",
+          "title": "商家入驻",
           "path": "merchant/onboarding.html"
         },
         {
-          "title": "M9 结算与对账",
+          "title": "结算与对账",
           "path": "merchant/settlement.html"
         },
         {
-          "title": "M10 ERP 集成与 Bridge",
-          "path": "merchant/erp-bridge.html"
-        },
-        {
-          "title": "M11 供应商 Agent 与人机协同",
-          "path": "merchant/merchant-agent.html"
-        },
-        {
-          "title": "M11 全链路演练",
-          "path": "merchant/walkthrough.html"
-        },
-        {
-          "title": "附录 MA—MF",
-          "path": "merchant/appendices.html"
-        }
-      ]
-    },
-    {
-      "title": "商家侧 UTP-M · 原语",
-      "children": [
-        {
-          "title": "MP1 商品管理",
-          "path": "merchant/primitives/listing/index.html"
-        },
-        {
-          "title": "MP2 库存管理",
-          "path": "merchant/primitives/inventory/index.html"
-        },
-        {
-          "title": "MP3 询盘响应（草案）",
-          "path": "merchant/primitives/quote/index.html"
-        },
-        {
-          "title": "MP4 订单受理",
-          "path": "merchant/primitives/acceptance/index.html"
-        },
-        {
-          "title": "MP5 发货执行",
-          "path": "merchant/primitives/delivery/index.html"
-        },
-        {
-          "title": "M8 MP6 售后原语",
-          "path": "merchant/primitives/aftersale/index.html"
+          "title": "供应商原语",
+          "children": [
+            {
+              "title": "商品原语",
+              "children": [
+                {
+                  "title": "概览",
+                  "path": "merchant/primitives/listing/index.html"
+                },
+                {
+                  "title": "REST 绑定",
+                  "path": "merchant/primitives/listing/transports/rest.html"
+                },
+                {
+                  "title": "MCP 绑定",
+                  "path": "merchant/primitives/listing/transports/mcp.html"
+                },
+                {
+                  "title": "A2A 绑定",
+                  "path": "merchant/primitives/listing/transports/a2a.html"
+                }
+              ]
+            },
+            {
+              "title": "库存原语",
+              "children": [
+                {
+                  "title": "概览",
+                  "path": "merchant/primitives/inventory/index.html"
+                },
+                {
+                  "title": "REST 绑定",
+                  "path": "merchant/primitives/inventory/transports/rest.html"
+                },
+                {
+                  "title": "MCP 绑定",
+                  "path": "merchant/primitives/inventory/transports/mcp.html"
+                },
+                {
+                  "title": "A2A 绑定",
+                  "path": "merchant/primitives/inventory/transports/a2a.html"
+                }
+              ]
+            },
+            {
+              "title": "报价原语",
+              "children": [
+                {
+                  "title": "概览",
+                  "path": "merchant/primitives/quote/index.html"
+                },
+                {
+                  "title": "REST 绑定",
+                  "path": "merchant/primitives/quote/transports/rest.html"
+                },
+                {
+                  "title": "MCP 绑定",
+                  "path": "merchant/primitives/quote/transports/mcp.html"
+                },
+                {
+                  "title": "A2A 绑定",
+                  "path": "merchant/primitives/quote/transports/a2a.html"
+                }
+              ]
+            },
+            {
+              "title": "接单原语",
+              "children": [
+                {
+                  "title": "概览",
+                  "path": "merchant/primitives/acceptance/index.html"
+                },
+                {
+                  "title": "REST 绑定",
+                  "path": "merchant/primitives/acceptance/transports/rest.html"
+                },
+                {
+                  "title": "MCP 绑定",
+                  "path": "merchant/primitives/acceptance/transports/mcp.html"
+                },
+                {
+                  "title": "A2A 绑定",
+                  "path": "merchant/primitives/acceptance/transports/a2a.html"
+                }
+              ]
+            },
+            {
+              "title": "交付原语",
+              "children": [
+                {
+                  "title": "概览",
+                  "path": "merchant/primitives/delivery/index.html"
+                },
+                {
+                  "title": "REST 绑定",
+                  "path": "merchant/primitives/delivery/transports/rest.html"
+                },
+                {
+                  "title": "MCP 绑定",
+                  "path": "merchant/primitives/delivery/transports/mcp.html"
+                },
+                {
+                  "title": "A2A 绑定",
+                  "path": "merchant/primitives/delivery/transports/a2a.html"
+                }
+              ]
+            },
+            {
+              "title": "售后原语",
+              "children": [
+                {
+                  "title": "概览",
+                  "path": "merchant/primitives/aftersale/index.html"
+                },
+                {
+                  "title": "REST 绑定",
+                  "path": "merchant/primitives/aftersale/transports/rest.html"
+                },
+                {
+                  "title": "MCP 绑定",
+                  "path": "merchant/primitives/aftersale/transports/mcp.html"
+                },
+                {
+                  "title": "A2A 绑定",
+                  "path": "merchant/primitives/aftersale/transports/a2a.html"
+                }
+              ]
+            }
+          ]
         }
       ]
     }
@@ -334,11 +383,6 @@
     },
     {
       "group": "协议核心",
-      "title": "采购模式",
-      "path": "protocol-core/procurement-models.html"
-    },
-    {
-      "group": "协议核心",
       "title": "商业拓扑",
       "path": "protocol-core/business-topology.html"
     },
@@ -351,11 +395,6 @@
       "group": "协议核心",
       "title": "传输与通信",
       "path": "protocol-core/transport-communication.html"
-    },
-    {
-      "group": "协议核心",
-      "title": "全局状态机",
-      "path": "protocol-core/global-state-machine.html"
     },
     {
       "group": "协议核心",
@@ -393,258 +432,354 @@
       "path": "protocol-core/human-agent-interaction.html"
     },
     {
-      "group": "寻源原语",
+      "group": "UTP-B",
+      "title": "采购模式",
+      "path": "protocol-core/procurement-models.html"
+    },
+    {
+      "group": "UTP-B",
+      "title": "全局状态机",
+      "path": "protocol-core/global-state-machine.html"
+    },
+    {
+      "group": "UTP-B",
+      "parent": "寻源原语",
       "title": "概览",
       "path": "primitives/source/index.html"
     },
     {
-      "group": "寻源原语",
-      "parent": "传输方式",
-      "title": "REST",
+      "group": "UTP-B",
+      "parent": "寻源原语",
+      "title": "REST 绑定",
       "path": "primitives/source/transports/rest.html"
     },
     {
-      "group": "寻源原语",
-      "parent": "传输方式",
-      "title": "MCP",
+      "group": "UTP-B",
+      "parent": "寻源原语",
+      "title": "MCP 绑定",
       "path": "primitives/source/transports/mcp.html"
     },
     {
-      "group": "寻源原语",
-      "parent": "传输方式",
-      "title": "A2A",
+      "group": "UTP-B",
+      "parent": "寻源原语",
+      "title": "A2A 绑定",
       "path": "primitives/source/transports/a2a.html"
     },
     {
-      "group": "寻源原语",
-      "parent": "传输方式",
-      "title": "Embedded",
+      "group": "UTP-B",
+      "parent": "寻源原语",
+      "title": "Embedded 绑定",
       "path": "primitives/source/transports/embedded.html"
     },
     {
-      "group": "寻源原语",
+      "group": "UTP-B",
+      "parent": "寻源原语",
       "title": "购物车扩展",
       "path": "primitives/source/extensions/cart.html"
     },
     {
-      "group": "议价原语",
+      "group": "UTP-B",
+      "parent": "询盘原语",
       "title": "概览",
       "path": "primitives/negotiate/index.html"
     },
     {
-      "group": "议价原语",
-      "parent": "传输方式",
-      "title": "REST",
+      "group": "UTP-B",
+      "parent": "询盘原语",
+      "title": "REST 绑定",
       "path": "primitives/negotiate/transports/rest.html"
     },
     {
-      "group": "议价原语",
-      "parent": "传输方式",
-      "title": "MCP",
+      "group": "UTP-B",
+      "parent": "询盘原语",
+      "title": "MCP 绑定",
       "path": "primitives/negotiate/transports/mcp.html"
     },
     {
-      "group": "议价原语",
-      "parent": "传输方式",
-      "title": "A2A",
+      "group": "UTP-B",
+      "parent": "询盘原语",
+      "title": "A2A 绑定",
       "path": "primitives/negotiate/transports/a2a.html"
     },
     {
-      "group": "议价原语",
-      "parent": "传输方式",
-      "title": "Embedded",
+      "group": "UTP-B",
+      "parent": "询盘原语",
+      "title": "Embedded 绑定",
       "path": "primitives/negotiate/transports/embedded.html"
     },
     {
-      "group": "订购原语",
+      "group": "UTP-B",
+      "parent": "订购原语",
       "title": "概览",
       "path": "primitives/purchase/index.html"
     },
     {
-      "group": "订购原语",
-      "parent": "传输方式",
-      "title": "REST",
+      "group": "UTP-B",
+      "parent": "订购原语",
+      "title": "REST 绑定",
       "path": "primitives/purchase/transports/rest.html"
     },
     {
-      "group": "订购原语",
-      "parent": "传输方式",
-      "title": "MCP",
+      "group": "UTP-B",
+      "parent": "订购原语",
+      "title": "MCP 绑定",
       "path": "primitives/purchase/transports/mcp.html"
     },
     {
-      "group": "订购原语",
-      "parent": "传输方式",
-      "title": "A2A",
+      "group": "UTP-B",
+      "parent": "订购原语",
+      "title": "A2A 绑定",
       "path": "primitives/purchase/transports/a2a.html"
     },
     {
-      "group": "订购原语",
-      "parent": "传输方式",
-      "title": "Embedded",
+      "group": "UTP-B",
+      "parent": "订购原语",
+      "title": "Embedded 绑定",
       "path": "primitives/purchase/transports/embedded.html"
     },
     {
-      "group": "支付原语",
+      "group": "UTP-B",
+      "parent": "支付原语",
       "title": "概览",
       "path": "primitives/pay/index.html"
     },
     {
-      "group": "支付原语",
-      "parent": "传输方式",
-      "title": "REST",
+      "group": "UTP-B",
+      "parent": "支付原语",
+      "title": "REST 绑定",
       "path": "primitives/pay/transports/rest.html"
     },
     {
-      "group": "支付原语",
-      "parent": "传输方式",
-      "title": "MCP",
+      "group": "UTP-B",
+      "parent": "支付原语",
+      "title": "MCP 绑定",
       "path": "primitives/pay/transports/mcp.html"
     },
     {
-      "group": "支付原语",
-      "parent": "传输方式",
-      "title": "A2A",
+      "group": "UTP-B",
+      "parent": "支付原语",
+      "title": "A2A 绑定",
       "path": "primitives/pay/transports/a2a.html"
     },
     {
-      "group": "支付原语",
-      "parent": "传输方式",
-      "title": "Embedded",
+      "group": "UTP-B",
+      "parent": "支付原语",
+      "title": "Embedded 绑定",
       "path": "primitives/pay/transports/embedded.html"
     },
     {
-      "group": "履约原语",
+      "group": "UTP-B",
+      "parent": "履约原语",
       "title": "概览",
       "path": "primitives/fulfill/index.html"
     },
     {
-      "group": "履约原语",
-      "parent": "传输方式",
-      "title": "REST",
+      "group": "UTP-B",
+      "parent": "履约原语",
+      "title": "REST 绑定",
       "path": "primitives/fulfill/transports/rest.html"
     },
     {
-      "group": "履约原语",
-      "parent": "传输方式",
-      "title": "MCP",
+      "group": "UTP-B",
+      "parent": "履约原语",
+      "title": "MCP 绑定",
       "path": "primitives/fulfill/transports/mcp.html"
     },
     {
-      "group": "履约原语",
-      "parent": "传输方式",
-      "title": "A2A",
+      "group": "UTP-B",
+      "parent": "履约原语",
+      "title": "A2A 绑定",
       "path": "primitives/fulfill/transports/a2a.html"
     },
     {
-      "group": "履约原语",
-      "parent": "传输方式",
-      "title": "Embedded",
+      "group": "UTP-B",
+      "parent": "履约原语",
+      "title": "Embedded 绑定",
       "path": "primitives/fulfill/transports/embedded.html"
     },
     {
-      "group": "争议解决原语",
+      "group": "UTP-B",
+      "parent": "争议解决原语",
       "title": "概览",
       "path": "primitives/resolve/index.html"
     },
     {
-      "group": "争议解决原语",
-      "parent": "传输方式",
-      "title": "REST",
+      "group": "UTP-B",
+      "parent": "争议解决原语",
+      "title": "REST 绑定",
       "path": "primitives/resolve/transports/rest.html"
     },
     {
-      "group": "争议解决原语",
-      "parent": "传输方式",
-      "title": "MCP",
+      "group": "UTP-B",
+      "parent": "争议解决原语",
+      "title": "MCP 绑定",
       "path": "primitives/resolve/transports/mcp.html"
     },
     {
-      "group": "争议解决原语",
-      "parent": "传输方式",
-      "title": "A2A",
+      "group": "UTP-B",
+      "parent": "争议解决原语",
+      "title": "A2A 绑定",
       "path": "primitives/resolve/transports/a2a.html"
     },
     {
-      "group": "争议解决原语",
-      "parent": "传输方式",
-      "title": "Embedded",
+      "group": "UTP-B",
+      "parent": "争议解决原语",
+      "title": "Embedded 绑定",
       "path": "primitives/resolve/transports/embedded.html"
     },
     {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "UTP-M 供应商侧规范 · 目录总览",
-      "path": "merchant/index.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "供应商接入快速开始",
-      "path": "merchant/quickstart.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "M1 供应商侧架构总览",
-      "path": "merchant/overview.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "M2 入驻与能力声明",
+      "group": "UTP-M",
+      "title": "商家入驻",
       "path": "merchant/onboarding.html"
     },
     {
-      "group": "商家侧 UTP-M · 原语",
-      "title": "M3 MP1 商品原语",
-      "path": "merchant/primitives/listing/index.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 原语",
-      "title": "M4 MP2 库存原语",
-      "path": "merchant/primitives/inventory/index.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 原语",
-      "title": "M5 MP3 报价原语",
-      "path": "merchant/primitives/quote/index.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 原语",
-      "title": "M6 MP4 接单原语",
-      "path": "merchant/primitives/acceptance/index.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 原语",
-      "title": "M7 MP5 交付原语",
-      "path": "merchant/primitives/delivery/index.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 原语",
-      "title": "M8 MP6 售后原语",
-      "path": "merchant/primitives/aftersale/index.html"
-    },
-    {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "M9 结算与对账",
+      "group": "UTP-M",
+      "title": "结算与对账",
       "path": "merchant/settlement.html"
     },
     {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "M10 ERP 集成与 Bridge",
-      "path": "merchant/erp-bridge.html"
+      "group": "UTP-M",
+      "parent": "商品原语",
+      "title": "概览",
+      "path": "merchant/primitives/listing/index.html"
     },
     {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "M11 供应商 Agent 与人机协同",
-      "path": "merchant/merchant-agent.html"
+      "group": "UTP-M",
+      "parent": "商品原语",
+      "title": "REST 绑定",
+      "path": "merchant/primitives/listing/transports/rest.html"
     },
     {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "M12 供应商全链路演练",
-      "path": "merchant/walkthrough.html"
+      "group": "UTP-M",
+      "parent": "商品原语",
+      "title": "MCP 绑定",
+      "path": "merchant/primitives/listing/transports/mcp.html"
     },
     {
-      "group": "商家侧 UTP-M · 核心（2026-07-30 Draft）",
-      "title": "UTP-M 附录（MA—MF）",
-      "path": "merchant/appendices.html"
+      "group": "UTP-M",
+      "parent": "商品原语",
+      "title": "A2A 绑定",
+      "path": "merchant/primitives/listing/transports/a2a.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "库存原语",
+      "title": "概览",
+      "path": "merchant/primitives/inventory/index.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "库存原语",
+      "title": "REST 绑定",
+      "path": "merchant/primitives/inventory/transports/rest.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "库存原语",
+      "title": "MCP 绑定",
+      "path": "merchant/primitives/inventory/transports/mcp.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "库存原语",
+      "title": "A2A 绑定",
+      "path": "merchant/primitives/inventory/transports/a2a.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "报价原语",
+      "title": "概览",
+      "path": "merchant/primitives/quote/index.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "报价原语",
+      "title": "REST 绑定",
+      "path": "merchant/primitives/quote/transports/rest.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "报价原语",
+      "title": "MCP 绑定",
+      "path": "merchant/primitives/quote/transports/mcp.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "报价原语",
+      "title": "A2A 绑定",
+      "path": "merchant/primitives/quote/transports/a2a.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "接单原语",
+      "title": "概览",
+      "path": "merchant/primitives/acceptance/index.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "接单原语",
+      "title": "REST 绑定",
+      "path": "merchant/primitives/acceptance/transports/rest.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "接单原语",
+      "title": "MCP 绑定",
+      "path": "merchant/primitives/acceptance/transports/mcp.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "接单原语",
+      "title": "A2A 绑定",
+      "path": "merchant/primitives/acceptance/transports/a2a.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "交付原语",
+      "title": "概览",
+      "path": "merchant/primitives/delivery/index.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "交付原语",
+      "title": "REST 绑定",
+      "path": "merchant/primitives/delivery/transports/rest.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "交付原语",
+      "title": "MCP 绑定",
+      "path": "merchant/primitives/delivery/transports/mcp.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "交付原语",
+      "title": "A2A 绑定",
+      "path": "merchant/primitives/delivery/transports/a2a.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "售后原语",
+      "title": "概览",
+      "path": "merchant/primitives/aftersale/index.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "售后原语",
+      "title": "REST 绑定",
+      "path": "merchant/primitives/aftersale/transports/rest.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "售后原语",
+      "title": "MCP 绑定",
+      "path": "merchant/primitives/aftersale/transports/mcp.html"
+    },
+    {
+      "group": "UTP-M",
+      "parent": "售后原语",
+      "title": "A2A 绑定",
+      "path": "merchant/primitives/aftersale/transports/a2a.html"
     }
   ]
 }

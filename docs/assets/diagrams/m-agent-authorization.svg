@@ -16,7 +16,7 @@
 <!-- Mandate -->
 <rect x="250" y="52" width="230" height="88" rx="6" fill="#fff2cc" stroke="#d6b656"/>
 <text x="365" y="72" text-anchor="middle" font-size="12" font-weight="bold">授权凭证（operation Mandate）</text>
-<text x="365" y="90" text-anchor="middle" font-size="9.5">类型/验证同主规范 Ch.6 · Scope 显式枚举（附录 MC）</text>
+<text x="365" y="90" text-anchor="middle" font-size="9.5">类型/验证同 UTP 规范 Ch.6 · Scope 显式枚举（附录 MC）</text>
 <text x="365" y="105" text-anchor="middle" font-size="9.5">单笔金额上限 + 累计限额 + 过期时间</text>
 <text x="365" y="120" text-anchor="middle" font-size="9.5">承诺性签名（accept / 报价）MUST 有金额时效</text>
 <text x="365" y="134" text-anchor="middle" font-size="9.5" fill="#b85450">MAY 随时吊销：新签名拒绝，既有签名不撤销</text>

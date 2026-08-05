@@ -1,5 +1,5 @@
 ---
-title: M8 MP6 售后原语
+title: 售后原语
 section: merchant
 owner: merchant-team
 status: review
@@ -7,15 +7,15 @@ version: 2026-07-31
 format: html
 ---
 
-<h1 id="s-m8">M8 · MP6 售后原语（Aftersale）</h1>
+<h1 id="s-m8">售后原语（Aftersale）</h1>
 
-    <p class="lead">供应商侧售后处置原语。对买方提出的退款、退货退款、换货、补发与维修请求作出结构化处置结论，并在需要退货的方案下确认退货收货与验货结果。本原语规范的是<strong>买卖双方在协议层的售后协商与执行</strong>，与主规范 <a href="../../../primitives/resolve/index.md">第 16 章</a>（P6 Resolve 争议解决）分工明确：售后先行，协商不成才升级争议裁决。</p>
+    <p class="lead">供应商侧售后处置原语。对买方提出的退款、退货退款、换货、补发与维修请求作出结构化处置结论，并在需要退货的方案下确认退货收货与验货结果。本原语规范的是<strong>买卖双方在协议层的售后协商与执行</strong>，与 UTP-B 规范 <a href="../../../primitives/resolve/index.md">第 16 章</a>（P6 Resolve 争议解决）分工明确：售后先行，协商不成才升级争议裁决。</p>
 
-    <h2 id="s-m81">M8.1 Overview（定位与意图）</h2>
+    <h2 id="s-m81">Overview（定位与意图）</h2>
 
     <p><strong>意图。</strong>Aftersale 是 UTP-M 第六个供应商原语（MP6）。交付完成不等于交易结束。质量争议、错发漏发、运输损坏在 B2B 场景中是常态，而这些请求的处置结论直接决定资金去向（退款金额）与货物归属（是否退回）。若不在协议层规范，买方 Agent 无法预期"申请多久有回应""拒绝的理由是否可判定"，供应商也无法把售后决策交给 Agent 自动化。本原语把售后处置从平台私有流程提升为可协商、可审计、可自动化的协议动作。</p>
 
-    <p><strong>原语判据。</strong>本原语通过 <a href="../../overview.md#s-m17">M1.7</a> 三关判据：</p>
+    <p><strong>原语判据。</strong>本原语通过 与 UTP-B 规范 P1—P6 的衔接矩阵（Interlock Matrix） 三关判据：</p>
     <ul>
       <li><strong>T1 运行时性：</strong>售后请求在交易运行时产生，处置结论有 deadline 约束，不是签约前的一次性配置。</li>
       <li><strong>T2 双边对手性：</strong>买方提出诉求、供应商给出结论，双方可多轮协商——存在真实的对手方与合意过程。</li>
@@ -40,25 +40,25 @@ service:        dev.utp.merchant
       <tbody>
         <tr><td>执行退款资金动作</td><td>Marketplace（代收代付方）</td><td>平台托管拓扑下资金在平台账户，供应商无退款通道；供应商只通过 <code>utp.aftersale.refund_completed</code> 观测结果</td></tr>
         <tr><td>换货与补发的发货动作</td><td>MP5 交付原语 <code>utp.delivery.ship</code></td><td>原语正交性——发货能力已在 MP5 定义，售后场景携带 <code>aftersale_ref</code> 复用即可，MUST NOT 重复定义</td></tr>
-        <tr><td>争议裁决与补偿裁定</td><td>主规范 P6 Resolve</td><td>裁决需第三方（Arbiter）介入并产出约束性结论，本原语只表达双方合意</td></tr>
+        <tr><td>争议裁决与补偿裁定</td><td>UTP-B 规范 P6 Resolve</td><td>裁决需第三方（Arbiter）介入并产出约束性结论，本原语只表达双方合意</td></tr>
         <tr><td>买方发起售后申请</td><td>买方侧（经 Marketplace 路由）</td><td>本原语是供应商侧应答面，申请动作在买方侧</td></tr>
         <tr><td>退货物流的承运与轨迹</td><td>Shipper 角色</td><td>退货物流单号经 <code>utp.aftersale.return_shipped</code> 透传，供应商是消费方</td></tr>
       </tbody>
     </table>
 
-    <h2 id="s-m82">M8.2 与 P6 Resolve 的边界（Aftersale vs Dispute）</h2>
+    <h2 id="s-m82">与 P6 Resolve 的边界（Aftersale vs Dispute）</h2>
 
     <p>这是本章最容易被误解的部分。售后与争议解决<strong>不是同一件事的两种叫法</strong>，而是两个前后衔接、性质不同的阶段：</p>
 
     <table>
-      <thead><tr><th>维度</th><th>MP6 售后原语（本章）</th><th>P6 Resolve（主规范第 16 章）</th></tr></thead>
+      <thead><tr><th>维度</th><th>MP6 售后原语（本章）</th><th>P6 Resolve（UTP-B 规范第 16 章）</th></tr></thead>
       <tbody>
         <tr><td>性质</td><td>双方<strong>协商执行</strong></td><td>第三方<strong>裁决</strong></td></tr>
         <tr><td>参与方</td><td>Buyer ↔ Marketplace ↔ Seller</td><td>Buyer ↔ Arbiter（Seller 应答）</td></tr>
         <tr><td>触发条件</td><td>买方提出售后诉求</td><td>售后协商不成、供应商拒绝后买方不服、验货结论有异议</td></tr>
         <tr><td>产出</td><td><code>AftersaleResolution</code>（双方合意方案）</td><td><code>ResolutionOutcome</code> + <code>CompensationOrder</code>（约束性裁定）</td></tr>
         <tr><td>资源标识</td><td><code>aftersale_id</code></td><td><code>dispute_id</code></td></tr>
-        <tr><td>供应商动作</td><td>本原语 6 个 Action</td><td>无新增原语——经 <code>utp.resolve.dispute_routed</code> 回调答辩（见 <a href="../../merchant-agent.md#s-m114">M11.4</a>）</td></tr>
+        <tr><td>供应商动作</td><td>本原语 6 个 Action</td><td>无新增原语——经 <code>utp.resolve.dispute_routed</code> 回调答辩（见 Agent 授权链（Delegation & Mandate））</td></tr>
       </tbody>
     </table>
 
@@ -67,12 +67,12 @@ service:        dev.utp.merchant
       <li>售后 MUST 先行。买方 SHOULD 先提交售后申请；平台 MAY 对未经售后直接发起争议的请求要求先走售后（严重违约场景例外）。</li>
       <li>升级后本售后单 MUST 收敛至 <code>CLOSED</code>（<code>close_reason = escalated_to_dispute</code>），并在 <code>dispute_ref</code> 中记录争议标识。争议在 dispute 资源上独立演进，本原语 MUST NOT 表达裁决过程。</li>
       <li>本原语的处置记录（含拒绝原因与举证）MUST 可作为争议阶段的 Evidence Bundle 组成部分——这是"售后先行"的实际价值：<strong>拒绝时不举证，升级后将处于举证不利地位</strong>。</li>
-      <li>裁决产出的补偿 MUST 通过结算调整项落地（见 <a href="../../settlement.md#s-m94">M9.4</a>），不在本原语内表达。</li>
+      <li>裁决产出的补偿 MUST 通过结算调整项落地（见 <a href="../../settlement.md#s-m94">账单出具与查询（Statements）</a>），不在本原语内表达。</li>
     </ul>
 
-    <h2 id="s-m83">M8.3 Lifecycle / State Machine（售后单生命周期）</h2>
+    <h2 id="s-m83">Lifecycle / State Machine（售后单生命周期）</h2>
 
-    <p>状态作用域为 <code>resource</code>，锚点 <code>aftersale_id</code>。本状态机 MUST NOT 与主规范全局状态机混同——售后的执行结果通过退款事实与结算冲销影响交易，<strong>不新增任何全局状态</strong>（见 <a href="../../overview.md#s-m19">M1.9</a>）。</p>
+    <p>状态作用域为 <code>resource</code>，锚点 <code>aftersale_id</code>。本状态机 MUST NOT 与 UTP-B 规范全局状态机混同——售后的执行结果通过退款事实与结算冲销影响交易，<strong>不新增任何全局状态</strong>（见 全局状态机边界声明（State Machine Boundary））。</p>
 
     <div class="diagram-wrap">
       <img src="../../../../assets/diagrams/m-aftersale-state-machine.svg" alt="MP6 售后单状态机" />
@@ -113,11 +113,11 @@ service:        dev.utp.merchant
       </tbody>
     </table>
 
-    <p class="note"><strong>确定性保证。</strong>同一状态下同一触发 MUST 只有一条可用迁移。<code>deadline_expired</code> 的多目标迁移由互斥的 <code>timeout_policy</code> 条件区分（见 <a href="../../overview.md#s-m110">M1.10</a> 通用规则）。状态机迁移触发器的载体约定（与其余 MP 原语及主规范 P1—P6 一致）：<strong>供应商可调用动作置于 <code>action</code> 字段并用全限定名</strong>（<code>utp.aftersale.*</code>），<strong>回调与系统触发置于 <code>event</code> 字段并用裸名</strong>（<code>request_routed</code> / <code>refund_completed</code> / <code>deadline_expired</code>），二者 MUST NOT 混用。</p>
+    <p class="note"><strong>确定性保证。</strong>同一状态下同一触发 MUST 只有一条可用迁移。<code>deadline_expired</code> 的多目标迁移由互斥的 <code>timeout_policy</code> 条件区分（见 通用规则继承（Commons Inheritance） 通用规则）。状态机迁移触发器的载体约定（与其余 MP 原语及 UTP-B 规范 P1—P6 一致）：<strong>供应商可调用动作置于 <code>action</code> 字段并用全限定名</strong>（<code>utp.aftersale.*</code>），<strong>回调与系统触发置于 <code>event</code> 字段并用裸名</strong>（<code>request_routed</code> / <code>refund_completed</code> / <code>deadline_expired</code>），二者 MUST NOT 混用。</p>
 
     <p><strong>轮次上限。</strong>协商轮次上限由 Marketplace 受理策略声明。超限后 Marketplace MUST 拒绝新的 <code>propose</code> 并返回 <code>AFTERSALE.MAX_ROUNDS</code>，售后单停留在 <code>REQUESTED</code>——<strong>本原语不因轮次超限自动迁移，供应商无需为此 <code>reject</code></strong>。</p>
 
-    <h2 id="s-m84">M8.4 Actions（动作定义）</h2>
+    <h2 id="s-m84">Actions（动作定义）</h2>
 
     <table>
       <thead><tr><th>Action</th><th>语义</th><th>幂等</th><th>签名要求</th></tr></thead>
@@ -131,7 +131,7 @@ service:        dev.utp.merchant
       </tbody>
     </table>
 
-    <p><strong>M8.4.1 approve — 处置方案的约束</strong></p>
+    <p><strong>approve — 处置方案的约束</strong></p>
     <ul>
       <li>方案退款金额 MUST NOT 大于 <code>AftersaleRequest.requested_amount</code>；超出时返回 <code>AFTERSALE.RESOLUTION_EXCEEDS_REQUEST</code>。需要提出更优或结构不同的方案时 MUST 使用 <code>propose</code>。</li>
       <li><code>aftersale_type</code> MAY 与买方请求类型不同（如买方请求退货退款、方案为仅退款折让），此时 <strong>MUST 视为提议性质</strong>——实现上 SHOULD 使用 <code>propose</code> 以获得买方明确确认。</li>
@@ -139,10 +139,10 @@ service:        dev.utp.merchant
       <li><code>replacement_required = true</code> 时，重发 MUST 通过 <code>utp.delivery.ship</code> 携带 <code>aftersale_ref</code> 执行——本原语不定义发货动作。</li>
     </ul>
 
-    <p><strong>M8.4.2 reject — 举证义务</strong></p>
+    <p><strong>reject — 举证义务</strong></p>
     <p>原因码为 <code>no_defect_found</code> / <code>buyer_damage</code> / <code>used_or_altered</code> 时 SHOULD 附举证材料（<code>EvidenceReference</code>）。<strong>这不是形式要求</strong>：拒绝记录会进入争议阶段的证据包，缺失举证将使供应商在裁决中处于不利地位。<code>reason_code = other</code> 时 MUST 提供 <code>reason_note</code>。</p>
 
-    <p><strong>M8.4.3 confirm_return — 验货结论的资金后果</strong></p>
+    <p><strong>confirm_return — 验货结论的资金后果</strong></p>
     <table>
       <thead><tr><th><code>inspection_result</code></th><th>语义</th><th>退款执行</th></tr></thead>
       <tbody>
@@ -153,7 +153,7 @@ service:        dev.utp.merchant
     </table>
     <p>结果非 <code>pass</code> 时 MUST 提供 <code>discrepancy_note</code>，并 SHOULD 附开箱照片等举证。<code>received_lines</code> 的数量 MUST NOT 超过方案涉及数量，否则返回 <code>AFTERSALE.QUANTITY_EXCEEDS_RETURN</code>。</p>
 
-    <h2 id="s-m85">M8.5 Entities（实体定义）</h2>
+    <h2 id="s-m85">Entities（实体定义）</h2>
 
     <table>
       <thead><tr><th>实体</th><th>用途</th><th>关键约束</th></tr></thead>
@@ -170,11 +170,11 @@ service:        dev.utp.merchant
       </tbody>
     </table>
 
-    <p><strong>通用类型复用（MUST NOT 自建副本）：</strong><code>Money</code>、<code>Address</code>、<code>Signature</code>、<code>EvidenceReference</code> 全部引用主规范通用实体（见 <a href="../../../schemas/index.md#s-common-money">Ch.25</a>）。分页复用 <code>common/pagination.json</code>（游标制）。</p>
+    <p><strong>通用类型复用（MUST NOT 自建副本）：</strong><code>Money</code>、<code>Address</code>、<code>Signature</code>、<code>EvidenceReference</code> 全部引用 UTP 规范通用实体（见 <a href="../../../schemas/index.md">Ch.25</a>）。分页复用 <code>common/pagination.json</code>（游标制）。</p>
 
-    <h2 id="s-m86">M8.6 Error Handling（错误码）</h2>
+    <h2 id="s-m86">Error Handling（错误码）</h2>
 
-    <p>错误码格式继承主规范 <a href="../../../protocol-core/primitive-framework.md#s-1043-standard-error-response">10.4.3</a> 标准错误响应。</p>
+    <p>错误码格式继承 UTP 规范 <a href="../../../protocol-core/primitive-framework.md#s-1043-standard-error-response">标准错误响应格式</a> 标准错误响应。</p>
 
     <table>
       <thead><tr><th>错误码</th><th>HTTP</th><th>语义</th><th>恢复建议</th></tr></thead>
@@ -192,7 +192,7 @@ service:        dev.utp.merchant
       </tbody>
     </table>
 
-    <h2 id="s-m87">M8.7 Scopes（授权范围）</h2>
+    <h2 id="s-m87">Scopes（授权范围）</h2>
 
     <table>
       <thead><tr><th>Scope</th><th>覆盖动作</th><th>Mandate 类型</th></tr></thead>
@@ -202,9 +202,9 @@ service:        dev.utp.merchant
       </tbody>
     </table>
 
-    <p>写操作 MUST 先完成主规范 <a href="../../../protocol-core/security-trust.md">第 5 章</a>操作准入判定，并持有 <code>operation</code> Mandate（见 <a href="../../overview.md#s-m110">M1.10</a>）。Agent 自主处置时 MUST 记录决策审计（见 <a href="../../merchant-agent.md#s-m116">M11.6</a>），<code>decided_by = policy_auto</code> 时 MUST 提供 <code>policy_ref</code>。</p>
+    <p>写操作 MUST 先完成 UTP 规范 <a href="../../../protocol-core/security-trust.md">第 5 章</a>操作准入判定，并持有 <code>operation</code> Mandate（见 通用规则继承（Commons Inheritance））。Agent 自主处置时 MUST 记录决策审计（见 决策审计（Decision Audit）），<code>decided_by = policy_auto</code> 时 MUST 提供 <code>policy_ref</code>。</p>
 
-    <h2 id="s-m88">M8.8 Callbacks（回调事件）</h2>
+    <h2 id="s-m88">Callbacks（回调事件）</h2>
 
     <table>
       <thead><tr><th>事件</th><th>触发时机</th><th>供应商动作</th></tr></thead>
@@ -217,27 +217,10 @@ service:        dev.utp.merchant
       </tbody>
     </table>
 
-    <p>推送失败按指数退避重试（≤5 次）后转轮询降级——<code>list</code> 与 <code>query</code> 是兜底通道，<strong>推送丢失 MUST NOT 阻塞业务</strong>（见 <a href="../../onboarding.md#s-m26">M2.6</a>）。</p>
+    <p>推送失败按指数退避重试（≤5 次）后转轮询降级——<code>list</code> 与 <code>query</code> 是兜底通道，<strong>推送丢失 MUST NOT 阻塞业务</strong>（见 <a href="../../onboarding.md#s-m26">Step 5：回调登记与连通性验收（Callback & Readiness）</a>）。</p>
+<h2 id="s-m810">Mode 影响（Mode Sensitivity）</h2>
 
-    <h2 id="s-m89">M8.9 Transport Bindings（传输绑定）</h2>
-
-    <table>
-      <thead><tr><th>Action</th><th>REST</th><th>MCP Tool</th><th>A2A Task</th></tr></thead>
-      <tbody>
-        <tr><td><code>approve</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/approve</code></td><td><code>utp_aftersale_approve</code></td><td><code>utp:aftersale:approve</code></td></tr>
-        <tr><td><code>reject</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/reject</code></td><td><code>utp_aftersale_reject</code></td><td><code>utp:aftersale:reject</code></td></tr>
-        <tr><td><code>propose</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/proposals</code></td><td><code>utp_aftersale_propose</code></td><td><code>utp:aftersale:propose</code></td></tr>
-        <tr><td><code>confirm_return</code></td><td><code>POST /utp/m/v1/aftersales/{aftersale_id}/return-receipt</code></td><td><code>utp_aftersale_confirm_return</code></td><td><code>utp:aftersale:confirm_return</code></td></tr>
-        <tr><td><code>query</code></td><td><code>GET /utp/m/v1/aftersales/{aftersale_id}</code></td><td><code>utp_aftersale_query</code></td><td><code>utp:aftersale:query</code></td></tr>
-        <tr><td><code>list</code></td><td><code>GET /utp/m/v1/aftersales</code></td><td><code>utp_aftersale_list</code></td><td><code>utp:aftersale:list</code></td></tr>
-      </tbody>
-    </table>
-
-    <p>Embedded 绑定不适用于本原语（供应商侧 Endpoint 必须可被平台反向调用）。传输语义与 <code>MessageEnvelope</code> 继承主规范 <a href="../../../protocol-core/transport-communication.md#s-411">4.1.1</a>。</p>
-
-    <h2 id="s-m810">M8.10 Mode 影响（Mode Sensitivity）</h2>
-
-    <p>本原语默认 Mode 无关（见 <a href="../../overview.md#s-m18">M1.8</a>）。Mode 仅在以下三处影响行为，未列出的差异 MUST 视为不存在：</p>
+    <p>本原语默认 Mode 无关（见 Mode 对供应商侧的影响（Mode Awareness））。Mode 仅在以下三处影响行为，未列出的差异 MUST 视为不存在：</p>
 
     <table>
       <thead><tr><th>Mode 维度</th><th>影响点</th><th>行为</th></tr></thead>
@@ -248,7 +231,7 @@ service:        dev.utp.merchant
       </tbody>
     </table>
 
-    <h2 id="s-m811">M8.11 Examples（示例）</h2>
+    <h2 id="s-m811">Examples（示例）</h2>
 
     <p><strong>示例 1：质量问题退货退款（完整闭环）</strong></p>
 <pre class="highlight"><code class="language-json">// ① 回调：售后请求路由

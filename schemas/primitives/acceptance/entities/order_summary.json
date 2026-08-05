@@ -29,7 +29,7 @@
     },
     "invoice": {
       "type": "object",
-      "description": "发票要求（结构以主规范 Purchase 章节为准）。",
+      "description": "发票要求（结构以 UTP-B 规范 Purchase 章节为准）。",
       "additionalProperties": true
     }
   },

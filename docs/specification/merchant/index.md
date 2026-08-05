@@ -7,16 +7,16 @@ version: 2026-07-31
 format: html
 ---
 
-<h1 id="s-utp-m-specification">UTP-M Specification — 2026-07-30（Draft）</h1>
+<h1 id="s-utp-m-specification">UTP-M Specification — 2026-08-04（Draft）</h1>
     <h2 id="s-merchant-side">UTP 供应商侧规范（Merchant-Side Specification）— Release Candidate 1</h2>
     <blockquote>
-      <p>本规范定义 UTP（Universal Trade Protocol）v1.0 的<strong>供应商侧能力</strong>：商品、库存、报价、接单、交付、售后，以及结算对账、ERP 集成与供应商 Agent。本规范是与主规范 UTPB（买方侧）<strong>并列的独立协议（Parallel Protocol）</strong>，面向平台托管（Market–Merchant）场景：它<strong>复用</strong> UTP 的通用底层能力（商业场景、商业拓扑、发现协商、通信认证、P0 原语框架、通用实体与错误码格式），但<strong>不依赖</strong> UTPB 专属的三项高级能力——采购模式、全局状态机、路径编排（2026-08-03 分层解耦裁决）。UTPB 与本规范是两套独立的 DAG 与 trade context，通过 Marketplace 双面枢纽衔接，而非合并为一。与主规范章节体系的对应关系及治理路线见<a href="appendices.md#s-me">附录 E</a>（资料性）。</p>
+      <p>本规范定义 UTP（Universal Trade Protocol）v1.0 的<strong>供应商侧能力</strong>：商品、库存、报价、接单、交付、售后，以及结算对账、ERP 集成与供应商 Agent。本规范是与 UTP-B 规范（买方侧）<strong>并列的独立协议（Parallel Protocol）</strong>，面向平台托管（Market–Merchant）场景：它<strong>复用</strong> UTP 的通用底层能力（商业场景、商业拓扑、发现协商、通信认证、P0 原语框架、六维 Mode 维度模型、通用实体与错误码格式），但<strong>不依赖</strong> UTP-B 专属的两项高级能力——采购模式编排、全局状态机（2026-08-03 分层解耦裁决）。UTP-B 与本规范是两套独立的 DAG 与 trade context，通过 Marketplace 双面枢纽衔接，而非合并为一。与 UTP 规范章节体系的对应关系及治理路线见<a href="appendices.md#s-me">附录 E</a>（资料性）。</p>
     </blockquote>
 
     <h2 id="s-positioning">定位与阅读方式</h2>
-    <p>主规范 UTP 定义的六大交易原语（P1—P6）以采购方（Buyer）为主要发起方，回答"交易如何执行"。本规范回答其前置与对偶问题：<strong>商品从哪里来、订单如何被供应商受理与履行、货款如何回到供应商</strong>。二者合起来构成完整的商业闭环：</p>
-<div class="diagram"><img src="../../assets/diagrams/m-volume-map.svg" alt="UTP-M 与 UTPB 的章节对偶：M2→L0 发现、MP1→P1、MP3↔P2 询盘、MP2/MP4↔P3、MP5→P5、M8←P4 打款" style="max-width: 100%; height: auto;"></div>
-    <p>本规范所有原语遵守主规范 <a href="../protocol-core/primitive-framework.md#s-1023-action-definition-format">10.2.3 操作定义格式</a>的角色绑定规则：每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>。"UTP-M"仅是编辑与阅读上的分组名称，发现与协商流程 MUST NOT 据此推断角色方向。</p>
+    <p>UTP-B 规范定义的六大交易原语（P1—P6）以采购方（Buyer）为主要发起方，回答"交易如何执行"。本规范回答其前置与对偶问题：<strong>商品从哪里来、订单如何被供应商受理与履行、货款如何回到供应商</strong>。二者合起来构成完整的商业闭环：</p>
+<div class="diagram"><img src="../../assets/diagrams/m-volume-map.svg" alt="UTP-M 与 UTP-B 的章节对偶：M2→L0 发现、MP1→P1、MP3↔P2 询盘、MP2/MP4↔P3、MP5→P5、M8←P4 打款" style="max-width: 100%; height: auto;"></div>
+    <p>本规范所有原语遵守 UTP 规范 <a href="../protocol-core/primitive-framework.md#s-1023-action-definition-format">《操作定义格式》 操作定义格式</a>的角色绑定规则：每个 Action 恰好声明一个 <code>initiator_role</code> 与一个 <code>handler_role</code>。"UTP-M"仅是编辑与阅读上的分组名称，发现与协商流程 MUST NOT 据此推断角色方向。</p>
 
     <h2 id="s-toc-tables">章节目录</h2>
     <h3 id="s-part-0">导读</h3>
@@ -30,7 +30,7 @@ format: html
     <table>
       <thead><tr><th>章节</th><th>标题</th><th>内容概要</th></tr></thead>
       <tbody>
-        <tr><td>M1</td><td><a href="overview.md">供应商侧架构总览</a></td><td>设计原则、角色模型（新增 Marketplace）、两种拓扑（平台托管/自托管）、MP 原语总表、商品—交易闭环、与主规范的衔接矩阵</td></tr>
+        <tr><td>M1</td><td><a href="overview.md">供应商侧架构总览</a></td><td>设计原则、角色模型（新增 Marketplace）、两种拓扑（平台托管/自托管）、MP 原语总表、商品—交易闭环、与 UTP-B 规范的衔接矩阵</td></tr>
         <tr><td>M2</td><td><a href="onboarding.md">入驻与能力声明</a></td><td>供应商入驻五步流程：身份与密钥、Profile 发布、Registry 登记、资质合规、回调登记与连通性验收</td></tr>
       </tbody>
     </table>
@@ -66,10 +66,10 @@ format: html
 
     <h2 id="s-conventions">编辑约定</h2>
     <ul>
-      <li>本规范沿用主规范 README 第 4 节的全部行文规范：RFC 2119 关键词、实体四列表格（字段名/类型/必填/描述）、<code>snake_case</code> 字段、JSON 示例与实体定义严格一致。</li>
-      <li>章节编号使用 <code>M{n}</code> 前缀，小节使用 <code>M{n}.{x}</code>；锚点格式 <code>id="s-m{编号去点}"</code>，如 <code>s-m31</code>、<code>s-m311</code>，避免与主规范 <code>s-*</code> 冲突。</li>
-      <li>凡引用主规范内容，一律使用相对链接 <code>../{file}.html#s-xxx</code> 并注明章节号；本规范 MUST NOT 复制主规范定义，只做引用。</li>
-      <li>与主规范章节体系的对应关系与联动清单以<a href="appendices.md#s-me">附录 E</a>为准（资料性）。</li>
+      <li>本规范沿用 UTP 规范 README 第 4 节的全部行文规范：RFC 2119 关键词、实体四列表格（字段名/类型/必填/描述）、<code>snake_case</code> 字段、JSON 示例与实体定义严格一致。</li>
+      <li>章节编号使用 <code>M{n}</code> 前缀，小节使用 <code>M{n}.{x}</code>；锚点格式 <code>id="s-m{编号去点}"</code>，如 <code>s-m31</code>、<code>s-m311</code>，避免与 UTP 规范 <code>s-*</code> 冲突。</li>
+      <li>凡引用 UTP 规范内容，一律使用相对链接 <code>../{file}.html#s-xxx</code> 并注明章节号；本规范 MUST NOT 复制 UTP 规范定义，只做引用。</li>
+      <li>与 UTP 规范章节体系的对应关系与联动清单以<a href="appendices.md#s-me">附录 E</a>为准（资料性）。</li>
     </ul>
 
     <h2 id="s-stability">稳定性分级承诺（Stability Levels）</h2>
@@ -78,16 +78,16 @@ format: html
       <thead><tr><th>级别</th><th>范围</th><th>承诺</th></tr></thead>
       <tbody>
         <tr><td><strong>Stable</strong></td><td>MP1、MP2、MP4、MP5（商品/库存/接单/交付）操作集与 REST 路径、请求/响应 Schema、资源状态机、错误码、回调事件、签名规则（JCS+SHA-256+JWS ES256）、幂等契约、批量协议、五步入驻流程（MP3 报价、MP6 售后为本轮新增，列 Experimental，不在本行承诺内）</td><td>正式版 MUST NOT 做破坏性变更；新增字段一律 OPTIONAL；SDK 可直接按本版本实现</td></tr>
-        <tr><td><strong>Stable-with-dependency</strong></td><td>Profile 结构（随主规范 3.3）、MessageEnvelope、Mode 超时配置、MP4↔P3 / MP5↔P5 / MP6↔P6 衔接引用</td><td>自身语义稳定；若主规范对应章节变更，本规范同步修订引用（不改变本侧行为）</td></tr>
+        <tr><td><strong>Stable-with-dependency</strong></td><td>Profile 结构（随 UTP 规范 《发现与协商》）、MessageEnvelope、Mode 超时配置、MP4↔P3 / MP5↔P5 / MP6↔P6 衔接引用</td><td>自身语义稳定；若 UTP 规范对应章节变更，本规范同步修订引用（不改变本侧行为）</td></tr>
         <tr><td><strong>Experimental</strong></td><td>MP3 报价原语与 MP6 售后原语（本轮新增，实现方反馈后可能调整字段与状态命名）；<code>utp.pay.settlement</code> 扩展、<code>delegation_policy</code> 透传模式（询盘/争议）、AI 辅助录入 <code>source_materials</code>、多仓库存投影</td><td>MAY 在后续版本调整；生产依赖前应跟踪附录 MF 开放问题</td></tr>
       </tbody>
     </table>
 
     <h2 id="s-doc-meta">文档信息</h2>
     <ul>
-      <li><strong>版本：</strong> 2026-08-04（日期版本，Draft；按上述稳定性分级承诺发布，稳定后随主规范按季度发布正式版）</li>
+      <li><strong>版本：</strong> 2026-08-04（日期版本，Draft；按上述稳定性分级承诺发布，稳定后随 UTP 规范按季度发布正式版）</li>
       <li><strong>基础：</strong> UTP Protocol Specification v1.0（2026-07-03）</li>
-      <li><strong>原语版本基线：</strong> 2026-07-31（MP1—MP6 统一取值，与主规范 P1—P6 的原语版本对齐）</li>
-      <li><strong>状态：</strong> Release Candidate——Stable 面冻结；转正式版前待办：Marketplace 角色 RFC 流程（附录 ME 第 2 项）与主规范引用冻结点后的一致性复扫</li>
+      <li><strong>原语版本基线：</strong> 2026-07-31（MP1—MP6 统一取值，与 UTP-B 规范 P1—P6 的原语版本对齐）</li>
+      <li><strong>状态：</strong> Release Candidate——Stable 面冻结；转正式版前待办：Marketplace 角色 RFC 流程（附录 ME 第 2 项）与 UTP 规范引用冻结点后的一致性复扫</li>
       <li><strong>机读契约：</strong> 实体 Schema、原语定义文件与状态机见<a href="appendices.md#s-md">附录 MD</a>；一致性校验工具（validate_schemas / test_fixtures）随本规范同源发布</li>
     </ul>

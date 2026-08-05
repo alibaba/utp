@@ -5,15 +5,15 @@
 <marker id="mVolArrowO" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#d79b00"/></marker>
 </defs>
 <g>
-<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">商家侧分册（UTP-M）与主规范（买方侧）的章节对偶</text>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">UTP-M（商家侧）与 UTP-B 规范（买方侧）的章节对偶</text>
 
 <!-- left column band -->
 <rect x="30" y="40" width="300" height="290" rx="8" fill="none" stroke="#d79b00" stroke-dasharray="6 3"/>
-<text x="180" y="60" text-anchor="middle" font-size="12" fill="#d79b00" font-weight="bold">供应商侧（UTP-M · 本分册）</text>
+<text x="180" y="60" text-anchor="middle" font-size="12" fill="#d79b00" font-weight="bold">供应商侧（UTP-M · 本规范）</text>
 
 <!-- right column band -->
 <rect x="430" y="40" width="300" height="290" rx="8" fill="none" stroke="#6c8ebf" stroke-dasharray="6 3"/>
-<text x="580" y="60" text-anchor="middle" font-size="12" fill="#6c8ebf" font-weight="bold">采购侧（UTP 主规范）</text>
+<text x="580" y="60" text-anchor="middle" font-size="12" fill="#6c8ebf" font-weight="bold">采购侧（UTP-B 规范）</text>
 
 <!-- left items -->
 <g>

@@ -4,7 +4,7 @@
   "name": "utp.quote",
   "version": "2026-07-31",
   "title": "MP3 Quote — 询盘响应原语定义（utp-m M5）",
-  "description": "供应商对路由到达的买方 P2 询盘给出可核验的报价/应答（平台托管拓扑）。与主线 utp.negotiate 的关系是【串联两跳】而非并列通道：平台托管拓扑下供应商既无买方 callback_base 也无与买方的直接会话，第一跳 utp.quote.quote（Seller → Marketplace，本原语）提交报价事实，第二跳 utp.negotiate.quote（direction = seller_to_buyer，由 Marketplace 以 Seller 侧 handler 身份执行）将同一份 Quote 交付买方；两跳承载同一 Quote 实体与同一 terms_hash，Marketplace MUST NOT 改写报价内容。自托管拓扑下本原语不适用，供应商 Endpoint 直接执行 utp.negotiate.quote 回调。报价体复用主线权威实体 negotiate/entities/quote.json；本原语补充其 terms_hash 计算规则（JCS + SHA-256，见 entities/quote_input.json）。MAY 级能力：pricing_mode = L0 的供应商可不声明。",
+  "description": "供应商对路由到达的买方 P2 询盘给出可核验的报价/应答（平台托管拓扑）。与 UTP-B 规范 utp.negotiate 的关系是【串联两跳】而非并列通道：平台托管拓扑下供应商既无买方 callback_base 也无与买方的直接会话，第一跳 utp.quote.quote（Seller → Marketplace，本原语）提交报价事实，第二跳 utp.negotiate.quote（direction = seller_to_buyer，由 Marketplace 以 Seller 侧 handler 身份执行）将同一份 Quote 交付买方；两跳承载同一 Quote 实体与同一 terms_hash，Marketplace MUST NOT 改写报价内容。自托管拓扑下本原语不适用，供应商 Endpoint 直接执行 utp.negotiate.quote 回调。报价体复用 UTP-B 规范权威实体 negotiate/entities/quote.json；本原语补充其 terms_hash 计算规则（JCS + SHA-256，见 entities/quote_input.json）。MAY 级能力：pricing_mode = L0 的供应商可不声明。",
   "service": "dev.utp.merchant",
   "actions": {
     "quote": {
@@ -34,7 +34,7 @@
       ]
     },
     "revise": {
-      "description": "QUOTED → QUOTED（version 递增；新版本 MUST 重新签名，旧版本失效并保留可溯）。仅适用于 quote 产生的 QUOTED；bid 产生的 QUOTED MUST 返回 QUOTE.STATE_CONFLICT（投标密封不可变）。第二跳表达：Marketplace MUST 以新的 utp.negotiate.quote 交付修订后的报价，主线协商状态停留 QUOTED（主线状态机当前未定义 QUOTED 自环，已登记为跨规范协调项，见附录 ME）。",
+      "description": "QUOTED → QUOTED（version 递增；新版本 MUST 重新签名，旧版本失效并保留可溯）。仅适用于 quote 产生的 QUOTED；bid 产生的 QUOTED MUST 返回 QUOTE.STATE_CONFLICT（投标密封不可变）。第二跳表达：Marketplace MUST 以新的 utp.negotiate.quote 交付修订后的报价，UTP-B 规范协商状态停留 QUOTED（UTP-B 规范状态机当前未定义 QUOTED 自环，已登记为跨规范协调项，见附录 ME）。",
       "initiator_role": "Seller",
       "handler_role": "Marketplace",
       "input_schema": {
@@ -163,28 +163,28 @@
   "state_machine": {
     "scope": "resource",
     "resource_key": "inquiry_id",
-    "description": "应答任务状态机（M5.2）。资源键 inquiry_id：主线协商 RELEASED 后买方重新 inquiry 会产生新的 inquiry_id，因此本原语终态不可逆不妨碍协商重启（新询盘 = 新任务）。多轮议价 = QUOTED ⇄ BUYER_COUNTERED 循环，round_no 单调递增；轮次上限由主线 P2 引擎执行（拒绝超限的 counter-offer 并返回 NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS），本原语不因轮次超限产生迁移。超时缺省 auto_decline（不存在 auto_accept）。终态后写操作 MUST 返回 QUOTE.STATE_CONFLICT。",
+    "description": "应答任务状态机（M5.2）。资源键 inquiry_id：UTP-B 规范协商 RELEASED 后买方重新 inquiry 会产生新的 inquiry_id，因此本原语终态不可逆不妨碍协商重启（新询盘 = 新任务）。多轮议价 = QUOTED ⇄ BUYER_COUNTERED 循环，round_no 单调递增；轮次上限由 UTP-B 规范 P2 引擎执行（拒绝超限的 counter-offer 并返回 NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS），本原语不因轮次超限产生迁移。超时缺省 auto_decline（不存在 auto_accept）。终态后写操作 MUST 返回 QUOTE.STATE_CONFLICT。",
     "initial_state": "INQUIRY_PENDING",
     "states": {
       "INQUIRY_PENDING": {
-        "description": "待应答（询盘路由送达，deadline 计时开始）。对应主线协商状态 INQUIRED。"
+        "description": "待应答（询盘路由送达，deadline 计时开始）。对应 UTP-B 规范协商状态 INQUIRED。"
       },
       "QUOTED": {
-        "description": "已报价（买方决策窗口；revise 产生新版本停留本态）。对应主线协商状态 QUOTED。"
+        "description": "已报价（买方决策窗口；revise 产生新版本停留本态）。对应 UTP-B 规范协商状态 QUOTED。"
       },
       "BUYER_COUNTERED": {
-        "description": "买方还价（回到可应答，round_no 递增）。对应主线协商状态 COUNTERED。"
+        "description": "买方还价（回到可应答，round_no 递增）。对应 UTP-B 规范协商状态 COUNTERED。"
       },
       "BOUND": {
-        "description": "条款绑定（买方在有效期内接受，P2 产出 terms_hash 进入 P3；MP4 accept MUST NOT 偏离已绑定条款）。对应主线协商状态 BOUND。",
+        "description": "条款绑定（买方在有效期内接受，P2 产出 terms_hash 进入 P3；MP4 accept MUST NOT 偏离已绑定条款）。对应 UTP-B 规范协商状态 BOUND。",
         "terminal": true
       },
       "DECLINED": {
-        "description": "已谢绝（显式 decline 或超时 auto_decline）。对应主线协商状态 RELEASED（协商失败/退出）。",
+        "description": "已谢绝（显式 decline 或超时 auto_decline）。对应 UTP-B 规范协商状态 RELEASED（协商失败/退出）。",
         "terminal": true
       },
       "EXPIRED": {
-        "description": "报价失效（validity 到期未接受，或买方撤回询盘）。对应主线协商状态 RELEASED。",
+        "description": "报价失效（validity 到期未接受，或买方撤回询盘）。对应 UTP-B 规范协商状态 RELEASED。",
         "terminal": true
       }
     },

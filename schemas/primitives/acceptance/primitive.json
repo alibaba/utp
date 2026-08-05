@@ -8,7 +8,7 @@
   "service": "dev.utp.merchant",
   "actions": {
     "accept": {
-      "description": "PENDING_ACCEPT | ON_HOLD → ACCEPTED（MUST 附覆盖 terms_hash 的卖方 ES256 签名；作为主规范 13.2.3 \"卖方承诺处理\"的完成证据参与 SIGNING → PURCHASED 原子迁移）",
+      "description": "PENDING_ACCEPT | ON_HOLD → ACCEPTED（MUST 附覆盖 terms_hash 的卖方 ES256 签名；作为 UTP-B 规范 13.2.3 \"卖方承诺处理\"的完成证据参与 SIGNING → PURCHASED 原子迁移）",
       "initiator_role": "Seller",
       "handler_role": "Marketplace",
       "input_schema": {
@@ -189,7 +189,7 @@
   "state_machine": {
     "scope": "resource",
     "resource_key": "routing_id",
-    "description": "终态到达后任何写操作 MUST 返回 ACCEPTANCE.STATE_CONFLICT（幂等重放同一 idempotency_key 除外）。deadline 由订单路由时的 Mode 超时配置决定（主规范 4.2.4）。EXPIRED 不是独立状态；超时自动处置在终态记录上以 arrived_via = timeout_auto 标记（错误码 ACCEPTANCE.EXPIRED 用于时限后的写操作拒绝）。",
+    "description": "终态到达后任何写操作 MUST 返回 ACCEPTANCE.STATE_CONFLICT（幂等重放同一 idempotency_key 除外）。deadline 由订单路由时的 Mode 超时配置决定（UTP 规范 4.2.4）。EXPIRED 不是独立状态；超时自动处置在终态记录上以 arrived_via = timeout_auto 标记（错误码 ACCEPTANCE.EXPIRED 用于时限后的写操作拒绝）。",
     "initial_state": "PENDING_ACCEPT",
     "states": {
       "PENDING_ACCEPT": {

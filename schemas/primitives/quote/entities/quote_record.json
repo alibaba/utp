@@ -3,7 +3,7 @@
   "$id": "https://ut-protocol.com/schemas/primitives/quote/entities/quote_record.json",
   "version": "2026-07-30",
   "title": "QuoteRecord",
-  "description": "MP3 应答记录（utp-m M5.10.1）。报价内容以主线权威 Quote 实体承载，本实体只增加供应商侧任务状态、轮次/版本与审计维度；纳入协商 Evidence Bundle 供 P6 举证。",
+  "description": "MP3 应答记录（utp-m M5.10.1）。报价内容以 UTP-B 规范权威 Quote 实体承载，本实体只增加供应商侧任务状态、轮次/版本与审计维度；纳入协商 Evidence Bundle 供 P6 举证。",
   "type": "object",
   "required": ["record_id", "inquiry_id", "negotiation_id", "status", "round_no", "version", "decided_by", "decided_at"],
   "properties": {
@@ -32,7 +32,7 @@
     "round_no": {
       "type": "integer",
       "minimum": 1,
-      "description": "议价轮次；买方还价事件递增。对应主线 Quote.round。"
+      "description": "议价轮次；买方还价事件递增。对应 UTP-B 规范 Quote.round。"
     },
     "version": {
       "type": "integer",
@@ -41,7 +41,7 @@
     },
     "quote": {
       "$ref": "../../negotiate/entities/quote.json",
-      "description": "本记录承载的报价（主线权威实体）。status == QUOTED 时必填。"
+      "description": "本记录承载的报价（UTP-B 规范权威实体）。status == QUOTED 时必填。"
     },
     "seller_signature": {
       "$ref": "../../common/entities/signature.json",

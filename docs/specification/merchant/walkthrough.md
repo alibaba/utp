@@ -8,10 +8,10 @@ format: html
 ---
 
 <h1 id="s-m12">M12 · 供应商全链路演练（Merchant End-to-End Walkthrough）</h1>
-    <blockquote><p><strong>本章为资料性（Informative）。</strong>演练序列与 JSON 报文示例用于说明各章规范性条款的组合使用方式，不新增任何规范性要求；示例与各章条款或机读 Schema 不一致时，以条款与 Schema 为准。M12.9 验证清单是对 M1.6 闭环不变式（规范性，定义于各引用章节）的检查索引。</p></blockquote>
+    <blockquote><p><strong>本章为资料性（Informative）。</strong>演练序列与 JSON 报文示例用于说明各章规范性条款的组合使用方式，不新增任何规范性要求；示例与各章条款或机读 Schema 不一致时，以条款与 Schema 为准。<a href="#s-m129">闭环总验证清单（Loop Verification Checklist）</a> 验证清单是对 商品—交易闭环（End-to-End Loop） 闭环不变式（规范性，定义于各引用章节）的检查索引。</p></blockquote>
 
-    <h2 id="s-m121">M12.1 场景设定（Scenario Setup）</h2>
-    <p>本章以一家电子产品制造商"上海示例供应链有限公司"接入 Marketplace 为主线，演练<strong>入驻 → 发布 → 上架 → 被寻源 → 报价 → 接单 → 发货 → 结算</strong>的完整闭环。它是主规范<a href="../guides/procurement-walkthrough.md">第 24 章标准采购全链路</a>的<strong>供应商侧镜像</strong>——主规范第 24 章从买方视角走完同一笔交易，两章互为对照。</p>
+    <h2 id="s-m121">场景设定（Scenario Setup）</h2>
+    <p>本章以一家电子产品制造商"上海示例供应链有限公司"接入 Marketplace 为主线，演练<strong>入驻 → 发布 → 上架 → 被寻源 → 报价 → 接单 → 发货 → 结算</strong>的完整闭环。它是 UTP-B 规范<a href="../guides/procurement-walkthrough.md">第 24 章标准采购全链路</a>的<strong>供应商侧镜像</strong>——UTP-B 规范第 24 章从买方视角走完同一笔交易，两章互为对照。</p>
     <table>
       <thead><tr><th>项目</th><th>设定</th></tr></thead>
       <tbody>
@@ -21,24 +21,24 @@ format: html
         <tr><td>交易 Mode</td><td><code>(L1, L1, L0, L1, L0, L0)</code>：阶梯定价 + 简单询价 + 全额支付 + 委托物流</td></tr>
       </tbody>
     </table>
-    <h3 id="s-m1211">M12.1.1 全链路时序总览</h3>
+    <h3 id="s-m1211">全链路时序总览</h3>
 <div class="diagram"><img src="../../assets/diagrams/m-e2e-sequence.svg" alt="供应商全链路时序总览：Phase 0—6 从入驻、发布、被寻源、报价、接单、发货到结算的三方交互" style="max-width: 100%; height: auto;"></div>
 
-    <h2 id="s-m122">M12.2 Phase 0：入驻（Onboarding）</h2>
-    <p>按 M2 五步流程完成：生成 ES256 密钥对 → 发布 Profile（声明 Seller 角色 + MP1—MP6 原语 + <code>dev.utp.merchant_callback</code> Service，示例见 <a href="onboarding.md#s-m23">M2.3</a>）→ 注册获取 <code>merchant_id: mch-sh-00812</code> → 资质审核 <code>QUALIFIED</code> → 沙箱验收 7 项全过 → 状态 <code>ACTIVE</code>。</p>
+    <h2 id="s-m122">Phase 0：入驻（Onboarding）</h2>
+    <p>按 M2 五步流程完成：生成 ES256 密钥对 → 发布 Profile（声明 Seller 角色 + MP1—MP6 原语 + <code>dev.utp.merchant_callback</code> Service，示例见 <a href="onboarding.md#s-m23">Step 2：Profile 发布（Profile Declaration）</a>）→ 注册获取 <code>merchant_id: mch-sh-00812</code> → 资质审核 <code>QUALIFIED</code> → 沙箱验收 7 项全过 → 状态 <code>ACTIVE</code>。</p>
 
-    <h2 id="s-m123">M12.3 Phase 1：发布商品与设置库存</h2>
-    <p>Bridge 从 ERP 物料主数据生成发布请求（完整示例见 <a href="primitives/listing/index.md#s-m3101">M3.10.1</a>）：</p>
+    <h2 id="s-m123">Phase 1：发布商品与设置库存</h2>
+    <p>Bridge 从 ERP 物料主数据生成发布请求（完整示例见 <a href="primitives/listing/index.md#s-m3101">发布并上架一个多 SKU 商品</a>）：</p>
 <pre class="highlight"><code>1. POST /utp/m/v1/listings           → listing_id=item-BT-NC-001, PENDING_REVIEW
 2. 回调 utp.listing.review_result    → APPROVED, auto_list 生效 → LISTED
 3. PUT  /utp/m/v1/inventory/item-BT-NC-001/sku-X3-BLK
    { "available": 500, "expected_revision": 0 }
    → { available:500, sellable:500, revision:1 }
 </code></pre>
-    <p><strong>闭环检查点 ①（对应 M1.6 不变式 1/2）：</strong>此刻买方侧 <code>source.lookup(item-BT-NC-001)</code> 返回的 <code>skus[].stock=500</code>、<code>pricing.tiered_pricing</code> 与供应商发布结构逐字段对齐。</p>
+    <p><strong>闭环检查点 ①（对应 商品—交易闭环（End-to-End Loop） 不变式 1/2）：</strong>此刻买方侧 <code>source.lookup(item-BT-NC-001)</code> 返回的 <code>skus[].stock=500</code>、<code>pricing.tiered_pricing</code> 与供应商发布结构逐字段对齐。</p>
 
-    <h2 id="s-m124">M12.4 Phase 2—3：被寻源与报价（买方视角对照）</h2>
-    <p>买方按主规范流程 <code>source.search → source.lookup → negotiate.inquiry</code>（询 100 件价格与交期）。供应商侧：</p>
+    <h2 id="s-m124">Phase 2—3：被寻源与报价（买方视角对照）</h2>
+    <p>买方按 UTP-B 规范流程 <code>source.search → source.lookup → negotiate.inquiry</code>（询 100 件价格与交期）。供应商侧：</p>
 <pre class="highlight"><code class="language-json">// Marketplace 将询盘转给供应商回调（P2 的 Seller handler 侧）；
 // Merchant Agent 按 M11.3.2 策略生成报价（阶梯价内，无需人工）：
 // negotiate.quote 应答
@@ -53,9 +53,9 @@ format: html
   "decided_by": "agent"
 }
 </code></pre>
-    <p>买方接受报价形成 Binding Terms（主规范 P2），报价与 Listing <code>pricing_tiers</code> 一致（100 件档 268 元）——报价不越界，Agent 自主完成。</p>
+    <p>买方接受报价形成 Binding Terms（UTP-B 规范 P2），报价与 Listing <code>pricing_tiers</code> 一致（100 件档 268 元）——报价不越界，Agent 自主完成。</p>
 
-    <h2 id="s-m125">M12.5 Phase 4：下单、路由与接单</h2>
+    <h2 id="s-m125">Phase 4：下单、路由与接单</h2>
 <pre class="highlight"><code class="language-json">// 1. 买方 purchase.create（100 件）→ 协议引擎创建临时 hold
 //    供应商收到回调：
 { "event": "utp.inventory.hold_created", "hold_id": "hold-20260722-0091",
@@ -76,12 +76,12 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
 { "terms_hash": "sha256:d4e5f6a7b8c9...",
   "seller_signature": "eyJhbGciOiJFUzI1NiJ9...", "decided_by": "human" }
 
-// 4. 协议引擎完成 SIGNING → PURCHASED 原子迁移（承诺处理/库存锁定/terms_hash 校验，主规范 13.2.3）
+// 4. 协议引擎完成 SIGNING → PURCHASED 原子迁移（承诺处理/库存锁定/terms_hash 校验， UTP-B 规范 13.2.3）
 //    hold-20260722-0091: HELD → LOCKED；ERP 创建 SO-2026-07553 并建立映射
 </code></pre>
     <p><strong>闭环检查点 ②（不变式 3）：</strong>MP4 提交的卖方签名覆盖订购 <code>terms_hash</code>，与买方侧 Mandate 操作准入共同构成双边承诺，订购凭证成立，全局状态 <code>PURCHASING → PAYING</code>。买方支付（P4，全额 alipay）确认后进入 <code>FULFILLING</code>。</p>
 
-    <h2 id="s-m126">M12.6 Phase 5：发货与买方收货</h2>
+    <h2 id="s-m126">Phase 5：发货与买方收货</h2>
 <pre class="highlight"><code class="language-json">// 1. ERP 出库单确认 → Bridge 幂等键 ship-OUT-20260723-081 → 发货：
 POST /utp/m/v1/deliveries
 { "transaction_id": "utp-txn-01J4X7K9M2P5Q8R3V6W0YZ",
@@ -105,7 +105,7 @@ POST /utp/m/v1/deliveries
 </code></pre>
     <p><strong>闭环检查点 ③（不变式 4）：</strong>买方 <code>fulfill.query</code> 与供应商 <code>delivery.query</code> 呈现同一 <code>shipment_id / tracking_number</code> 的两个投影。</p>
 
-    <h2 id="s-m127">M12.7 Phase 6：结算与对账</h2>
+    <h2 id="s-m127">Phase 6：结算与对账</h2>
 <pre class="highlight"><code class="language-json">// T+7 账单出具回调 → 供应商拉取明细：
 GET /utp/m/v1/settlements/statements/stmt-202607-C-0031
 {
@@ -130,30 +130,30 @@ GET /utp/m/v1/settlements/statements/stmt-202607-C-0031
 // Bridge 三方核对（ERP 应收 × 账单 × PaymentConfirmation）一致 → 确认
 // → PAID_OUT（附打款流水 payout-20260803-771）→ ERP 应收核销
 </code></pre>
-    <p><strong>闭环检查点 ④（不变式 M9.2.2）：</strong><code>gross_amount</code> 与 PaymentConfirmation 一致；每笔扣减有协议条款引用；账单可逐笔回溯到 <code>transaction_id</code>。至此货、款、单三流闭合。</p>
+    <p><strong>闭环检查点 ④（不变式 <a href="settlement.md#s-m922">结算金额构成不变式</a>）：</strong><code>gross_amount</code> 与 PaymentConfirmation 一致；每笔扣减有协议条款引用；账单可逐笔回溯到 <code>transaction_id</code>。至此货、款、单三流闭合。</p>
 
-    <h2 id="s-m128">M12.8 异常支线演练（Exception Paths）</h2>
+    <h2 id="s-m128">异常支线演练（Exception Paths）</h2>
     <table>
       <thead><tr><th>支线</th><th>触发</th><th>协议路径</th><th>收敛结果</th></tr></thead>
       <tbody>
         <tr><td>缺货拒单</td><td>接单核验发现 ERP 实际库存不足</td><td><code>acceptance.reject(inventory_insufficient)</code> → P3 补偿链释放 hold → 订购 <code>CANCELLED</code>；Bridge 随即 <code>inventory.set</code> 校准</td><td>买方收到结构化拒绝与替代建议；无资金损失</td></tr>
         <tr><td>受理超时</td><td>ERP 审批流卡住超过 deadline</td><td><code>timeout_policy=auto_reject</code> 自动处置 + <code>acceptance.expired</code> 回调</td><td>订单不悬挂；供应商复盘审批时效</td></tr>
         <tr><td>发货延迟</td><td>原料短缺，无法按 3 天交期发货</td><td><code>delivery.update(delay, new_eta)</code> → 买方侧 <code>DELAYED</code>；买方可等待或 <code>resolve.raise</code></td><td>延迟事实留痕；争议按证据裁决</td></tr>
-        <tr><td>买方拒收</td><td>到货外观破损</td><td>买方 <code>fulfill.reject</code>（P5）→ Resolve 激活 → 裁决退款 → CompensationOrder 进入结算 <code>adjustments</code>（M9.6.2）</td><td>结算条目冻结 → 裁决后按调整项出账</td></tr>
+        <tr><td>买方拒收</td><td>到货外观破损</td><td>买方 <code>fulfill.reject</code>（P5）→ Resolve 激活 → 裁决退款 → CompensationOrder 进入结算 <code>adjustments</code>（<a href="settlement.md#s-m962">SettlementEntry</a>）</td><td>结算条目冻结 → 裁决后按调整项出账</td></tr>
         <tr><td>账单差异</td><td>佣金费率与商户协议不符</td><td><code>settlement.discrepancy.submit(fee_mismatch)</code> → Marketplace 更正账单新版本</td><td>新版账单确认后打款</td></tr>
-        <tr><td>商品强制下架</td><td>资质到期未换证</td><td>平台 <code>SUSPENDED_BY_PLATFORM</code> + 回调通知 → 供应商补证 → 恢复 <code>PUBLISHED</code> → 重新 <code>list</code></td><td>存量订单履约义务不变（M2.7）</td></tr>
+        <tr><td>商品强制下架</td><td>资质到期未换证</td><td>平台 <code>SUSPENDED_BY_PLATFORM</code> + 回调通知 → 供应商补证 → 恢复 <code>PUBLISHED</code> → 重新 <code>list</code></td><td>存量订单履约义务不变（<a href="onboarding.md#s-m27">商户生命周期状态（Merchant Lifecycle）</a>）</td></tr>
       </tbody>
     </table>
 
-    <h2 id="s-m129">M12.9 闭环总验证清单（Loop Verification Checklist）</h2>
+    <h2 id="s-m129">闭环总验证清单（Loop Verification Checklist）</h2>
     <table>
-      <thead><tr><th>#</th><th>不变式（M1.6）</th><th>本章验证位置</th></tr></thead>
+      <thead><tr><th>#</th><th>不变式（商品—交易闭环（End-to-End Loop））</th><th>本章验证位置</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Source 投影 == Listing 发布结构</td><td>M12.3 检查点 ①</td></tr>
-        <tr><td>2</td><td>Purchase 库存校验/锁定 == MP2 同一数据源</td><td>M12.5（hold→LOCKED→CONSUMED 全程可查）</td></tr>
-        <tr><td>3</td><td>卖方承诺处理经 MP4 完成并注入 P3 原子迁移</td><td>M12.5 检查点 ②</td></tr>
-        <tr><td>4</td><td>MP5 Delivery == 买方 fulfill 同一记录</td><td>M12.6 检查点 ③</td></tr>
-        <tr><td>5</td><td>delist 后 Source/Purchase 既有错误码生效</td><td>M3.10.2（专项演练）</td></tr>
-        <tr><td>—</td><td>结算三流闭合（货/款/单）</td><td>M12.7 检查点 ④</td></tr>
+        <tr><td>1</td><td>Source 投影 == Listing 发布结构</td><td><a href="#s-m123">Phase 1：发布商品与设置库存</a> 检查点 ①</td></tr>
+        <tr><td>2</td><td>Purchase 库存校验/锁定 == MP2 同一数据源</td><td><a href="#s-m125">Phase 4：下单、路由与接单</a>（hold→LOCKED→CONSUMED 全程可查）</td></tr>
+        <tr><td>3</td><td>卖方承诺处理经 MP4 完成并注入 P3 原子迁移</td><td><a href="#s-m125">Phase 4：下单、路由与接单</a> 检查点 ②</td></tr>
+        <tr><td>4</td><td>MP5 Delivery == 买方 fulfill 同一记录</td><td><a href="#s-m126">Phase 5：发货与买方收货</a> 检查点 ③</td></tr>
+        <tr><td>5</td><td>delist 后 Source/Purchase 既有错误码生效</td><td><a href="primitives/listing/index.md#s-m3102">下架与闭环验证</a>（专项演练）</td></tr>
+        <tr><td>—</td><td>结算三流闭合（货/款/单）</td><td><a href="#s-m127">Phase 6：结算与对账</a> 检查点 ④</td></tr>
       </tbody>
     </table>

@@ -4,7 +4,7 @@
   "name": "utp.aftersale",
   "version": "2026-07-31",
   "title": "MP6 售后原语（Aftersale Primitive）",
-  "description": "供应商侧售后处置原语：对买方提出的退款、退货退款、换货、补发、维修请求作出结构化处置结论，并在需要退货的方案下确认退货收货与验货结果。本原语定义的是买卖双方在协议层的售后协商与执行，MUST NOT 与主规范 P6 Resolve 混同——P6 是第三方（Arbiter）介入的争议裁决，本原语是双方合意的售后处置；售后 MUST 先行，协商不成才由买方升级 P6。退款资金动作由 Marketplace（代收代付方）执行，本原语不定义资金指令；换货与补发的发货复用 MP5 交付原语的 ship（携带 aftersale_ref 关联），不重复定义。",
+  "description": "供应商侧售后处置原语：对买方提出的退款、退货退款、换货、补发、维修请求作出结构化处置结论，并在需要退货的方案下确认退货收货与验货结果。本原语定义的是买卖双方在协议层的售后协商与执行，MUST NOT 与 UTP-B 规范 P6 Resolve 混同——P6 是第三方（Arbiter）介入的争议裁决，本原语是双方合意的售后处置；售后 MUST 先行，协商不成才由买方升级 P6。退款资金动作由 Marketplace（代收代付方）执行，本原语不定义资金指令；换货与补发的发货复用 MP5 交付原语的 ship（携带 aftersale_ref 关联），不重复定义。",
   "service": "dev.utp.merchant",
   "actions": {
     "approve": {
@@ -167,7 +167,7 @@
   "state_machine": {
     "scope": "resource",
     "resource_key": "aftersale_id",
-    "description": "售后单资源状态机。作用域为 resource，MUST NOT 与主规范全局状态机（transaction 作用域）混同：售后的执行结果通过退款事实与结算冲销影响交易，不新增全局状态。",
+    "description": "售后单资源状态机。作用域为 resource，MUST NOT 与 UTP-B 规范全局状态机（transaction 作用域）混同：售后的执行结果通过退款事实与结算冲销影响交易，不新增全局状态。",
     "initial_state": "REQUESTED",
     "states": {
       "REQUESTED": {
@@ -318,7 +318,7 @@
       "round_limit_policy": "协商轮次上限由 Marketplace 受理策略声明。超限后 Marketplace MUST 拒绝新的 propose 并返回 AFTERSALE.MAX_ROUNDS，售后单停留在 REQUESTED，本原语不因轮次超限自动迁移。",
       "escalation_boundary": "本原语 MUST NOT 表达裁决过程与裁决结果。升级 P6 后售后单收敛至 CLOSED，争议在 dispute 资源上独立演进；裁决产出的补偿通过结算调整项落地。",
       "refund_authority": "退款资金动作 MUST 由 Marketplace（代收代付方）执行。供应商侧无退款 Action，只通过 refund_completed 回调观测结果。",
-      "trigger_convention": "迁移触发器的载体约定（与其余 MP 原语及主规范 P1—P6 一致）：供应商可调用动作置于 action 字段并使用全限定名（utp.aftersale.*）；回调与系统触发置于 event 字段并使用裸名（request_routed / refund_completed / deadline_expired 等）。二者 MUST NOT 混用，以免实现方误将回调当作可调用 Action。"
+      "trigger_convention": "迁移触发器的载体约定（与其余 MP 原语及 UTP-B 规范 P1—P6 一致）：供应商可调用动作置于 action 字段并使用全限定名（utp.aftersale.*）；回调与系统触发置于 event 字段并使用裸名（request_routed / refund_completed / deadline_expired 等）。二者 MUST NOT 混用，以免实现方误将回调当作可调用 Action。"
     }
   }
 }

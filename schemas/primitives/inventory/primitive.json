@@ -141,7 +141,7 @@
   "state_machine": {
     "scope": "resource",
     "resource_key": "hold_id",
-    "description": "Inventory 数量记录本身无状态机（available 为带版本的数值账本）。本状态机是交易性占用（InventoryHold）的投影：迁移全部由主规范 P3 Purchase 及其补偿链驱动（M4.7 同源契约），MP2 操作不驱动任何迁移，供应商仅通过 hold.query 只读核验。",
+    "description": "Inventory 数量记录本身无状态机（available 为带版本的数值账本）。本状态机是交易性占用（InventoryHold）的投影：迁移全部由 UTP-B 规范 P3 Purchase 及其补偿链驱动（M4.7 同源契约），MP2 操作不驱动任何迁移，供应商仅通过 hold.query 只读核验。",
     "initial_state": "HELD",
     "states": {
       "HELD": {
@@ -164,7 +164,7 @@
         "from": null,
         "event": "purchase_created",
         "to": "HELD",
-        "condition": "主规范 purchase.create 创建临时库存占用（13.5.2）。"
+        "condition": "UTP-B 规范 purchase.create 创建临时库存占用（13.5.2）。"
       },
       {
         "from": null,

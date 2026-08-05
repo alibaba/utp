@@ -3,7 +3,7 @@
   "$id": "https://ut-protocol.com/schemas/primitives/quote/entities/quote_input.json",
   "version": "2026-07-30",
   "title": "QuoteInput",
-  "description": "MP3 quote / bid 请求载荷（utp-m M5.9.1）。报价内容复用主线 P2 的权威 Quote 实体（negotiate/entities/quote.json），本原语不重复定义报价结构；差异仅在于提交通道（Seller → Marketplace，平台托管拓扑）与业务签名要求。本原语补充主线 Quote.terms_hash 留白的计算规则：terms_hash MUST 是 Quote 实体去除 terms_hash 与 signature 字段后按 RFC 8785（JCS）规范化的 SHA-256，格式 sha256:<64 位小写十六进制>；seller_signature 的 JWS payload MUST 为该哈希串（M1.10 业务签名统一规则）。",
+  "description": "MP3 quote / bid 请求载荷（utp-m M5.9.1）。报价内容复用 UTP-B 规范 P2 的权威 Quote 实体（negotiate/entities/quote.json），本原语不重复定义报价结构；差异仅在于提交通道（Seller → Marketplace，平台托管拓扑）与业务签名要求。本原语补充 UTP-B 规范 Quote.terms_hash 留白的计算规则：terms_hash MUST 是 Quote 实体去除 terms_hash 与 signature 字段后按 RFC 8785（JCS）规范化的 SHA-256，格式 sha256:<64 位小写十六进制>；seller_signature 的 JWS payload MUST 为该哈希串（M1.10 业务签名统一规则）。",
   "type": "object",
   "required": ["idempotency_key", "quote", "seller_signature", "decided_by"],
   "properties": {
@@ -14,7 +14,7 @@
     },
     "quote": {
       "$ref": "../../negotiate/entities/quote.json",
-      "description": "报价内容（主线权威 Quote 实体）。supplier_id MUST 与调用方 agent_id 一致；inquiry_ref MUST 与本次询盘路由的 negotiation 上下文匹配；validity 缺省时 Marketplace MUST 按平台默认有效期补全并在响应中回显。"
+      "description": "报价内容（UTP-B 规范权威 Quote 实体）。supplier_id MUST 与调用方 agent_id 一致；inquiry_ref MUST 与本次询盘路由的 negotiation 上下文匹配；validity 缺省时 Marketplace MUST 按平台默认有效期补全并在响应中回显。"
     },
     "quote_note": {
       "type": "string",

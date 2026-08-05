@@ -141,7 +141,7 @@
   "state_machine": {
     "scope": "resource",
     "resource_key": "shipment_id",
-    "description": "DELIVERED/CLOSED 由物流回执与买方 P5 动作驱动，供应商 MUST NOT 直接声明（主规范 17.0.2）。分批交付时每个 batch_id 独立实例化本状态机，订单级视图是全部批次的聚合。",
+    "description": "DELIVERED/CLOSED 由物流回执与买方 P5 动作驱动，供应商 MUST NOT 直接声明（UTP-B 规范 17.0.2）。分批交付时每个 batch_id 独立实例化本状态机，订单级视图是全部批次的聚合。",
     "initial_state": "PREPARING",
     "states": {
       "PREPARING": {

@@ -27,7 +27,7 @@
       "items": {
         "$ref": "pricing_tier.json"
       },
-      "description": "MOQ 阶梯价，与主规范 PricingTiers 同构。"
+      "description": "MOQ 阶梯价，与 UTP-B 规范 PricingTiers 同构。"
     },
     "negotiable": {
       "type": "boolean",

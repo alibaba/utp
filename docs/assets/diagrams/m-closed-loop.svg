@@ -25,7 +25,7 @@
 
 <!-- Buyer band middle -->
 <rect x="20" y="168" width="720" height="92" rx="8" fill="none" stroke="#6c8ebf" stroke-dasharray="6 3"/>
-<text x="82" y="186" font-size="11" fill="#6c8ebf" font-weight="bold">买方侧（UTP 主规范）</text>
+<text x="82" y="186" font-size="11" fill="#6c8ebf" font-weight="bold">买方侧（UTP-B 规范）</text>
 
 <rect x="40" y="196" width="150" height="48" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
 <text x="115" y="216" text-anchor="middle" font-size="12" font-weight="bold">L0 发现（Ch.3）</text>
