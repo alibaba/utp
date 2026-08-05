@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/statement_issued_payload.json",
+  "version": "2026-07-30",
+  "title": "StatementIssuedPayload",
+  "description": "结算账单出具通知（M8.4）。明细经 settlement.statement.detail 拉取。",
+  "type": "object",
+  "required": [
+    "statement_id",
+    "period",
+    "total_payable",
+    "dispute_deadline"
+  ],
+  "properties": {
+    "statement_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "period": {
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "total_payable": {
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "dispute_deadline": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

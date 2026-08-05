@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/settlement/entry_status.json",
+  "version": "2026-07-01",
+  "title": "EntryStatus",
+  "description": "结算条目生命周期（M8.3）。",
+  "enum": [
+    "SETTLEABLE",
+    "FROZEN",
+    "BILLED",
+    "PAID_OUT",
+    "PAYOUT_FAILED"
+  ]
+}

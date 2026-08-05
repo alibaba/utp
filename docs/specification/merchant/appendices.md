@@ -89,7 +89,9 @@ format: html
         <tr><td>MP3 询盘响应（草案）</td><td><code>primitives/quote/primitive.json</code> + <code>entities/</code></td><td>QuoteRecord、DeclineReason 与 quote/decline 输入输出；<strong>报价体复用 <code>primitives/negotiate/entities/quote.json</code>（UTP-B 规范权威 Quote 实体）</strong>（报价原语）</td></tr>
         <tr><td>MP4 订单受理</td><td><code>primitives/acceptance/primitive.json</code> + <code>entities/</code></td><td>OrderRouting、AcceptanceRecord、RejectReason 与 accept/reject/hold/amend 输入输出（接单原语）</td></tr>
         <tr><td>MP5 交付</td><td><code>primitives/delivery/primitive.json</code> + <code>entities/</code></td><td>Shipment、Package、SplitPlan、Event 与 prepare/ship/split/update 输入输出（M7；与 UTP-B 规范 Fulfill 侧 Shipment 的合并见 ME 第 7 项）</td></tr>
-        <tr><td>入驻与回调、结算（非原语）</td><td><code>merchant/entities/</code></td><td>MerchantRegistration、DelegationPolicy、AcceptancePolicy、回调 Envelope 与各事件载荷（<a href="onboarding.md#s-m26">Step 5：回调登记与连通性验收（Callback & Readiness）</a>）、SettlementStatement/Entry/Discrepancy（结算与对账）——非原语能力，与 <code>discovery/</code>、<code>transport/</code> 同级安置</td></tr>
+        <tr><td>入驻与能力声明（非原语）</td><td><code>merchant/registration/</code></td><td>MerchantRegistration、MerchantStatus、CredentialSubmission、Contact、DelegationPolicy、AcceptancePolicy、ErpIntegrationMode 与 RegistrationOutput（商家入驻）</td></tr>
+        <tr><td>结算与对账（非原语）</td><td><code>merchant/settlement/</code></td><td>SettlementStatement/Entry/Discrepancy、SettlementAccount、Fee、Adjustment 与各查询输入输出（结算与对账）</td></tr>
+        <tr><td>回调事件（非原语）</td><td><code>merchant/events/</code></td><td>回调 Envelope、EventType 注册表与各事件载荷 <code>*_payload</code>（<a href="onboarding.md#s-m26">Step 5：回调登记与连通性验收（Callback & Readiness）</a>）——以上三者均为非原语能力，与 <code>discovery/</code>、<code>transport/</code> 同级安置</td></tr>
       </tbody>
     </table>
     <p>状态机的机器可读定义内嵌于各 <code>primitive.json</code> 的 <code>state_machine</code>（<code>scope: resource</code>，以 <code>listing_id</code>/<code>inquiry_id</code>/<code>routing_id</code>/<code>shipment_id</code> 为资源键），与正文各章状态机表逐条一致；Action 迁移以全限定名（<code>utp.acceptance.accept</code>）表达，外部与系统事件以 <code>event</code> 字段表达。</p>

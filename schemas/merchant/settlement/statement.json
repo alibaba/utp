@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/settlement/statement.json",
+  "version": "2026-07-01",
+  "title": "Statement",
+  "description": "SettlementStatement（M8.6.1）：Marketplace 签名账单；差异更正生成新版本，旧版本保留。",
+  "type": "object",
+  "required": [
+    "statement_id",
+    "merchant_id",
+    "period",
+    "version",
+    "entries",
+    "total_gross",
+    "total_fees",
+    "total_payable",
+    "status",
+    "dispute_deadline",
+    "issuer_signature"
+  ],
+  "properties": {
+    "statement_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "merchant_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "period": {
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "entry.json"
+      }
+    },
+    "total_gross": {
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "total_fees": {
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "total_payable": {
+      "description": "MUST 等于 Σ(entries.payable_amount)（M8.2.2 不变式 4）。",
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "status": {
+      "$ref": "statement_status.json"
+    },
+    "dispute_deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "异议截止时间（异议期 SHOULD ≥ 7 天）。"
+    },
+    "payout_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "打款流水引用（PAID_OUT 后必有）。"
+    },
+    "issuer_signature": {
+      "$ref": "../../primitives/common/entities/signature.json",
+      "description": "Marketplace ES256 签名，覆盖账单哈希。"
+    }
+  },
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "status": {
+        "const": "PAID_OUT"
+      }
+    },
+    "required": [
+      "status"
+    ]
+  },
+  "then": {
+    "required": [
+      "payout_ref"
+    ]
+  }
+}

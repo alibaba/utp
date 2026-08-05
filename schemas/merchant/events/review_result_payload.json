@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/review_result_payload.json",
+  "version": "2026-07-30",
+  "title": "ReviewResultPayload",
+  "description": "商品审核结论（M3.4）。驳回 MUST 附结构化原因。",
+  "type": "object",
+  "required": [
+    "listing_id",
+    "result",
+    "status",
+    "effective_at"
+  ],
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "result": {
+      "enum": [
+        "APPROVED",
+        "REJECTED"
+      ]
+    },
+    "status": {
+      "$ref": "../../primitives/listing/entities/listing_status.json"
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_.]*$"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "description": "驳回原因码列表（REVIEW.* 原因码空间，M3.5.2）。"
+    },
+    "effective_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "result": {
+        "const": "REJECTED"
+      }
+    },
+    "required": [
+      "result"
+    ]
+  },
+  "then": {
+    "required": [
+      "reasons"
+    ]
+  }
+}

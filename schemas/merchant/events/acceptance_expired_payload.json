@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/acceptance_expired_payload.json",
+  "version": "2026-07-30",
+  "title": "AcceptanceExpiredPayload",
+  "description": "受理超时自动处置结果（M6.3）。arrived_via 恒为 timeout_auto。",
+  "type": "object",
+  "required": [
+    "routing_id",
+    "purchase_id",
+    "conclusion",
+    "arrived_via"
+  ],
+  "properties": {
+    "routing_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "conclusion": {
+      "$ref": "../../primitives/acceptance/entities/conclusion.json"
+    },
+    "arrived_via": {
+      "const": "timeout_auto"
+    }
+  },
+  "additionalProperties": true
+}

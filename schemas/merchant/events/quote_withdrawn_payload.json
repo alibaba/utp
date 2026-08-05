@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/quote_withdrawn_payload.json",
+  "version": "2026-07-30",
+  "title": "QuoteWithdrawnPayload",
+  "description": "utp.quote.withdrawn 载荷（M5.1.5 补偿）：买方撤回询盘，在途报价作废（供应商无补偿义务）。",
+  "type": "object",
+  "required": [
+    "inquiry_id",
+    "status"
+  ],
+  "properties": {
+    "inquiry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "status": {
+      "const": "EXPIRED"
+    },
+    "withdrawn_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

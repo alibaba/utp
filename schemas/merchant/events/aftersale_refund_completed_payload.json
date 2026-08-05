@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/aftersale_refund_completed_payload.json",
+  "version": "2026-08-04",
+  "title": "AftersaleRefundCompletedPayload",
+  "description": "平台退款完成载荷。供应商据此冲销 ERP 应收，并核对结算调整项。",
+  "type": "object",
+  "required": [
+    "aftersale_id",
+    "refund_ref",
+    "refund_amount",
+    "completed_at"
+  ],
+  "properties": {
+    "aftersale_id": {
+      "type": "string"
+    },
+    "refund_ref": {
+      "type": "string",
+      "description": "平台退款凭据标识，MUST 可用于结算对账核对。"
+    },
+    "refund_amount": {
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "settlement_adjustment_ref": {
+      "type": "string",
+      "description": "关联的结算调整项标识（退款在结算侧的冲销凭据）。"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

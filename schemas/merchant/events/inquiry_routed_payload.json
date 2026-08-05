@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/inquiry_routed_payload.json",
+  "version": "2026-07-30",
+  "title": "InquiryRoutedPayload",
+  "description": "utp.quote.inquiry_routed 载荷（M5.7.1）：Marketplace 将买方 P2 询盘路由给声明 utp.quote 的供应商；MP3 应答任务的起点。",
+  "type": "object",
+  "required": [
+    "inquiry_id",
+    "deadline"
+  ],
+  "properties": {
+    "inquiry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "trade_context_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "subject": {
+      "type": "string",
+      "description": "询盘主题。"
+    },
+    "listing_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "listing_id"
+        ],
+        "properties": {
+          "listing_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "sku_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

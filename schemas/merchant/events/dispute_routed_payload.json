@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/dispute_routed_payload.json",
+  "version": "2026-07-30",
+  "title": "DisputeRoutedPayload",
+  "description": "争议答辩透传路由（M1.4.4）。争议完整实体属 P6 域；答辩提交前 MUST 人工确认（M10.5）。",
+  "type": "object",
+  "required": [
+    "dispute_id",
+    "transaction_id",
+    "deadline"
+  ],
+  "properties": {
+    "dispute_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "summary": {
+      "type": "string"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

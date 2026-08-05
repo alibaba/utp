@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/registration/acceptance_policy.json",
+  "version": "2026-07-30",
+  "title": "AcceptancePolicy",
+  "description": "AcceptancePolicy（M10.3.1）：Principal 签名的自动接单策略——策略即授权的书面化。规则条件结构由实现定义，本 Schema 约束治理要素。",
+  "type": "object",
+  "required": [
+    "policy_id",
+    "version",
+    "mode",
+    "escalation",
+    "amount_ceiling",
+    "owner_signature"
+  ],
+  "properties": {
+    "policy_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "策略版本；变更递增，旧版本存档（决策可回溯）。"
+    },
+    "mode": {
+      "enum": [
+        "auto",
+        "assisted",
+        "manual"
+      ]
+    },
+    "auto_accept_rules": {
+      "type": "array",
+      "description": "自动接单条件组（AND 语义）；mode=auto 时 MUST 非空。",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "auto_reject_rules": {
+      "type": "array",
+      "description": "自动拒单条件组（命中即 reject，附映射的 M6.10.2 原因码）。",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "amend_price_allowed": {
+      "type": "boolean",
+      "description": "是否允许卖方在受理阶段发起 amend_price 改价提议（M6.12）。默认值随交易 decision 模式取值：B2C（decision=L0，即时零售）默认 false，B2B（decision=L1—L2，标准采购）默认 true。为 false 时 amend_price MUST 返回 ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED。省略时由 Marketplace 按类目与模式取默认值。"
+    },
+    "amend_price_auto_accept_ceiling": {
+      "$ref": "../../primitives/common/entities/money.json",
+      "description": "买方侧可自动确认改价提议的价差封顶（绝对额）。超封顶的改价提议 MUST 升级人工（B2B HAI）或自动拒绝（B2C）。仅当 amend_price_allowed=true 时生效。"
+    },
+    "escalation": {
+      "type": "object",
+      "description": "不满足自动规则时的升级路径；MUST 声明升级后的答复时限策略。",
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "enum": [
+            "hold_and_ticket",
+            "assisted_review"
+          ]
+        },
+        "reply_within_minutes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "amount_ceiling": {
+      "description": "自动决策金额上限；超过 MUST 升级人工（M10.5 控制点）。",
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "owner_signature": {
+      "$ref": "../../primitives/common/entities/signature.json",
+      "description": "Principal（商家授权人）对策略版本的 ES256 签名。"
+    }
+  },
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "mode": {
+        "const": "auto"
+      }
+    },
+    "required": [
+      "mode"
+    ]
+  },
+  "then": {
+    "required": [
+      "auto_accept_rules"
+    ],
+    "properties": {
+      "auto_accept_rules": {
+        "minItems": 1
+      }
+    }
+  }
+}

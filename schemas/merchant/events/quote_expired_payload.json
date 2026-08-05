@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/quote_expired_payload.json",
+  "version": "2026-07-30",
+  "title": "QuoteExpiredPayload",
+  "description": "utp.quote.expired 载荷（M5.3）：应答时限到期按 quote_policy.on_timeout 自动谢绝（MP3 不存在 auto_accept，M5.1.2）。",
+  "type": "object",
+  "required": [
+    "inquiry_id",
+    "record_id",
+    "status"
+  ],
+  "properties": {
+    "inquiry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "status": {
+      "const": "DECLINED"
+    },
+    "decline_reason": {
+      "$ref": "../../primitives/quote/entities/decline_reason.json"
+    },
+    "decided_by": {
+      "const": "policy_auto"
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

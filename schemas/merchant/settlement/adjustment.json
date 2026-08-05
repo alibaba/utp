@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/settlement/adjustment.json",
+  "version": "2026-07-01",
+  "title": "Adjustment",
+  "description": "调整项：方向由 direction 表达（credit 增加应结 / debit 减少应结），amount 恒为非负 Money；MUST 引用裁决或退款凭证（M8.2.2 不变式 3）。",
+  "type": "object",
+  "required": [
+    "direction",
+    "amount",
+    "order_ref"
+  ],
+  "properties": {
+    "direction": {
+      "enum": [
+        "credit",
+        "debit"
+      ]
+    },
+    "amount": {
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "order_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "CompensationOrder 或退款凭证引用。"
+    }
+  },
+  "additionalProperties": true
+}

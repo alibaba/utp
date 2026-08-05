@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/registration/delegation_policy.json",
+  "version": "2026-07-30",
+  "title": "DelegationPolicy",
+  "description": "Handler 侧执行模式声明（M1.4.4 / M2.4.1）：键为原语 ID（仅 utp.negotiate / utp.resolve），值为执行模式配置。缺省全部 direct。passthrough MUST 声明 on_timeout 兜底。",
+  "type": "object",
+  "propertyNames": {
+    "enum": [
+      "utp.negotiate",
+      "utp.resolve"
+    ]
+  },
+  "additionalProperties": {
+    "type": "object",
+    "required": [
+      "mode"
+    ],
+    "properties": {
+      "mode": {
+        "enum": [
+          "direct",
+          "passthrough"
+        ]
+      },
+      "on_timeout": {
+        "enum": [
+          "direct_fallback",
+          "structured_timeout"
+        ]
+      }
+    },
+    "additionalProperties": true,
+    "if": {
+      "properties": {
+        "mode": {
+          "const": "passthrough"
+        }
+      },
+      "required": [
+        "mode"
+      ]
+    },
+    "then": {
+      "required": [
+        "on_timeout"
+      ]
+    }
+  }
+}

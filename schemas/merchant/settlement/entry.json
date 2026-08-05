@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/settlement/entry.json",
+  "version": "2026-07-01",
+  "title": "Entry",
+  "description": "SettlementEntry（M8.6.2）：逐笔可追溯到交易与支付凭证。",
+  "type": "object",
+  "required": [
+    "entry_id",
+    "transaction_id",
+    "purchase_id",
+    "payment_confirmation_ref",
+    "gross_amount",
+    "fees",
+    "payable_amount",
+    "status"
+  ],
+  "properties": {
+    "entry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "purchase_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "shipment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "分批或多阶段付款时定位阶段。"
+    },
+    "payment_confirmation_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "PaymentConfirmation 引用；gross_amount MUST 与其合计一致（M8.2.2 不变式 1）。"
+    },
+    "gross_amount": {
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "fees": {
+      "type": "array",
+      "items": {
+        "$ref": "fee.json"
+      },
+      "description": "扣减项；空数组表示本条目无扣减。"
+    },
+    "adjustments": {
+      "type": "array",
+      "items": {
+        "$ref": "adjustment.json"
+      }
+    },
+    "payable_amount": {
+      "description": "应结金额 = gross − Σfees ± Σadjustments（按 direction）。",
+      "$ref": "../../primitives/common/entities/money.json"
+    },
+    "status": {
+      "$ref": "entry_status.json"
+    }
+  },
+  "additionalProperties": true
+}

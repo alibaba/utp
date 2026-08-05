@@ -1,0 +1,380 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ut-protocol.com/schemas/merchant/events/envelope.json",
+  "version": "2026-08-04",
+  "title": "Envelope",
+  "description": "回调事件统一信封。event → payload 结构强绑定；未知 event 类型接收方 MUST 忽略并 2xx 确认（向前兼容）。",
+  "type": "object",
+  "required": [
+    "event",
+    "event_id",
+    "occurred_at",
+    "payload"
+  ],
+  "properties": {
+    "event": {
+      "$ref": "event_type.json"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "事件唯一标识；接收方按此幂等去重。"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.listing.review_result"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "review_result_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "enum": [
+              "utp.inventory.hold_created",
+              "utp.inventory.hold_released"
+            ]
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "../../primitives/inventory/entities/hold.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.acceptance.order_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "../../primitives/acceptance/entities/order_routing.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.acceptance.expired"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "acceptance_expired_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.negotiate.inquiry_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "inquiry_routed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.resolve.dispute_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "dispute_routed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.delivery.receipt"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "delivery_receipt_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.settlement.statement_issued"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "statement_issued_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.quote.inquiry_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "inquiry_routed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.quote.expired"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "quote_expired_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.quote.withdrawn"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "quote_withdrawn_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.settlement.paid"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "settlement_paid_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.request_routed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_request_routed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.proposal_result"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_proposal_result_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.return_shipped"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_return_shipped_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.refund_completed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_refund_completed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.aftersale.closed"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "aftersale_closed_payload.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "utp.delivery.tracking_event"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "delivery_tracking_event_payload.json"
+          }
+        }
+      }
+    }
+  ]
+}
