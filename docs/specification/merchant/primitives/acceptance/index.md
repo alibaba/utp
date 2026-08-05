@@ -21,7 +21,7 @@ version: 2026-07-31
 - [操作矩阵（Operations Matrix）](#s-m69)
 - [Entities（实体定义）](#s-m610)
 - [Use Case Walkthroughs（用例演练）](#s-m611a2)
-- [改价提议（Price Amendment）](#s-m612)
+- [改价提议（Price Amendment）](#s-m-6-12)
 
 ---
 
@@ -47,7 +47,7 @@ service:        dev.utp.merchant
 
 Acceptance 是 UTP-M 第四个供应商原语（MP4），其意图是让供应商对买方发起的订购给出**显式、签名、可审计的受理结论**。 UTP-B 规范 P3 将卖方接受抽象为"卖方完成自身承诺处理"（[状态迁移的原子性](../../../primitives/purchase/index.md#s-1323)），并要求卖方在 complete 前"确认可行性"（[Seller 角色职责](../../../primitives/purchase/index.md#s-1352-seller)），但未定义承诺处理的产生机制，拒绝只能以错误码被动表达。MP4 将这一留白定义为显式协议动作，使供应商 Agent、ERP 审批流和人工后台都能以统一接口参与接单决策。
 
-### 关键设计原则 {#s-m612}
+### 关键设计原则 {#s-m-6-1-2}
 
 - **MP4 不替代 P3，而是喂给 P3。**订购成立的唯一路径仍然是 UTP-B 规范 `purchase.complete` 的原子迁移（`SIGNING → PURCHASED`）；MP4 `accept` 即 《状态迁移的原子性》 所要求的"卖方承诺处理"在平台托管拓扑下的规范化实现，其产出（卖方 ES256 签名，覆盖 `terms_hash`）是承诺处理完成的可审计证据。MP4 `reject` 则触发 P3 既有补偿链（释放库存 → `CANCELLED`）。
 - **受理结论是不可撤销承诺。**`accept` 一经提交，供应商即受条款约束（与买方签名对称）；反悔只能走 P6 Resolve。
@@ -59,7 +59,7 @@ Acceptance 是 UTP-M 第四个供应商原语（MP4），其意图是让供应�
 - **拒绝（reject）**：以结构化原因码拒绝（库存不足、区域限售、风控、价格失效等）。
 - **挂起（hold）**：在受理时限内暂缓（等待 ERP 审批/人工确认），MUST 声明预计答复时间。
 - **交期变更申报（amend_leadtime）**：接受订单但申报与 Listing 承诺不同的交期，交买方确认。
-- **改价提议（amend_price）**：接受订单但提议与下单条款不同的价格（运费重算、规格差价、阶梯价等），交买方确认后按新条款成立。改价 MUST NOT 单方生效，且是否允许由交易模式（B2B / B2C）与受理策略决定（[改价提议（Price Amendment）](#s-m612)）。
+- **改价提议（amend_price）**：接受订单但提议与下单条款不同的价格（运费重算、规格差价、阶梯价等），交买方确认后按新条款成立。改价 MUST NOT 单方生效，且是否允许由交易模式（B2B / B2C）与受理策略决定（[改价提议（Price Amendment）](#s-m-6-12)）。
 - **查询（query / list）**：待受理与历史受理记录检索。
 
 MP4 不覆盖：订购草案的创建与修改（Buyer 专属， UTP-B 规范 《角色与访问约束》）、询盘与报价（P2 询盘 / MP3 询盘响应，M5）、发货（MP5）。
@@ -236,7 +236,7 @@ MP4 不覆盖：订购草案的创建与修改（Buyer 专属， UTP-B 规范 �
 | `utp.acceptance.reject` | `PENDING_ACCEPT`, `ON_HOLD` | 进入 `REJECTED` 终态；触发 P3 补偿 | `query` | Seller；MUST 携带结构化原因码。 |
 | `utp.acceptance.hold` | `PENDING_ACCEPT` | 进入 `ON_HOLD`；不延长 deadline | `accept`, `reject`, `amend_leadtime`, `query` | Seller；每单至多一次；MUST 声明 `expected_reply_at`。 |
 | `utp.acceptance.amend_leadtime` | `PENDING_ACCEPT`, `ON_HOLD` | 进入 `AMEND_PROPOSED`，等待买方确认 | `query` | Seller；新交期 MUST 在平台允许幅度内；MUST 提供 `amended_leadtime_days`（相对交期）或 `promised_ship_at`（绝对发货时间）至少其一；买方确认后视同 ACCEPTED。 |
-| `utp.acceptance.amend_price` | `PENDING_ACCEPT`, `ON_HOLD` | 进入 `AMEND_PROPOSED`，等待买方确认 | `query` | Seller；受理策略 MUST 允许改价（`amend_price_allowed`，B2C 默认禁止）；MUST 携带 `base_terms_hash` 与覆盖 `proposed_terms_hash` 的卖方签名；`line_adjustments`/`order_adjustments` 至少其一；买方确认后按新 `terms_hash` 视同 ACCEPTED（[改价提议（Price Amendment）](#s-m612)）。 |
+| `utp.acceptance.amend_price` | `PENDING_ACCEPT`, `ON_HOLD` | 进入 `AMEND_PROPOSED`，等待买方确认 | `query` | Seller；受理策略 MUST 允许改价（`amend_price_allowed`，B2C 默认禁止）；MUST 携带 `base_terms_hash` 与覆盖 `proposed_terms_hash` 的卖方签名；`line_adjustments`/`order_adjustments` 至少其一；买方确认后按新 `terms_hash` 视同 ACCEPTED（[改价提议（Price Amendment）](#s-m-6-12)）。 |
 | `utp.acceptance.query` | 任意 | 无 | 当前状态下可执行动作 | Seller；按 `routing_id`/`purchase_id` 查询。 |
 | `utp.acceptance.list` | — | 无 | `accept`, `reject`, `hold`, `query` | Seller；按状态/时间筛选，分页；轮询降级通道。 |
 
@@ -329,7 +329,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
 
 ---
 
-## 改价提议（Price Amendment） {#s-m612}
+## 改价提议（Price Amendment） {#s-m-6-12}
 
 `utp.acceptance.amend_price` 允许供应商在受理阶段提出价格调整。本节确立两条约束：**其一，本动作是提议，不是变更**（改价 MUST NOT 单方生效）；**其二，改价是否可用、如何被确认，由交易模式（B2B / B2C）与受理策略参数化决定**（[B2B 与 B2C 场景的改价策略](#s-m6122)），而非对场景硬编码。
 

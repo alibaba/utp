@@ -42,7 +42,7 @@ version: 2026-07-31
 | 商品级 Mode 收窄 | mode_constraints | Listing 上对商户 Profile Mode 范围的商品级子集声明，驱动 Source 搜索可见性过滤（“能被搜到即可被履约”）。 | [Listing](primitives/listing/index.md#s-m391) / [Mode-Driven Behavior（模式驱动行为）](primitives/listing/index.md#s-m36) |
 | 售后单（Aftersale Order） | 以 `aftersale_id` 为锚点的售后处置资源，记录诉求、方案、协商回合、退货验货与退款凭据。 | [Entities（实体定义）](primitives/aftersale/index.md#s-m85) |  |
 | 处置方案（AftersaleResolution） | 售后的双方合意结论，含类型、退款金额、是否退货与运费责任；`resolution_hash` 为签名对象。 | [Entities（实体定义）](primitives/aftersale/index.md#s-m85) |  |
-| 改价提议（Price Amendment） | 受理阶段卖方提出的价格调整提议。MUST NOT 单方生效，买方确认后 `proposed_terms_hash` 成为权威条款哈希。 | [改价提议（Price Amendment）](primitives/acceptance/index.md#s-m612) |  |
+| 改价提议（Price Amendment） | 受理阶段卖方提出的价格调整提议。MUST NOT 单方生效，买方确认后 `proposed_terms_hash` 成为权威条款哈希。 | [改价提议（Price Amendment）](primitives/acceptance/index.md#s-m-6-12) |  |
 
 ## 附录 MB：错误码总表（Error Code Registry） {#s-mb}
 
