@@ -4,26 +4,28 @@ section: merchant
 owner: merchant-team
 status: review
 version: 2026-07-31
-format: html
 ---
 
-<h1 id="s-m3">商品原语（Listing）</h1>
-    <h2 id="s-m3-toc">目录</h2>
-    <ul>
-      <li><a href="#s-m31">Overview（概述）</a></li>
-      <li><a href="#s-m32">Lifecycle / State Machine（生命周期 / 状态机）</a></li>
-      <li><a href="#s-m33">Error Handling（错误处理）</a></li>
-      <li><a href="#s-m34">Scopes（权限范围）</a></li>
-      <li><a href="#s-m35">Guidelines（角色职责指引）</a></li>
-      <li><a href="#s-m36">Mode-Driven Behavior（模式驱动行为）</a></li>
-      <li><a href="#s-m37">Operations（操作定义）</a></li>
-      
-      <li><a href="#s-m39">Entities（实体定义）</a></li>
-      <li><a href="#s-m310">Use Case Walkthroughs（用例演练）</a></li>
-    </ul>
-    <hr />
-    <h2 id="s-m3-identity">原语身份</h2>
-<pre class="highlight"><code>primitive_id:   utp.listing
+# 商品原语（Listing） {#s-m3}
+
+## 目录 {#s-m3-toc}
+
+- [Overview（概述）](#s-m31)
+- [Lifecycle / State Machine（生命周期 / 状态机）](#s-m32)
+- [Error Handling（错误处理）](#s-m33)
+- [Scopes（权限范围）](#s-m34)
+- [Guidelines（角色职责指引）](#s-m35)
+- [Mode-Driven Behavior（模式驱动行为）](#s-m36)
+- [Operations（操作定义）](#s-m37)
+- [Entities（实体定义）](#s-m39)
+- [Use Case Walkthroughs（用例演练）](#s-m310)
+
+---
+
+## 原语身份 {#s-m3-identity}
+
+```
+primitive_id:   utp.listing
 version:        2026-07-31
 initiator_role: Seller
 handler_role:   Marketplace
@@ -32,49 +34,59 @@ state_delta:    ∅ → listing(LISTED)（资源作用域，不产生全局交�
 actions:        publish, update, list, delist, query, archive, batch
 compensation:   delist（使商品退出可交易范围，不影响已成立订单）
 service:        dev.utp.merchant
-</code></pre>
+```
 
-    <hr />
-    <h2 id="s-m31">Overview（概述）</h2>
-    <h3 id="s-m311">意图</h3>
-    <p>Listing 是 UTP-M 第一个供应商原语（MP1），其意图是使供应商能够把商品（Goods）或服务（Service）以标准结构发布到 Marketplace，并控制其可交易状态。Listing 的产出是<strong>商品档案（Listing）</strong>及其状态；只有处于 <code>LISTED</code> 状态的商品才进入买方 P1 Source 的可搜索范围。</p>
-    <p>Listing 是整个商业闭环的起点：没有 Listing，P1 Source 无货可搜。 UTP-B 规范中"商品已下架"（<code>PURCHASE.CREATE.INVALID_ITEMS</code>）、"商品不存在或已下架"（<code>SOURCE.LOOKUP.ITEM_NOT_FOUND</code>）等既有错误码的触发源，由本原语的 <code>delist</code>/<code>archive</code> 正式闭合。</p>
-    <h3 id="s-m312">关键设计原则</h3>
-    <p><strong>"商品发布"与"商品上架"是两个独立动作。</strong><code>publish</code> 建立商品档案并进入平台审核；<code>list</code> 使审核通过的商品进入可交易状态。分离的原因：审核是平台治理动作（时长不可控），上架是供应商经营决策（可反复执行）。供应商 MAY 在 <code>publish</code> 请求中声明 <code>auto_list: true</code>，审核通过后自动上架。</p>
-    <p><strong>Listing 管信息，不管数量。</strong>商品的可售数量由 MP2 Inventory（<a href="../../primitives/inventory/index.md">M4</a>）独立管理。<code>publish</code>/<code>update</code> 请求 MUST NOT 携带库存数量字段；实现方若在同一 UI 中同时编辑信息与库存，MUST 在协议层拆分为 MP1 与 MP2 两次调用。</p>
-    <h3 id="s-m313">范围</h3>
-    <p>Listing 覆盖以下场景：</p>
-    <ul>
-      <li><strong>商品发布（Publish）</strong>：创建商品档案（标题、类目、属性、SKU、定价、履约条款、媒体资源、合规资质引用）。发布请求 MAY 携带 AI 辅助录入素材（<a href="#s-m397">SourceMaterials（AI 辅助录入素材）</a> SourceMaterials：图片/商品链接/表格），由 Marketplace 解析为结构化草稿供供应商确认。</li>
-      <li><strong>商品更新（Update）</strong>：修改商品档案；价格与核心属性变更受版本化快照保护（<a href="#s-m324">版本化与变更分级</a>）。</li>
-      <li><strong>上架/下架（List / Delist）</strong>：控制商品是否可被搜索与订购。</li>
-      <li><strong>查询（Query）</strong>：查询商品档案、状态与审核结论。</li>
-      <li><strong>归档（Archive）</strong>：商品永久退出经营（终态）。</li>
-    </ul>
-    <p>Listing 不覆盖：库存数量（MP2）、订单处理（MP4）、类目体系治理（平台运营域）、搜索排序与推荐（平台实现域）。</p>
-    <h3 id="s-m314">前置条件</h3>
-    <table>
-      <thead><tr><th>条件</th><th>必需？</th><th>说明</th></tr></thead>
-      <tbody>
-        <tr><td><code>merchant.status == 'ACTIVE'</code></td><td>MUST</td><td>供应商已完成入驻五步流程（<a href="../../onboarding.md#s-m27">商户生命周期状态（Merchant Lifecycle）</a>）。<code>SANDBOX</code> 状态仅允许沙箱环境操作。</td></tr>
-        <tr><td><code>seller.identity.verified == true</code></td><td>MUST</td><td>Seller 身份已验证，请求携带有效 RFC 9421 签名。</td></tr>
-        <tr><td><code>category ∈ merchant.qualified_categories</code></td><td>MUST</td><td>商品类目在供应商资质核准范围内。</td></tr>
-        <tr><td><code>compliance_level ≥ L1 → compliance_refs != null</code></td><td>MUST</td><td>合规要求类目 MUST 附资质文件引用。</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m315">后置条件</h3>
-    <table>
-      <thead><tr><th>条件</th><th>说明</th></tr></thead>
-      <tbody>
-        <tr><td><code>listing.listing_id != null</code></td><td>商品档案已建立，含全局唯一标识。</td></tr>
-        <tr><td><code>listing.status == 'LISTED'</code>（完成 <code>list</code> 后）</td><td>商品进入可交易状态。</td></tr>
-        <tr><td><code>source.lookup(item_id == listing.listing_id) 可命中</code></td><td>买方 P1 Source 可搜索/查询该商品（平台托管拓扑）。</td></tr>
-        <tr><td><code>listing.version_hash</code> 已生成</td><td>当前版本快照的 SHA256 哈希，供订单条款快照引用。</td></tr>
-        <tr><td><code>listing_snapshot 已存档</code></td><td>每次生效版本 MUST 存档，可纳入 Evidence Bundle。</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m316">语义契约</h3>
-<pre class="highlight"><code class="language-json">{
+---
+
+## Overview（概述） {#s-m31}
+
+### 意图 {#s-m311}
+
+Listing 是 UTP-M 第一个供应商原语（MP1），其意图是使供应商能够把商品（Goods）或服务（Service）以标准结构发布到 Marketplace，并控制其可交易状态。Listing 的产出是**商品档案（Listing）**及其状态；只有处于 `LISTED` 状态的商品才进入买方 P1 Source 的可搜索范围。
+
+Listing 是整个商业闭环的起点：没有 Listing，P1 Source 无货可搜。 UTP-B 规范中"商品已下架"（`PURCHASE.CREATE.INVALID_ITEMS`）、"商品不存在或已下架"（`SOURCE.LOOKUP.ITEM_NOT_FOUND`）等既有错误码的触发源，由本原语的 `delist`/`archive` 正式闭合。
+
+### 关键设计原则 {#s-m312}
+
+**"商品发布"与"商品上架"是两个独立动作。**`publish` 建立商品档案并进入平台审核；`list` 使审核通过的商品进入可交易状态。分离的原因：审核是平台治理动作（时长不可控），上架是供应商经营决策（可反复执行）。供应商 MAY 在 `publish` 请求中声明 `auto_list: true`，审核通过后自动上架。
+
+**Listing 管信息，不管数量。**商品的可售数量由 MP2 Inventory（[M4](../../primitives/inventory/index.md)）独立管理。`publish`/`update` 请求 MUST NOT 携带库存数量字段；实现方若在同一 UI 中同时编辑信息与库存，MUST 在协议层拆分为 MP1 与 MP2 两次调用。
+
+### 范围 {#s-m313}
+
+Listing 覆盖以下场景：
+
+- **商品发布（Publish）**：创建商品档案（标题、类目、属性、SKU、定价、履约条款、媒体资源、合规资质引用）。发布请求 MAY 携带 AI 辅助录入素材（[SourceMaterials（AI 辅助录入素材）](#s-m397) SourceMaterials：图片/商品链接/表格），由 Marketplace 解析为结构化草稿供供应商确认。
+- **商品更新（Update）**：修改商品档案；价格与核心属性变更受版本化快照保护（[版本化与变更分级](#s-m324)）。
+- **上架/下架（List / Delist）**：控制商品是否可被搜索与订购。
+- **查询（Query）**：查询商品档案、状态与审核结论。
+- **归档（Archive）**：商品永久退出经营（终态）。
+
+Listing 不覆盖：库存数量（MP2）、订单处理（MP4）、类目体系治理（平台运营域）、搜索排序与推荐（平台实现域）。
+
+### 前置条件 {#s-m314}
+
+| 条件 | 必需？ | 说明 |
+| --- | --- | --- |
+| `merchant.status == 'ACTIVE'` | MUST | 供应商已完成入驻五步流程（[商户生命周期状态（Merchant Lifecycle）](../../onboarding.md#s-m27)）。`SANDBOX` 状态仅允许沙箱环境操作。 |
+| `seller.identity.verified == true` | MUST | Seller 身份已验证，请求携带有效 RFC 9421 签名。 |
+| `category ∈ merchant.qualified_categories` | MUST | 商品类目在供应商资质核准范围内。 |
+| `compliance_level ≥ L1 → compliance_refs != null` | MUST | 合规要求类目 MUST 附资质文件引用。 |
+
+### 后置条件 {#s-m315}
+
+| 条件 | 说明 |
+| --- | --- |
+| `listing.listing_id != null` | 商品档案已建立，含全局唯一标识。 |
+| `listing.status == 'LISTED'`（完成 `list` 后） | 商品进入可交易状态。 |
+| `source.lookup(item_id == listing.listing_id) 可命中` | 买方 P1 Source 可搜索/查询该商品（平台托管拓扑）。 |
+| `listing.version_hash` 已生成 | 当前版本快照的 SHA256 哈希，供订单条款快照引用。 |
+| `listing_snapshot 已存档` | 每次生效版本 MUST 存档，可纳入 Evidence Bundle。 |
+
+### 语义契约 {#s-m316}
+
+```json
+{
   "primitive": "utp.listing",
   "preconditions": [
     "merchant.status == 'ACTIVE'",
@@ -104,250 +116,258 @@ service:        dev.utp.merchant
     "on_platform_suspend": "平台依据治理规则强制下架（SUSPENDED_BY_PLATFORM），MUST 通知供应商并附申诉路径"
   }
 }
-</code></pre>
+```
 
-    <hr />
-    <h2 id="s-m32">Lifecycle / State Machine（生命周期 / 状态机）</h2>
-    <h3 id="s-m321">Listing 资源状态机</h3>
-<div class="diagram"><img src="../../../../assets/diagrams/m-listing-state-machine.svg" alt="Listing 资源状态机：PENDING_REVIEW/REJECTED/PUBLISHED/LISTED/DELISTED/SUSPENDED_BY_PLATFORM/ARCHIVED 及迁移" style="max-width: 100%; height: auto;"></div>
-    <h3 id="s-m322">状态定义与迁移规则</h3>
-    <table>
-      <thead><tr><th>状态</th><th>含义</th><th>进入条件</th><th>允许的操作</th></tr></thead>
-      <tbody>
-        <tr><td><code>PENDING_REVIEW</code></td><td>已提交，平台审核中</td><td><code>publish</code>，或对 LISTED 商品的重大 <code>update</code>（<a href="#s-m324">版本化与变更分级</a>）</td><td><code>query</code>；供应商 MAY 撤回（视为 <code>archive</code>）</td></tr>
-        <tr><td><code>REJECTED</code></td><td>审核驳回</td><td>平台审核不通过，附原因码</td><td><code>update</code>（修改后自动重新进入 <code>PENDING_REVIEW</code>）, <code>query</code>, <code>archive</code></td></tr>
-        <tr><td><code>PUBLISHED</code></td><td>审核通过，未上架</td><td>审核通过；或从 <code>LISTED</code> 执行 <code>delist</code> 前的历史状态恢复</td><td><code>list</code>, <code>update</code>, <code>query</code>, <code>archive</code></td></tr>
-        <tr><td><code>LISTED</code></td><td>已上架，可搜索可订购</td><td><code>list</code> 成功执行</td><td><code>update</code>, <code>delist</code>, <code>query</code></td></tr>
-        <tr><td><code>DELISTED</code></td><td>已下架，不可搜索不可订购</td><td><code>delist</code> 成功执行</td><td><code>list</code>（重新上架）, <code>update</code>, <code>query</code>, <code>archive</code></td></tr>
-        <tr><td><code>SUSPENDED_BY_PLATFORM</code></td><td>平台强制下架（治理动作）</td><td>资质过期、违规、风控触发</td><td><code>query</code>；整改通过后由平台恢复至 <code>PUBLISHED</code></td></tr>
-        <tr><td><code>ARCHIVED</code></td><td>永久退出（终态）</td><td><code>archive</code> 成功执行</td><td><code>query</code>（只读）</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m323">状态迁移的确定性</h3>
-    <p>同一状态下同一操作 MUST 产生唯一确定的迁移结果（继承 UTP 规范状态机确定性约束）。特别地：</p>
-    <ul>
-      <li><code>list</code> 仅在 <code>PUBLISHED</code>、<code>DELISTED</code> 状态允许；对 <code>PENDING_REVIEW</code> 执行 <code>list</code> MUST 返回 <code>LISTING.LIST.NOT_REVIEWED</code>。</li>
-      <li><code>delist</code> 生效 MUST 是原子的：生效时刻之后的 <code>source.lookup</code> MUST 返回 <code>SOURCE.LOOKUP.ITEM_NOT_FOUND</code>，<code>purchase.create</code> MUST 返回 <code>PURCHASE.CREATE.INVALID_ITEMS</code>；生效时刻之前已创建的订购草案按其条款快照继续（<code>complete</code> 时的最终校验以下架事实为准，失败走 P3 既有补偿链）。</li>
-      <li><code>archive</code> 对存在未完结订单的商品 MUST 被拒绝（<code>LISTING.ARCHIVE.OPEN_ORDERS</code>），供应商应先 <code>delist</code> 并待订单完结。</li>
-    </ul>
-    <h3 id="s-m324">版本化与变更分级</h3>
-    <p>每次生效变更产生新的 <code>version</code>（单调递增整数）与 <code>version_hash</code>。变更分两级：</p>
-    <table>
-      <thead><tr><th>变更级别</th><th>字段范围</th><th>处理方式</th></tr></thead>
-      <tbody>
-        <tr><td>轻量变更（minor）</td><td><code>description</code>、<code>media</code>、<code>fulfillment_terms.leadtime_days</code>、SKU 增补</td><td>即时生效，商品保持 <code>LISTED</code>；生成新版本快照</td></tr>
-        <tr><td>重大变更（major）</td><td><code>title</code>、<code>category</code>、<code>pricing</code>（降价除外）、SKU 删除、<code>compliance_refs</code></td><td>MUST 重新审核：商品保持旧版本继续可售，新版本进入 <code>PENDING_REVIEW</code>，审核通过后原子切换</td></tr>
-      </tbody>
-    </table>
-    <p>订购条款快照（P3 的 <code>terms_snapshot</code>）MUST 引用下单时刻的 <code>listing_id + version_hash</code>；价格一致性校验（<code>PURCHASE.CREATE.PRICE_CHANGED</code>）以该版本为基准。被任何有效订单引用的版本快照 MUST 保留至争议时效期结束。</p>
+---
 
-    <hr />
-    <h2 id="s-m33">Error Handling（错误处理）</h2>
-    <p>错误响应 MUST 使用 UTP 规范 P0 通<a href="../../../protocol-core/primitive-framework.md#s-1043-standard-error-response">标准错误响应格式</a>。本节定义 Listing 特有错误码：</p>
-    <table>
-      <thead><tr><th>错误码</th><th>严重级别</th><th>HTTP 映射</th><th>描述</th><th>建议处理</th></tr></thead>
-      <tbody>
-        <tr><td><code>LISTING.PUBLISH.MERCHANT_NOT_ACTIVE</code></td><td>error</td><td>403</td><td>供应商未完成入驻或处于 <code>RESTRICTED</code>/<code>TERMINATED</code> 状态。</td><td>完成入驻流程或联系平台解除限制。</td></tr>
-        <tr><td><code>LISTING.PUBLISH.CATEGORY_NOT_QUALIFIED</code></td><td>error</td><td>403</td><td>商品类目不在供应商资质核准范围内。</td><td>申请类目资质后重试。</td></tr>
-        <tr><td><code>LISTING.PUBLISH.SCHEMA_INVALID</code></td><td>error</td><td>400</td><td>商品结构不符合 Listing Schema（缺必填字段、SKU 结构错误、含库存数量字段等）。</td><td>按错误详情修正后重试。</td></tr>
-        <tr><td><code>LISTING.PUBLISH.COMPLIANCE_MISSING</code></td><td>error</td><td>422</td><td><code>compliance_level ≥ L1</code> 类目缺少资质文件引用。</td><td>补充 <code>compliance_refs</code> 后重试。</td></tr>
-        <tr><td><code>LISTING.PUBLISH.DUPLICATE</code></td><td>error</td><td>409</td><td>幂等键重复但请求内容不一致。</td><td>使用新的幂等键。</td></tr>
-        <tr><td><code>LISTING.PUBLISH.INGEST_FAILED</code></td><td>error</td><td>422</td><td>AI 辅助录入素材解析失败或置信度不足（图片不可读、链接不可达、表格结构无法识别）。响应 MUST 附逐素材的解析报告。</td><td>修正素材后重试，或改为结构化字段直接提交。</td></tr>
-        <tr><td><code>LISTING.UPDATE.NOT_FOUND</code></td><td>error</td><td>404</td><td>指定 <code>listing_id</code> 不存在或不属于调用方。</td><td>校验 <code>listing_id</code>。</td></tr>
-        <tr><td><code>LISTING.UPDATE.VERSION_CONFLICT</code></td><td>error</td><td>409</td><td><code>expected_version</code> 与当前版本不一致（并发修改）。</td><td>重新 <code>query</code> 获取最新版本后重试。</td></tr>
-        <tr><td><code>LISTING.UPDATE.IMMUTABLE_FIELD</code></td><td>error</td><td>400</td><td>尝试修改不可变字段（<code>listing_id</code>、<code>merchant_id</code>、库存数量字段）。</td><td>数量走 <code>utp.inventory</code>；其余字段不可改。</td></tr>
-        <tr><td><code>LISTING.LIST.NOT_REVIEWED</code></td><td>error</td><td>409</td><td>商品未通过审核（<code>PENDING_REVIEW</code>/<code>REJECTED</code>）不可上架。</td><td>等待或按驳回原因修改。</td></tr>
-        <tr><td><code>LISTING.LIST.SUSPENDED</code></td><td>error</td><td>403</td><td>商品处于 <code>SUSPENDED_BY_PLATFORM</code>，供应商不可自行上架。</td><td>按整改要求处理并申诉。</td></tr>
-        <tr><td><code>LISTING.DELIST.STATE_CONFLICT</code></td><td>warning</td><td>409</td><td>商品已处于下架/归档状态。</td><td>幂等返回当前状态。</td></tr>
-        <tr><td><code>LISTING.ARCHIVE.OPEN_ORDERS</code></td><td>error</td><td>409</td><td>存在未完结订单，不可归档。</td><td>先 <code>delist</code>，待订单完结后归档。</td></tr>
-        <tr><td><code>LISTING.QUERY.NOT_FOUND</code></td><td>error</td><td>404</td><td>商品不存在或调用方无权访问。</td><td>校验标识与权限。</td></tr>
-        <tr><td><code>LISTING.RATE_LIMITED</code></td><td>warning</td><td>429</td><td>发布/更新频率超过平台限流阈值。</td><td>按 <code>Retry-After</code> 等待后重试；批量场景改用 <a href="#s-m372">批量模式（Batch Mode）</a> 批量模式。</td></tr>
-      </tbody>
-    </table>
+## Lifecycle / State Machine（生命周期 / 状态机） {#s-m32}
 
-    <hr />
-    <h2 id="s-m34">Scopes（权限范围）</h2>
-    <table>
-      <thead><tr><th>Scope</th><th>类型</th><th>描述</th><th>授予方</th><th>默认分配</th></tr></thead>
-      <tbody>
-        <tr><td><code>listing:publish</code></td><td>Action Scope</td><td>发布商品档案。</td><td>Marketplace（入驻通过后）</td><td>Seller 角色</td></tr>
-        <tr><td><code>listing:update</code></td><td>Action Scope</td><td>更新商品档案。</td><td>Marketplace</td><td>Seller 角色（仅本方商品）</td></tr>
-        <tr><td><code>listing:list</code></td><td>Action Scope</td><td>上架商品。</td><td>Marketplace</td><td>Seller 角色（仅本方商品）</td></tr>
-        <tr><td><code>listing:delist</code></td><td>Action Scope</td><td>下架商品。</td><td>Marketplace</td><td>Seller 角色（仅本方商品）</td></tr>
-        <tr><td><code>listing:query</code></td><td>Action Scope</td><td>查询商品档案、状态与审核结论。</td><td>Marketplace</td><td>Seller 角色（仅本方商品）</td></tr>
-        <tr><td><code>listing:archive</code></td><td>Action Scope</td><td>归档商品。</td><td>Marketplace</td><td>Seller 角色（仅本方商品）</td></tr>
-      </tbody>
-    </table>
-    <p><strong>权限约束：</strong></p>
-    <ul>
-      <li>全部 Listing 操作 MUST 仅作用于调用方（<code>agent_id</code>）名下的商品；跨商户访问 MUST 返回 <code>LISTING.QUERY.NOT_FOUND</code>（不泄露存在性）。</li>
-      <li><code>SUSPENDED_BY_PLATFORM</code> 的进入与解除是 Marketplace 的治理动作，不对应供应商 Scope。</li>
-      <li>审核（review）是 Marketplace 内部义务，不是协议 Action；审核结论通过回调事件 <code>utp.listing.review_result</code>（<a href="onboarding.md#s-m261">回调事件类型注册表</a>）通知。</li>
-    </ul>
+### Listing 资源状态机 {#s-m321}
 
-    <hr />
-    <h2 id="s-m35">Guidelines（角色职责指引）</h2>
-    <h3 id="s-m351">Seller 角色职责</h3>
-    <table>
-      <thead><tr><th>职责</th><th>级别</th><th>说明</th></tr></thead>
-      <tbody>
-        <tr><td>信息真实准确</td><td>MUST</td><td>商品标题、属性、资质 MUST 真实；虚假信息导致的争议中 ListingSnapshot 将作为对供应商不利的证据。</td></tr>
-        <tr><td>结构化发布</td><td>MUST</td><td>MUST 按 Listing Schema 提供结构化字段，MUST NOT 把关键交易条件（价格、交期）只写在描述富文本中。</td></tr>
-        <tr><td>价格一致性</td><td>MUST</td><td><code>pricing</code> MUST 与其经 MP3 应答 P2 询盘的报价口径一致（<a href="primitives/quote/index.md#s-m551">Seller 角色职责</a>）；<code>pricing_mode ≥ L1</code> 时 MUST 提供 <code>pricing_tiers</code>。</td></tr>
-        <tr><td>及时下架</td><td>MUST</td><td>停售、断货长期无法补货、资质失效时 MUST 及时 <code>delist</code>，减少 <code>PURCHASE.CREATE.INVALID_ITEMS</code> 对买方体验的冲击。</td></tr>
-        <tr><td>版本自洽</td><td>SHOULD</td><td>重大变更 SHOULD 避开销售高峰；利用 <a href="#s-m324">版本化与变更分级</a> 的"旧版本可售 + 新版本审核"机制平滑切换。</td></tr>
-        <tr><td>媒体合规</td><td>SHOULD</td><td>图片/视频资源 SHOULD 使用持久 URI，MUST 拥有合法版权。</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m352">Marketplace 角色职责</h3>
-    <table>
-      <thead><tr><th>职责</th><th>级别</th><th>说明</th></tr></thead>
-      <tbody>
-        <tr><td>审核时效</td><td>MUST</td><td>MUST 公示审核 SLA 并在 SLA 内给出结论；驳回 MUST 附结构化原因码（附录 MB 的 <code>REVIEW.*</code> 原因码空间）。</td></tr>
-        <tr><td>索引一致性</td><td>MUST</td><td><code>list</code>/<code>delist</code> 生效后，Source 可搜索范围 MUST 在声明的传播时限（SHOULD ≤ 60s）内一致；生效时刻以状态迁移时间戳为准。</td></tr>
-        <tr><td>投影保真</td><td>MUST</td><td>Source 返回的商品投影 MUST 来自最新生效版本，MUST NOT 篡改供应商声明的价格与条款。</td></tr>
-        <tr><td>快照存档</td><td>MUST</td><td>MUST 存档每个生效版本快照，保存期不低于争议时效期；被订单引用的版本 MUST NOT 删除。</td></tr>
-        <tr><td>治理透明</td><td>MUST</td><td>强制下架 MUST 通知供应商，附原因与申诉路径；恢复条件 MUST 可核验。</td></tr>
-        <tr><td>限流公示</td><td>SHOULD</td><td>SHOULD 公示发布/更新限流阈值与批量通道规格。</td></tr>
-      </tbody>
-    </table>
+![Listing 资源状态机：PENDING_REVIEW/REJECTED/PUBLISHED/LISTED/DELISTED/SUSPENDED_BY_PLATFORM/ARCHIVED 及迁移](../../../../assets/diagrams/m-listing-state-machine.svg)
 
-    <hr />
-    <h2 id="s-m36">Mode-Driven Behavior（模式驱动行为）</h2>
-    <table>
-      <thead><tr><th>Mode 维度</th><th>对 Listing 的影响</th></tr></thead>
-      <tbody>
-        <tr><td><code>pricing_mode</code> L0</td><td><code>pricing.unit_price</code> MUST 存在；<code>pricing_tiers</code> MUST NOT 存在。</td></tr>
-        <tr><td><code>pricing_mode</code> L1</td><td><code>pricing_tiers</code>（MOQ/MOA 阶梯）MUST 存在，与 UTP-B 规范 PricingTiers 同构。</td></tr>
-        <tr><td><code>pricing_mode</code> L2/L3</td><td>MAY 标记 <code>negotiable: true</code>；L3 竞价商品 MUST 提供 <code>bid_starting_price</code> 与 <code>bid_deadline</code>。</td></tr>
-        <tr><td><code>fulfillment_structure</code> L1+</td><td><code>fulfillment_terms</code> MUST 声明 <code>ships_from</code>、<code>leadtime_days</code>；L2 的阶段划分、前置条件和完成条件 MUST 在交易条款锁定时确定。Listing 已知相关条件时 MAY 预告，但不得仅因 L2 自动推导可分批。</td></tr>
-        <tr><td><code>relationship_mode</code> L2+</td><td>MAY 发布仅对框架协议客户可见的协议价商品（<code>visibility: "framework_only"</code>）。</td></tr>
-        <tr><td><code>compliance_level</code> L1+</td><td><code>compliance_refs</code> MUST 存在且审核通过；L2+（跨境）MUST 含原产地与进出口许可引用；L3 MUST 附审计报告引用。</td></tr>
-      </tbody>
-    </table>
-    <p><strong>搜索可见性规则（Mode 过滤）：</strong>商品的有效 Mode 范围 = 商户 Profile 中对应原语的 <code>supported_mode_range</code>（<code>utp.roles.seller.primitives</code>， UTP 规范 《发现与协商》） ∩ 商品 <code>mode_constraints</code>（缺省为前者）。Marketplace 的 P1 Source MUST 按会话 <code>ModeConfiguration</code> 过滤：会话 Mode 任一维度不在商品有效范围内的商品，MUST NOT 出现在携带任意 <code>filters</code> 的 <code>search</code> 结果中，对其 <code>lookup</code> MUST 返回 <code>SOURCE.MODE.UNSUPPORTED</code>（UTP-B 规范 《错误码定义》）。该规则将 UTP 规范的运行时错误前置为搜索期过滤，消除“能搜到却无法按该模式成交”的供需错配（闭环不变式 6，见 商品—交易闭环（End-to-End Loop））。</p>
+### 状态定义与迁移规则 {#s-m322}
 
-    <hr />
-    <h2 id="s-m37">Operations（操作定义）</h2>
-    <p>Listing 的核心操作为 <code>publish</code>、<code>update</code>、<code>list</code>、<code>delist</code>、<code>query</code>、<code>archive</code>，复用 UTP 规范 <a href="../../../protocol-core/primitive-framework.md#s-1023-action-definition-format">《操作定义格式》 操作定义格式</a>。</p>
-    <h3 id="s-m371">Listing 操作矩阵</h3>
-    <table>
-      <thead><tr><th>操作</th><th>适用状态</th><th>状态影响</th><th><code>valid_next_actions</code></th><th>关键约束</th></tr></thead>
-      <tbody>
-        <tr><td><code>utp.listing.publish</code></td><td>（新建）</td><td>创建档案并进入 <code>PENDING_REVIEW</code>；<code>auto_list: true</code> 时审核通过后自动 <code>LISTED</code></td><td><code>query</code></td><td>Seller；MUST 通过 Schema 校验与类目资质校验；MUST 携带 Seller JWS 签名覆盖 <code>version_hash</code>；MAY 携带 <code>source_materials</code>（AI 解析产出的字段与显式提交字段冲突时，显式字段 MUST 优先）。</td></tr>
-        <tr><td><code>utp.listing.update</code></td><td><code>REJECTED</code>, <code>PUBLISHED</code>, <code>LISTED</code>, <code>DELISTED</code></td><td>minor：即时生效新版本；major：新版本进入 <code>PENDING_REVIEW</code>，旧版本继续可售</td><td><code>query</code>, <code>list</code>, <code>delist</code></td><td>Seller；MUST 携带 <code>expected_version</code> 乐观锁；MUST NOT 修改库存数量。</td></tr>
-        <tr><td><code>utp.listing.list</code></td><td><code>PUBLISHED</code>, <code>DELISTED</code></td><td>进入 <code>LISTED</code>，纳入 Source 可搜索范围</td><td><code>update</code>, <code>delist</code>, <code>query</code>, <code>utp.inventory.set</code></td><td>Seller；上架前 SHOULD 已通过 <code>utp.inventory.set</code> 设置可售数量，否则商品可搜索但不可订购。</td></tr>
-        <tr><td><code>utp.listing.delist</code></td><td><code>LISTED</code></td><td>进入 <code>DELISTED</code>，原子退出可搜索/可订购范围</td><td><code>list</code>, <code>update</code>, <code>query</code>, <code>archive</code></td><td>Seller；已成立订单不受影响；幂等。</td></tr>
-        <tr><td><code>utp.listing.query</code></td><td>任意</td><td>无状态影响</td><td>当前状态下可执行的动作</td><td>Seller；支持按 <code>listing_id</code> 单查、按状态/类目/时间的列表查询（分页）及按 <code>batch_id</code> 轮询批量任务逐条结果（<a href="#s-m372">批量模式（Batch Mode）</a>）。</td></tr>
-        <tr><td><code>utp.listing.archive</code></td><td><code>PUBLISHED</code>, <code>DELISTED</code>, <code>REJECTED</code></td><td>进入 <code>ARCHIVED</code> 终态</td><td><code>query</code></td><td>Seller；存在未完结订单 MUST 拒绝；不可逆。</td></tr>
-        <tr><td><code>utp.listing.batch</code></td><td>同 <code>publish</code>/<code>update</code></td><td>逐条同单条操作</td><td><code>query</code>（按 <code>batch_id</code>）</td><td>Seller；批量提交通道，单批 ≤ 500 条、逐条独立成败，MAY 异步；规则见 <a href="#s-m372">批量模式（Batch Mode）</a>。</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m372">批量模式（Batch Mode）</h3>
-    <p>面向 ERP 全量/增量同步场景（同步模式（Synchronization Patterns）），<code>publish</code> 与 <code>update</code> MUST 支持批量提交：</p>
-    <ul>
-      <li>批量请求为条目数组（单批 MUST ≤ 500 条），整批共享一个 <code>idempotency_key</code>，逐条独立校验、独立成败。</li>
-      <li>响应 MUST 逐条返回 <code>{index, listing_id | error}</code>；部分失败不影响其余条目（部分成功语义）。</li>
-      <li>批量任务 MAY 异步执行：响应返回 <code>batch_id</code>，供应商以 <code>query</code>（<code>batch_id</code> 维度）轮询结果；推送模式下以回调通知完成。</li>
-    </ul>
+| 状态 | 含义 | 进入条件 | 允许的操作 |
+| --- | --- | --- | --- |
+| `PENDING_REVIEW` | 已提交，平台审核中 | `publish`，或对 LISTED 商品的重大 `update`（[版本化与变更分级](#s-m324)） | `query`；供应商 MAY 撤回（视为 `archive`） |
+| `REJECTED` | 审核驳回 | 平台审核不通过，附原因码 | `update`（修改后自动重新进入 `PENDING_REVIEW`）, `query`, `archive` |
+| `PUBLISHED` | 审核通过，未上架 | 审核通过；或从 `LISTED` 执行 `delist` 前的历史状态恢复 | `list`, `update`, `query`, `archive` |
+| `LISTED` | 已上架，可搜索可订购 | `list` 成功执行 | `update`, `delist`, `query` |
+| `DELISTED` | 已下架，不可搜索不可订购 | `delist` 成功执行 | `list`（重新上架）, `update`, `query`, `archive` |
+| `SUSPENDED_BY_PLATFORM` | 平台强制下架（治理动作） | 资质过期、违规、风控触发 | `query`；整改通过后由平台恢复至 `PUBLISHED` |
+| `ARCHIVED` | 永久退出（终态） | `archive` 成功执行 | `query`（只读） |
 
-    <hr />
-<h2 id="s-m39">Entities（实体定义）</h2>
-    <h3 id="s-m391">Listing</h3>
-    <table>
-      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
-      <tbody>
-        <tr><td><code>listing_id</code></td><td>string</td><td>是</td><td>商品全局唯一标识，由 Marketplace 在 <code>publish</code> 时生成。买方侧 P1 Source 的 <code>item_id</code> 与此同值。</td></tr>
-        <tr><td><code>merchant_id</code></td><td>string</td><td>是</td><td>所属供应商在平台域内的标识（<a href="onboarding.md#s-m242">注册接口与结果</a>）。</td></tr>
-        <tr><td><code>status</code></td><td>enum</td><td>是</td><td><a href="#s-m322">状态定义与迁移规则</a> 定义的状态枚举。</td></tr>
-        <tr><td><code>version</code></td><td>integer</td><td>是</td><td>版本号，单调递增。</td></tr>
-        <tr><td><code>version_hash</code></td><td>string</td><td>是</td><td>当前版本规范化 JSON 的 SHA256 哈希。</td></tr>
-        <tr><td><code>type</code></td><td>enum</td><td>是</td><td><code>goods</code>（实物）/ <code>service</code>（服务）/ <code>digital</code>（虚拟）。</td></tr>
-        <tr><td><code>title</code></td><td>string</td><td>是</td><td>商品标题。</td></tr>
-        <tr><td><code>category</code></td><td>string</td><td>是</td><td>平台类目标识。</td></tr>
-        <tr><td><code>description</code></td><td>string</td><td>否</td><td>商品描述（富文本引用或纯文本）。</td></tr>
-        <tr><td><code>attributes</code></td><td>object</td><td>否</td><td>类目属性键值对（品牌、型号、材质等），键空间由类目 Schema 定义。</td></tr>
-        <tr><td><code>skus</code></td><td>ListingSku[]</td><td>是</td><td>SKU 列表，MUST 至少一条（<a href="#s-m392">ListingSku</a>）。</td></tr>
-        <tr><td><code>pricing</code></td><td>ListingPricing</td><td>是</td><td>定价结构（<a href="#s-m393">ListingPricing</a>）。</td></tr>
-        <tr><td><code>fulfillment_terms</code></td><td>FulfillmentTerms</td><td>是</td><td>履约条款（<a href="#s-m394">FulfillmentTerms</a>）。</td></tr>
-        <tr><td><code>trade_methods</code></td><td>array</td><td>是</td><td>支持的 Trade Method 列表，结构同 UTP-B 规范 （<a href="../../../primitives/purchase/index.md">《订购原语》</a> 引用的 TradeMethod）。</td></tr>
-        <tr><td><code>media</code></td><td>ListingMedia[]</td><td>否</td><td>图片/视频资源（<a href="#s-m395">ListingMedia 与 ListingSnapshot</a>）。</td></tr>
-        <tr><td><code>compliance_refs</code></td><td>array</td><td>否</td><td>资质文件引用列表（<code>credential_id</code> + 类型）；<code>compliance_level ≥ L1</code> 时必填。</td></tr>
-        <tr><td><code>visibility</code></td><td>enum</td><td>否</td><td><code>public</code>（默认）/ <code>framework_only</code>（仅框架协议客户可见）。</td></tr>
-        <tr><td><code>mode_constraints</code></td><td>object</td><td>否</td><td>商品级 Mode 能力收窄声明：六个核心维度各为 Level 数组，MUST 为商户 Profile 对应原语 <code>supported_mode_range</code> 对应维度的非空子集；缺省继承 Profile 全量范围。驱动 Source 搜索可见性过滤（<a href="#s-m36">Mode-Driven Behavior（模式驱动行为）</a>）。</td></tr>
-        <tr><td><code>auto_list</code></td><td>boolean</td><td>否</td><td>审核通过后是否自动上架，默认 <code>false</code>。</td></tr>
-        <tr><td><code>seller_signature</code></td><td>string</td><td>是</td><td>Seller ES256 签名（JWS），覆盖 <code>version_hash</code>。</td></tr>
-        <tr><td><code>created_at</code> / <code>updated_at</code></td><td>ISO-8601</td><td>是</td><td>创建/最近生效变更时间。</td></tr>
-      </tbody>
-    </table>
-    <blockquote><p>Listing MUST NOT 含任何库存数量字段。库存见 <a href="../../primitives/inventory/index.md#s-m49">Entities（实体定义）</a>。</p></blockquote>
-    <h3 id="s-m392">ListingSku</h3>
-    <table>
-      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
-      <tbody>
-        <tr><td><code>sku_id</code></td><td>string</td><td>是</td><td>SKU 标识，商品内唯一。买方侧 P1/P3 的 <code>sku_id</code> 与此同值。</td></tr>
-        <tr><td><code>spec</code></td><td>object</td><td>是</td><td>规格键值对（如 <code>{"color": "黑色", "size": "L"}</code>）。</td></tr>
-        <tr><td><code>price_offset</code></td><td>Money</td><td>否</td><td>相对 <code>pricing.unit_price</code> 的差价；缺省为零差价。</td></tr>
-        <tr><td><code>barcode</code></td><td>string</td><td>否</td><td>商品条码（EAN/UPC）。</td></tr>
-        <tr><td><code>external_ref</code></td><td>string</td><td>否</td><td>供应商内部编码（ERP 物料号），用于 M10 ID 映射；平台 MUST 原样保存并在订单路由中回传。</td></tr>
-        <tr><td><code>status</code></td><td>enum</td><td>是</td><td><code>active</code> / <code>inactive</code>（SKU 级停售，不影响其它 SKU）。</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m393">ListingPricing</h3>
-    <table>
-      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
-      <tbody>
-        <tr><td><code>pricing_mode</code></td><td>enum</td><td>是</td><td>本商品支持的最低定价模式：<code>L0</code>—<code>L3</code>，MUST 落在会话 Mode 协商范围内。</td></tr>
-        <tr><td><code>unit_price</code></td><td>Money</td><td>条件</td><td>固定单价；<code>pricing_mode == L0</code> 时必填。Money 结构同 UTP 规范 <a href="../../../schemas/index.md">25.2 Money</a>。</td></tr>
-        <tr><td><code>pricing_tiers</code></td><td>array</td><td>条件</td><td>阶梯价数组 <code>{min_quantity, unit_price}</code>；<code>pricing_mode ≥ L1</code> 时必填，与 UTP-B 规范 PricingTiers 同构。</td></tr>
-        <tr><td><code>negotiable</code></td><td>boolean</td><td>否</td><td>是否可议价（对应 <code>pricing_mode ≥ L2</code>）。</td></tr>
-        <tr><td><code>bid_starting_price</code> / <code>bid_deadline</code></td><td>Money / ISO-8601</td><td>条件</td><td>竞价起拍价与截止时间；<code>pricing_mode == L3</code> 时必填。</td></tr>
-        <tr><td><code>currency</code></td><td>string</td><td>是</td><td>ISO 4217 币种，商品内全部价格 MUST 同币种。</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m394">FulfillmentTerms</h3>
-    <table>
-      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
-      <tbody>
-        <tr><td><code>ships_from</code></td><td>string</td><td>是</td><td>发货地。</td></tr>
-        <tr><td><code>leadtime_days</code></td><td>integer</td><td>是</td><td>标准备货交期（自然日）。MP4 <code>amend_leadtime</code> 的变更基准。</td></tr>
-        <tr><td><code>shipping_fee_policy</code></td><td>object</td><td>是</td><td>运费策略（<code>type</code>: <code>free</code>/<code>flat</code>/<code>threshold_free</code>，及金额参数）。</td></tr>
-        <tr><td><code>return_policy</code></td><td>string</td><td>是</td><td>退换货政策声明。</td></tr>
-        <tr><td><code>splittable</code></td><td>boolean</td><td>否</td><td>是否支持分批发货，默认 <code>false</code>；MP5 <code>split</code> 的前提。</td></tr>
-        <tr><td><code>moq</code></td><td>integer</td><td>否</td><td>最小起订量；P3 校验 <code>PURCHASE.CREATE.INVALID_ITEMS</code>（数量不满足 MOQ）的依据。</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m395">ListingMedia 与 ListingSnapshot</h3>
-    <p><code>ListingMedia</code> 记录 <code>media_id</code>、<code>type</code>（<code>image</code>/<code>video</code>）、<code>uri</code>、<code>sort_order</code>。<code>ListingSnapshot</code> 是版本快照存档实体，包含 <code>listing_id</code>、<code>version</code>、<code>version_hash</code>、完整 Listing 规范化 JSON、<code>effective_from</code>/<code>effective_to</code> 与 <code>seller_signature</code>；被订单条款快照引用时 MUST 可按 <code>listing_id + version_hash</code> 检索，并可纳入 Evidence Bundle。</p>
-    <h3 id="s-m396">与买方侧 Source 投影的字段对齐</h3>
-    <table>
-      <thead><tr><th>买方侧字段（P1 Source lookup）</th><th>供应商侧来源（本章）</th></tr></thead>
-      <tbody>
-        <tr><td><code>item.item_id</code></td><td><code>listing.listing_id</code></td></tr>
-        <tr><td><code>item.title</code> / <code>specifications</code></td><td><code>listing.title</code> / <code>listing.attributes</code></td></tr>
-        <tr><td><code>item.skus[]</code>（<code>sku_id</code>/<code>spec</code>/<code>price</code>）</td><td><code>listing.skus[]</code>（价格 = <code>unit_price + price_offset</code>；<code>stock</code> 来自 MP2 <code>available</code> 快照）</td></tr>
-        <tr><td><code>item.pricing</code>（含 <code>tiered_pricing</code>）</td><td><code>listing.pricing</code></td></tr>
-        <tr><td><code>item.fulfillment</code></td><td><code>listing.fulfillment_terms</code></td></tr>
-        <tr><td><code>item.trade_methods</code></td><td><code>listing.trade_methods</code></td></tr>
-        <tr><td><code>item.seller</code>（资质摘要）</td><td><a href="onboarding.md#s-m25">Step 4：资质与合规（Qualification & Compliance）</a> 审核通过的 SupplierCredentials</td></tr>
-      </tbody>
-    </table>
-    <h3 id="s-m397">SourceMaterials（AI 辅助录入素材）</h3>
-    <p>面向研发能力较弱或商品资料非结构化的供应商，<code>publish</code> 请求 MAY 携带原始素材，由 Marketplace 的解析能力生成结构化商品草稿。本实体<strong>仅存在于请求侧</strong>：解析产出 MUST 落为标准 Listing 字段后才能生效，素材本身 MUST NOT 作为商品语义存储或进入买方投影；解析失败返回 <code>LISTING.PUBLISH.INGEST_FAILED</code>（<a href="#s-m33">Error Handling（错误处理）</a>）。</p>
-    <table>
-      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>描述</th></tr></thead>
-      <tbody>
-        <tr><td><code>image_urls</code></td><td>array</td><td>否</td><td>产品原始图片 URI 列表；用于自动预测类目、属性与规格。</td></tr>
-        <tr><td><code>product_urls</code></td><td>array</td><td>否</td><td>商品原始链接列表；用于自动解析链接内商品信息。</td></tr>
-        <tr><td><code>spreadsheet_url</code></td><td>string</td><td>否</td><td>供应商自维护的货品信息表格 URI（Excel/CSV）。</td></tr>
-      </tbody>
-    </table>
-    <p>约束：三个字段 MUST 至少提供其一；解析产出与请求中显式提交的字段冲突时，显式字段 MUST 优先；解析置信度信息 SHOULD 随响应返回供供应商/Agent 复核（对应 人机控制点（HAI Control Points） 控制点：价格类解析结果 SHOULD 经确认后生效）。</p>
+### 状态迁移的确定性 {#s-m323}
 
-    <hr />
-    <h2 id="s-m310">Use Case Walkthroughs（用例演练）</h2>
-    <h3 id="s-m3101">发布并上架一个多 SKU 商品</h3>
-<pre class="highlight"><code class="language-json">// 请求：utp.listing.publish
+同一状态下同一操作 MUST 产生唯一确定的迁移结果（继承 UTP 规范状态机确定性约束）。特别地：
+
+- `list` 仅在 `PUBLISHED`、`DELISTED` 状态允许；对 `PENDING_REVIEW` 执行 `list` MUST 返回 `LISTING.LIST.NOT_REVIEWED`。
+- `delist` 生效 MUST 是原子的：生效时刻之后的 `source.lookup` MUST 返回 `SOURCE.LOOKUP.ITEM_NOT_FOUND`，`purchase.create` MUST 返回 `PURCHASE.CREATE.INVALID_ITEMS`；生效时刻之前已创建的订购草案按其条款快照继续（`complete` 时的最终校验以下架事实为准，失败走 P3 既有补偿链）。
+- `archive` 对存在未完结订单的商品 MUST 被拒绝（`LISTING.ARCHIVE.OPEN_ORDERS`），供应商应先 `delist` 并待订单完结。
+
+### 版本化与变更分级 {#s-m324}
+
+每次生效变更产生新的 `version`（单调递增整数）与 `version_hash`。变更分两级：
+
+| 变更级别 | 字段范围 | 处理方式 |
+| --- | --- | --- |
+| 轻量变更（minor） | `description`、`media`、`fulfillment_terms.leadtime_days`、SKU 增补 | 即时生效，商品保持 `LISTED`；生成新版本快照 |
+| 重大变更（major） | `title`、`category`、`pricing`（降价除外）、SKU 删除、`compliance_refs` | MUST 重新审核：商品保持旧版本继续可售，新版本进入 `PENDING_REVIEW`，审核通过后原子切换 |
+
+订购条款快照（P3 的 `terms_snapshot`）MUST 引用下单时刻的 `listing_id + version_hash`；价格一致性校验（`PURCHASE.CREATE.PRICE_CHANGED`）以该版本为基准。被任何有效订单引用的版本快照 MUST 保留至争议时效期结束。
+
+---
+
+## Error Handling（错误处理） {#s-m33}
+
+错误响应 MUST 使用 UTP 规范 P0 通[标准错误响应格式](../../../protocol-core/primitive-framework.md#s-1043-standard-error-response)。本节定义 Listing 特有错误码：
+
+| 错误码 | 严重级别 | HTTP 映射 | 描述 | 建议处理 |
+| --- | --- | --- | --- | --- |
+| `LISTING.PUBLISH.MERCHANT_NOT_ACTIVE` | error | 403 | 供应商未完成入驻或处于 `RESTRICTED`/`TERMINATED` 状态。 | 完成入驻流程或联系平台解除限制。 |
+| `LISTING.PUBLISH.CATEGORY_NOT_QUALIFIED` | error | 403 | 商品类目不在供应商资质核准范围内。 | 申请类目资质后重试。 |
+| `LISTING.PUBLISH.SCHEMA_INVALID` | error | 400 | 商品结构不符合 Listing Schema（缺必填字段、SKU 结构错误、含库存数量字段等）。 | 按错误详情修正后重试。 |
+| `LISTING.PUBLISH.COMPLIANCE_MISSING` | error | 422 | `compliance_level ≥ L1` 类目缺少资质文件引用。 | 补充 `compliance_refs` 后重试。 |
+| `LISTING.PUBLISH.DUPLICATE` | error | 409 | 幂等键重复但请求内容不一致。 | 使用新的幂等键。 |
+| `LISTING.PUBLISH.INGEST_FAILED` | error | 422 | AI 辅助录入素材解析失败或置信度不足（图片不可读、链接不可达、表格结构无法识别）。响应 MUST 附逐素材的解析报告。 | 修正素材后重试，或改为结构化字段直接提交。 |
+| `LISTING.UPDATE.NOT_FOUND` | error | 404 | 指定 `listing_id` 不存在或不属于调用方。 | 校验 `listing_id`。 |
+| `LISTING.UPDATE.VERSION_CONFLICT` | error | 409 | `expected_version` 与当前版本不一致（并发修改）。 | 重新 `query` 获取最新版本后重试。 |
+| `LISTING.UPDATE.IMMUTABLE_FIELD` | error | 400 | 尝试修改不可变字段（`listing_id`、`merchant_id`、库存数量字段）。 | 数量走 `utp.inventory`；其余字段不可改。 |
+| `LISTING.LIST.NOT_REVIEWED` | error | 409 | 商品未通过审核（`PENDING_REVIEW`/`REJECTED`）不可上架。 | 等待或按驳回原因修改。 |
+| `LISTING.LIST.SUSPENDED` | error | 403 | 商品处于 `SUSPENDED_BY_PLATFORM`，供应商不可自行上架。 | 按整改要求处理并申诉。 |
+| `LISTING.DELIST.STATE_CONFLICT` | warning | 409 | 商品已处于下架/归档状态。 | 幂等返回当前状态。 |
+| `LISTING.ARCHIVE.OPEN_ORDERS` | error | 409 | 存在未完结订单，不可归档。 | 先 `delist`，待订单完结后归档。 |
+| `LISTING.QUERY.NOT_FOUND` | error | 404 | 商品不存在或调用方无权访问。 | 校验标识与权限。 |
+| `LISTING.RATE_LIMITED` | warning | 429 | 发布/更新频率超过平台限流阈值。 | 按 `Retry-After` 等待后重试；批量场景改用 [批量模式（Batch Mode）](#s-m372) 批量模式。 |
+
+---
+
+## Scopes（权限范围） {#s-m34}
+
+| Scope | 类型 | 描述 | 授予方 | 默认分配 |
+| --- | --- | --- | --- | --- |
+| `listing:publish` | Action Scope | 发布商品档案。 | Marketplace（入驻通过后） | Seller 角色 |
+| `listing:update` | Action Scope | 更新商品档案。 | Marketplace | Seller 角色（仅本方商品） |
+| `listing:list` | Action Scope | 上架商品。 | Marketplace | Seller 角色（仅本方商品） |
+| `listing:delist` | Action Scope | 下架商品。 | Marketplace | Seller 角色（仅本方商品） |
+| `listing:query` | Action Scope | 查询商品档案、状态与审核结论。 | Marketplace | Seller 角色（仅本方商品） |
+| `listing:archive` | Action Scope | 归档商品。 | Marketplace | Seller 角色（仅本方商品） |
+
+**权限约束：**
+
+- 全部 Listing 操作 MUST 仅作用于调用方（`agent_id`）名下的商品；跨商户访问 MUST 返回 `LISTING.QUERY.NOT_FOUND`（不泄露存在性）。
+- `SUSPENDED_BY_PLATFORM` 的进入与解除是 Marketplace 的治理动作，不对应供应商 Scope。
+- 审核（review）是 Marketplace 内部义务，不是协议 Action；审核结论通过回调事件 `utp.listing.review_result`（[回调事件类型注册表](../../onboarding.md#s-m261)）通知。
+
+---
+
+## Guidelines（角色职责指引） {#s-m35}
+
+### Seller 角色职责 {#s-m351}
+
+| 职责 | 级别 | 说明 |
+| --- | --- | --- |
+| 信息真实准确 | MUST | 商品标题、属性、资质 MUST 真实；虚假信息导致的争议中 ListingSnapshot 将作为对供应商不利的证据。 |
+| 结构化发布 | MUST | MUST 按 Listing Schema 提供结构化字段，MUST NOT 把关键交易条件（价格、交期）只写在描述富文本中。 |
+| 价格一致性 | MUST | `pricing` MUST 与其经 MP3 应答 P2 询盘的报价口径一致（[Seller 角色职责](../../primitives/quote/index.md#s-m551)）；`pricing_mode ≥ L1` 时 MUST 提供 `pricing_tiers`。 |
+| 及时下架 | MUST | 停售、断货长期无法补货、资质失效时 MUST 及时 `delist`，减少 `PURCHASE.CREATE.INVALID_ITEMS` 对买方体验的冲击。 |
+| 版本自洽 | SHOULD | 重大变更 SHOULD 避开销售高峰；利用 [版本化与变更分级](#s-m324) 的"旧版本可售 + 新版本审核"机制平滑切换。 |
+| 媒体合规 | SHOULD | 图片/视频资源 SHOULD 使用持久 URI，MUST 拥有合法版权。 |
+
+### Marketplace 角色职责 {#s-m352}
+
+| 职责 | 级别 | 说明 |
+| --- | --- | --- |
+| 审核时效 | MUST | MUST 公示审核 SLA 并在 SLA 内给出结论；驳回 MUST 附结构化原因码（附录 MB 的 `REVIEW.*` 原因码空间）。 |
+| 索引一致性 | MUST | `list`/`delist` 生效后，Source 可搜索范围 MUST 在声明的传播时限（SHOULD ≤ 60s）内一致；生效时刻以状态迁移时间戳为准。 |
+| 投影保真 | MUST | Source 返回的商品投影 MUST 来自最新生效版本，MUST NOT 篡改供应商声明的价格与条款。 |
+| 快照存档 | MUST | MUST 存档每个生效版本快照，保存期不低于争议时效期；被订单引用的版本 MUST NOT 删除。 |
+| 治理透明 | MUST | 强制下架 MUST 通知供应商，附原因与申诉路径；恢复条件 MUST 可核验。 |
+| 限流公示 | SHOULD | SHOULD 公示发布/更新限流阈值与批量通道规格。 |
+
+---
+
+## Mode-Driven Behavior（模式驱动行为） {#s-m36}
+
+| Mode 维度 | 对 Listing 的影响 |
+| --- | --- |
+| `pricing_mode` L0 | `pricing.unit_price` MUST 存在；`pricing_tiers` MUST NOT 存在。 |
+| `pricing_mode` L1 | `pricing_tiers`（MOQ/MOA 阶梯）MUST 存在，与 UTP-B 规范 PricingTiers 同构。 |
+| `pricing_mode` L2/L3 | MAY 标记 `negotiable: true`；L3 竞价商品 MUST 提供 `bid_starting_price` 与 `bid_deadline`。 |
+| `fulfillment_structure` L1+ | `fulfillment_terms` MUST 声明 `ships_from`、`leadtime_days`；L2 的阶段划分、前置条件和完成条件 MUST 在交易条款锁定时确定。Listing 已知相关条件时 MAY 预告，但不得仅因 L2 自动推导可分批。 |
+| `relationship_mode` L2+ | MAY 发布仅对框架协议客户可见的协议价商品（`visibility: "framework_only"`）。 |
+| `compliance_level` L1+ | `compliance_refs` MUST 存在且审核通过；L2+（跨境）MUST 含原产地与进出口许可引用；L3 MUST 附审计报告引用。 |
+
+**搜索可见性规则（Mode 过滤）：**商品的有效 Mode 范围 = 商户 Profile 中对应原语的 `supported_mode_range`（`utp.roles.seller.primitives`， UTP 规范 《发现与协商》） ∩ 商品 `mode_constraints`（缺省为前者）。Marketplace 的 P1 Source MUST 按会话 `ModeConfiguration` 过滤：会话 Mode 任一维度不在商品有效范围内的商品，MUST NOT 出现在携带任意 `filters` 的 `search` 结果中，对其 `lookup` MUST 返回 `SOURCE.MODE.UNSUPPORTED`（UTP-B 规范 《错误码定义》）。该规则将 UTP 规范的运行时错误前置为搜索期过滤，消除“能搜到却无法按该模式成交”的供需错配（闭环不变式 6，见 商品—交易闭环（End-to-End Loop））。
+
+---
+
+## Operations（操作定义） {#s-m37}
+
+Listing 的核心操作为 `publish`、`update`、`list`、`delist`、`query`、`archive`，复用 UTP 规范 [《操作定义格式》 操作定义格式](../../../protocol-core/primitive-framework.md#s-1023-action-definition-format)。
+
+### Listing 操作矩阵 {#s-m371}
+
+| 操作 | 适用状态 | 状态影响 | `valid_next_actions` | 关键约束 |
+| --- | --- | --- | --- | --- |
+| `utp.listing.publish` | （新建） | 创建档案并进入 `PENDING_REVIEW`；`auto_list: true` 时审核通过后自动 `LISTED` | `query` | Seller；MUST 通过 Schema 校验与类目资质校验；MUST 携带 Seller JWS 签名覆盖 `version_hash`；MAY 携带 `source_materials`（AI 解析产出的字段与显式提交字段冲突时，显式字段 MUST 优先）。 |
+| `utp.listing.update` | `REJECTED`, `PUBLISHED`, `LISTED`, `DELISTED` | minor：即时生效新版本；major：新版本进入 `PENDING_REVIEW`，旧版本继续可售 | `query`, `list`, `delist` | Seller；MUST 携带 `expected_version` 乐观锁；MUST NOT 修改库存数量。 |
+| `utp.listing.list` | `PUBLISHED`, `DELISTED` | 进入 `LISTED`，纳入 Source 可搜索范围 | `update`, `delist`, `query`, `utp.inventory.set` | Seller；上架前 SHOULD 已通过 `utp.inventory.set` 设置可售数量，否则商品可搜索但不可订购。 |
+| `utp.listing.delist` | `LISTED` | 进入 `DELISTED`，原子退出可搜索/可订购范围 | `list`, `update`, `query`, `archive` | Seller；已成立订单不受影响；幂等。 |
+| `utp.listing.query` | 任意 | 无状态影响 | 当前状态下可执行的动作 | Seller；支持按 `listing_id` 单查、按状态/类目/时间的列表查询（分页）及按 `batch_id` 轮询批量任务逐条结果（[批量模式（Batch Mode）](#s-m372)）。 |
+| `utp.listing.archive` | `PUBLISHED`, `DELISTED`, `REJECTED` | 进入 `ARCHIVED` 终态 | `query` | Seller；存在未完结订单 MUST 拒绝；不可逆。 |
+| `utp.listing.batch` | 同 `publish`/`update` | 逐条同单条操作 | `query`（按 `batch_id`） | Seller；批量提交通道，单批 ≤ 500 条、逐条独立成败，MAY 异步；规则见 [批量模式（Batch Mode）](#s-m372)。 |
+
+### 批量模式（Batch Mode） {#s-m372}
+
+面向 ERP 全量/增量同步场景（同步模式（Synchronization Patterns）），`publish` 与 `update` MUST 支持批量提交：
+
+- 批量请求为条目数组（单批 MUST ≤ 500 条），整批共享一个 `idempotency_key`，逐条独立校验、独立成败。
+- 响应 MUST 逐条返回 `{index, listing_id | error}`；部分失败不影响其余条目（部分成功语义）。
+- 批量任务 MAY 异步执行：响应返回 `batch_id`，供应商以 `query`（`batch_id` 维度）轮询结果；推送模式下以回调通知完成。
+
+---
+
+## Entities（实体定义） {#s-m39}
+
+### Listing {#s-m391}
+
+| 字段名 | 类型 | 必填 | 描述 |
+| --- | --- | --- | --- |
+| `listing_id` | string | 是 | 商品全局唯一标识，由 Marketplace 在 `publish` 时生成。买方侧 P1 Source 的 `item_id` 与此同值。 |
+| `merchant_id` | string | 是 | 所属供应商在平台域内的标识（[注册接口与结果](../../onboarding.md#s-m242)）。 |
+| `status` | enum | 是 | [状态定义与迁移规则](#s-m322) 定义的状态枚举。 |
+| `version` | integer | 是 | 版本号，单调递增。 |
+| `version_hash` | string | 是 | 当前版本规范化 JSON 的 SHA256 哈希。 |
+| `type` | enum | 是 | `goods`（实物）/ `service`（服务）/ `digital`（虚拟）。 |
+| `title` | string | 是 | 商品标题。 |
+| `category` | string | 是 | 平台类目标识。 |
+| `description` | string | 否 | 商品描述（富文本引用或纯文本）。 |
+| `attributes` | object | 否 | 类目属性键值对（品牌、型号、材质等），键空间由类目 Schema 定义。 |
+| `skus` | ListingSku[] | 是 | SKU 列表，MUST 至少一条（[ListingSku](#s-m392)）。 |
+| `pricing` | ListingPricing | 是 | 定价结构（[ListingPricing](#s-m393)）。 |
+| `fulfillment_terms` | FulfillmentTerms | 是 | 履约条款（[FulfillmentTerms](#s-m394)）。 |
+| `trade_methods` | array | 是 | 支持的 Trade Method 列表，结构同 UTP-B 规范 （[《订购原语》](../../../primitives/purchase/index.md) 引用的 TradeMethod）。 |
+| `media` | ListingMedia[] | 否 | 图片/视频资源（[ListingMedia 与 ListingSnapshot](#s-m395)）。 |
+| `compliance_refs` | array | 否 | 资质文件引用列表（`credential_id` + 类型）；`compliance_level ≥ L1` 时必填。 |
+| `visibility` | enum | 否 | `public`（默认）/ `framework_only`（仅框架协议客户可见）。 |
+| `mode_constraints` | object | 否 | 商品级 Mode 能力收窄声明：六个核心维度各为 Level 数组，MUST 为商户 Profile 对应原语 `supported_mode_range` 对应维度的非空子集；缺省继承 Profile 全量范围。驱动 Source 搜索可见性过滤（[Mode-Driven Behavior（模式驱动行为）](#s-m36)）。 |
+| `auto_list` | boolean | 否 | 审核通过后是否自动上架，默认 `false`。 |
+| `seller_signature` | string | 是 | Seller ES256 签名（JWS），覆盖 `version_hash`。 |
+| `created_at` / `updated_at` | ISO-8601 | 是 | 创建/最近生效变更时间。 |
+
+> Listing MUST NOT 含任何库存数量字段。库存见 [Entities（实体定义）](../../primitives/inventory/index.md#s-m49)。
+
+### ListingSku {#s-m392}
+
+| 字段名 | 类型 | 必填 | 描述 |
+| --- | --- | --- | --- |
+| `sku_id` | string | 是 | SKU 标识，商品内唯一。买方侧 P1/P3 的 `sku_id` 与此同值。 |
+| `spec` | object | 是 | 规格键值对（如 `{"color": "黑色", "size": "L"}`）。 |
+| `price_offset` | Money | 否 | 相对 `pricing.unit_price` 的差价；缺省为零差价。 |
+| `barcode` | string | 否 | 商品条码（EAN/UPC）。 |
+| `external_ref` | string | 否 | 供应商内部编码（ERP 物料号），用于 M10 ID 映射；平台 MUST 原样保存并在订单路由中回传。 |
+| `status` | enum | 是 | `active` / `inactive`（SKU 级停售，不影响其它 SKU）。 |
+
+### ListingPricing {#s-m393}
+
+| 字段名 | 类型 | 必填 | 描述 |
+| --- | --- | --- | --- |
+| `pricing_mode` | enum | 是 | 本商品支持的最低定价模式：`L0`—`L3`，MUST 落在会话 Mode 协商范围内。 |
+| `unit_price` | Money | 条件 | 固定单价；`pricing_mode == L0` 时必填。Money 结构同 UTP 规范 [25.2 Money](../../../schemas/index.md)。 |
+| `pricing_tiers` | array | 条件 | 阶梯价数组 `{min_quantity, unit_price}`；`pricing_mode ≥ L1` 时必填，与 UTP-B 规范 PricingTiers 同构。 |
+| `negotiable` | boolean | 否 | 是否可议价（对应 `pricing_mode ≥ L2`）。 |
+| `bid_starting_price` / `bid_deadline` | Money / ISO-8601 | 条件 | 竞价起拍价与截止时间；`pricing_mode == L3` 时必填。 |
+| `currency` | string | 是 | ISO 4217 币种，商品内全部价格 MUST 同币种。 |
+
+### FulfillmentTerms {#s-m394}
+
+| 字段名 | 类型 | 必填 | 描述 |
+| --- | --- | --- | --- |
+| `ships_from` | string | 是 | 发货地。 |
+| `leadtime_days` | integer | 是 | 标准备货交期（自然日）。MP4 `amend_leadtime` 的变更基准。 |
+| `shipping_fee_policy` | object | 是 | 运费策略（`type`: `free`/`flat`/`threshold_free`，及金额参数）。 |
+| `return_policy` | string | 是 | 退换货政策声明。 |
+| `splittable` | boolean | 否 | 是否支持分批发货，默认 `false`；MP5 `split` 的前提。 |
+| `moq` | integer | 否 | 最小起订量；P3 校验 `PURCHASE.CREATE.INVALID_ITEMS`（数量不满足 MOQ）的依据。 |
+
+### ListingMedia 与 ListingSnapshot {#s-m395}
+
+`ListingMedia` 记录 `media_id`、`type`（`image`/`video`）、`uri`、`sort_order`。`ListingSnapshot` 是版本快照存档实体，包含 `listing_id`、`version`、`version_hash`、完整 Listing 规范化 JSON、`effective_from`/`effective_to` 与 `seller_signature`；被订单条款快照引用时 MUST 可按 `listing_id + version_hash` 检索，并可纳入 Evidence Bundle。
+
+### 与买方侧 Source 投影的字段对齐 {#s-m396}
+
+| 买方侧字段（P1 Source lookup） | 供应商侧来源（本章） |
+| --- | --- |
+| `item.item_id` | `listing.listing_id` |
+| `item.title` / `specifications` | `listing.title` / `listing.attributes` |
+| `item.skus[]`（`sku_id`/`spec`/`price`） | `listing.skus[]`（价格 = `unit_price + price_offset`；`stock` 来自 MP2 `available` 快照） |
+| `item.pricing`（含 `tiered_pricing`） | `listing.pricing` |
+| `item.fulfillment` | `listing.fulfillment_terms` |
+| `item.trade_methods` | `listing.trade_methods` |
+| `item.seller`（资质摘要） | [Step 4：资质与合规（Qualification & Compliance）](../../onboarding.md#s-m25) 审核通过的 SupplierCredentials |
+
+### SourceMaterials（AI 辅助录入素材） {#s-m397}
+
+面向研发能力较弱或商品资料非结构化的供应商，`publish` 请求 MAY 携带原始素材，由 Marketplace 的解析能力生成结构化商品草稿。本实体**仅存在于请求侧**：解析产出 MUST 落为标准 Listing 字段后才能生效，素材本身 MUST NOT 作为商品语义存储或进入买方投影；解析失败返回 `LISTING.PUBLISH.INGEST_FAILED`（[Error Handling（错误处理）](#s-m33)）。
+
+| 字段名 | 类型 | 必填 | 描述 |
+| --- | --- | --- | --- |
+| `image_urls` | array | 否 | 产品原始图片 URI 列表；用于自动预测类目、属性与规格。 |
+| `product_urls` | array | 否 | 商品原始链接列表；用于自动解析链接内商品信息。 |
+| `spreadsheet_url` | string | 否 | 供应商自维护的货品信息表格 URI（Excel/CSV）。 |
+
+约束：三个字段 MUST 至少提供其一；解析产出与请求中显式提交的字段冲突时，显式字段 MUST 优先；解析置信度信息 SHOULD 随响应返回供供应商/Agent 复核（对应 人机控制点（HAI Control Points） 控制点：价格类解析结果 SHOULD 经确认后生效）。
+
+---
+
+## Use Case Walkthroughs（用例演练） {#s-m310}
+
+### 发布并上架一个多 SKU 商品 {#s-m3101}
+
+```
+// 请求：utp.listing.publish
 POST /utp/m/v1/listings
 {
   "session_id": "utp-session-m-20260722-s01",
@@ -402,10 +422,13 @@ POST /utp/m/v1/listings
   "status": "LISTED",
   "effective_at": "2026-07-22T10:30:00Z"
 }
-</code></pre>
-    <h3 id="s-m3102">下架与闭环验证</h3>
-<pre class="highlight"><code>1. Seller: POST /utp/m/v1/listings/item-BT-NC-001/delist  → status = DELISTED
+```
+
+### 下架与闭环验证 {#s-m3102}
+
+```
+1. Seller: POST /utp/m/v1/listings/item-BT-NC-001/delist  → status = DELISTED
 2. Buyer:  GET  /utp/v1/source/items/item-BT-NC-001       → 404 SOURCE.LOOKUP.ITEM_NOT_FOUND
 3. Buyer:  POST /utp/purchase/create（含该 item）          → 400 PURCHASE.CREATE.INVALID_ITEMS
 4. 既有订单（下架前 PURCHASED）：MP4/MP5 义务不变，继续履行
-</code></pre>
+```
