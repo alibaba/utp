@@ -12,6 +12,12 @@ format: html
 <h2 id="s-81-mode-dimensions">Mode 维度（Mode Dimensions）</h2>
 <h3 id="s-811">维度模型</h3>
 <p>一次交易的 Mode 是一个六元组：</p>
+<figure id="s-811-mode-matrix" style="margin: 20px 0 28px;">
+  <img src="../../assets/diagrams/procurement-mode-six-dimension-matrix.svg" alt="UTP 采购模式六维配置矩阵：价格模式、决策链路、付款结构、履约结构、关系模式和合规要求分别从简单端 L0 到复杂端 L3 取值。" style="width: 100%; display: block; border-radius: 8px;">
+  <figcaption style="margin-top: 10px; color: #6b7280; font-size: 13px; text-align: center;">
+    图 8-1 采购模式六维配置矩阵
+  </figcaption>
+</figure>
 <h3 id="s-812">六维度定义表</h3>
 <table>
 <thead>
