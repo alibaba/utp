@@ -65,8 +65,8 @@ UTP-B 规范定义的六大交易原语（P1—P6）以采购方（Buyer）为�
 
 - 本规范沿用 UTP 规范 README 第 4 节的全部行文规范：RFC 2119 关键词、实体四列表格（字段名/类型/必填/描述）、`snake_case` 字段、JSON 示例与实体定义严格一致。
 - 章节编号使用 `M{n}` 前缀，小节使用 `M{n}.{x}`；锚点格式 `id="s-m{编号去点}"`，如 `s-m31`、`s-m311`，避免与 UTP 规范 `s-*` 冲突。
-- 凡引用 UTP 规范内容，一律使用相对链接 `../{file}.html#s-xxx` 并注明章节号；本规范 MUST NOT 复制 UTP 规范定义，只做引用。
-- 与 UTP 规范章节体系的对应关系与联动清单以[附录 E](appendices.md#s-me)为准（资料性）。
+- 凡引用 UTP 规范内容，一律使用相对链接 `../{file}.html#s-xxx` 并注明引用标题；UTP-B 规范发布版不使用章节编号，MUST NOT 在引用中出现“第 X 章 / Ch.X”字样；本规范 MUST NOT 复制 UTP 规范定义，只做引用。
+- 与 UTP 规范文档体系的对应关系与联动清单以[附录 E](appendices.md#s-me)为准（资料性）。
 
 ## 稳定性分级承诺（Stability Levels） {#s-stability}
 

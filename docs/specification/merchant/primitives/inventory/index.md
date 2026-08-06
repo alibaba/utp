@@ -34,7 +34,6 @@ intent:         供应商维护商品可售数量，并与交易性占用（hold
 state_delta:    inventory.available 数值变更（资源作用域，无独立状态机）
 actions:        set, adjust, query, hold.query, batch
 compensation:   adjust（反向调整）；交易性占用的释放由 P3 补偿链触发
-service:        dev.utp.merchant
 ```
 
 ---
@@ -47,10 +46,10 @@ Inventory 是 UTP-M 第二个供应商原语（MP2），其意图是让供应商
 
 ### 关键设计原则 {#s-m412}
 
-- **数量与信息分离：**Inventory 只管数量，商品信息属于 MP1。二者可独立变更、独立授权、独立限流（库存变更频率通常比商品信息高 2—3 个数量级）。
+- **数量与信息分离**：Inventory 只管数量，商品信息属于 MP1。二者可独立变更、独立授权、独立限流（库存变更频率通常比商品信息高 2—3 个数量级）。
 - **供应商是数量的唯一权威写入方：**`available` 只能由 Seller 通过 `set`/`adjust` 写入；Marketplace MUST NOT 主动修改 `available`，只能在其上叠加交易性占用。
-- **交易性占用是 P3 的副作用，不是 MP2 的 Action：**hold（临时占用）与 lock（最终锁定）由 UTP-B 规范 `purchase.create`/`complete` 触发（[《Seller 角色职责》 Seller 职责"锁定库存"](../../../primitives/purchase/index.md#s-1352-seller)），MP2 提供 `hold.query` 让供应商核验占用明细。这保持了 P3 与 MP2 的正交：P3 消费库存，MP2 供给库存。
-- **乐观并发：**写操作 MUST 携带 `expected_revision`（乐观锁）或声明 `commutative: true`（纯增量可交换模式，仅 `adjust`），防止 ERP 回写与平台扣减的并发丢失更新（库存一致性与防超卖（Inventory Consistency） 的防超卖基础）。**最简接入路径：**日常同步只用 `adjust + commutative: true`（无需维护版本号、天然抗乱序重试），仅在盘点校准时用 `set + expected_revision`——两个操作、两个场景，足以覆盖全部库存需求。
+- **交易性占用是 P3 的副作用，不是 MP2 的 Action**：hold（临时占用）与 lock（最终锁定）由 UTP-B 规范 `purchase.create`/`complete` 触发（[《Seller 角色职责》 Seller 职责"锁定库存"](../../../primitives/purchase/index.md#s-1352-seller)），MP2 提供 `hold.query` 让供应商核验占用明细。这保持了 P3 与 MP2 的正交：P3 消费库存，MP2 供给库存。
+- **乐观并发**：写操作 MUST 携带 `expected_revision`（乐观锁）或声明 `commutative: true`（纯增量可交换模式，仅 `adjust`），防止 ERP 回写与平台扣减的并发丢失更新（库存一致性与防超卖（Inventory Consistency） 的防超卖基础）。**最简接入路径**：日常同步只用 `adjust + commutative: true`（无需维护版本号、天然抗乱序重试），仅在盘点校准时用 `set + expected_revision`——两个操作、两个场景，足以覆盖全部库存需求。
 
 ### 前置条件与后置条件 {#s-m413}
 
@@ -124,7 +123,7 @@ Inventory 无独立资源状态机；`hold` 记录具有生命周期：`HELD →
 | `inventory:query` | Action Scope | 查询数量视图与 revision。 | Marketplace | Seller 角色（仅本方 SKU） |
 | `inventory:hold:query` | Action Scope | 查询占用/锁定明细。 | Marketplace | Seller 角色（仅本方 SKU） |
 
-**权限约束：**不存在 `hold:create`/`hold:release` Scope——占用的创建与释放是 P3 交易事件的副作用，任何角色 MUST NOT 通过 MP2 直接操纵占用。
+**权限约束**：不存在 `hold:create`/`hold:release` Scope——占用的创建与释放是 P3 交易事件的副作用，任何角色 MUST NOT 通过 MP2 直接操纵占用。
 
 ---
 
@@ -168,9 +167,9 @@ Inventory 无独立资源状态机；`hold` 记录具有生命周期：`HELD →
 1. **同源：**`purchase.create` 校验库存可用性（UTP-B 规范 《Seller 角色职责》 Seller 职责与 《操作定义（Actions）》 操作定义）读取的数量 == MP2 的 `sellable`。
 2. **hold 映射：**`purchase.create` 创建的临时库存 hold（UTP-B 规范 《Seller 角色职责》）MUST 生成 MP2 InventoryHold 记录（状态 `HELD`，含 `transaction_id`、TTL）。
 3. **lock 映射：**`purchase.complete` 的原子迁移条件之一"最终库存锁定成功"（UTP-B 规范 《状态迁移的原子性》）在 MP2 侧表现为对应 hold 状态 `HELD → LOCKED`；若无先行 hold，则直接创建 `LOCKED` 记录。
-4. **释放映射：**P3 补偿链（UTP-B 规范 《补偿链执行》"释放已锁库存"）执行时，MP2 侧对应记录 MUST 迁移至 `RELEASED` 并推送 `hold_released` 回调。
-5. **核销映射：**MP5 `delivery.ship` 确认后，对应 `LOCKED` 数量迁移至 `CONSUMED`，`available` 同步扣减（[库存模型（Inventory Model）](#s-m42)）。
-6. **证据：**P3 要求的 `inventory_receipt` / `inventory_release_receipt`（UTP-B 规范状态机 T5 与 C-PURCHASE-FAILURE 的 required_evidence）由 Marketplace 基于 InventoryHold 状态迁移记录生成，供应商可通过 `hold.query` 获取同一记录用于对账。
+4. **释放映射**：P3 补偿链（UTP-B 规范 《补偿链执行》"释放已锁库存"）执行时，MP2 侧对应记录 MUST 迁移至 `RELEASED` 并推送 `hold_released` 回调。
+5. **核销映射**：MP5 `delivery.ship` 确认后，对应 `LOCKED` 数量迁移至 `CONSUMED`，`available` 同步扣减（[库存模型（Inventory Model）](#s-m42)）。
+6. **证据**：P3 要求的 `inventory_receipt` / `inventory_release_receipt`（UTP-B 规范状态机 T5 与 C-PURCHASE-FAILURE 的 required_evidence）由 Marketplace 基于 InventoryHold 状态迁移记录生成，供应商可通过 `hold.query` 获取同一记录用于对账。
 
 自托管拓扑下，上述契约退化为供应商 Endpoint 的内部实现义务（其对买方承诺的 《Seller 角色职责》 职责不变）。
 

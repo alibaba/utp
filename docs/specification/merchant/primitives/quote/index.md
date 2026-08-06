@@ -35,7 +35,6 @@ intent:         供应商对路由到达的买方询盘给出可核验的报价/
 state_delta:    inquiry_routed → quote_record（资源作用域）
 actions:        quote, revise, bid, decline, query, list
 compensation:   应答超时 → 按 quote_policy 自动谢绝并通知双方
-service:        dev.utp.merchant
 ```
 
 ---
@@ -48,10 +47,10 @@ Quote 是 UTP-M 第三个供应商原语（MP3），其意图是让供应商对�
 
 ### 关键设计原则 {#s-m512}
 
-- **MP3 不替代 P2，而是 P2 报价交付的第一跳。**协商的权威状态机在 P2（询盘/报价/议价/条款绑定）；MP3 `quote` 的产出（卖方 ES256 签名，覆盖 UTP-B 规范 `Quote.terms_hash`）由 Marketplace 以 `utp.negotiate.quote` 原样交付买方，条款绑定仍由 P2 完成并产出订购 `terms_hash` 进入 P3。
+- **MP3 不替代 P2，而是 P2 报价交付的第一跳**。协商的权威状态机在 P2（询盘/报价/议价/条款绑定）；MP3 `quote` 的产出（卖方 ES256 签名，覆盖 UTP-B 规范 `Quote.terms_hash`）由 Marketplace 以 `utp.negotiate.quote` 原样交付买方，条款绑定仍由 P2 完成并产出订购 `terms_hash` 进入 P3。
 - **报价是有时效的承诺。**`quote` 在 `quote.validity` 内对供应商有约束力（买方在时效内接受即绑定）；到期自动失效，不产生义务。
-- **应答超时必有确定性处置。**每条路由询盘 MUST 关联应答时限；超时按 `quote_policy.on_timeout` 自动谢绝（询盘不同于订单，超时缺省为 `auto_decline`，不存在 auto_accept）。
-- **可选能力。**MP3 为 MAY 级能力：仅服务一口价直购（pricing_mode = L0）的供应商可不声明本原语，不影响 MP1/MP2/MP4/MP5 闭环（Mode 对供应商侧的影响（Mode Awareness） Mode 接触点不新增）。
+- **应答超时必有确定性处置**。每条路由询盘 MUST 关联应答时限；超时按 `quote_policy.on_timeout` 自动谢绝（询盘不同于订单，超时缺省为 `auto_decline`，不存在 auto_accept）。
+- **可选能力**。MP3 为 MAY 级能力：仅服务一口价直购（pricing_mode = L0）的供应商可不声明本原语，不影响 MP1/MP2/MP4/MP5 闭环（Mode 对供应商侧的影响（Mode Awareness） Mode 接触点不新增）。
 
 ### 范围 {#s-m513}
 
@@ -120,7 +119,7 @@ MP3 不覆盖：询盘的发起与撤回（Buyer 专属，P2）、条款绑定�
 | `DECLINED` | 已谢绝（终态） | `decline`；或超时策略 auto_decline | `query`（只读） |
 | `EXPIRED` | 报价失效（终态） | `valid_until` 到期买方未接受；或询盘撤回 | `query`（只读） |
 
-**确定性约束：**终态到达后任何写操作 MUST 返回 `QUOTE.STATE_CONFLICT`（幂等重放同一 `idempotency_key` 除外）。多轮议价 = `QUOTED ⇄ BUYER_COUNTERED` 循环，轮次 `round_no` 单调递增；**轮次上限由 UTP-B 规范 P2 引擎执行**（拒绝超限的买方 `counter-offer` 并返回 `NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS`，协商停留 `QUOTED`），本原语不因轮次超限产生迁移。各状态与 UTP-B 规范 P2 协商状态的对应见 [状态映射（State Correspondence）](#s-m562)。
+**确定性约束**：终态到达后任何写操作 MUST 返回 `QUOTE.STATE_CONFLICT`（幂等重放同一 `idempotency_key` 除外）。多轮议价 = `QUOTED ⇄ BUYER_COUNTERED` 循环，轮次 `round_no` 单调递增；**轮次上限由 UTP-B 规范 P2 引擎执行**（拒绝超限的买方 `counter-offer` 并返回 `NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS`，协商停留 `QUOTED`），本原语不因轮次超限产生迁移。各状态与 UTP-B 规范 P2 协商状态的对应见 [状态映射（State Correspondence）](#s-m562)。
 
 ---
 
@@ -181,8 +180,8 @@ MP3 不覆盖：询盘的发起与撤回（Buyer 专属，P2）、条款绑定�
 
 UTP-B 规范 P2 的 `utp.negotiate.quote` 的方向是 `seller_to_buyer`（供应商交付报价，回调至买方 `{callback_base}`）。平台托管拓扑下，供应商既没有买方的回调地址，也没有与买方的直接会话，因此报价交付是**串联两跳**而非并列的两个通道：
 
-1. **第一跳（本原语）：**Seller → Marketplace，`utp.quote.quote` 提交带签名的报价事实。
-2. **第二跳（UTP-B 规范 P2）：**Marketplace 以 Seller 侧 handler 身份执行 `utp.negotiate.quote`，把**同一份 Quote 实体**交付买方。Marketplace MUST NOT 改写报价内容（金额、有效期、条款、`terms_hash` 逐字节保持）；平台加价或补贴 MUST 以独立条目呈现。
+1. **第一跳（本原语）**：Seller → Marketplace，`utp.quote.quote` 提交带签名的报价事实。
+2. **第二跳（UTP-B 规范 P2）**：Marketplace 以 Seller 侧 handler 身份执行 `utp.negotiate.quote`，把**同一份 Quote 实体**交付买方。Marketplace MUST NOT 改写报价内容（金额、有效期、条款、`terms_hash` 逐字节保持）；平台加价或补贴 MUST 以独立条目呈现。
 
 自托管拓扑（自托管拓扑（Self-Hosted））下本原语不适用：供应商 Endpoint 直接作为 P2 的 handler 执行 `utp.negotiate.quote` 回调，本原语是其内部模型的参考。
 
@@ -198,21 +197,21 @@ UTP-B 规范 P2 的 `utp.negotiate.quote` 的方向是 `seller_to_buyer`（供�
 | `BOUND`（终） | `BOUND` | 买方经 `utp.negotiate.binding` 绑定条款，全局状态迁移至 PURCHASING。 |
 | `DECLINED` / `EXPIRED`（终） | `RELEASED` | 协商失败、超时或买方退出。 |
 
-**终态不可逆与协商重启的关系：**UTP-B 规范允许 `RELEASED` 后买方重新发起 `utp.negotiate.inquiry`。此时协议引擎 MUST 生成**新的 `inquiry_id`**，即产生一个新的应答任务；本原语的终态不可逆**不妨碍**协商重启（新询盘 = 新任务，历史记录仍可 `query`）。
+**终态不可逆与协商重启的关系**：UTP-B 规范允许 `RELEASED` 后买方重新发起 `utp.negotiate.inquiry`。此时协议引擎 MUST 生成**新的 `inquiry_id`**，即产生一个新的应答任务；本原语的终态不可逆**不妨碍**协商重启（新询盘 = 新任务，历史记录仍可 `query`）。
 
 ### 职责边界 {#s-m563}
 
-1. **条款绑定是 P2 的权威职责。**买方在 `quote.validity` 内接受报价后，由 P2 执行绑定核查并产出 `terms_hash` 与 NegotiationResult（UTP 规范 《发现与协商》），随后进入 P3 订购；本原语 MUST NOT 自行宣称绑定成立。
-2. **签名与哈希同源。**本原语 `quote` 的签名覆盖 UTP 规范 `Quote.terms_hash`（计算规则见 [terms_hash 计算规则（补充 UTP-B 规范留白）](#s-m5101a)）。绑定后 MP4 `accept` 的签名覆盖订购 `terms_hash`，二者构成完整价格证据链；**MP4 `accept` MUST NOT 偏离已绑定条款**。
-3. **轮次上限由 P2 引擎执行。**会话锁定轮次约束时，超限的买方 `counter-offer` 由 P2 引擎拒绝并返回 `NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS`，协商停留在 `QUOTED`；**本原语不因轮次超限产生迁移，供应商无需为此 `decline`**。
+1. **条款绑定是 P2 的权威职责**。买方在 `quote.validity` 内接受报价后，由 P2 执行绑定核查并产出 `terms_hash` 与 NegotiationResult（UTP 规范 《发现与协商》），随后进入 P3 订购；本原语 MUST NOT 自行宣称绑定成立。
+2. **签名与哈希同源**。本原语 `quote` 的签名覆盖 UTP 规范 `Quote.terms_hash`（计算规则见 [terms_hash 计算规则（补充 UTP-B 规范留白）](#s-m5101a)）。绑定后 MP4 `accept` 的签名覆盖订购 `terms_hash`，二者构成完整价格证据链；**MP4 `accept` MUST NOT 偏离已绑定条款**。
+3. **轮次上限由 P2 引擎执行**。会话锁定轮次约束时，超限的买方 `counter-offer` 由 P2 引擎拒绝并返回 `NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS`，协商停留在 `QUOTED`；**本原语不因轮次超限产生迁移，供应商无需为此 `decline`**。
 4. **报价修订的第二跳表达。**`revise` 产生新版本后，Marketplace MUST 以新的 `utp.negotiate.quote` 交付修订报价， UTP-B 规范协商状态停留 `QUOTED`。 UTP-B 规范状态机当前未定义 `QUOTED` 自环，该表达已登记为跨规范协调项（附录 ME）。
-5. **L3 竞价的分支独立性。**多供应商竞价时各报价分支相互独立（UTP-B 规范 P2 约束），买方 `binding` 只能选择其中一个分支；未被选中的分支收敛为 `EXPIRED`。
+5. **L3 竞价的分支独立性**。多供应商竞价时各报价分支相互独立（UTP-B 规范 P2 约束），买方 `binding` 只能选择其中一个分支；未被选中的分支收敛为 `EXPIRED`。
 
 ---
 
 ## 询盘路由（Inquiry Routing） {#s-m57}
 
-询盘路由是 Marketplace → Seller 的推送事件（回调 Service，[回调事件类型注册表](../../onboarding.md#s-m261)），不是供应商可调用的 Action。
+询盘路由是 Marketplace → Seller 的推送事件（回调推送，[回调事件类型注册表](../../onboarding.md#s-m261)），不是供应商可调用的 Action。
 
 ### InquiryRouting 事件载荷 {#s-m571}
 
@@ -261,7 +260,7 @@ UTP-B 规范 P2 的 `utp.negotiate.quote` 的方向是 `seller_to_buyer`（供�
 
 ### QuoteRecord {#s-m5101}
 
-**报价内容复用 UTP-B 规范权威实体。**本原语 MUST NOT 重复定义报价结构：报价以 UTP-B 规范 P2 的 `Quote` 实体承载（`primitives/negotiate/entities/quote.json`，字段 `quote_id`/`inquiry_ref`/`supplier_id`/`round`/`line_items`/`prices`/`lead_time`/`available_trade_modes`/`answers`/`validity`/`stock_guaranteed`/`terms_hash`）。QuoteRecord 只增加供应商侧的任务状态、版本与审计维度：
+**报价内容复用 UTP-B 规范权威实体**。本原语 MUST NOT 重复定义报价结构：报价以 UTP-B 规范 P2 的 `Quote` 实体承载（`primitives/negotiate/entities/quote.json`，字段 `quote_id`/`inquiry_ref`/`supplier_id`/`round`/`line_items`/`prices`/`lead_time`/`available_trade_modes`/`answers`/`validity`/`stock_guaranteed`/`terms_hash`）。QuoteRecord 只增加供应商侧的任务状态、版本与审计维度：
 
 | 字段名 | 类型 | 必填 | 描述 |
 | --- | --- | --- | --- |

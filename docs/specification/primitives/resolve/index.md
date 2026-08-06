@@ -26,9 +26,9 @@ trigger:        can activate from ANY state (cross-cutting concern)
 
 ### 意图 {#s-1611}
 
-Resolve 是 UTP 第六个交易原语（P6），其意图是**处理交易过程中产生的争议**。与其他五个原语不同，Resolve 不是交易流程的"最后一步"——它是一个** 随时可激活的横切关注点（cross-cutting concern）**。任何原语执行后，只要任一方认为交易结果与预期不符，都可以激活 Resolve。
+Resolve 是 UTP 第六个交易原语（P6），其意图是**处理交易过程中产生的争议**。与其他五个原语不同，Resolve 不是交易流程的"最后一步"——它是一个**随时可激活的横切关注点（cross-cutting concern）**。任何原语执行后，只要任一方认为交易结果与预期不符，都可以激活 Resolve。
 
-Resolve 的设计目标是将争议解决从"平台黑箱处理"提升为"协议级可验证机制"。传统的电商争议解决依赖平台客服人工裁定，裁定依据不透明、证据链不完整、结果不可预测。Resolve 通过**结构化证据包（Evidence Bundle）**、** 五层责任模型（Responsibility Layering）**和** 三级处置路径（Three-level Resolution）**，使争议解决的每一步都有据可查、有理可推、有法可依。
+Resolve 的设计目标是将争议解决从"平台黑箱处理"提升为"协议级可验证机制"。传统的电商争议解决依赖平台客服人工裁定，裁定依据不透明、证据链不完整、结果不可预测。Resolve 通过**结构化证据包（Evidence Bundle）**、**五层责任模型（Responsibility Layering）** 和**三级处置路径（Three-level Resolution）**，使争议解决的每一步都有据可查、有理可推、有法可依。
 
 ### 关键设计原则 {#s-1612}
 

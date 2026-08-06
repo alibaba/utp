@@ -219,7 +219,7 @@ format: html
 </tr>
 </tbody>
 </table>
-<p><code>fulfillment_structure</code> 关注履约义务的组织方式，不关注最终映射到几个 Business Domain。Mode 只推导所需角色与所需原语：所需角色用于生成商业拓扑的角色节点和角色关系边，所需原语作为后续执行 DAG 的独立输入。角色映射到哪些 Business Domain，以及同一 Business Domain 是否承担多个角色，由第 3 章 <code>TopologyConfiguration.role_domain_bindings</code> 确定。</p>
+<p><code>fulfillment_structure</code> 关注履约义务的组织方式，不关注最终映射到几个 Business Domain。Mode 只推导所需角色与所需原语：所需角色用于生成商业拓扑的角色节点和角色关系边，所需原语作为后续执行 DAG 的独立输入。角色映射到哪些 Business Domain，以及同一 Business Domain 是否承担多个角色，由《商业拓扑》的 <code>TopologyConfiguration.role_domain_bindings</code> 确定。</p>
 <p><strong>relationship_mode（关系模式）：</strong></p>
 <table>
 <thead>
@@ -684,7 +684,7 @@ format: html
 <li>反例：<code>customs_complexity</code>（海关复杂度）仅在跨境场景有意义，适合作为 M3 领域维度而非 M2 核心维度。</li>
 </ul>
 <h3 id="s-843-m2">M2：核心维度集（协议规范正文）</h3>
-<p>协议 1.0 版本在规范正文中定义初始的 6 个核心维度（见 8.1.2）。这些维度覆盖绝大多数 B2B 和 B2C 场景。</p>
+<p>协议 1.0 版本在规范正文中定义初始的 6 个核心维度（见<a href="#s-812">六维度定义表</a>）。这些维度覆盖绝大多数 B2B 和 B2C 场景。</p>
 <p><strong>变更规则：</strong></p>
 <ol>
 <li>核心维度的新增、语义修改或废弃 MUST 走 RFC 治理流程。</li>
@@ -849,8 +849,8 @@ format: html
 </table>
 <p><strong>交叉引用：</strong></p>
 <ul>
-<li>Mode 协商在会话建立中的时序位置见<a href="transport-communication.md">第 4 章：传输与通信</a></li>
+<li>Mode 协商在会话建立中的时序位置见<a href="transport-communication.md">《传输与通信》</a></li>
 <li>Mode 与原语执行规则详见第 11—16 章各交易原语</li>
-<li>履约结构（<code>fulfillment_structure</code>）维度与商业拓扑中履约角色、角色关系边的关系见<a href="business-topology.md">第 9 章</a></li>
-<li>合规要求（<code>compliance_level</code>）维度与资质认证的关系见<a href="risk-audit.md">第 7 章</a></li>
+<li>履约结构（<code>fulfillment_structure</code>）维度与商业拓扑中履约角色、角色关系边的关系见<a href="business-topology.md">《商业拓扑》</a></li>
+<li>合规要求（<code>compliance_level</code>）维度与资质认证的关系见<a href="risk-audit.md">《风控与审计》</a></li>
 </ul>

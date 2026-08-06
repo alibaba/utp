@@ -5,7 +5,6 @@
   "version": "2026-07-31",
   "title": "MP3 Quote — 询盘响应原语定义（utp-m M5）",
   "description": "供应商对路由到达的买方 P2 询盘给出可核验的报价/应答（平台托管拓扑）。与 UTP-B 规范 utp.negotiate 的关系是【串联两跳】而非并列通道：平台托管拓扑下供应商既无买方 callback_base 也无与买方的直接会话，第一跳 utp.quote.quote（Seller → Marketplace，本原语）提交报价事实，第二跳 utp.negotiate.quote（direction = seller_to_buyer，由 Marketplace 以 Seller 侧 handler 身份执行）将同一份 Quote 交付买方；两跳承载同一 Quote 实体与同一 terms_hash，Marketplace MUST NOT 改写报价内容。自托管拓扑下本原语不适用，供应商 Endpoint 直接执行 utp.negotiate.quote 回调。报价体复用 UTP-B 规范权威实体 negotiate/entities/quote.json；本原语补充其 terms_hash 计算规则（JCS + SHA-256，见 entities/quote_input.json）。MAY 级能力：pricing_mode = L0 的供应商可不声明。",
-  "service": "dev.utp.merchant",
   "actions": {
     "quote": {
       "description": "INQUIRY_PENDING | BUYER_COUNTERED → QUOTED（MUST 附覆盖 quote_hash 的卖方 ES256 签名；MUST 声明 valid_until）",

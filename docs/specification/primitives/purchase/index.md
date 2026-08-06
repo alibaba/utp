@@ -79,7 +79,7 @@ Purchase 覆盖以下场景：
     "purchase.status == 'purchased' OR agreement.status == 'agreement_active'",
     "purchase.purchase_id != null OR contract.agreement_id != null",
     "purchase.terms_snapshot == 最终条款（SHA256 哈希锁定，不可篡改）",
-    "complete 或 contract-complete 已满足第 5 章 Mandate 准入",
+    "complete 或 contract-complete 已满足《安全与信任》Mandate 准入",
     "IF action == purchase.complete → inventory.locked(purchase.line_items) == true",
     "IF action == purchase.complete → session.state == 'PAYING'",
     "evidence_bundle.contains(['mandate', 'authorization_decision', 'terms_hash'])"
@@ -115,7 +115,7 @@ Purchase 使用一张内部状态机描述订单与协议的衔接。订单由 `
 | --- | --- | --- | --- |
 | `INIT` | 尚未创建订单或合同草案 | 开始创建订单或合同 | `purchase.create` 或 `purchase.contract-create` |
 | `DRAFT` | 订单草案已创建 | `purchase.create` 成功执行 | `purchase.update`, `purchase.complete`, `purchase.query`, `purchase.cancel` |
-| `SIGNING` | 订单正在完成承诺处理 | 订单 `purchase.complete` 已通过第 5 章 Mandate 准入，正在执行最终库存锁定与卖方承诺处理 | 等待库存锁定和承诺处理结果 |
+| `SIGNING` | 订单正在完成承诺处理 | 订单 `purchase.complete` 已通过《安全与信任》Mandate 准入，正在执行最终库存锁定与卖方承诺处理 | 等待库存锁定和承诺处理结果 |
 | `PURCHASED` | 订购已成立（不可撤销） | 最终库存锁定和卖方承诺处理成功 | `purchase.query`；进入 Pay 原语；或发起 Resolve |
 | `AGREEMENT_DRAFT` / `AGREEMENT_SIGNING` | 采购合同或框架协议草案 / 正在完成承诺处理 | `purchase.contract-create` / `purchase.contract-complete`；具体形态由 `contract_type` 区分 | 草案可 `contract-update`、`contract-complete`、`query`、`cancel`；承诺处理中仅可 `query` |
 | `AGREEMENT_ACTIVE` | 采购合同或框架协议已生效 | 协议承诺处理完成 | `purchase.query`；在协议有效范围内反复创建引用该协议的独立订单 |

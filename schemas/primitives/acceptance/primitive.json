@@ -5,10 +5,9 @@
   "version": "2026-07-31",
   "title": "MP4 Acceptance Primitive Definition",
   "description": "订单受理原语定义文件（UTP-M M6）。声明操作、角色绑定、传输绑定与受理任务状态机。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/acceptance.json。",
-  "service": "dev.utp.merchant",
   "actions": {
     "accept": {
-      "description": "PENDING_ACCEPT | ON_HOLD → ACCEPTED（MUST 附覆盖 terms_hash 的卖方 ES256 签名；作为 UTP-B 规范 13.2.3 \"卖方承诺处理\"的完成证据参与 SIGNING → PURCHASED 原子迁移）",
+      "description": "PENDING_ACCEPT | ON_HOLD → ACCEPTED（MUST 附覆盖 terms_hash 的卖方 ES256 签名；作为 UTP-B 规范《全局状态机》\"卖方承诺处理\"的完成证据参与 SIGNING → PURCHASED 原子迁移）",
       "initiator_role": "Seller",
       "handler_role": "Marketplace",
       "input_schema": {

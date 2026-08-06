@@ -13,7 +13,7 @@ format: html
 <hr />
 <h2 id="s-91-topology-model">Topology Model（拓扑模型）</h2>
 <h3 id="s-911-commerce-topology">CommerceTopology 形式定义</h3>
-<p><code>CommerceTopology</code> 表达一类采购交易中必须被协议显式识别的角色集合，以及这些角色之间允许建立的无向业务关系。它为应用层形成第 3 章的发现范围配置和后续执行 DAG 提供责任结构，不是 Business Domain 清单，也不描述 Action 调用方向或原语执行顺序。</p>
+<p><code>CommerceTopology</code> 表达一类采购交易中必须被协议显式识别的角色集合，以及这些角色之间允许建立的无向业务关系。它为应用层形成《发现与协商》的发现范围配置和后续执行 DAG 提供责任结构，不是 Business Domain 清单，也不描述 Action 调用方向或原语执行顺序。</p>
 <pre class="highlight"><code>CommerceTopology = G(R, U) = {
   topology_id: string,
   roles: RoleId[],
@@ -337,7 +337,7 @@ Resolve.raise -&gt; Escrow.freeze
 
 <span id="s-931"></span>
 <h3 id="s-923-governance-overview">治理模型概述</h3>
-<p>与 Mode 维度治理类似（参见<a href="procurement-models.md#s-84-dimension-governance">第 8 章 8.4 节</a>），角色集合 R 采用三层治理模型（R1 / R2 / R3）。其中 R1 是判断角色能否成立的元规则，不是 <code>RoleDefinition.governance_layer</code> 的实例取值；可注册的角色实体只属于 R2 或 R3，在通用性与领域适应性之间取得平衡。</p>
+<p>与 Mode 维度治理类似（参见<a href="procurement-models.md#s-84-dimension-governance">《采购模式》维度扩展与治理</a>），角色集合 R 采用三层治理模型（R1 / R2 / R3）。其中 R1 是判断角色能否成立的元规则，不是 <code>RoleDefinition.governance_layer</code> 的实例取值；可注册的角色实体只属于 R2 或 R3，在通用性与领域适应性之间取得平衡。</p>
 <div class="state-machine-diagram" style="width: 100%; max-width: 900px; border: 1px solid #e5e7eb; border-radius: 8px;">
 <img src="../../assets/diagrams/role-governance.svg" alt="R 角色治理三层模型 R1/R2/R3：R3 领域角色扩展由行业联盟注册，R2 核心角色集需 RFC 治理，R1 角色元规则是极难变更的协议宪法" style="width: 100%; display: block;">
 </div>

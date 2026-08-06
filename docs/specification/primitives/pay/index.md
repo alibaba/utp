@@ -26,9 +26,9 @@ precondition:   valid PurchaseCredential exists
 
 ### 意图 {#s-1411}
 
-Pay 是 UTP 第四个交易原语（P4），其意图是**执行资金转移** —— 将采购方（或其指定的支付方）的资金按照 PurchaseCredential 中约定的条款转移至供应商（或其指定的收款方）。Pay 的产出是** 支付确认凭证（PaymentConfirmation）**，包含支付请求、采购聚合、金额、时间戳、支付工具标识和证据包引用；协议级 `transaction_id` 由统一 Action 信封承载。
+Pay 是 UTP 第四个交易原语（P4），其意图是**执行资金转移** —— 将采购方（或其指定的支付方）的资金按照 PurchaseCredential 中约定的条款转移至供应商（或其指定的收款方）。Pay 的产出是**支付确认凭证（PaymentConfirmation）**，包含支付请求、采购聚合、金额、时间戳、支付工具标识和证据包引用；协议级 `transaction_id` 由统一 Action 信封承载。
 
-Pay 是交易从"订购确认"走向"执行"的第一个实质动作。在 P3 标准响应确认独立交易边界，且该响应被 `evaluate_result` 接受并由路径编排生成 `transaction_id` 后，Pay 原语负责将财务义务转化为实际的资金流动。Pay 原语的设计核心是**安全**（敏感支付凭证不明文传输）和** 可收敛性**（渠道回调、主动查询与退款补偿必须收敛到同一交易锚点）。
+Pay 是交易从"订购确认"走向"执行"的第一个实质动作。在 P3 标准响应确认独立交易边界，且该响应被 `evaluate_result` 接受并由路径编排生成 `transaction_id` 后，Pay 原语负责将财务义务转化为实际的资金流动。Pay 原语的设计核心是**安全**（敏感支付凭证不明文传输）和**可收敛性**（渠道回调、主动查询与退款补偿必须收敛到同一交易锚点）。
 
 ### 关键设计原则 {#s-1412}
 
@@ -443,7 +443,7 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 
 **意图：** 发起支付请求。根据 PurchaseCredential 中的 `payment_due` 信息，构造 PaymentRequest 并提交至支付渠道。对于即时全额支付，此操作同时触发 `confirm`。对于分阶段支付，此操作为第一期支付做准备。
 
-**与 HAI 的协同：** 当支付工具、支付方式或绑定关系已在 HAI Confirmation Surface 中由 Principal 完成选择时，后续 `utp.pay.initiate` 的必填输入 SHOULD 直接来自 HAI `§20.7.4` 续跑响应中的 `data` / `valid_next_actions[].default_input`。实现 MAY 支持 post-resume 的 session-bound invoke（即由引擎根据当前交易权威状态补齐支付相关输入），但该增强能力 MUST NOT 替代 HAI 在续跑响应中提供连续权威引用链的职责。
+**与 HAI 的协同：** 当支付工具、支付方式或绑定关系已在 HAI Confirmation Surface 中由 Principal 完成选择时，后续 `utp.pay.initiate` 的必填输入 SHOULD 直接来自 HAI [确认后续跑](../../protocol-core/human-agent-interaction.md#s-19-7-4) 续跑响应中的 `data` / `valid_next_actions[].default_input`。实现 MAY 支持 post-resume 的 session-bound invoke（即由引擎根据当前交易权威状态补齐支付相关输入），但该增强能力 MUST NOT 替代 HAI 在续跑响应中提供连续权威引用链的职责。
 
 **请求：**
 
@@ -751,7 +751,7 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 
 **意图：** 查询支付状态。调用方可按 `payment_request_id` 查询单笔支付的实时状态，或按 `purchase_id` 查询某个 PurchaseCredential 下全部支付阶段的汇总状态。此操作为只读操作，MUST NOT 触发任何资金变动或状态机迁移，可安全地重复调用。
 
-**意图澄清：** `query` 返回的是** 协议引擎侧**记录的支付状态。当协议侧状态为 `AUTHORIZED`（已授权待确认）等非终态，或调用方需要以支付渠道的权威流水为准时，支付适配器 SHOULD 通过渠道状态查询或回调补偿取得最终状态证据；若协议侧与渠道侧事实持续不一致，MUST 升级至 Resolve 处理。
+**意图澄清：** `query` 返回的是**协议引擎侧**记录的支付状态。当协议侧状态为 `AUTHORIZED`（已授权待确认）等非终态，或调用方需要以支付渠道的权威流水为准时，支付适配器 SHOULD 通过渠道状态查询或回调补偿取得最终状态证据；若协议侧与渠道侧事实持续不一致，MUST 升级至 Resolve 处理。
 
 **前置条件：**
 
@@ -893,7 +893,7 @@ Pay 原语包含以下核心子操作：`initiate`（发起支付）、`confirm`
 
 ## Escrow（资金托管） {#s-1410-escrow}
 
-**结算担保模型是可选升级项，而非协议默认。** UTP 默认采用即时到账直付（[SettlementInstruction](#s-14914-settlementinstruction) 的 `settlement_type == "instant"`）：资金在支付授权成功后直接进入收款方账户，无第三方托管介入。协议 MUST NOT 假设一切交易都需要平台担保。Escrow（资金托管，`settlement_type == "escrow"`）与账期结算（`settlement_type == "deferred"`）是面向高信任门槛或跨境合规场景的** 可选**增强，仅当交易的 `trust_level`、`compliance_level` 或对手方风险要求引入第三方信用中介时才启用。本节描述的 Escrow 机制仅在 [PaymentRequest](#s-1491-paymentrequest) 的 `escrow_mode == true`（即 `settlement_type == "escrow"`）时生效；即时直付与账期结算路径不经过本节所述的托管账户与条件释放流程。
+**结算担保模型是可选升级项，而非协议默认。** UTP 默认采用即时到账直付（[SettlementInstruction](#s-14914-settlementinstruction) 的 `settlement_type == "instant"`）：资金在支付授权成功后直接进入收款方账户，无第三方托管介入。协议 MUST NOT 假设一切交易都需要平台担保。Escrow（资金托管，`settlement_type == "escrow"`）与账期结算（`settlement_type == "deferred"`）是面向高信任门槛或跨境合规场景的**可选**增强，仅当交易的 `trust_level`、`compliance_level` 或对手方风险要求引入第三方信用中介时才启用。本节描述的 Escrow 机制仅在 [PaymentRequest](#s-1491-paymentrequest) 的 `escrow_mode == true`（即 `settlement_type == "escrow"`）时生效；即时直付与账期结算路径不经过本节所述的托管账户与条件释放流程。
 
 ### 概述 {#s-14101}
 

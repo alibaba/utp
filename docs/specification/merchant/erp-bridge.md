@@ -10,7 +10,7 @@ version: 2026-07-31
 
 ## 定位（Positioning） {#s-m101}
 
-绝大多数供应商的商品、库存、订单、发货与财务事实的权威系统是其内部 ERP/WMS/OMS。本章定义 **Merchant Bridge**：把供应商内部系统与 UTP-M 原语连接起来的集成规范。Bridge 是 UTP 规范存量兼容思想（[Ch.22](../guides/legacy-migration.md) 的 Bridge/Adapter 模式）在供应商侧的具体化——UTP 规范定义了"传统系统如何映射 UTP 语义"，本章定义"供应商内部单据如何映射 MP 原语"。
+绝大多数供应商的商品、库存、订单、发货与财务事实的权威系统是其内部 ERP/WMS/OMS。本章定义 **Merchant Bridge**：把供应商内部系统与 UTP-M 原语连接起来的集成规范。Bridge 是 UTP 规范存量兼容思想（[存量兼容](../guides/legacy-migration.md)的 Bridge/Adapter 模式）在供应商侧的具体化——UTP 规范定义了"传统系统如何映射 UTP 语义"，本章定义"供应商内部单据如何映射 MP 原语"。
 
 本章内容是**实现指引 + 少量互操作约束**：ID [映射](#s-m103)与幂等/一致性规则（[库存一致性与防超卖（Inventory Consistency）](#s-m105)）为规范性要求（RFC 关键词有效）；同步模式与部署形态为最佳实践。
 
@@ -34,7 +34,7 @@ Bridge MUST 维护双向 ID 映射表并保证映射持久、唯一、可审计�
 | UTP-M 标识 | ERP 侧典型单据 | 映射建立时机 | 协议承载字段 |
 | --- | --- | --- | --- |
 | `listing_id` + `sku_id` | 物料/商品主数据（Item Master） | `listing.publish` 成功时 | `skus[].external_ref`（[ListingSku](primitives/listing/index.md#s-m392)）：发布时写入 ERP 物料号，平台在订单路由中原样回传 |
-| `purchase_id` / `transaction_id` | 销售订单（SO） | `acceptance.accept` 后创建 SO 时 | AcceptanceRecord 与 SO 号在 Bridge 映射表内关联（`transaction_id` 是交易边界的唯一公共锚点， UTP-B 规范 [与全局状态机的关系](../primitives/purchase/index.md#s-1325)；内部单据号与它的映射属 Bridge 私有状态，对应第 22 章 Bridge/Adapter 模式的卖方侧） |
+| `purchase_id` / `transaction_id` | 销售订单（SO） | `acceptance.accept` 后创建 SO 时 | AcceptanceRecord 与 SO 号在 Bridge 映射表内关联（`transaction_id` 是交易边界的唯一公共锚点， UTP-B 规范 [与全局状态机的关系](../primitives/purchase/index.md#s-1325)；内部单据号与它的映射属 Bridge 私有状态，对应《存量兼容》Bridge/Adapter 模式的卖方侧） |
 | `shipment_id` / `batch_id` | 出库单 / 发货单 | ERP 出库确认 → `delivery.ship` | Shipment.packages[].items[].external_ref 回传物料号；出库单号存于映射表 |
 | `hold_id` | 库存预留单（Reservation） | `hold_created` 回调时 | InventoryHold.transaction_id 关联 |
 | `statement_id` / `entry_id` | 应收对账单 | `statement_issued` 回调时 | SettlementEntry.transaction_id 关联 SO 收款核销 |
@@ -71,18 +71,18 @@ Bridge MUST 维护双向 ID 映射表并保证映射持久、唯一、可审计�
 
 多渠道（线下 + 多平台）售卖同一物理库存时，Bridge MUST 遵守：
 
-1. **单一权威：**物理库存的权威值在 ERP；平台侧 `available` 是 ERP 分配给该渠道的**渠道配额**的镜像。Bridge MUST NOT 让两个渠道共享同一无划分配额（超卖根源）。
-2. **增量优先：**渠道内销售扣减由平台 lock/consume 自动完成（[与 P3 Purchase 的库存一致性契约（Interlock with P3）](primitives/inventory/index.md#s-m47)），Bridge MUST NOT 对协议内订单重复下调 `available`；只同步**协议外**变化（线下出库、盘亏、调拨），使用 `adjust + reason_code + source_ref`。
-3. **校准窗口：**定时全量校准（`set`）MUST 选择低峰窗口执行，且以 `expected_revision` 提交；遇 `INVENTORY.REVISION_CONFLICT` MUST 重读后基于最新占用重新计算，MUST NOT 盲目重试覆盖。
-4. **安全垫：**高并发 SKU SHOULD 配置渠道安全库存（ERP 侧扣留缓冲量不分配），把并发窗口内的超卖概率压到接单环节可拦截的水平——最终兜底是 MP4 `reject(inventory_insufficient)`，但 SHOULD 作为异常路径而非常态。
+1. **单一权威**：物理库存的权威值在 ERP；平台侧 `available` 是 ERP 分配给该渠道的**渠道配额**的镜像。Bridge MUST NOT 让两个渠道共享同一无划分配额（超卖根源）。
+2. **增量优先**：渠道内销售扣减由平台 lock/consume 自动完成（[与 P3 Purchase 的库存一致性契约（Interlock with P3）](primitives/inventory/index.md#s-m47)），Bridge MUST NOT 对协议内订单重复下调 `available`；只同步**协议外**变化（线下出库、盘亏、调拨），使用 `adjust + reason_code + source_ref`。
+3. **校准窗口**：定时全量校准（`set`）MUST 选择低峰窗口执行，且以 `expected_revision` 提交；遇 `INVENTORY.REVISION_CONFLICT` MUST 重读后基于最新占用重新计算，MUST NOT 盲目重试覆盖。
+4. **安全垫**：高并发 SKU SHOULD 配置渠道安全库存（ERP 侧扣留缓冲量不分配），把并发窗口内的超卖概率压到接单环节可拦截的水平——最终兜底是 MP4 `reject(inventory_insufficient)`，但 SHOULD 作为异常路径而非常态。
 
 ## 幂等、顺序与容错（Idempotency, Ordering &amp; Fault Tolerance） {#s-m106}
 
-- **幂等键派生：**Bridge 的 `idempotency_key` MUST 从 ERP 侧业务单据确定性派生（如 `ship-{出库单号}`），保证进程重启/重放后同一单据不产生重复副作用。
-- **顺序保证：**同一资源（同一 SKU 库存、同一订单）的上行操作 MUST 串行化（按资源分片的本地队列）；跨资源无顺序要求。回调消费 MUST 容忍乱序与重复：以事件携带的资源状态与 `revision`/时间戳做幂等合并，MUST NOT 依赖到达顺序。
-- **重试与死信：**上行失败按指数退避重试；不可恢复错误（4xx 语义错误）MUST 进入死信队列并告警人工处理，MUST NOT 无限重试。
-- **断点续传：**Bridge MUST 持久化同步游标；重启后从游标恢复，配合幂等键实现精确一次的等效语义。
-- **时钟与时限：**接单 `deadline` 等时限判断 MUST 以消息载荷内的时间戳为准（服务端时钟），Bridge 本地时钟仅作参考。
+- **幂等键派生**：Bridge 的 `idempotency_key` MUST 从 ERP 侧业务单据确定性派生（如 `ship-{出库单号}`），保证进程重启/重放后同一单据不产生重复副作用。
+- **顺序保证**：同一资源（同一 SKU 库存、同一订单）的上行操作 MUST 串行化（按资源分片的本地队列）；跨资源无顺序要求。回调消费 MUST 容忍乱序与重复：以事件携带的资源状态与 `revision`/时间戳做幂等合并，MUST NOT 依赖到达顺序。
+- **重试与死信**：上行失败按指数退避重试；不可恢复错误（4xx 语义错误）MUST 进入死信队列并告警人工处理，MUST NOT 无限重试。
+- **断点续传**：Bridge MUST 持久化同步游标；重启后从游标恢复，配合幂等键实现精确一次的等效语义。
+- **时钟与时限**：接单 `deadline` 等时限判断 MUST 以消息载荷内的时间戳为准（服务端时钟），Bridge 本地时钟仅作参考。
 
 ## 对账钩子（Reconciliation Hooks） {#s-m107}
 
@@ -98,4 +98,4 @@ Bridge SHOULD 实现三层定时对账，闭合"事件驱动可能丢失"的最�
 
 - Seller 私钥 MUST 由供应商侧（Bridge/HSM/密管服务）持有；MUST NOT 托管给 Marketplace。Bridge 代签场景下，Bridge 属于 Seller 信任域内组件。
 - Bridge 北向出站 MUST 校验 Marketplace 回调签名（RFC 9421）与事件幂等；南向凭据（ERP 账号）MUST 与北向密钥隔离存储。
-- Bridge 操作日志 MUST 记录：协议请求/响应摘要、签名指纹、ID 映射变更、游标推进——满足争议举证与审计要求（UTP 规范 Ch.7 风控与审计的供应商侧落点）。
+- Bridge 操作日志 MUST 记录：协议请求/响应摘要、签名指纹、ID 映射变更、游标推进——满足争议举证与审计要求（UTP 规范《风控与审计》的供应商侧落点）。

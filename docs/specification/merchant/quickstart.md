@@ -17,8 +17,8 @@ version: 2026-07-31
 UTP-M 的最简实现面（通用规则继承（Commons Inheritance） 传输绑定支持要求）：
 
 ```
-① 一个 REST 客户端     → 调用 Marketplace 的 dev.utp.merchant Service（MP1—MP6）
-② 一个 Webhook 端点    → 接收 dev.utp.merchant_callback 回调（订单路由、审核结论、账单）
+① 一个 REST 客户端     → 调用 Marketplace 承载 MP1—MP6 的供应商侧端点
+② 一个 Webhook 端点    → 接收回调推送（订单路由、审核结论、账单）
 
 不需要：MCP/A2A（可选）、Merchant Agent（可选）、ERP Bridge（有 ERP 才需要）
 Mode 配置：零配置即可跑通全流程（M1.8 Mode 默认无关性原则）
@@ -29,7 +29,7 @@ Mode 配置：零配置即可跑通全流程（M1.8 Mode 默认无关性原则�
 | 步骤 | 动作 | 产出 | 参考 |
 | --- | --- | --- | --- |
 | 1 | 生成 ES256 密钥对，确定 `agent_id`（如 `did:web:你的域名`） | 身份与密钥 | [Step 1：身份与密钥（Identity & Keys）](onboarding.md#s-m22) |
-| 2 | 在你的域名 `/.well-known/utp` 发布 Profile（声明 MP 原语 + 回调 Service） | 能力声明 | [Step 2：Profile 发布（Profile Declaration）](onboarding.md#s-m23)（含可复制示例） |
+| 2 | 在你的域名 `/.well-known/utp` 发布 Profile（声明 MP 原语 + 回调接收端点） | 能力声明 | [Step 2：Profile 发布（Profile Declaration）](onboarding.md#s-m23)（含可复制示例） |
 | 3 | 向 Marketplace 提交注册（**必须法人主体亲自完成，不可委托 Agent**） | `merchant_id` | [Step 3：Marketplace 注册（Registration）](onboarding.md#s-m24) |
 | 4 | 按平台公示清单提交资质 | `QUALIFIED` | [Step 4：资质与合规（Qualification & Compliance）](onboarding.md#s-m25) |
 | 5 | 沙箱验收（签名互验、发布/接单/发货全流程跑通） | `ACTIVE`，可发商品 | [沙箱验收清单（Readiness Checklist）](onboarding.md#s-m262) 验收清单 |

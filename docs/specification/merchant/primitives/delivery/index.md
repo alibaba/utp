@@ -35,7 +35,6 @@ state_delta:    purchase_credential → delivery(SHIPPED)（资源作用域）
 actions:        prepare, ship, split, update, query
 compensation:   异常申报（update: exception/delay）→ 传导为买方侧 DELAYED；
                 拒收/争议由 P5/P6 处理，MP5 不定义逆向物流原语
-service:        dev.utp.merchant
 ```
 
 ---
@@ -48,8 +47,8 @@ Delivery 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商�
 
 ### 关键设计原则 {#s-m712}
 
-- **MP5 产生事实，P5 消费事实。**MP5 的每个生效动作 MUST 由 Marketplace 转换为买方侧 `fulfill.notify` 推送（载荷 `FulfillNotifyInput`）与 `fulfill.query` 可查询的履约事件（`FulfillmentEvent`，[与 P5 Fulfill 的事实传导契约（Interlock with P5）](#s-m77)）。买方可观测状态机（SHIPPED/DELAYED/DELIVERED）的驱动源即 MP5。
-- **备货态是供应商内部状态的最小外露。**UTP-B 规范明确"备货、待发等供应方内部状态不在（买方可观测）状态机范围内"（《采购方可观测状态机》）。MP5 的 `prepare` 仅用于供应商向平台申报备货进度（供 `leadtime` 查询参考与延迟预警），MUST NOT 触发买方可观测状态迁移。
+- **MP5 产生事实，P5 消费事实**。MP5 的每个生效动作 MUST 由 Marketplace 转换为买方侧 `fulfill.notify` 推送（载荷 `FulfillNotifyInput`）与 `fulfill.query` 可查询的履约事件（`FulfillmentEvent`，[与 P5 Fulfill 的事实传导契约（Interlock with P5）](#s-m77)）。买方可观测状态机（SHIPPED/DELAYED/DELIVERED）的驱动源即 MP5。
+- **备货态是供应商内部状态的最小外露**。UTP-B 规范明确"备货、待发等供应方内部状态不在（买方可观测）状态机范围内"（《采购方可观测状态机》）。MP5 的 `prepare` 仅用于供应商向平台申报备货进度（供 `leadtime` 查询参考与延迟预警），MUST NOT 触发买方可观测状态迁移。
 - **验收永远在买方。**`receive`/`reject`/`inspect` 是 P5 的买方/检验方动作；MP5 不定义任何验收或逆向物流动作，退换货走 P6 Resolve 的补偿指令。
 
 ### 范围 {#s-m713}
@@ -236,7 +235,7 @@ Delivery 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商�
 | `estimated_delivery_at` | ISO-8601 | 否 | 预计送达时间（ETA）。 |
 | `shipped_at` | ISO-8601 | 是 | 交运时间。 |
 | `document_refs` | array | 否 | 单证引用（发货单、报关单、原产地证等）；`compliance_level ≥ L2` 时按要求必附。 |
-| `seller_signature` | string | 是 | Seller ES256 签名（JWS），覆盖 `shipment_hash`。**shipment_hash 定义（规范性）：**对对象 `{transaction_id, batch_id, carrier_code, tracking_number, packages, ships_from, shipped_at}`（缺省字段省略键）按 RFC 8785（JCS）规范化后的 UTF-8 字节串计算 SHA-256，十六进制小写串作为 JWS payload（统一规则见 通用规则继承（Commons Inheritance））。Marketplace MUST 重算并验证，不一致返回 `DELIVERY.TRACKING_INVALID`。 |
+| `seller_signature` | string | 是 | Seller ES256 签名（JWS），覆盖 `shipment_hash`。**shipment_hash 定义（规范性）**：对对象 `{transaction_id, batch_id, carrier_code, tracking_number, packages, ships_from, shipped_at}`（缺省字段省略键）按 RFC 8785（JCS）规范化后的 UTF-8 字节串计算 SHA-256，十六进制小写串作为 JWS payload（统一规则见 通用规则继承（Commons Inheritance））。Marketplace MUST 重算并验证，不一致返回 `DELIVERY.TRACKING_INVALID`。 |
 
 ### Package {#s-m792}
 

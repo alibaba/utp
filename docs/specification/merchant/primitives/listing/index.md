@@ -33,7 +33,6 @@ intent:         供应商发布、更新并控制商品在 UTP 网络中的可�
 state_delta:    ∅ → listing(LISTED)（资源作用域，不产生全局交易状态）
 actions:        publish, update, list, delist, query, archive, batch
 compensation:   delist（使商品退出可交易范围，不影响已成立订单）
-service:        dev.utp.merchant
 ```
 
 ---
@@ -42,7 +41,7 @@ service:        dev.utp.merchant
 
 ### 意图 {#s-m311}
 
-Listing 是 UTP-M 第一个供应商原语（MP1），其意图是使供应商能够把商品（Goods）或服务（Service）以标准结构发布到 Marketplace，并控制其可交易状态。Listing 的产出是**商品档案（Listing）**及其状态；只有处于 `LISTED` 状态的商品才进入买方 P1 Source 的可搜索范围。
+Listing 是 UTP-M 第一个供应商原语（MP1），其意图是使供应商能够把商品（Goods）或服务（Service）以标准结构发布到 Marketplace，并控制其可交易状态。Listing 的产出是**商品档案（Listing）** 及其状态；只有处于 `LISTED` 状态的商品才进入买方 P1 Source 的可搜索范围。
 
 Listing 是整个商业闭环的起点：没有 Listing，P1 Source 无货可搜。 UTP-B 规范中"商品已下架"（`PURCHASE.CREATE.INVALID_ITEMS`）、"商品不存在或已下架"（`SOURCE.LOOKUP.ITEM_NOT_FOUND`）等既有错误码的触发源，由本原语的 `delist`/`archive` 正式闭合。
 
@@ -50,7 +49,7 @@ Listing 是整个商业闭环的起点：没有 Listing，P1 Source 无货可搜
 
 **"商品发布"与"商品上架"是两个独立动作。**`publish` 建立商品档案并进入平台审核；`list` 使审核通过的商品进入可交易状态。分离的原因：审核是平台治理动作（时长不可控），上架是供应商经营决策（可反复执行）。供应商 MAY 在 `publish` 请求中声明 `auto_list: true`，审核通过后自动上架。
 
-**Listing 管信息，不管数量。**商品的可售数量由 MP2 Inventory（[M4](../../primitives/inventory/index.md)）独立管理。`publish`/`update` 请求 MUST NOT 携带库存数量字段；实现方若在同一 UI 中同时编辑信息与库存，MUST 在协议层拆分为 MP1 与 MP2 两次调用。
+**Listing 管信息，不管数量**。商品的可售数量由 MP2 Inventory（[M4](../../primitives/inventory/index.md)）独立管理。`publish`/`update` 请求 MUST NOT 携带库存数量字段；实现方若在同一 UI 中同时编辑信息与库存，MUST 在协议层拆分为 MP1 与 MP2 两次调用。
 
 ### 范围 {#s-m313}
 
@@ -239,7 +238,7 @@ Listing 不覆盖：库存数量（MP2）、订单处理（MP4）、类目体系
 | `relationship_mode` L2+ | MAY 发布仅对框架协议客户可见的协议价商品（`visibility: "framework_only"`）。 |
 | `compliance_level` L1+ | `compliance_refs` MUST 存在且审核通过；L2+（跨境）MUST 含原产地与进出口许可引用；L3 MUST 附审计报告引用。 |
 
-**搜索可见性规则（Mode 过滤）：**商品的有效 Mode 范围 = 商户 Profile 中对应原语的 `supported_mode_range`（`utp.roles.seller.primitives`， UTP 规范 《发现与协商》） ∩ 商品 `mode_constraints`（缺省为前者）。Marketplace 的 P1 Source MUST 按会话 `ModeConfiguration` 过滤：会话 Mode 任一维度不在商品有效范围内的商品，MUST NOT 出现在携带任意 `filters` 的 `search` 结果中，对其 `lookup` MUST 返回 `SOURCE.MODE.UNSUPPORTED`（UTP-B 规范 《错误码定义》）。该规则将 UTP 规范的运行时错误前置为搜索期过滤，消除“能搜到却无法按该模式成交”的供需错配（闭环不变式 6，见 商品—交易闭环（End-to-End Loop））。
+**搜索可见性规则（Mode 过滤）**：商品的有效 Mode 范围 = 商户 Profile 中对应原语的 `supported_mode_range`（`utp.roles.seller.primitives`， UTP 规范 《发现与协商》） ∩ 商品 `mode_constraints`（缺省为前者）。Marketplace 的 P1 Source MUST 按会话 `ModeConfiguration` 过滤：会话 Mode 任一维度不在商品有效范围内的商品，MUST NOT 出现在携带任意 `filters` 的 `search` 结果中，对其 `lookup` MUST 返回 `SOURCE.MODE.UNSUPPORTED`（UTP-B 规范 《错误码定义》）。该规则将 UTP 规范的运行时错误前置为搜索期过滤，消除“能搜到却无法按该模式成交”的供需错配（闭环不变式 6，见 商品—交易闭环（End-to-End Loop））。
 
 ---
 

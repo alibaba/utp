@@ -15,7 +15,7 @@ format: html
 <li><strong>电子证据包</strong>（Evidence Bundle）：将交易全生命周期证据组件化为可验证、可导出、可审计的标准容器；</li>
 <li><strong>动态信任调整</strong>（Dynamic Trust Adjustment，DTA）：协议引擎基于可验证事实对 Agent 信任等级进行治理的事件机制，只规定事件格式与协议级影响，不规定升级/降级策略。</li>
 </ul>
-<p>资金托管（Escrow）的详细规范已移至 <a href="../primitives/pay/index.md#s-1410-escrow">P4 支付原语第 14.10 节</a>。Mandate Chain 的签发与数据结构见 <a href="identity-authorization.md#s-64">第 6 章 6.4 节</a>。</p>
+<p>资金托管（Escrow）的详细规范已移至 <a href="../primitives/pay/index.md#s-1410-escrow">P4 支付原语的 Escrow（资金托管）小节</a>。Mandate Chain 的签发与数据结构见 <a href="identity-authorization.md#s-64">《身份与授权》 Mandate Chain</a>。</p>
 <hr />
 
 <h2 id="s-71-risk-signals">Risk Signals（风控信号）</h2>
@@ -112,7 +112,7 @@ format: html
 <li>协议引擎 <strong>MUST</strong> 将信封中的信号与 Evidence Bundle 关联存储（以 <code>message_id</code> 为关联键），以便事后审计追溯；</li>
 <li>信号传递 <strong>MUST NOT</strong> 替代消息签名或授权验证，仅作为风控评估的补充上下文。</li>
 </ol>
-<p>示例参见 <a href="transport-communication.md#s-411">第 4 章 4.1.1 节</a>。</p>
+<p>示例参见 <a href="transport-communication.md#s-411">《传输与通信》 MessageEnvelope</a>。</p>
 
 <h4 id="s-7151">信号请求机制</h4>
 <p>接收方可能需要发送方补充特定信号。除发送方主动附带外，协议支持接收方通过响应消息请求所需信号。<strong>此机制仅适用于 UTP 标准注册信号</strong>（<code>org.utp.*</code> 命名空间下定义了请求语义的信号），自定义信号不在本机制范围内。</p>
@@ -438,7 +438,7 @@ format: html
 <p><strong>实现主体：</strong>DTA 事件的签发方可以是协议引擎、审计服务或其他受信任治理方；UTP 不要求存在单一中心化的全局信任服务。任何消费者 MUST 先验证事件签名、来源、时间顺序与触发证据，再按本地治理策略计算当前有效信任状态。单一交易参与方不得仅凭本方声明直接改变其他参与方的协议权限。</p>
 <p><strong>消费方：</strong></p>
 <ul>
-<li><strong>HAI 控制层</strong>：根据信任等级调整人机协同交互强度（见 <a href="human-agent-interaction.md">第 20 章</a>）；</li>
+<li><strong>HAI 控制层</strong>：根据信任等级调整人机协同交互强度（见 <a href="human-agent-interaction.md">《人机交互协同》</a>）；</li>
 <li><strong>Delegation Scope 执行层</strong>：收紧或放宽 Agent 的自主操作边界；</li>
 <li><strong>买方 Agent</strong>：接收自身信任等级变化通知，调整行为策略；</li>
 <li><strong>审计系统</strong>：将 TrustAdjustmentEvent 写入 Evidence Bundle；</li>

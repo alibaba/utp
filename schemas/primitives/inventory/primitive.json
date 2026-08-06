@@ -5,7 +5,6 @@
   "version": "2026-07-31",
   "title": "MP2 Inventory Primitive Definition",
   "description": "库存管理原语定义文件（UTP-M M4）。声明操作、角色绑定、传输绑定与 InventoryHold 状态机投影。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/inventory.json。",
-  "service": "dev.utp.merchant",
   "actions": {
     "set": {
       "description": "无资源状态迁移（available 绝对值覆盖；MUST 携带 expected_revision，结果不得低于当前占用量）",

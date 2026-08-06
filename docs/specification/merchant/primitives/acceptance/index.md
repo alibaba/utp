@@ -36,7 +36,6 @@ intent:         供应商对路由到达的订购请求给出可核验的受理�
 state_delta:    order_routed → acceptance_record（资源作用域）
 actions:        accept, reject, hold, amend_leadtime, amend_price, query, list
 compensation:   受理超时 → 按 acceptance_policy 自动处置并通知双方
-service:        dev.utp.merchant
 ```
 
 ---
@@ -49,9 +48,9 @@ Acceptance 是 UTP-M 第四个供应商原语（MP4），其意图是让供应�
 
 ### 关键设计原则 {#s-m-6-1-2}
 
-- **MP4 不替代 P3，而是喂给 P3。**订购成立的唯一路径仍然是 UTP-B 规范 `purchase.complete` 的原子迁移（`SIGNING → PURCHASED`）；MP4 `accept` 即 《状态迁移的原子性》 所要求的"卖方承诺处理"在平台托管拓扑下的规范化实现，其产出（卖方 ES256 签名，覆盖 `terms_hash`）是承诺处理完成的可审计证据。MP4 `reject` 则触发 P3 既有补偿链（释放库存 → `CANCELLED`）。
+- **MP4 不替代 P3，而是喂给 P3**。订购成立的唯一路径仍然是 UTP-B 规范 `purchase.complete` 的原子迁移（`SIGNING → PURCHASED`）；MP4 `accept` 即 《状态迁移的原子性》 所要求的"卖方承诺处理"在平台托管拓扑下的规范化实现，其产出（卖方 ES256 签名，覆盖 `terms_hash`）是承诺处理完成的可审计证据。MP4 `reject` 则触发 P3 既有补偿链（释放库存 → `CANCELLED`）。
 - **受理结论是不可撤销承诺。**`accept` 一经提交，供应商即受条款约束（与买方签名对称）；反悔只能走 P6 Resolve。
-- **超时必有确定性处置。**每笔路由订单 MUST 关联受理时限与超时策略（自动接受 / 自动拒绝），杜绝订单悬挂。
+- **超时必有确定性处置**。每笔路由订单 MUST 关联受理时限与超时策略（自动接受 / 自动拒绝），杜绝订单悬挂。
 
 ### 范围 {#s-m613}
 
@@ -120,7 +119,7 @@ MP4 不覆盖：订购草案的创建与修改（Buyer 专属， UTP-B 规范 �
 | `ACCEPTED` | 已接受（终态） | `accept` 签名验证通过；或买方确认交期/价格变更；或超时策略 auto_accept | `query`；衔接 `purchase.complete`（[与 P3 Purchase 签名流程的衔接（Interlock with P3）](#s-m66)） |
 | `REJECTED` | 已拒绝（终态） | `reject`；或买方拒绝交期/价格变更；或超时策略 auto_reject | `query`（只读） |
 
-**确定性约束：**终态到达后任何写操作 MUST 返回 `ACCEPTANCE.STATE_CONFLICT`（幂等重放同一 `idempotency_key` 除外）。`deadline` 由订单路由时的 Mode 超时配置决定（UTP 规范 [会话超时上下文](../../../protocol-core/transport-communication.md#s-424) Mode 协商确定的超时配置），挂起不延长时限；延时需求 MUST 走 `amend_leadtime` 或买方侧 HAI 超时扩展。
+**确定性约束**：终态到达后任何写操作 MUST 返回 `ACCEPTANCE.STATE_CONFLICT`（幂等重放同一 `idempotency_key` 除外）。`deadline` 由订单路由时的 Mode 超时配置决定（UTP 规范 [会话超时上下文](../../../protocol-core/transport-communication.md#s-424) Mode 协商确定的超时配置），挂起不延长时限；延时需求 MUST 走 `amend_leadtime` 或买方侧 HAI 超时扩展。
 
 ---
 
@@ -183,7 +182,7 @@ MP4 不覆盖：订购草案的创建与修改（Buyer 专属， UTP-B 规范 �
 
 本节是闭环不变式 3（商品—交易闭环（End-to-End Loop））的规范定义：
 
-1. 买方 `purchase.complete` 通过第 5 章 Mandate 操作准入后，P3 进入 `SIGNING`；平台托管拓扑下，协议引擎 MUST 生成受理任务并路由给供应商（[订单路由（Order Routing）](#s-m67)）。
+1. 买方 `purchase.complete` 通过《安全与信任》的 Mandate 操作准入后，P3 进入 `SIGNING`；平台托管拓扑下，协议引擎 MUST 生成受理任务并路由给供应商（[订单路由（Order Routing）](#s-m67)）。
 2. MP4 `accept` 请求 MUST 携带卖方 ES256 签名（JWS），签名内容 MUST 覆盖该订购的 `terms_hash`。 UTP-B 规范未规定"卖方承诺处理"的具体形式（《状态迁移的原子性》 留白）；**本规范将带签名的 `accept` 定义为平台托管拓扑下承诺处理的规范形式**，AcceptanceRecord 即其可审计凭证。
 3. 协议引擎确认卖方承诺处理完成后，按 UTP-B 规范 《状态迁移的原子性》 执行 `SIGNING → PURCHASED` 原子迁移（承诺处理完成、最终库存锁定、terms_hash 与条款快照一致）；任一失败按 《补偿链执行》 补偿链处理，MP4 侧受理任务保持 ACCEPTED（签名事实不回滚，重试由引擎负责）。
 4. B2C 全 L0 模式的"自动承诺处理"（UTP-B 规范 《B2C 退化行为详解》）在本模型中实现为：`acceptance_policy.mode == "auto"` 时由 Merchant Agent 或平台代理组件按预授权策略即时调用 `accept`（自动决策策略（AcceptancePolicy 与定价策略）），协议语义完全一致，无特殊路径。
@@ -194,7 +193,7 @@ MP4 不覆盖：订购草案的创建与修改（Buyer 专属， UTP-B 规范 �
 
 ## 订单路由（Order Routing） {#s-m67}
 
-订单路由是 Marketplace → Seller 的推送事件（回调 Service，[回调事件类型注册表](../../onboarding.md#s-m261)），不是供应商可调用的 Action。
+订单路由是 Marketplace → Seller 的推送事件（回调推送，[回调事件类型注册表](../../onboarding.md#s-m261)），不是供应商可调用的 Action。
 
 ### OrderRouting 事件载荷 {#s-m671}
 
@@ -345,7 +344,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
 
 ### B2B 与 B2C 场景的改价策略 {#s-m6122}
 
-改价**是否被允许**、买方**如何确认**，不是两套独立规则，而是沿 UTP 规范[交易模式频谱](../../../protocol-core/procurement-models.md)（第 8 章）`decision` 维度参数化的同一机制——`amend_price_allowed`（受理策略字段）与买方侧确认阈值随模式取值不同。“B2C” 与 “B2B” 是 `decision=L0` 与 `decision=L1—L2` 两类常见取值的通俗称呼，协议 MUST NOT 为它们硬编码特例。
+改价**是否被允许**、买方**如何确认**，不是两套独立规则，而是沿 UTP 规范[交易模式频谱](../../../protocol-core/procurement-models.md)的 `decision` 维度参数化的同一机制——`amend_price_allowed`（受理策略字段）与买方侧确认阈值随模式取值不同。“B2C” 与 “B2B” 是 `decision=L0` 与 `decision=L1—L2` 两类常见取值的通俗称呼，协议 MUST NOT 为它们硬编码特例。
 
 | 维度 | B2C（`decision=L0` 闪购/即时零售） | B2B（`decision=L1—L2` 标准采购/大宗） |
 | --- | --- | --- |
@@ -356,11 +355,11 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
 | 买方确认方式 | Agent 在极小阈值内 MAY 自动确认，超阈值 → 自动拒绝（即时零售通常无人工在环） | Agent 按采购授权容差评估：容差内 MAY 自动确认，超容差 → 升级人工（[HAI](../../merchant-agent.md)） |
 | 底层理由 | 消费者“所见即所得”信任；买方 Agent 授权低值且窄 | 采购 Agent 持议价授权、金额容差与审批链 |
 
-**B2C（`decision=L0`）为什么默认禁止改价。**即时零售场景中，买方 Agent 以下单价即时成交、且通常无人工在环。若允许卖方在受理阶段抬价，买方 Agent 既无授权确认、也无人可升级，只能超时拒绝——这既伤害“所见即所得”的消费者信任，也让订单在 `AMEND_PROPOSED` 空耗时限。因此 B2C 默认 `amend_price_allowed = false`：价格错误 MUST 以 `reject`（`price_stale`）表达，由买方回到寻源。唯一窄例外是偏远/超尺寸目的地的运费重算，且平台 MUST 对可自动接受的运费差额设封顶，超封顶仍走拒绝。
+**B2C（`decision=L0`）为什么默认禁止改价**。即时零售场景中，买方 Agent 以下单价即时成交、且通常无人工在环。若允许卖方在受理阶段抬价，买方 Agent 既无授权确认、也无人可升级，只能超时拒绝——这既伤害“所见即所得”的消费者信任，也让订单在 `AMEND_PROPOSED` 空耗时限。因此 B2C 默认 `amend_price_allowed = false`：价格错误 MUST 以 `reject`（`price_stale`）表达，由买方回到寻源。唯一窄例外是偏远/超尺寸目的地的运费重算，且平台 MUST 对可自动接受的运费差额设封顶，超封顶仍走拒绝。
 
-**B2B（`decision=L1—L2`）为什么改价是常态。**大宗采购中，运费按实际抛重结算、数量落入不同阶梯价、原材料成本波动都是订单成立前的正常变量。买方是持采购授权（Mandate，第 5 章）的采购 Agent，天然具备“在授权容差内接受价格调整”的能力。因此 B2B 默认允许改价：卖方以 `amend_price` 结构化提议，买方 Agent 依原因码（[适用场景与原因码](#s-m6123)）与采购授权的金额容差自动判定——容差内 MAY 自动确认，超容差 MUST 升级人工买家（HAI）。提议—确认的双动作全程保持双签与 `terms_hash` 证据链完整。
+**B2B（`decision=L1—L2`）为什么改价是常态**。大宗采购中，运费按实际抛重结算、数量落入不同阶梯价、原材料成本波动都是订单成立前的正常变量。买方是持采购授权（Mandate，《身份与授权》）的采购 Agent，天然具备“在授权容差内接受价格调整”的能力。因此 B2B 默认允许改价：卖方以 `amend_price` 结构化提议，买方 Agent 依原因码（[适用场景与原因码](#s-m6123)）与采购授权的金额容差自动判定——容差内 MAY 自动确认，超容差 MUST 升级人工买家（HAI）。提议—确认的双动作全程保持双签与 `terms_hash` 证据链完整。
 
-**框架协议（`relationship=L2+`）下的改价。**存在框架协议时，价格 MUST 遵循框架的定价规则；受理阶段的 `amend_price` SHOULD 仅反映框架许可的调整（如指数化的原材料成本、约定的运费公式），并 MUST 在 `reason_note` 中引用 `framework_agreement_ref`。超出框架条款的价格变化 MUST 以 `reject` 处置或走框架重新协商，而非逐单改价。
+**框架协议（`relationship=L2+`）下的改价**。存在框架协议时，价格 MUST 遵循框架的定价规则；受理阶段的 `amend_price` SHOULD 仅反映框架许可的调整（如指数化的原材料成本、约定的运费公式），并 MUST 在 `reason_note` 中引用 `framework_agreement_ref`。超出框架条款的价格变化 MUST 以 `reject` 处置或走框架重新协商，而非逐单改价。
 
 ### 适用场景与原因码 {#s-m6123}
 
@@ -425,4 +424,4 @@ POST /utp/m/v1/acceptances/rt-4471/amend-price
 
 **逐行改价示例（规格差价）**：`line_adjustments` 中给出 `line_no`、`original_unit_price`、`proposed_unit_price` 与适用 `quantity`；未列出的订单行 MUST 视为不调整。
 
-**B2C 对比。**同一运费重算若发生在 `decision=L0` 闪购订单且差额超过平台封顶，卖方 MUST NOT 走 `amend_price`（将返回 `ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED`），而应以 `reject`（`reason_code = price_stale`）结束，由买方 Agent 重新寻源。
+**B2C 对比**。同一运费重算若发生在 `decision=L0` 闪购订单且差额超过平台封顶，卖方 MUST NOT 走 `amend_price`（将返回 `ACCEPTANCE.AMEND_PRICE.NOT_ALLOWED`），而应以 `reject`（`reason_code = price_stale`）结束，由买方 Agent 重新寻源。

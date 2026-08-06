@@ -8,16 +8,16 @@ version: 2026-07-31
 
 # M12 · 供应商全链路演练（Merchant End-to-End Walkthrough） {#s-m12}
 
-> **本章为资料性（Informative）。**演练序列与 JSON 报文示例用于说明各章规范性条款的组合使用方式，不新增任何规范性要求；示例与各章条款或机读 Schema 不一致时，以条款与 Schema 为准。[闭环总验证清单（Loop Verification Checklist）](#s-m129) 验证清单是对 商品—交易闭环（End-to-End Loop） 闭环不变式（规范性，定义于各引用章节）的检查索引。
+> **本章为资料性（Informative）**。演练序列与 JSON 报文示例用于说明各章规范性条款的组合使用方式，不新增任何规范性要求；示例与各章条款或机读 Schema 不一致时，以条款与 Schema 为准。[闭环总验证清单（Loop Verification Checklist）](#s-m129) 验证清单是对 商品—交易闭环（End-to-End Loop） 闭环不变式（规范性，定义于各引用章节）的检查索引。
 
 ## 场景设定（Scenario Setup） {#s-m121}
 
-本章以一家电子产品制造商"上海示例供应链有限公司"接入 Marketplace 为主线，演练**入驻 → 发布 → 上架 → 被寻源 → 报价 → 接单 → 发货 → 结算**的完整闭环。它是 UTP-B 规范[第 24 章标准采购全链路](../guides/procurement-walkthrough.md)的**供应商侧镜像**——UTP-B 规范第 24 章从买方视角走完同一笔交易，两章互为对照。
+本章以一家电子产品制造商"上海示例供应链有限公司"接入 Marketplace 为主线，演练**入驻 → 发布 → 上架 → 被寻源 → 报价 → 接单 → 发货 → 结算**的完整闭环。它是 UTP-B 规范[标准采购全链路](../guides/procurement-walkthrough.md)的**供应商侧镜像**——UTP-B 规范在《标准采购全链路》中从买方视角走完同一笔交易，两篇互为对照。
 
 | 项目 | 设定 |
 | --- | --- |
 | 供应商 | `agent_id: did:web:supplier.example.com`；ERP 集成形态 `bridge`；Merchant Agent 启用（`assisted` 接单） |
-| Marketplace | `marketplace.example.com`，承载 `dev.utp.merchant` 与 `dev.utp.trade` 两个 Service |
+| Marketplace | `marketplace.example.com`，在同一 Profile 中并列声明买方侧与供应商侧两组传输配置（不同 Endpoint） |
 | 商品 | ProSound X3 降噪耳机（阶梯价，L1 定价） |
 | 交易 Mode | `(L1, L1, L0, L1, L0, L0)`：阶梯定价 + 简单询价 + 全额支付 + 委托物流 |
 
@@ -27,7 +27,7 @@ version: 2026-07-31
 
 ## Phase 0：入驻（Onboarding） {#s-m122}
 
-按 M2 五步流程完成：生成 ES256 密钥对 → 发布 Profile（声明 Seller 角色 + MP1—MP6 原语 + `dev.utp.merchant_callback` Service，示例见 [Step 2：Profile 发布（Profile Declaration）](onboarding.md#s-m23)）→ 注册获取 `merchant_id: mch-sh-00812` → 资质审核 `QUALIFIED` → 沙箱验收 7 项全过 → 状态 `ACTIVE`。
+按 M2 五步流程完成：生成 ES256 密钥对 → 发布 Profile（声明 Seller 角色 + MP1—MP6 原语 + 回调接收端点传输配置，示例见 [Step 2：Profile 发布（Profile Declaration）](onboarding.md#s-m23)）→ 注册获取 `merchant_id: mch-sh-00812` → 资质审核 `QUALIFIED` → 沙箱验收 7 项全过 → 状态 `ACTIVE`。
 
 ## Phase 1：发布商品与设置库存 {#s-m123}
 
@@ -41,7 +41,7 @@ Bridge 从 ERP 物料主数据生成发布请求（完整示例见 [发布并上
    → { available:500, sellable:500, revision:1 }
 ```
 
-**闭环检查点 ①（对应 商品—交易闭环（End-to-End Loop） 不变式 1/2）：**此刻买方侧 `source.lookup(item-BT-NC-001)` 返回的 `skus[].stock=500`、`pricing.tiered_pricing` 与供应商发布结构逐字段对齐。
+**闭环检查点 ①（对应 商品—交易闭环（End-to-End Loop） 不变式 1/2）**：此刻买方侧 `source.lookup(item-BT-NC-001)` 返回的 `skus[].stock=500`、`pricing.tiered_pricing` 与供应商发布结构逐字段对齐。
 
 ## Phase 2—3：被寻源与报价（买方视角对照） {#s-m124}
 
@@ -92,7 +92,7 @@ POST /utp/m/v1/acceptances/route-20260722-0335/accept
 //    hold-20260722-0091: HELD → LOCKED；ERP 创建 SO-2026-07553 并建立映射
 ```
 
-**闭环检查点 ②（不变式 3）：**MP4 提交的卖方签名覆盖订购 `terms_hash`，与买方侧 Mandate 操作准入共同构成双边承诺，订购凭证成立，全局状态 `PURCHASING → PAYING`。买方支付（P4，全额 alipay）确认后进入 `FULFILLING`。
+**闭环检查点 ②（不变式 3）**：MP4 提交的卖方签名覆盖订购 `terms_hash`，与买方侧 Mandate 操作准入共同构成双边承诺，订购凭证成立，全局状态 `PURCHASING → PAYING`。买方支付（P4，全额 alipay）确认后进入 `FULFILLING`。
 
 ## Phase 5：发货与买方收货 {#s-m126}
 
@@ -119,7 +119,7 @@ POST /utp/m/v1/deliveries
 // → 批次 CLOSED；全局状态 FULFILLING → SETTLED（全局状态机判定）
 ```
 
-**闭环检查点 ③（不变式 4）：**买方 `fulfill.query` 与供应商 `delivery.query` 呈现同一 `shipment_id / tracking_number` 的两个投影。
+**闭环检查点 ③（不变式 4）**：买方 `fulfill.query` 与供应商 `delivery.query` 呈现同一 `shipment_id / tracking_number` 的两个投影。
 
 ## Phase 6：结算与对账 {#s-m127}
 

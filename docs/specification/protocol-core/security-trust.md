@@ -25,7 +25,7 @@ format: html
 <h2 id="s-51">操作准入语义（Operation Admission Semantics）</h2>
 <h3 id="s-511">概述与定位</h3>
 <p>当采购链路由多个 Agent 接力完成时，安全问题最终落到具体操作：调用方身份是否成立，用户或上游主体是否授权，授权边界是否覆盖本次操作，失败后是否留有审计依据。5.1 将这些问题收敛为操作前准入判定，规定受保护操作进入业务处理前的判定顺序、失败语义和审计责任。</p>
-<p>准入要求由各原语操作直接表达。原语章节负责声明 action scope、是否需要 Mandate、是否触发 Human Confirmation，以及该操作需要哪些审计记录；Mandate Chain 的结构与验证见第 6 章，Evidence Bundle 的采集、保存和导出见第 7 章，Human Confirmation 的交互语义见第 20 章。本节规定这些机制在执行前如何组合成一次可机器判定的放行检查。</p>
+<p>准入要求由各原语操作直接表达。原语章节负责声明 action scope、是否需要 Mandate、是否触发 Human Confirmation，以及该操作需要哪些审计记录；Mandate Chain 的结构与验证见《身份与授权》，Evidence Bundle 的采集、保存和导出见《风控与审计》，Human Confirmation 的交互语义见《人机交互协同》。本节规定这些机制在执行前如何组合成一次可机器判定的放行检查。</p>
 <p>本地安全评估属于策略层输入。平台可以用本地评级做产品分层、生态准入、风控决策或监管报告；治理域也可以把 ISO/IEC 29115、NIST SP 800-63、eIDAS 等 assurance model 映射为本地策略。运行时互操作以具体操作声明、标准错误和审计证据为准；评分结果进入策略层，由各治理域自行解释。</p>
 
 <h3 id="s-512">准入判定顺序</h3>
@@ -43,37 +43,37 @@ format: html
 <tr>
 <td>1</td>
 <td>Profile 与 Trust Anchor 验证</td>
-<td>第 3 章 Profile、5.3 信任画像入口、第 6 章 Trust Anchor</td>
+<td>《发现与协商》Profile、《信任画像》入口、《身份与授权》Trust Anchor</td>
 <td><code>PROFILE_UNTRUSTED</code> / <code>TRUST_ANCHOR_INVALID</code></td>
 </tr>
 <tr>
 <td>2</td>
 <td>Agent Authentication</td>
-<td>5.2 机制声明、第 6 章认证机制</td>
+<td>《认证与授权机制声明》、《身份与授权》认证机制</td>
 <td><code>AUTHENTICATION_REQUIRED</code> / <code>AUTHENTICATION_FAILED</code></td>
 </tr>
 <tr>
 <td>3</td>
 <td>User Authorization</td>
-<td>5.2 授权入口、第 6 章 OAuth 流程、各原语 action scope</td>
+<td>《认证与授权机制声明》授权入口、《身份与授权》OAuth 流程、各原语 action scope</td>
 <td><code>AUTHORIZATION_REQUIRED</code> / <code>SCOPE_INSUFFICIENT</code></td>
 </tr>
 <tr>
 <td>4</td>
 <td>Mandate / Delegation Scope</td>
-<td>第 6 章 Mandate Chain、各原语操作要求</td>
+<td>《身份与授权》Mandate Chain、各原语操作要求</td>
 <td><code>MANDATE_REQUIRED</code> / <code>MANDATE_INVALID</code></td>
 </tr>
 <tr>
 <td>5</td>
 <td>Human Confirmation</td>
-<td>第 20 章 HAI、各原语触发条件</td>
+<td>《人机交互协同》HAI、各原语触发条件</td>
 <td><code>CONFIRMATION_REQUIRED</code> / <code>CONFIRMATION_FAILED</code></td>
 </tr>
 <tr>
 <td>6</td>
 <td>Audit Evidence</td>
-<td>第 7 章 Evidence Bundle、Authorization Decision 与导出规则</td>
+<td>《风控与审计》Evidence Bundle、Authorization Decision 与导出规则</td>
 <td><code>EVIDENCE_REQUIRED</code> / <code>EVIDENCE_INCOMPLETE</code></td>
 </tr>
 </tbody>
@@ -97,28 +97,28 @@ format: html
 </tr>
 <tr>
 <td>Agent Authentication</td>
-<td>5.2 / 第 6 章 / 各原语章节</td>
+<td>《认证与授权机制声明》 / 《身份与授权》 / 各原语</td>
 <td>该操作是否要求 Agent 身份认证，以及是否要求请求级签名、sender-constrained token、WIMSE 或远程证明。</td>
 </tr>
 <tr>
 <td>User Authorization</td>
-<td>5.2 / 第 6 章 / 各原语章节</td>
+<td>《认证与授权机制声明》 / 《身份与授权》 / 各原语</td>
 <td>该操作是否要求用户或上游主体授权，以及 token scope 与授权主体约束。</td>
 </tr>
 <tr>
 <td>Mandate</td>
-<td>第 6 章 / 各原语章节</td>
+<td>《身份与授权》 / 各原语</td>
 <td>该操作是否要求 Checkout、Payment 或 Operation Mandate，以及 Mandate Chain 的边界校验。</td>
 </tr>
 <tr>
 <td>Human Confirmation</td>
-<td>第 20 章 / 各原语章节</td>
+<td>《人机交互协同》 / 各原语</td>
 <td>该操作是否需要 Confirmation Surface、确认记录或升级控制等级。</td>
 </tr>
 <tr>
 <td>Evidence</td>
-<td>第 7 章 / 各原语章节</td>
-<td>该操作必须写入的 Authorization Decision、Evidence Bundle 组件和导出要求。证据格式、保留与导出方式由第 7 章定义。</td>
+<td>《风控与审计》 / 各原语</td>
+<td>该操作必须写入的 Authorization Decision、Evidence Bundle 组件和导出要求。证据格式、保留与导出方式由《风控与审计》定义。</td>
 </tr>
 </tbody>
 </table>
@@ -138,8 +138,8 @@ format: html
 <ol>
 <li>Profile 中可发现对接所需的认证、授权和 Mandate 能力；</li>
 <li>请求失败时返回可机器处理的标准错误；</li>
-<li>需要人类确认时进入第 20 章定义的 Confirmation Surface；</li>
-<li>高风险操作的准入判定和证据引用可在第 7 章 Evidence Bundle 中追溯。</li>
+<li>需要人类确认时进入《人机交互协同》定义的 Confirmation Surface；</li>
+<li>高风险操作的准入判定和证据引用可在《风控与审计》Evidence Bundle 中追溯。</li>
 </ol>
 <hr />
 
@@ -155,7 +155,7 @@ format: html
 <li><strong>User Authorization</strong>：请求方 Agent 如何获得代表终端用户或上游授权主体在资源提供方处行事的授权。它回答「谁授权的」，对应 <strong>User-authenticated</strong> 操作级别。</li>
 </ul>
 
-<p>本章仅定义两类机制的<strong>声明层</strong>要求：声明哪些字段、如何验证声明一致性、声明缺失时如何降级。认证与授权机制的发现细节与流程执行见 <a href="identity-authorization.md">第 6 章</a>。</p>
+<p>本章仅定义两类机制的<strong>声明层</strong>要求：声明哪些字段、如何验证声明一致性、声明缺失时如何降级。认证与授权机制的发现细节与流程执行见 <a href="identity-authorization.md">《身份与授权》</a>。</p>
 
 <h3 id="s-522">Agent Authentication</h3>
 
@@ -218,7 +218,7 @@ format: html
 <td><code>issuer</code></td>
 <td>string</td>
 <td>条件</td>
-<td>凭证签发方标识。<code>type="api_keys"</code> 时为 key 发行方；<code>type="mtls"</code> 时为受信任 CA issuer；<code>type="oauth2_client_credentials"</code> 时为 OAuth Authorization Server issuer；<code>type="http_message_signatures"</code> 时为签名密钥发布方；<code>type="wimse"</code> 时为 workload identity issuer 或 Agent Identity Server（AIS）。除具备跨域信任锚背书外，issuer MUST 与 <code>agent_id</code> 同属一个 trust domain。跨域信任锚背书的登记与查证机制见<a href="identity-authorization.md#s-651">第 6 章 6.5.1 节</a>。</td>
+<td>凭证签发方标识。<code>type="api_keys"</code> 时为 key 发行方；<code>type="mtls"</code> 时为受信任 CA issuer；<code>type="oauth2_client_credentials"</code> 时为 OAuth Authorization Server issuer；<code>type="http_message_signatures"</code> 时为签名密钥发布方；<code>type="wimse"</code> 时为 workload identity issuer 或 Agent Identity Server（AIS）。除具备跨域信任锚背书外，issuer MUST 与 <code>agent_id</code> 同属一个 trust domain。跨域信任锚背书的登记与查证机制见<a href="identity-authorization.md#s-651">《身份与授权》 信任根基础设施</a>。</td>
 </tr>
 <tr>
 <td><code>config</code></td>
@@ -325,14 +325,14 @@ format: html
 <td><code>endpoint</code></td>
 <td>string</td>
 <td>是</td>
-<td>Authorization Server 入口，MUST 为 HTTPS URL。实现方按第 6 章 6.3.3 节从该入口发现 OAuth metadata，并从 metadata 获取 issuer、authorization endpoint、token endpoint、JWKS 与 scopes_supported。</td>
+<td>Authorization Server 入口，MUST 为 HTTPS URL。实现方按《身份与授权》的 <a href="identity-authorization.md#s-633">Discovery 小节</a>从该入口发现 OAuth metadata，并从 metadata 获取 issuer、authorization endpoint、token endpoint、JWKS 与 scopes_supported。</td>
 </tr>
 </tbody>
 </table>
 
 <h3 id="s-524">Mandates Capability</h3>
 
-<p>Mandates Capability 声明 Profile 发布方支持哪些 Mandate 类型。它只表达能力集合，不表达某个操作是否强制要求 Mandate；具体操作的 Mandate 要求由原语定义、会话协商、运行时授权挑战或本地策略表达，Mandate Chain 的结构与验证语义见第 6 章。</p>
+<p>Mandates Capability 声明 Profile 发布方支持哪些 Mandate 类型。它只表达能力集合，不表达某个操作是否强制要求 Mandate；具体操作的 Mandate 要求由原语定义、会话协商、运行时授权挑战或本地策略表达，Mandate Chain 的结构与验证语义见《身份与授权》。</p>
 
 <p><strong>MandatesConfig 实体定义：</strong></p>
 <table>
@@ -381,9 +381,9 @@ format: html
 
 <h3 id="s-526">授权机制发现（Authorization Mechanism Discovery）</h3>
 
-<p>在 OAuth 2 授权流程开始前，请求方 Agent MUST 先从资源提供方的 UTPProfile 中发现并验证其 Authorization Server。发现流程包括：从 Profile 端点获取 UTPProfile、读取 <code>user_authorization.supported_mechanisms</code>、校验 <code>endpoint</code> 的 HTTPS 与 trust domain 约束、按第 6 章 6.3.3 节获取 RFC 8414 metadata 并验证 issuer 匹配。</p>
+<p>在 OAuth 2 授权流程开始前，请求方 Agent MUST 先从资源提供方的 UTPProfile 中发现并验证其 Authorization Server。发现流程包括：从 Profile 端点获取 UTPProfile、读取 <code>user_authorization.supported_mechanisms</code>、校验 <code>endpoint</code> 的 HTTPS 与 trust domain 约束、按《身份与授权》的 Discovery 小节获取 RFC 8414 metadata 并验证 issuer 匹配。</p>
 
-<p>本章只声明发现入口与验证要求，详细的 RFC 8414 metadata 请求、响应字段、错误处理与 Access Token 验证流程见 <a href="identity-authorization.md#s-633">第 6 章 6.3.3 节</a>；OAuth 2.0 / 2.1 Authorization Code 授权流程详见 <a href="identity-authorization.md#s-63">第 6 章 6.3 节</a>。PKCE 是否启用由 Authorization Server 与客户端配置决定。</p>
+<p>本章只声明发现入口与验证要求，详细的 RFC 8414 metadata 请求、响应字段、错误处理与 Access Token 验证流程见 <a href="identity-authorization.md#s-633">《身份与授权》 Discovery 小节</a>；OAuth 2.0 / 2.1 Authorization Code 授权流程详见 <a href="identity-authorization.md#s-63">《身份与授权》 用户授权机制</a>。PKCE 是否启用由 Authorization Server 与客户端配置决定。</p>
 
 <h3 id="s-527">与操作准入语义的协同</h3>
 
@@ -396,7 +396,7 @@ format: html
 
 <h3 id="s-528">陌生 Agent 交互的信任准入视角</h3>
 
-<p>陌生 Agent 交互指双方此前缺少直接业务关系、双边凭证或固定授权入口的场景。该场景的发现、Profile 获取、Participant 绑定、Primitive Edge 选择与 BootstrapGraph 生成由<a href="discovery-negotiation.md#s-34">第 3 章 3.4 节</a>定义；Session 三步握手由<a href="transport-communication.md#s-421">第 4 章 4.2.1 节</a>定义。本节说明同一交互在信任与安全层面的准入逻辑。</p>
+<p>陌生 Agent 交互指双方此前缺少直接业务关系、双边凭证或固定授权入口的场景。该场景的发现、Profile 获取、Participant 绑定、Primitive Edge 选择与 BootstrapGraph 生成由<a href="discovery-negotiation.md#profile-discovery">《发现与协商》 Profile 发现</a>定义；Session 三步握手由<a href="transport-communication.md#s-42">《传输与通信》 消息校验与会话上下文</a>定义。本节说明同一交互在信任与安全层面的准入逻辑。</p>
 
 <p>从信任准入角度看，陌生 Agent 首次交互的目标，是把发现阶段得到的 Profile、Trust Anchor、能力入口和目标操作要求收敛为可验证的会话安全上下文。协议引擎在进入受保护操作前需要完成四类判断：对端身份是否由签名 Profile 支撑，双方是否存在可共同使用的 Agent Authentication 机制，目标操作是否需要 User Authorization 或 Mandate，以及相关确认与证据是否可以在运行时生成并追溯。</p>
 
@@ -406,12 +406,12 @@ format: html
 <tr><th>上下文项</th><th>权威来源</th><th>安全含义</th><th>运行时使用方式</th></tr>
 </thead>
 <tbody>
-<tr><td>Profile 验证结果</td><td>第 3 章 Profile、Registry、Trust Anchor</td><td>确认 <code>agent_id</code>、签名公钥、issuer、trust domain 与撤销状态</td><td>绑定 Participant 身份、Profile 摘要与后续验签材料</td></tr>
+<tr><td>Profile 验证结果</td><td>《发现与协商》Profile、Registry、Trust Anchor</td><td>确认 <code>agent_id</code>、签名公钥、issuer、trust domain 与撤销状态</td><td>绑定 Participant 身份、Profile 摘要与后续验签材料</td></tr>
 <tr><td>Agent Authentication 选择</td><td>双方 <code>agent_authentication.supported_mechanisms</code> 的交集</td><td>确认请求方 workload 可用哪种机制证明自身身份</td><td>每次请求验证 API Key、mTLS、OAuth Client Credentials token、HTTP Message Signatures、WIMSE WIT/WPT 或等价凭证</td></tr>
 <tr><td>User Authorization 入口</td><td>资源提供方 <code>user_authorization.supported_mechanisms</code></td><td>确认需要代表用户访问资源时应从哪个 Authorization Server 获取授权</td><td>发现 OAuth metadata，获取并校验 Access Token、issuer 与 scope</td></tr>
-<tr><td>Mandate 能力边界</td><td>双方 <code>mandates.supported_mandate_types</code> 与第 6 章 Mandate Chain</td><td>确认双方是否支持目标操作所需的 Checkout、Payment 或 Operation Mandate</td><td>在下单、支付、验收、退款、取消等操作前校验 Mandate Chain</td></tr>
-<tr><td>操作准入条件</td><td>原语定义、Mode、会话协商、运行时授权挑战或本地策略</td><td>明确本次 action 需要哪些认证、授权、Mandate、人类确认与证据</td><td>按 5.1.2 的顺序执行准入判定，并将结果写入 Authorization Decision</td></tr>
-<tr><td>证据引用</td><td>第 7 章 Evidence Bundle 与 AuthorizationArchive</td><td>保留 Profile 验证、机制选择、授权决策和拒绝原因</td><td>支撑审计、争议举证、监管导出与后续风险判断</td></tr>
+<tr><td>Mandate 能力边界</td><td>双方 <code>mandates.supported_mandate_types</code> 与《身份与授权》Mandate Chain</td><td>确认双方是否支持目标操作所需的 Checkout、Payment 或 Operation Mandate</td><td>在下单、支付、验收、退款、取消等操作前校验 Mandate Chain</td></tr>
+<tr><td>操作准入条件</td><td>原语定义、Mode、会话协商、运行时授权挑战或本地策略</td><td>明确本次 action 需要哪些认证、授权、Mandate、人类确认与证据</td><td>按<a href="#s-512">准入判定顺序</a>执行准入判定，并将结果写入 Authorization Decision</td></tr>
+<tr><td>证据引用</td><td>《风控与审计》Evidence Bundle 与 AuthorizationArchive</td><td>保留 Profile 验证、机制选择、授权决策和拒绝原因</td><td>支撑审计、争议举证、监管导出与后续风险判断</td></tr>
 </tbody>
 </table>
 
@@ -428,13 +428,13 @@ format: html
       style="display: block; width: 100%; min-width: 1120px; height: auto;">
   </div>
   <figcaption style="margin-top: 10px; color: #6b7280; font-size: 13px; text-align: center;">
-    图 5-1　陌生 Agent 交互的信任准入时序图（易读版；发现与协商主流程见第 3 章；可在图内滚动查看完整链路）
+    图 5-1　陌生 Agent 交互的信任准入时序图（易读版；发现与协商主流程见《发现与协商》；可在图内滚动查看完整链路）
   </figcaption>
 </figure>
 
-<p>该时序的产物是一组可审计的会话安全上下文记录，而不是新的协议实体。记录内容来自已存在的 Profile 摘要、Trust Anchor 验证结果、选定的 Agent Authentication 机制、User Authorization endpoint、Mandate 支持情况、目标操作准入条件和证据引用。会话安全上下文只锁定候选机制与信任入口；每个受保护 primitive action 执行前仍需按 5.1.2 重新验证认证、授权、Mandate、确认与证据条件。</p>
+<p>该时序的产物是一组可审计的会话安全上下文记录，而不是新的协议实体。记录内容来自已存在的 Profile 摘要、Trust Anchor 验证结果、选定的 Agent Authentication 机制、User Authorization endpoint、Mandate 支持情况、目标操作准入条件和证据引用。会话安全上下文只锁定候选机制与信任入口；每个受保护 primitive action 执行前仍需按<a href="#s-512">准入判定顺序</a>重新验证认证、授权、Mandate、确认与证据条件。</p>
 
-<p>当 Profile 摘要变化、BootstrapGraph 失效、认证凭证过期、授权 scope 不足、Mandate 缺失或运行时风险策略要求升级时，响应方应拦截当前操作，并返回能够说明缺失条件的标准错误。请求方补齐缺失材料后，可以重新发起该操作；所有拒绝和升级决策都应写入 Authorization Decision，并按第 7 章纳入 Evidence Bundle。</p>
+<p>当 Profile 摘要变化、BootstrapGraph 失效、认证凭证过期、授权 scope 不足、Mandate 缺失或运行时风险策略要求升级时，响应方应拦截当前操作，并返回能够说明缺失条件的标准错误。请求方补齐缺失材料后，可以重新发起该操作；所有拒绝和升级决策都应写入 Authorization Decision，并按《风控与审计》纳入 Evidence Bundle。</p>
 
 <hr />
 
@@ -446,11 +446,11 @@ format: html
 
 <p>信任画像不属于准入强制校验内容。UTPProfile 只声明 <code>trust_profile</code> 引用入口；完整 Trust Profile 文档通过该入口获取，并由 JWS 签名保证真实性与完整性。完整 Trust Profile 包含 <code>trust_level</code>、<code>trust_score</code> 与 <code>risk_indicators</code> 等字段，供买方 Agent 在候选参与方之间做偏好排序与风险提示，MUST NOT 替代 Profile 签名链、认证与授权机制声明、Mandate 或操作准入判定。</p>
 
-<p>完整的 Profile（定义见<a href="discovery-negotiation.md">第 3 章</a>）在 Profile 端点（<code>/.well-known/utp</code>）中发布，并由 AIS 的 ES256 密钥签名。</p>
+<p>完整的 Profile（定义见<a href="discovery-negotiation.md">《发现与协商》</a>）在 Profile 端点（<code>/.well-known/utp</code>）中发布，并由 AIS 的 ES256 密钥签名。</p>
 
 <h3 id="s-532">UTPProfile 与 TrustProfileReference 的命名边界</h3>
 
-<p><strong>UTPProfile 顶层相关字段摘录：</strong>完整 Profile 的权威结构见<a href="discovery-negotiation.md">第 3 章</a>与 <a href="../schemas/index.md#s-discovery-profile">第 25 章 UTPProfile Schema</a>。本表仅摘录与本章操作准入、认证授权机制声明和信任画像引用相关的顶层字段，用于说明它们在完整 Profile 中的位置。</p>
+<p><strong>UTPProfile 顶层相关字段摘录：</strong>完整 Profile 的权威结构见<a href="discovery-negotiation.md">《发现与协商》</a>与 <a href="../schemas/index.md#s-discovery-profile">UTPProfile Schema</a>。本表仅摘录与本章操作准入、认证授权机制声明和信任画像引用相关的顶层字段，用于说明它们在完整 Profile 中的位置。</p>
 <table>
 <thead>
 <tr>
@@ -727,7 +727,7 @@ format: html
 <li>若 Profile 声明 <code>trust_profile</code>，接收方 MUST 校验 <code>trust_profile.endpoint</code> 为 HTTPS URL，且其域名 MUST 与 Profile 发布域同属一个治理登记的信任域，或具备跨域信任锚背书。</li>
 <li>接收方获取 TrustProfileDocument 后 MUST 验证其签名、证书链或等价完整性证明、<code>agent_id</code> 绑定、<code>issuer</code> 信任链、<code>issued_at</code> / <code>expires_at</code> 时间窗，以及可选 <code>digest</code>。TrustProfileDocument 的 <code>issuer</code> 是该信任画像的发放方和公共评分背书方，不在 UTPProfile 的 <code>trust_profile</code> 引用中重复声明。</li>
 <li>若买方 Agent 参考 TrustProfileDocument 的 <code>trust_level</code>，该值低于当前交易所需的最低信任等级时，MAY 拒绝交易或要求升级信任等级。</li>
-<li>若 TrustProfileDocument 的 <code>risk_indicators</code> 中存在 <code>severity</code> 为 <code>"critical"</code> 的指标，接收方 SHOULD 将其作为本地策略输入，触发更强认证、人机协同确认（参见<a href="human-agent-interaction.md">第 20 章</a>）或拒绝该操作。</li>
+<li>若 TrustProfileDocument 的 <code>risk_indicators</code> 中存在 <code>severity</code> 为 <code>"critical"</code> 的指标，接收方 SHOULD 将其作为本地策略输入，触发更强认证、人机协同确认（参见<a href="human-agent-interaction.md">《人机交互协同》</a>）或拒绝该操作。</li>
 <li>TrustProfileDocument 的 <code>trust_level</code> 声明 MUST NOT 超过 Registry 为该 <code>agent_id</code> 记录的最高信任等级。</li>
 </ol>
 
@@ -798,9 +798,9 @@ format: html
 </table>
 <p><strong>交叉引用：</strong></p>
 <ul>
-<li>Profile 发布格式见<a href="discovery-negotiation.md">第 3 章：发现基础设施</a></li>
-<li>Agent 身份令牌与授权机制定义见<a href="identity-authorization.md">第 6 章：认证与授权</a></li>
-<li>凭证授权保存、资金托管、电子证据包等信任基础设施详见<a href="risk-audit.md">第 7 章：风控与审计</a></li>
+<li>Profile 发布格式见<a href="discovery-negotiation.md">《发现与协商》</a></li>
+<li>Agent 身份令牌与授权机制定义见<a href="identity-authorization.md">《身份与授权》</a></li>
+<li>凭证授权保存、资金托管、电子证据包等信任基础设施详见<a href="risk-audit.md">《风控与审计》</a></li>
 </ul>
 
 <h2 id="s-55">Profile 示例</h2>

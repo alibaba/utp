@@ -93,26 +93,26 @@ UTP-M 的机器可读 Schema 与买方侧原语 Schema **同仓同标准**（JSO
 
 状态机的机器可读定义内嵌于各 `primitive.json` 的 `state_machine`（`scope: resource`，以 `listing_id`/`inquiry_id`/`routing_id`/`shipment_id` 为资源键），与正文各章状态机表逐条一致；Action 迁移以全限定名（`utp.acceptance.accept`）表达，外部与系统事件以 `event` 字段表达。
 
-## 附录 ME：与 UTP 规范的章节对应与整合路线（Integration Map，资料性） {#s-me}
+## 附录 ME：与 UTP 规范的文档对应与整合路线（Integration Map，资料性） {#s-me}
 
-本附录为**资料性（Informative）**：给出本规范（UTP-M 并列的独立协议）各章与 UTP-B 规范章节体系的对应位置，以及 MP 原语升入 UTP 规范正式章节序列（需 RFC 治理流程）时的联动修改清单。对应关系的落地与否不影响本规范条款的规范效力；若执行整合，MUST 遵循 UTP 规范 README 第 3 节新增章节流程与第 4 节全局一致性检查。
+本附录为**资料性（Informative）**：给出本规范（UTP-M 并列的独立协议）各章与 UTP-B 规范文档体系的对应位置，以及 MP 原语升入 UTP 规范正式文档序列（需 RFC 治理流程）时的联动修改清单。对应关系的落地与否不影响本规范条款的规范效力；若执行整合，MUST 遵循 UTP 规范 README 第 3 节新增章节流程与第 4 节全局一致性检查。
 
 | # | 本规范内容 | 整合目标 | 联动修改 |
 | --- | --- | --- | --- |
-| 1 | M1 架构总览 | 并入 UTP 规范 Ch.2（架构总览新增"供应商侧视图"小节）+ Ch.9（角色） | architecture.html 六层图补充供应商侧调用方向 |
+| 1 | M1 架构总览 | 并入 UTP 规范《架构总览》（新增"供应商侧视图"小节）+《商业拓扑》（角色） | architecture.html 六层图补充供应商侧调用方向 |
 | 2 | Marketplace 角色（新增角色：Marketplace） | UTP 规范 《R2：标准角色集与角色加入规则》 R2 标准角色表（走 RFC 治理流程；过渡期 R3 `marketplace.Marketplace`，《R3：领域角色扩展》） | topology.html 角色表、加入规则表、RoleDefinition 示例；`registries/roles.registry.json` |
-| 3 | M2 入驻与能力声明 | 新章节（建议插在 Ch.3 发现与协商之后，作为"商户接入"章） | 全部 26 个页面 sidebar + 编号 +1 联动；discovery.html 《发现与协商》 Profile 增补 `dev.utp.merchant_callback` Service 说明 |
-| 4 | M3 MP1 / M4 MP2 / M5 MP3 / M6 MP4 / M7 MP5 六个原语章 | 交易原语组新增五章（P0 通用框架之后、或独立"供应商原语"分组） | index.html 目录表与统计；治理侧发布五个 `PrimitiveDefinition`；MessageEnvelope `primitive` 枚举扩展（transport.html 《MessageEnvelope》 + schemas.html 24.4 两处） |
+| 3 | M2 入驻与能力声明 | 新增独立页面（建议置于《发现与协商》之后，作为"商户接入"） | 全部 26 个页面 sidebar 联动；供应商侧传输配置与回调端点直接沿用 《发现与协商》 既有 `utp.services` 传输配置模型，无需修改 UTP-B 规范 |
+| 4 | M3 MP1 / M4 MP2 / M5 MP3 / M6 MP4 / M7 MP5 六个原语章 | 交易原语组新增五个页面（P0 通用框架之后、或独立"供应商原语"分组） | index.html 目录表与统计；治理侧发布五个 `PrimitiveDefinition`；MessageEnvelope `primitive` 枚举扩展（transport.html 《MessageEnvelope》 + schemas.html 《Schema 索引》两处） |
 | 4a | MP3 与 P2 对偶（[与 P2 询盘原语的衔接（Interlock with P2）](primitives/quote/index.md#s-m56)） | primitive-negotiate.html 增补"卖方侧应答经 utp.quote 完成"的规范通道说明（平台托管拓扑） | negotiation_id 上下文共享、Quote 实体复用与 terms_hash [计算规则](primitives/quote/index.md#s-m5101a)的双向交叉引用 |
 | 4b | MP3 `revise` 的第二跳表达（[职责边界](primitives/quote/index.md#s-m563) 第 4 项） | `primitives/negotiate/state_machine.json` 增补 `QUOTED --utp.negotiate.quote--> QUOTED` 自环（修订报价的重复交付），或在 `constraints` 中明确“同一 inquiry 的后续 quote 视为版本更新、不改变协商状态” | 本规范 [职责边界](primitives/quote/index.md#s-m563) 已声明当前处理方式； UTP-B 规范补充后引用即可，MP3 语义不变 |
 | 5 | MP4 与 P3 [衔接](primitives/acceptance/index.md#s-m66) | primitive-purchase.html 《Seller 角色职责》 / 《订购原语》 增补"卖方承诺处理经 utp.acceptance 完成"的规范通道说明 | 《B2C 退化行为详解》 自动承诺处理脚注指向 AcceptancePolicy |
 | 6 | MP2 与 P3 库存契约（[与 P3 Purchase 的库存一致性契约（Interlock with P3）](primitives/inventory/index.md#s-m47)） | primitive-purchase.html 《Seller 角色职责》（锁定库存职责）与 state-machine.html required_evidence 说明处增加交叉引用 | inventory_receipt / inventory_release_receipt 的生成来源注明 InventoryHold |
-| 7 | MP5 与 P5 [事实传导](primitives/delivery/index.md#s-m77) | primitive-fulfill.html 《订单履约事件通知（notify）》（notify 的事实来源）增加交叉引用。**历史不一致已修复**： UTP 规范早期版本中 topology/scenarios 引用的未定义操作 `fulfill.ship` 已全部清除，发货事实的唯一产生通道即 `utp.delivery.ship`（MP5），Ch.15 保持纯买方视角 | fulfill/shipment 两个 Shipment Schema 合并为单一权威定义 |
+| 7 | MP5 与 P5 [事实传导](primitives/delivery/index.md#s-m77) | primitive-fulfill.html 《订单履约事件通知（notify）》（notify 的事实来源）增加交叉引用。**历史不一致已修复**： UTP 规范早期版本中 topology/scenarios 引用的未定义操作 `fulfill.ship` 已全部清除，发货事实的唯一产生通道即 `utp.delivery.ship`（MP5），P5 Fulfill 保持纯买方视角 | fulfill/shipment 两个 Shipment Schema 合并为单一权威定义 |
 | 8 | M9 结算扩展 | primitive-pay.html 新增"settlement 扩展"小节（按 《原语扩展规范（Primitive Extension Specification）》 扩展规范格式） | Profile `primitives[].extensions` 声明说明；错误码表 |
-| 9 | M10 ERP Bridge | compatibility.html（Ch.22）新增"供应商侧 Bridge"小节 | 与既有 Bridge/Adapter 模式图并列 |
-| 10 | M11 Merchant Agent 与 HAI | human-agent-interaction.html（Ch.20）新增供应商侧控制点小节；identity.html（Ch.6）授权链示例增补 | AcceptancePolicy 作为授权书面化的示例 |
-| 11 | M12 全链路演练 | scenarios.html（Ch.21）新增"供应商侧全链路"场景，或独立章与 Ch.24 并列互链 | 与 procurement-walkthrough.html 互为镜像的交叉引用 |
-| 12 | 附录 MA/MB/MC/MD | 并入 UTP 规范附录 A（术语）/ B（错误码）/ Schema 索引（Ch.25 + 附录 D.8） | registries 三个注册表文件同步 |
+| 9 | M10 ERP Bridge | compatibility.html（《存量兼容》）新增"供应商侧 Bridge"小节 | 与既有 Bridge/Adapter 模式图并列 |
+| 10 | M11 Merchant Agent 与 HAI | human-agent-interaction.html（《人机交互协同》）新增供应商侧控制点小节；identity.html（《身份与授权》）授权链示例增补 | AcceptancePolicy 作为授权书面化的示例 |
+| 11 | M12 全链路演练 | scenarios.html（《商业场景》）新增"供应商侧全链路"场景，或独立页面与《标准采购全链路》并列互链 | 与 procurement-walkthrough.html 互为镜像的交叉引用 |
+| 12 | 附录 MA/MB/MC/MD | 并入 UTP 规范附录 A（术语）/ B（错误码）/ Schema 索引（schemas.html + 附录 D.8） | registries 三个注册表文件同步 |
 | 13 | [回调事件注册表](onboarding.md#s-m261) | transport.html 《异步通信》 异步通信增补"供应商侧事件类型"表 | — |
 
 > 整合原则重申：全部新增字段 OPTIONAL（向后兼容）；不改变任何既有 MUST/SHOULD/MAY 等级；不修改既有锚点 ID；MessageEnvelope 枚举扩展属于"只增不删"的兼容变更。
@@ -122,7 +122,7 @@ UTP-M 的机器可读 Schema 与买方侧原语 Schema **同仓同标准**（JSO
 | # | 问题 | 当前 RC 立场 | 待决策方 |
 | --- | --- | --- | --- |
 | 1 | Marketplace 进入 R2 核心角色集还是保持 R3 领域角色？ | 目标 R2（多数平台托管场景默认需要），过渡期 R3 试点 | RFC 治理流程（≥3 个独立实现方支持） |
-| 2 | `fulfill.ship` 的既有不一致（ME 第 7 项） | **已解决**： UTP-B 规范已清除全部 `fulfill.ship` 残留，Ch.15 保持纯买方视角，发货动作统一由 `utp.delivery.ship` 承载 | 已闭环（保留备忘） |
+| 2 | `fulfill.ship` 的既有不一致（ME 第 7 项） | **已解决**： UTP-B 规范已清除全部 `fulfill.ship` 残留，P5 Fulfill 保持纯买方视角，发货动作统一由 `utp.delivery.ship` 承载 | 已闭环（保留备忘） |
 | 3 | MP1 与 MP2 是否合并为单一原语？ | 保持分离（变更频率、授权粒度、限流特征差异大；见 MP 原语总表（Primitive Summary） 正交性检查） | 整合评审 |
 | 4 | 多仓（`warehouse_id`）与区域库存的 Source 投影规则 | 本版仅预留字段，投影规则未定义（Experimental） | 后续版本 |
 | 5 | 竞价商品（pricing L3）的供应商侧竞价管理动作 | 未覆盖（Listing 仅承载起拍价与截止时间） | 后续版本 |

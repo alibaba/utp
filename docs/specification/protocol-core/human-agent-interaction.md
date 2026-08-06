@@ -51,9 +51,9 @@ HAI 信封 MUST 至少包含下列语义元素：
 | 字段 | 必需性 | 描述 |
 | --- | --- | --- |
 | `interaction_level` | 是 | `surface.action` 所服务 Action 在原语定义文件中声明的控制等级；它不必等于产生该响应的前序 Action 的等级 |
-| `suspend` | 条件必需 | **[Suspend Record](#s-19-7-2)**；`CONFIRMED` 下 MUST 为 `status: ACTIVE`，并含 `suspend_id` 与 `suspended_action` |
-| `surface` | 条件必需 | **[Action Surface](#s-19-4)**（见 动作承接界面）；Agent 可见链 MAY 省略，完整对象由 Platform / Host 自 Surface 存储或注册表解析；`CONFIRMED` 下为 [Confirmation Surface](#s-19-7-3) |
-| `data_source` | 条件必需 | **[Data Source](#s-19-3)**；V2 确认场景或确认前需权威重读 / `data_hash` 校验时 MUST 提供；Agent 可见链 MAY 省略 |
+| `suspend` | 条件必需 | [**Suspend Record**](#s-19-7-2)；`CONFIRMED` 下 MUST 为 `status: ACTIVE`，并含 `suspend_id` 与 `suspended_action` |
+| `surface` | 条件必需 | [**Action Surface**](#s-19-4)（见 动作承接界面）；Agent 可见链 MAY 省略，完整对象由 Platform / Host 自 Surface 存储或注册表解析；`CONFIRMED` 下为 [Confirmation Surface](#s-19-7-3) |
+| `data_source` | 条件必需 | [**Data Source**](#s-19-3)；V2 确认场景或确认前需权威重读 / `data_hash` 校验时 MUST 提供；Agent 可见链 MAY 省略 |
 | `agent_hint` | SHOULD | 面向 Agent 的控制边界说明；MUST NOT 覆盖 risk、authorization 等协议约束 |
 
 Principal 确认续跑所允许的具名业务 Action 由 Suspend Record 中的 `suspended_action` 唯一确定，MUST NOT 以独立 Action 列表另行声明。
@@ -628,14 +628,14 @@ Cancel 触发后，处理方 MUST：
 
 ### 绑定内容 {#s-19-8-2}
 
-确认控制点可能需要下列证据语义要素。其对象、传输位置和验证方式由第 6 章、第 7 章及 Action/Profile 定义；不得将它们作为确认续跑 `hai` attachment 的固定字段。适用的字段 MUST 按 Action、`SecurityRequirement`、第 6 章或参与方声明的强度提供。
+确认控制点可能需要下列证据语义要素。其对象、传输位置和验证方式由《身份与授权》、《风控与审计》及 Action/Profile 定义；不得将它们作为确认续跑 `hai` attachment 的固定字段。适用的字段 MUST 按 Action、`SecurityRequirement`、《身份与授权》或参与方声明的强度提供。
 
 | 字段名 | 类型 | 必填等级 | 描述 |
 | --- | --- | --- | --- |
 | `principal_id` | string | 条件必填 | 本次确认对应的 Principal 身份结果 |
 | `session_binding` | string | 条件必填 | 与当前会话或代表 Principal 的承载方绑定的验证结果 |
 | `data_hash` | string | 条件必填 | 适用完整性 Profile 时，Principal 确认时所见数据哈希；存在 `data_source` 时 MUST 与其权威快照一致；计算范围与确认场景约束见 确认完整性绑定 |
-| `verification_refs` | string[] | 条件必填 | Action、`SecurityRequirement`（第 5 章）、第 6 章或 `operation_requirements` 要求更高认证/授权强度时 MUST 提供 |
+| `verification_refs` | string[] | 条件必填 | Action、`SecurityRequirement`（《安全与信任》）、《身份与授权》或 `operation_requirements` 要求更高认证/授权强度时 MUST 提供 |
 | `mandate_ref` | string | 条件必填 | 本次确认依赖 Mandate 或操作受 Mandate 覆盖时 MUST 提供 |
 | `evidence_component_refs` | string[] | 条件必填 | 参与方或 Platform 要求写入 Evidence Bundle 时 MUST 提供 |
 | `surface_hash` | string | 条件必填 | 最小互操作剖面下 MAY 省略；参与方声明或互操作层要素参与所见即所签绑定时 MUST 提供；计算范围见 确认完整性绑定 |
@@ -645,7 +645,7 @@ Cancel 触发后，处理方 MUST：
 ### 强度要求的来源 {#s-19-8-3}
 
 - Action 静态声明、原语风险等级、[信任准入评估](security-trust.md) `SecurityRequirement`、[认证与授权](identity-authorization.md)、Handler 的 `operation_requirements` 及会话协商结果决定本次确认所需的认证与授权强度。
-- 这些强度要求 MUST 引用第 6 章及相关原语章的既有定义。
+- 这些强度要求 MUST 引用《身份与授权》及相关原语的既有定义。
 - 参与方 MUST 在 Profile 或 `operation_requirements` 中显式声明所需强度，MUST NOT 仅依赖 UI 表达层暗示。
 - HAI Resume 与确认续跑业务 Action 只消费并绑定"本次确认已经满足所需认证/授权要求"的验证结果。
 
@@ -835,7 +835,7 @@ Mandate 的签发、验证与适用范围以[认证与授权](identity-authoriza
 | V2 数据泄漏 | Agent 不得请求将 HAI 控制读取结果交付至其可见链；处理方 MUST 按数据可见性规则裁剪 V2 响应 |
 | LLM 幻觉导致错误确认 | Confirmation Surface 数据来自权威源，非 Agent 推理输出 |
 | 过期数据确认 | refresh_strategy=strict 强制确认前重新获取或校验 |
-| 确认控制点证据不足 | 本次确认所需认证、授权与证据绑定结果必须可由第 6 章与第 7 章体系验证 |
+| 确认控制点证据不足 | 本次确认所需认证、授权与证据绑定结果必须可由《身份与授权》与《风控与审计》体系验证 |
 | 提交信息注入攻击 | 仅允许受控结构化提交；V2 数据禁入；不得直接触发状态迁移 |
 | SUPERVISED 窗口绕过 | `interrupt_window_ms` 为权威窗口计时，Agent 无法缩短 |
 | Data Source 滥用 | 处理方仅向已认证会话交付受控数据，MUST 验证 `action_ref`、附加参数与业务锚点归属 |

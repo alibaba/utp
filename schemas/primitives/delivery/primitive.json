@@ -5,7 +5,6 @@
   "version": "2026-07-31",
   "title": "MP5 交付原语（Delivery Primitive）",
   "description": "供应商侧交付执行原语：申报备货、发货、分批交付计划与运输异常，产生可核验的履约事实。本原语覆盖履约的卖方执行面（备货 → 发货 → 运输 → 妥投），MUST NOT 定义验收动作——验收（receive / reject / inspect）始终归买方侧 P5 履约原语。",
-  "service": "dev.utp.merchant",
   "actions": {
     "prepare": {
       "description": "∅ → PREPARING；prepare(completed) → READY。可选动作：仅申报备货进度供 leadtime 参考，MUST NOT 触发买方可观测状态迁移",
@@ -141,7 +140,7 @@
   "state_machine": {
     "scope": "resource",
     "resource_key": "shipment_id",
-    "description": "DELIVERED/CLOSED 由物流回执与买方 P5 动作驱动，供应商 MUST NOT 直接声明（UTP-B 规范 17.0.2）。分批交付时每个 batch_id 独立实例化本状态机，订单级视图是全部批次的聚合。",
+    "description": "DELIVERED/CLOSED 由物流回执与买方 P5 动作驱动，供应商 MUST NOT 直接声明（UTP-B 规范《全局状态机》迁移条件约束）。分批交付时每个 batch_id 独立实例化本状态机，订单级视图是全部批次的聚合。",
     "initial_state": "PREPARING",
     "states": {
       "PREPARING": {

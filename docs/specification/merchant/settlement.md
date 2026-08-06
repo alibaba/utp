@@ -12,7 +12,7 @@ version: 2026-07-31
 
 平台托管拓扑下，货款通常经 Marketplace（或其委托的 PaymentProcessor/Escrow）代收，再按结算周期与分账规则支付给供应商。本章定义供应商侧结算能力的协议表达。
 
-**设计选择：结算不是新原语，而是 P4 Pay 的只读扩展域。**理由：
+**设计选择：结算不是新原语，而是 P4 Pay 的只读扩展域**。理由：
 
 1. 资金转移的协议语义（支付、确认和退款）已由 UTP-B 规范 P4 Pay 完整定义；供应商结算是这些事实的**汇总视图**，不产生新的资金转移语义。
 2. 本章按 UTP [原语扩展规范](../protocol-core/primitive-framework.md#s-105-extension-spec)挂载 `utp.pay.settlement` 扩展：命名遵循 《扩展命名》（`utp.{primitive}.{extension_domain}`），Marketplace 在 Profile 的 `utp.primitives["utp.pay"][].extensions` 中声明 `{ "name": "utp.pay.settlement" }`（同 UTP 规范 《发现与协商》 示例中 `utp.source.cart` 的声明方式）；双方声明兼容版本后扩展生效（《版本协商与生效规则》）。扩展只新增只读操作，不改变 P4 核心语义与状态迁移（《扩展概念与边界》）。
@@ -29,7 +29,7 @@ version: 2026-07-31
 | 结算账户 | 供应商收款账户引用（脱敏），入驻时登记（[MerchantRegistration 实体](onboarding.md#s-m241) `settlement_account`） | 入驻；变更需重新验证 |
 | 结算周期 | `T+n`（确认收货后 n 日）/ 半月结 / 月结 | 入驻时从 Marketplace 公示的账期选项中选择；MUST 在商户协议中签署并可查询 |
 | 佣金与费用 | 平台佣金率（类目维度）、支付通道费、增值服务费 | 商户协议 + 账单逐笔明示 |
-| 结算触发条件 | 默认：买方 `fulfill.receive` 确认收货 + 无未决争议；Escrow 拓扑下等价于 Escrow 释放条件（Escrow 角色见 UTP 规范 [R2：标准角色集与角色加入规则](../protocol-core/business-topology.md#s-922-standard-roles)；释放约束见第 14 章 P4，Seller MUST NOT 直接触发资金释放） | Mode/拓扑锁定时 |
+| 结算触发条件 | 默认：买方 `fulfill.receive` 确认收货 + 无未决争议；Escrow 拓扑下等价于 Escrow 释放条件（Escrow 角色见 UTP 规范 [R2：标准角色集与角色加入规则](../protocol-core/business-topology.md#s-922-standard-roles)；释放约束见 [P4 Pay](../primitives/pay/index.md)，Seller MUST NOT 直接触发资金释放） | Mode/拓扑锁定时 |
 
 ### 结算金额构成不变式 {#s-m922}
 

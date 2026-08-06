@@ -5,7 +5,6 @@
   "version": "2026-07-31",
   "title": "MP1 Listing Primitive Definition",
   "description": "商品管理原语定义文件（UTP-M M3）。声明操作、角色绑定、传输绑定与 Listing 资源状态机。实体与操作载荷 Schema 见 https://schemas.utp.dev/merchant/listing.json。",
-  "service": "dev.utp.merchant",
   "actions": {
     "publish": {
       "description": "∅ → PENDING_REVIEW",

@@ -21,7 +21,7 @@ version: 2026-07-31
 - 供应商 MUST 持有全局唯一 `agent_id`。SHOULD 采用可验证标识形式（如 `did:web:supplier.example.com`）；`agent_id` 与法人主体的绑定由 Step 4 资质审核确认（`legal_name` 与资质文件一致，[MerchantRegistration 实体](#s-m241)）。
 - 供应商 MUST 生成 ES256（P-256）密钥对，公钥以 JWK 形式进入 Profile 的 `signing_keys`；私钥 MUST NOT 交给 Marketplace 或任何第三方。
 - 密钥轮换：新增 JWK MUST 保留旧 `kid` 至少 30 天用于验证存量凭证；轮换后 MUST 更新并重新发布 Profile（`signing_keys` 仅用于验证后续认证消息与业务签名，不对 Profile 本身签名， UTP 规范 《发现与协商》）。
-- 身份验证与授权（WIT/WPT、OAuth）遵循 UTP 规范[第 6 章](../protocol-core/identity-authorization.md)，本规范不重复定义。
+- 身份验证与授权（WIT/WPT、OAuth）遵循 UTP 规范[身份与授权](../protocol-core/identity-authorization.md)，本规范不重复定义。
 
 ## Step 2：Profile 发布（Profile Declaration） {#s-m23}
 
@@ -30,7 +30,7 @@ version: 2026-07-31
 供应商 MUST 在自己的 Endpoint 上按 UTP 规范 [Profile 发现](../protocol-core/discovery-negotiation.md#profile-discovery) 发布 Profile（`GET {utp_endpoint}/.well-known/utp`）。UTP-M 对 Profile 的增量要求：
 
 - `utp.primitives` MUST 声明其支持的 MP 原语及版本；`utp.supported_mode_range` MUST 声明适用于全部 Role 与 Primitive 的六维 Mode 范围（六维均必须存在且非空， UTP 规范 《发现与协商》）。Profile 只声明能力事实，不声明调用方向；方向由原语定义文件的 `initiator_role=Seller` 固定（UTP 规范 [操作定义格式](../protocol-core/primitive-framework.md#s-1023-action-definition-format)）。
-- 供应商若需接收订单路由与结算账单推送（[订单路由（Order Routing）](primitives/acceptance/index.md#s-m67)、[账单出具与查询（Statements）](settlement.md#s-m94)），MUST 在 `utp.services` 中声明自己的回调 Service（`dev.utp.merchant_callback`）。
+- 供应商若需接收订单路由与结算账单推送（[订单路由（Order Routing）](primitives/acceptance/index.md#s-m67)、[账单出具与查询（Statements）](settlement.md#s-m94)），MUST 在 `utp.services` 中声明自己的回调接收端点作为传输配置项（如 `id: merchant-callback-rest`）；回调信封、签名与重试语义同 UTP 规范 [Push Notification](../protocol-core/transport-communication.md#s-431)。
 
 **供应商 Profile 示例（仅示 UTP-M 增量部分，结构遵循 UTP 规范 《发现与协商》）：**
 
@@ -48,18 +48,13 @@ version: 2026-07-31
       "relationship_mode": ["L0", "L1", "L2"],
       "compliance_level": ["L0", "L1"]
     },
-    "services": {
-      "dev.utp.merchant_callback": [
-        {
-          "id": "merchant-callback-rest",
-          "version": "2026-07-01",
-          "spec": "https://utp.dev/2026-07-01/services/merchant_callback",
-          "transport": "rest",
-          "endpoint": "https://supplier.example.com/utp-m/callback",
-          "schema": "https://ut-protocol.com/schemas/services/merchant_callback/2026-07-01/rest.openapi.json"
-        }
-      ]
-    },
+    "services": [
+      {
+        "id": "merchant-callback-rest",
+        "transport": "rest",
+        "endpoint": "https://supplier.example.com/utp-m/callback"
+      }
+    ],
     "primitives": {
       "utp.listing":    [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/listing", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
       "utp.inventory":  [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/inventory", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
@@ -86,9 +81,9 @@ version: 2026-07-31
 
 说明：示例仅展示 UTP-M 增量部分；`utp.quote`（MP3 询盘响应）为 MAY 级能力，仅服务一口价直购的商家可不声明（[关键设计原则](primitives/quote/index.md#s-m512)）；兼营买卖双方角色或同时提供 P1—P6 能力时，按 UTP 规范 《发现与协商》 在同一 Profile 的 `utp.primitives` / `utp.roles` 下一并声明；`agent_authentication`、`user_authorization`、`mandates` 等安全能力声明同 UTP 规范 《发现与协商》，不因角色而变。
 
-对应地，Marketplace 的 Profile MUST 在 `utp.supported_mode_range` 中声明其适用于全部 Role 与 Primitive 的 Mode 范围（处理方向由原语定义文件的 `handler_role=Marketplace` 固定），并在 `utp.services` 中声明承载 MP 原语的 `dev.utp.merchant` Service。供应商在建立会话前 MUST 按 UTP 规范 [Profile 发现](../protocol-core/discovery-negotiation.md#profile-discovery)—《发现与协商》 完成协议版本解析、Profile 验证与角色对协商，Mode 范围交集的计算规则见 《发现与协商》。
+对应地，Marketplace 的 Profile MUST 在 `utp.supported_mode_range` 中声明其适用于全部 Role 与 Primitive 的 Mode 范围（处理方向由原语定义文件的 `handler_role=Marketplace` 固定），并在 `utp.services` 中声明承载 MP 原语的传输配置项（如 `id: merchant-rest-primary`）；具体 Action 的投递路径由各 MP 原语定义文件的 `transport_bindings` 与 Profile 传输配置组合确定（UTP 规范 《原语通用框架》）。供应商在建立会话前 MUST 按 UTP 规范 [Profile 发现](../protocol-core/discovery-negotiation.md#profile-discovery)—《发现与协商》 完成协议版本解析、Profile 验证与角色对协商，Mode 范围交集的计算规则见 《发现与协商》。
 
-**Marketplace（平台）Profile 示例（仅示与 UTP-M 相关部分；平台同时声明买方侧 `dev.utp.trade` Service 与 P1—P6，结构同 UTP 规范 《发现与协商》）：**
+**Marketplace（平台）Profile 示例（仅示与 UTP-M 相关部分；平台同时承接买方侧 P1—P6 时，在同一 Profile 中一并声明，结构同 UTP 规范 《发现与协商》）：**
 
 ```json
 {
@@ -104,28 +99,18 @@ version: 2026-07-31
       "relationship_mode": ["L0", "L1", "L2"],
       "compliance_level": ["L0", "L1", "L2"]
     },
-    "services": {
-      "dev.utp.merchant": [
-        {
-          "id": "merchant-rest-primary",
-          "version": "2026-07-01",
-          "spec": "https://utp.dev/2026-07-01/services/merchant",
-          "transport": "rest",
-          "endpoint": "https://marketplace.example.com/utp/m",
-          "schema": "https://ut-protocol.com/schemas/services/merchant/2026-07-01/rest.openapi.json"
-        }
-      ],
-      "dev.utp.trade": [
-        {
-          "id": "trade-rest-primary",
-          "version": "2026-07-01",
-          "spec": "https://utp.dev/2026-07-01/services/trade",
-          "transport": "rest",
-          "endpoint": "https://marketplace.example.com/utp",
-          "schema": "https://ut-protocol.com/schemas/services/trade/2026-07-01/rest.openapi.json"
-        }
-      ]
-    },
+    "services": [
+      {
+        "id": "merchant-rest-primary",
+        "transport": "rest",
+        "endpoint": "https://marketplace.example.com/utp/m"
+      },
+      {
+        "id": "trade-rest-primary",
+        "transport": "rest",
+        "endpoint": "https://marketplace.example.com/utp"
+      }
+    ],
     "primitives": {
       "utp.listing":    [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/listing", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
       "utp.inventory":  [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/inventory", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
@@ -149,16 +134,16 @@ version: 2026-07-31
 
 说明：`roles.marketplace` 列出其作为 MP 原语 handler 的承接集；`roles.seller` 是平台在买方侧的处理身份（平台托管拓扑，平台托管拓扑（Marketplace-Hosted））。同一 Profile、同一 `supported_mode_range`、同一安全能力声明覆盖全部角色（UTP 规范 《发现与协商》）；`marketplace` 为 R3 领域角色试点命名，进入 R2 后不变（新增角色：Marketplace）。
 
-### UTP-M Service 规格（Service Registry） {#s-m231}
+### 传输配置与回调端点（Transport Configurations） {#s-m231}
 
-UTP-M 定义两个 Service，规格如下（命名遵循 UTP 规范反域名风格，同 `dev.utp.trade`）：
+按 UTP 规范 《发现与协商》，`utp.services` 是唯一服务配置数组，数组项是传输配置而非命名 Service；本规范不引入额外的 Service 命名。供应商接入涉及的两个方向的 API 面由不同传输配置项区分（不同 Endpoint，平台 MAY 独立部署与限流）：
 
-| Service | 提供方 | 承载内容 | 绑定要求 | 定义位置 |
+| 传输配置项（示例 id） | 提供方 | 承载内容 | 绑定要求 | 定义位置 |
 | --- | --- | --- | --- | --- |
-| `dev.utp.merchant` | Marketplace | MP1—MP6 全部操作 + M9 结算扩展只读操作（供应商 → 平台方向） | REST MUST；MCP/A2A MAY（通用规则继承（Commons Inheritance）） | 各原语章传输绑定小节；机读定义见附录 MD 原语定义文件 |
-| `dev.utp.merchant_callback` | Seller（供应商自己部署） | [回调事件类型注册表](#s-m261) 全部回调事件（平台 → 供应商方向），信封/签名/重试同 UTP 规范 《Push Notification》 | REST MUST（单一 webhook 端点即可，事件类型在信封内区分） | [回调事件类型注册表](#s-m261) 事件表；事件 Schema 见 merchant/events.json |
+| `merchant-rest-primary` | Marketplace | MP1—MP6 全部操作 + M9 结算扩展只读操作（供应商 → 平台方向） | REST MUST；MCP/A2A MAY（通用规则继承（Commons Inheritance）） | 各原语章传输绑定小节；机读定义见附录 MD 原语定义文件 |
+| `merchant-callback-rest` | Seller（供应商自己部署） | [回调事件类型注册表](#s-m261) 全部回调事件（平台 → 供应商方向），信封/签名/重试同 UTP 规范 [Push Notification](../protocol-core/transport-communication.md#s-431) | REST MUST（单一 webhook 端点即可，事件类型在信封内区分） | [回调事件类型注册表](#s-m261) 事件表；事件 Schema 见 merchant/events.json |
 
-边界声明：两个 Service 与 UTP-B 规范 `dev.utp.trade` 完全分离，平台 MAY 独立部署与限流；供应商兼营买方时，买卖两侧 Service 在同一 Profile 中并列声明，互不影响。
+边界声明：供应商侧传输配置与同一平台的买方侧传输配置在各自 Profile 中并列声明，互不影响；供应商兼营买方时，买卖两侧能力在同一 Profile 中声明。具体 Action 的投递路径由 Action 的 `transport_bindings` 与 Profile 传输配置组合确定，MUST NOT 由服务名推导（UTP 规范 《原语通用框架》 标识命名规范）。
 
 ## Step 3：Marketplace 注册（Registration） {#s-m24}
 
@@ -191,21 +176,21 @@ Marketplace 在注册受理时 MUST：验证 `utp_endpoint` 可达且 Profile �
 
 ### 注册边界与访问凭证 {#s-m243}
 
-- **注册不可委托：**平台账号注册与商户协议签署 MUST 由商家主体（Principal）自行完成，MUST NOT 委托给 Agent（对应 人机控制点（HAI Control Points） 控制点）；注册完成后的资料提交、资质维护等操作 MAY 在授权下由 Agent 代办（[Step 4：资质与合规（Qualification & Compliance）](#s-m25)）。
-- **身份复用：**同一 `agent_id` MAY 同时承担买方与卖方身份——在 Profile 的 `utp.roles` 中同时声明 `buyer` 与 `seller`（复用 UTP 规范 [声明模型与可信来源](../protocol-core/discovery-negotiation.md#declaration-model)“同一 Business Domain MAY 承担多个 Role，共用同一份版本化 Profile”）；入驻仅叠加 Seller 侧能力，不要求独立账号。
-- **访问凭证：**商户状态进入 `ACTIVE` 后，按 UTP 规范[第 6 章](../protocol-core/identity-authorization.md)的身份与授权框架颁发访问凭证；后续全部 MP 原语调用 MUST 携带有效凭证。凭证的吊销与失效是 `RESTRICTED`/`TERMINATED`（[商户生命周期状态（Merchant Lifecycle）](#s-m27)）的技术执行手段。
+- **注册不可委托**：平台账号注册与商户协议签署 MUST 由商家主体（Principal）自行完成，MUST NOT 委托给 Agent（对应 人机控制点（HAI Control Points） 控制点）；注册完成后的资料提交、资质维护等操作 MAY 在授权下由 Agent 代办（[Step 4：资质与合规（Qualification & Compliance）](#s-m25)）。
+- **身份复用**：同一 `agent_id` MAY 同时承担买方与卖方身份——在 Profile 的 `utp.roles` 中同时声明 `buyer` 与 `seller`（复用 UTP 规范 [声明模型与可信来源](../protocol-core/discovery-negotiation.md#declaration-model)“同一 Business Domain MAY 承担多个 Role，共用同一份版本化 Profile”）；入驻仅叠加 Seller 侧能力，不要求独立账号。
+- **访问凭证**：商户状态进入 `ACTIVE` 后，按 UTP 规范[身份与授权](../protocol-core/identity-authorization.md)的框架颁发访问凭证；后续全部 MP 原语调用 MUST 携带有效凭证。凭证的吊销与失效是 `RESTRICTED`/`TERMINATED`（[商户生命周期状态（Merchant Lifecycle）](#s-m27)）的技术执行手段。
 
 ## Step 4：资质与合规（Qualification &amp; Compliance） {#s-m25}
 
-- **资质内容不进协议：**具体需要哪些资质文件由 Marketplace 按类目与商业场景公示（平台策略域，各平台对商家要求不同）；协议层只标准化资质的**提交通道、审核状态与引用结构**（复用 UTP-B 规范 SupplierCredentials 实体与 `credential_id` 引用，[《寻源原语》](../primitives/source/index.md)）。供应商 MUST 按平台公示清单提交。
+- **资质内容不进协议**：具体需要哪些资质文件由 Marketplace 按类目与商业场景公示（平台策略域，各平台对商家要求不同）；协议层只标准化资质的**提交通道、审核状态与引用结构**（复用 UTP-B 规范 SupplierCredentials 实体与 `credential_id` 引用，[《寻源原语》](../primitives/source/index.md)）。供应商 MUST 按平台公示清单提交。
 - Marketplace MUST 审核资质并给出结论：`QUALIFIED` / `REJECTED`（附结构化原因码）。审核期间状态为 `PENDING_QUALIFICATION`。
-- **资质维护是持续义务：**资质的更新、补充与到期换证与首次提交使用同一提交通道与状态机；在商家授权下 MAY 由 Merchant Agent 代办（Merchant Agent 职责边界（Responsibility Boundary）），但账号注册与商户协议签署除外（[注册边界与访问凭证](#s-m243)）。
+- **资质维护是持续义务**：资质的更新、补充与到期换证与首次提交使用同一提交通道与状态机；在商家授权下 MAY 由 Merchant Agent 代办（Merchant Agent 职责边界（Responsibility Boundary）），但账号注册与商户协议签署除外（[注册边界与访问凭证](#s-m243)）。
 - 当交易 `compliance_level ≥ L1` 时，Marketplace 在 P1 Source 响应中返回的供应商资质摘要 MUST 来自本步骤审核通过的文件；过期或吊销的资质 MUST 触发对应商品自动下架（[Guidelines（角色职责指引）](primitives/listing/index.md#s-m35) 的 `SUSPENDED_BY_PLATFORM` 路径）。
 - 资质有效期到期前 30 天，Marketplace SHOULD 通过回调通知供应商换证。
 
 ## Step 5：回调登记与连通性验收（Callback &amp; Readiness） {#s-m26}
 
-[订单路由](primitives/acceptance/index.md#s-m67)、结算账单（[账单出具与查询（Statements）](settlement.md#s-m94)）、审核结论（[Scopes（权限范围）](primitives/listing/index.md#s-m34)）等 Marketplace → Seller 的异步通知，统一通过供应商声明的 `dev.utp.merchant_callback` Service 推送，遵循 UTP 规范 [《Push Notification》 Push Notification](../protocol-core/transport-communication.md#s-431) 的信封、签名与重试规则。
+[订单路由](primitives/acceptance/index.md#s-m67)、结算账单（[账单出具与查询（Statements）](settlement.md#s-m94)）、审核结论（[Scopes（权限范围）](primitives/listing/index.md#s-m34)）等 Marketplace → Seller 的异步通知，统一推送到供应商在 `utp.services` 中声明的回调接收端点（传输配置与回调端点），遵循 UTP 规范 [《Push Notification》 Push Notification](../protocol-core/transport-communication.md#s-431) 的信封、签名与重试规则。
 
 ### 回调事件类型注册表 {#s-m261}
 

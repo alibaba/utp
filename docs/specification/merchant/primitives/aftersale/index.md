@@ -8,17 +8,17 @@ version: 2026-07-31
 
 # 售后原语（Aftersale） {#s-m8}
 
-供应商侧售后处置原语。对买方提出的退款、退货退款、换货、补发与维修请求作出结构化处置结论，并在需要退货的方案下确认退货收货与验货结果。本原语规范的是**买卖双方在协议层的售后协商与执行**，与 UTP-B 规范 [第 16 章](../../../primitives/resolve/index.md)（P6 Resolve 争议解决）分工明确：售后先行，协商不成才升级争议裁决。
+供应商侧售后处置原语。对买方提出的退款、退货退款、换货、补发与维修请求作出结构化处置结论，并在需要退货的方案下确认退货收货与验货结果。本原语规范的是**买卖双方在协议层的售后协商与执行**，与 UTP-B 规范 [P6 Resolve（争议解决）](../../../primitives/resolve/index.md)分工明确：售后先行，协商不成才升级争议裁决。
 
 ## Overview（定位与意图） {#s-m81}
 
-**意图。**Aftersale 是 UTP-M 第六个供应商原语（MP6）。交付完成不等于交易结束。质量争议、错发漏发、运输损坏在 B2B 场景中是常态，而这些请求的处置结论直接决定资金去向（退款金额）与货物归属（是否退回）。若不在协议层规范，买方 Agent 无法预期"申请多久有回应""拒绝的理由是否可判定"，供应商也无法把售后决策交给 Agent 自动化。本原语把售后处置从平台私有流程提升为可协商、可审计、可自动化的协议动作。
+**意图**。Aftersale 是 UTP-M 第六个供应商原语（MP6）。交付完成不等于交易结束。质量争议、错发漏发、运输损坏在 B2B 场景中是常态，而这些请求的处置结论直接决定资金去向（退款金额）与货物归属（是否退回）。若不在协议层规范，买方 Agent 无法预期"申请多久有回应""拒绝的理由是否可判定"，供应商也无法把售后决策交给 Agent 自动化。本原语把售后处置从平台私有流程提升为可协商、可审计、可自动化的协议动作。
 
-**原语判据。**本原语通过 与 UTP-B 规范 P1—P6 的衔接矩阵（Interlock Matrix） 三关判据：
+**原语判据**。本原语通过 与 UTP-B 规范 P1—P6 的衔接矩阵（Interlock Matrix） 三关判据：
 
-- **T1 运行时性：**售后请求在交易运行时产生，处置结论有 deadline 约束，不是签约前的一次性配置。
-- **T2 双边对手性：**买方提出诉求、供应商给出结论，双方可多轮协商——存在真实的对手方与合意过程。
-- **T3 可重复交易性：**每笔已交付订单都可能触发售后，动作可重复执行且需幂等。
+- **T1 运行时性**：售后请求在交易运行时产生，处置结论有 deadline 约束，不是签约前的一次性配置。
+- **T2 双边对手性**：买方提出诉求、供应商给出结论，双方可多轮协商——存在真实的对手方与合意过程。
+- **T3 可重复交易性**：每笔已交付订单都可能触发售后，动作可重复执行且需幂等。
 
 **原语身份**
 
@@ -31,7 +31,6 @@ intent:         对买方售后请求（退款/退货退款/换货/补发/维修
 state_delta:    aftersale_request → aftersale_record（资源作用域：aftersale_id）
 actions:        approve, reject, propose, confirm_return, query, list
 compensation:   处置超时 → 按 timeout_policy 自动收敛（auto_approve / auto_reject），推送 utp.aftersale.closed
-service:        dev.utp.merchant
 ```
 
 **职责边界（本原语不做什么）**
@@ -48,7 +47,7 @@ service:        dev.utp.merchant
 
 这是本章最容易被误解的部分。售后与争议解决**不是同一件事的两种叫法**，而是两个前后衔接、性质不同的阶段：
 
-| 维度 | MP6 售后原语（本章） | P6 Resolve（UTP-B 规范第 16 章） |
+| 维度 | MP6 售后原语（本章） | P6 Resolve（UTP-B 规范争议解决原语） |
 | --- | --- | --- |
 | 性质 | 双方**协商执行** | 第三方**裁决** |
 | 参与方 | Buyer ↔ Marketplace ↔ Seller | Buyer ↔ Arbiter（Seller 应答） |
@@ -99,9 +98,9 @@ service:        dev.utp.merchant
 | `RETURN_RECEIVED` | `refund_completed` | `COMPLETED` | 验货 `pass` 或 `partial`，平台按结论退款 |
 | `RETURN_RECEIVED` | `dispute_escalated` | `CLOSED` | 验货 `fail` 且供应商已升级 P6 |
 
-**确定性保证。**同一状态下同一触发 MUST 只有一条可用迁移。`deadline_expired` 的多目标迁移由互斥的 `timeout_policy` 条件区分（见 通用规则继承（Commons Inheritance） 通用规则）。状态机迁移触发器的载体约定（与其余 MP 原语及 UTP-B 规范 P1—P6 一致）：**供应商可调用动作置于 `action` 字段并用全限定名**（`utp.aftersale.*`），**回调与系统触发置于 `event` 字段并用裸名**（`request_routed` / `refund_completed` / `deadline_expired`），二者 MUST NOT 混用。
+**确定性保证**。同一状态下同一触发 MUST 只有一条可用迁移。`deadline_expired` 的多目标迁移由互斥的 `timeout_policy` 条件区分（见 通用规则继承（Commons Inheritance） 通用规则）。状态机迁移触发器的载体约定（与其余 MP 原语及 UTP-B 规范 P1—P6 一致）：**供应商可调用动作置于 `action` 字段并用全限定名**（`utp.aftersale.*`），**回调与系统触发置于 `event` 字段并用裸名**（`request_routed` / `refund_completed` / `deadline_expired`），二者 MUST NOT 混用。
 
-**轮次上限。**协商轮次上限由 Marketplace 受理策略声明。超限后 Marketplace MUST 拒绝新的 `propose` 并返回 `AFTERSALE.MAX_ROUNDS`，售后单停留在 `REQUESTED`——**本原语不因轮次超限自动迁移，供应商无需为此 `reject`**。
+**轮次上限**。协商轮次上限由 Marketplace 受理策略声明。超限后 Marketplace MUST 拒绝新的 `propose` 并返回 `AFTERSALE.MAX_ROUNDS`，售后单停留在 `REQUESTED`——**本原语不因轮次超限自动迁移，供应商无需为此 `reject`**。
 
 ## Actions（动作定义） {#s-m84}
 
@@ -149,7 +148,7 @@ service:        dev.utp.merchant
 | `InspectionResult` | 验货结论 | `pass` / `partial` / `fail` |
 | `FreightResponsibility` | 退货运费责任方 | 质量问题类 SHOULD 由卖方承担 |
 
-**通用类型复用（MUST NOT 自建副本）：**`Money`、`Address`、`Signature`、`EvidenceReference` 全部引用 UTP 规范通用实体（见 [Ch.25](../../../schemas/index.md)）。分页复用 `common/pagination.json`（游标制）。
+**通用类型复用（MUST NOT 自建副本）：**`Money`、`Address`、`Signature`、`EvidenceReference` 全部引用 UTP 规范通用实体（见 [Schema 索引](../../../schemas/index.md)）。分页复用 `common/pagination.json`（游标制）。
 
 ## Error Handling（错误码） {#s-m86}
 
@@ -175,7 +174,7 @@ service:        dev.utp.merchant
 | `aftersale:write` | `approve` / `reject` / `propose` / `confirm_return` | `operation` |
 | `aftersale:read` | `query` / `list` | `operation` |
 
-写操作 MUST 先完成 UTP 规范 [第 5 章](../../../protocol-core/security-trust.md)操作准入判定，并持有 `operation` Mandate（见 通用规则继承（Commons Inheritance））。Agent 自主处置时 MUST 记录决策审计（见 决策审计（Decision Audit）），`decided_by = policy_auto` 时 MUST 提供 `policy_ref`。
+写操作 MUST 先完成 UTP 规范《安全与信任》的[操作准入](../../../protocol-core/security-trust.md#s-5-trust-profile)判定，并持有 `operation` Mandate（见 通用规则继承（Commons Inheritance））。Agent 自主处置时 MUST 记录决策审计（见 决策审计（Decision Audit）），`decided_by = policy_auto` 时 MUST 提供 `policy_ref`。
 
 ## Callbacks（回调事件） {#s-m88}
 

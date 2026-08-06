@@ -10,7 +10,7 @@ version: 2026-07-30
 
 UTP 协议假设调用方 100% 是 AI Agent。所有原本由人类隐式承担的认知负荷——理解前置条件、推断下一步动作、处理异常恢复、协调多方——MUST 被显式编码进协议本身。本章规定协议层面的 Agent 友好**设计原则**与**合规等级（L4）要求**，用于指导传输层、P0 原语框架、各原语章节及人机协同章节的字段与行为设计。
 
-**章节边界**：本章不定义具体的请求/响应字段、Action Object 结构、错误对象字段或传输信封字段；这些字段分别由[第 4 章 传输与通信](transport-communication.md)、[第 10 章 原语通用框架](primitive-framework.md)、各原语章节及[第 20 章 人机协同交互控制](human-agent-interaction.md)定义。本章只规定上述章节在面向 Agent 暴露接口时必须遵循的设计原则与判定标准。
+**边界**：本章不定义具体的请求/响应字段、Action Object 结构、错误对象字段或传输信封字段；这些字段分别由[传输与通信](transport-communication.md)、[原语通用框架](primitive-framework.md)、各原语及[人机协同交互控制](human-agent-interaction.md)定义。本章只规定上述内容在面向 Agent 暴露接口时必须遵循的设计原则与判定标准。
 
 接口设计遵循三条元原则：
 
@@ -28,8 +28,8 @@ UTP 协议假设调用方 100% 是 AI Agent。所有原本由人类隐式承担�
 
 自描述信息由传输层、原语响应骨架与各原语业务输出共同承载：
 
-- 响应信封层的会话标识、时间基准、状态版本、快照引用等由[第 4 章](transport-communication.md)定义。
-- 动作标识、执行结果、当前原语状态及后续动作名称列表由[第 10 章 P0 响应骨架](primitive-framework.md#s-1023-action-definition-format)定义。
+- 响应信封层的会话标识、时间基准、状态版本、快照引用等由[传输与通信](transport-communication.md)定义。
+- 动作标识、执行结果、当前原语状态及后续动作名称列表由[P0 响应骨架](primitive-framework.md#s-1023-action-definition-format)定义。
 - 面向 Agent 的动作自然语言说明、输入提示、前置/后置条件、风险、确认、授权与恢复语义由各原语章节及本章设计原则共同约束。
 
 协议实现方 MUST 保证：Agent 仅凭当前会话上下文、响应中的自描述字段和已协商的静态快照，即可决定下一步安全动作。
@@ -125,9 +125,9 @@ UTP 协议要求实现方达到 L4 Agent 友好度。这里的 L4 不是指 Agen
 
 | 要求编号 | 要求描述 | 必要性 |
 | --- | --- | --- |
-| L4-01 | 状态型响应 MUST 携带自描述响应信封；关键节点响应（活跃 HAI 挂起 / 错误 / 对账）MUST 内联 `valid_next_actions`；状态迁移响应 SHOULD 内联；稳态响应 MAY 用可解析引用替代。响应信封字段定义见第 4 章。 | 必须 |
+| L4-01 | 状态型响应 MUST 携带自描述响应信封；关键节点响应（活跃 HAI 挂起 / 错误 / 对账）MUST 内联 `valid_next_actions`；状态迁移响应 SHOULD 内联；稳态响应 MAY 用可解析引用替代。响应信封字段定义见《传输与通信》。 | 必须 |
 | L4-02 | 错误响应 MUST 使用 P0 标准错误格式；当 `error.recoverable=true` 时，MUST 包含可执行的 `recovery_actions`。 | 必须 |
-| L4-03 | 每个可执行 Action 的运行时表示 MUST 包含动作标识、自然语言描述与执行入口；前置/后置条件 SHOULD 存在。具体字段定义见第 10 章及各原语章节。 | 必须 |
+| L4-03 | 每个可执行 Action 的运行时表示 MUST 包含动作标识、自然语言描述与执行入口；前置/后置条件 SHOULD 存在。具体字段定义见《原语通用框架》及各原语。 | 必须 |
 | L4-04 | 每个写操作或有副作用 Action MUST 声明幂等策略，执行请求 MUST 携带 `idempotency_key`。 | 必须 |
 | L4-05 | 涉及 Saga 或已产生副作用的失败 MUST 暴露补偿状态；若已执行补偿，MUST 通过审计引用暴露链路。 | 必须 |
 | L4-06 | 涉及资金、合同、库存、履约、合规或不可逆后果的 Action MUST 携带风险声明；需要用户或审批人确认时 MUST 携带面向人类的确认摘要。 | 必须 |
@@ -157,9 +157,9 @@ UTP 协议通过以下机制支持 Agent 自主决策：
 
 | 设计主题 | 原则来源 | 字段与行为定义来源 |
 | --- | --- | --- |
-| 响应信封、快照引用、传输封装、去重与投递 | 第 19 章 | [第 4 章 传输与通信](transport-communication.md) |
-| ActionRequest / ActionResponse 骨架、`valid_next_actions` 编码、幂等键位置、错误响应基础格式 | 第 19 章 | [第 10 章 原语通用框架](primitive-framework.md) |
-| 各原语的具体 Action 语义、输入/输出 Schema、状态影响、业务错误与恢复动作 | 第 19 章 | 各原语章节 |
-| 人机协同控制、HAI 信封、`suspend_id`、执行门与数据可见性 | 第 19 章 | [第 20 章 人机协同交互控制](human-agent-interaction.md) |
+| 响应信封、快照引用、传输封装、去重与投递 | 本章 | [传输与通信](transport-communication.md) |
+| ActionRequest / ActionResponse 骨架、`valid_next_actions` 编码、幂等键位置、错误响应基础格式 | 本章 | [原语通用框架](primitive-framework.md) |
+| 各原语的具体 Action 语义、输入/输出 Schema、状态影响、业务错误与恢复动作 | 本章 | 各原语 |
+| 人机协同控制、HAI 信封、`suspend_id`、执行门与数据可见性 | 本章 | [人机协同交互控制](human-agent-interaction.md) |
 
 各章节在定义具体字段时，MUST 以本章的 L4 要求为合规判定依据；本章在描述原则时，所举的字段名仅作说明性示例，不具有新增字段的规范性效力。

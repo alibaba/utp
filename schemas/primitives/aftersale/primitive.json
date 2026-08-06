@@ -5,7 +5,6 @@
   "version": "2026-07-31",
   "title": "MP6 售后原语（Aftersale Primitive）",
   "description": "供应商侧售后处置原语：对买方提出的退款、退货退款、换货、补发、维修请求作出结构化处置结论，并在需要退货的方案下确认退货收货与验货结果。本原语定义的是买卖双方在协议层的售后协商与执行，MUST NOT 与 UTP-B 规范 P6 Resolve 混同——P6 是第三方（Arbiter）介入的争议裁决，本原语是双方合意的售后处置；售后 MUST 先行，协商不成才由买方升级 P6。退款资金动作由 Marketplace（代收代付方）执行，本原语不定义资金指令；换货与补发的发货复用 MP5 交付原语的 ship（携带 aftersale_ref 关联），不重复定义。",
-  "service": "dev.utp.merchant",
   "actions": {
     "approve": {
       "description": "同意售后请求并给出最终处置方案（方案类型、退款金额、是否需要退货、运费责任）。方案 MUST 不超出买方请求的范围（退款金额 MUST NOT 大于 requested_amount）；需要更优/更差方案时使用 propose。签名 MUST 覆盖 resolution_hash。",
