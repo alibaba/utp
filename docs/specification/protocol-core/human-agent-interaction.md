@@ -97,40 +97,48 @@ Principal 确认续跑所允许的具名业务 Action 由 Suspend Record 中的 
 
 ### 存在活跃 HAI 挂起时的 Agent 可见最小语义 {#s-19-2-3}
 
-涉及 V2 级数据且存在活跃 HAI 挂起控制的操作，Agent 可见响应 MUST 至少表达以下语义。以下示例仅用于说明最小语义要素，不构成唯一合法格式：
+涉及 V2 级数据且存在活跃 HAI 挂起控制的操作，Agent 可见响应 MUST 至少表达以下语义。
+
+下列示例对应 Agent 首次调用声明为 `CONFIRMED` 的原语 Action（如 `utp.purchase.complete`）时，处理方创建活跃 Suspend Record、阻止业务副作用所返回的 [P0 ActionResponse](primitive-framework.md#s-1023-action-definition-format) 之 Agent 可见投影。`data_visibility` 为 ActionResponse 顶层字段（见 `action_response.json`），回显该 Action 的数据可见性上限，不属于 `hai` 对象。示例中 `output` 字段名与业务取值仅作说明，不构成字段级可见性注册表。以下示例不构成唯一合法格式：
 
 ```json
 {
+  "action": "utp.purchase.complete",
   "session_id": "utp-session-abc123",
-  "state": "PURCHASING",
-  "data": {
+  "execution_result": "SUCCESS",
+  "output": {
     "purchase_id": "purchase-5-001",
     "status": "awaiting_principal_confirmation"
   },
+  "valid_next_actions": [],
   "data_visibility": "V2",
   "hai": {
     "interaction_level": "CONFIRMED",
     "suspend": {
-      "status": "ACTIVE",
-      "reason": "purchase_confirmation",
+      "session_id": "utp-session-abc123",
+      "transaction_id": "utp-txn-xyz789",
       "suspended_action": "utp.purchase.complete",
-      "timeout_ms": 300000
-    }
-  },
-  "agent_hint": "采购单 purchase-5-001 正等待委托人在 UI 中确认。在挂起解除之前，你可以回答澄清性问题或引导用户进入确认界面，但不得将该采购视为已确认，也不得调用会推进该挂起交易的原语。"
+      "reason": "purchase_confirmation",
+      "status": "ACTIVE",
+      "created_at": "2026-07-20T06:00:00Z",
+      "timeout_ms": 300000,
+      "surface_id": "surf_01J..."
+    },
+    "agent_hint": "采购单 purchase-5-001 正等待委托人在 UI 中确认。在挂起解除之前，你可以回答澄清性问题或引导用户进入确认界面，但不得将该采购视为已确认，也不得调用会推进该挂起交易的原语。"
+  }
 }
 ```
 
 **规则**：
 
-1. `data` 中 MUST NOT 包含 V2 级数据的实际值（金额、地址、支付凭证等）
-2. `data` SHOULD 包含资源标识符与状态；当前控制语义说明 SHOULD 使用 `agent_hint`。
+1. `output` 中 MUST NOT 包含 V2 级数据的实际值（金额、地址、支付凭证等）
+2. `output` SHOULD 包含资源标识符与状态；当前控制语义说明 SHOULD 使用 `hai.agent_hint`。
 3. `suspend_id` MUST NOT 出现在 Agent 可见响应中供 LLM 复述；UTP Runtime MAY 从完整响应中提取，并仅在代表 Principal 提交后续 Action 时使用（见 安全考量）。
 4. V2 数据的完整内容通过 `data_source` 获取，仅进入 Surface renderer，MUST NOT 进入 Agent 可见内容
-5. `agent_hint` MAY 出现在响应中，用于说明当前状态、约束与允许的对话边界；它不得覆盖协议中的 risk、confirmation、authorization 与控制通道约束。
+5. `hai.agent_hint` MAY 出现在响应中，用于说明当前状态、约束与允许的对话边界；它不得覆盖协议中的 risk、confirmation、authorization 与控制通道约束。
 6. 若实现另行提供面向 Agent 的自然语言说明，该说明 SHOULD 使用 `agent_text`；`agent_text` 不承担结构化状态表达职责。
-7. `state` 表达当前 StateView；活跃挂起控制由 `hai` 控制对象表达。
-8. Agent 可见响应 MAY 省略"下一步动作列表"；活跃挂起期间允许的交互由状态语义与本章控制规则确定。
+7. 当前 StateView 由会话上下文或状态机制与 ActionResponse 并行提供；挂起响应中 StateView 的 `state` 与 `state_version` MUST 保持不变（见 CONFIRMED 协议行为）。活跃挂起控制由 `hai` 表达。
+8. Agent 可见响应 MAY 省略 `valid_next_actions`；活跃挂起期间允许的交互由状态语义与本章控制规则确定。
 
 ---
 
@@ -590,33 +598,42 @@ Cancel 触发后，处理方 MUST：
 
 ### 控制结果与 Agent 可见响应 {#s-19-7-6}
 
-确认续跑业务 Action 或 narrow Resume/Cancel 成功后，HAI MUST 记录人工决策已被接受、解除活跃挂起控制，并将经校验的结果交回后续执行链。成功响应属于[Agent友好接口](agent-friendly-interface.md)定义的状态迁移响应链；MUST 至少含可用于定位业务资源的稳定引用（见下列规则）。若服务端已知下一步动作的权威默认参数，SHOULD 在响应链中内联 `default_input`（见[Agent友好接口](agent-friendly-interface.md)）。
+本节规定 **挂起解除之后** Agent 必须能感知到的结果，不定义独立的「控制结果对象」。
 
-以下示例仅用于说明控制门解除后的 Agent 可见最小语义，不构成唯一合法格式：
+Principal 在 Confirmation Surface 完成确认后，代表 Principal 的 UTP Runtime 调用 [确认后续跑](#s-19-7-4) 中的 `suspended_action`（或 narrow Resume/Cancel 成功并触发等价后续执行）。处理方解除活跃 Suspend Record，并返回该业务 Action 的 **标准 P0 ActionResponse**——其中既含原语 `output` 与 `valid_next_actions`，也含 `hai.suspend.status = RESUMED` 或 `CANCELLED` 等挂起解除语义。该响应 MUST 进入绑定同一 `session_id` 的 Agent 可见链，MUST NOT 仅停留在 UTP Runtime 内部。
+
+成功响应属于[Agent友好接口](agent-friendly-interface.md)定义的状态迁移响应链；MUST 至少含可用于定位业务资源的稳定引用（见下列规则）。若服务端已知下一步动作的权威默认参数，SHOULD 在响应链中内联 `default_input`（见[Agent友好接口](agent-friendly-interface.md)）。
+
+以下示例对应 `utp.purchase.complete` 确认续跑成功后的 P0 ActionResponse Agent 可见投影；`output` 字段名与取值仅作说明。Cancel 场景下 `hai.suspend.status` 为 `CANCELLED`，`valid_next_actions` 与 `agent_hint` 按取消语义调整。以下示例不构成唯一合法格式：
 
 ```json
 {
-  "hai": {
-    "suspend": {
-      "status": "RESUMED"
-    }
-  },
-  "data": {
+  "action": "utp.purchase.complete",
+  "session_id": "utp-session-abc123",
+  "execution_result": "SUCCESS",
+  "output": {
     "purchase_id": "purchase-5-001",
     "status": "confirmed"
   },
-  "agent_hint": "委托人已在 UI 中完成采购确认。后续执行应遵循该原语的普通响应契约。"
+  "valid_next_actions": ["utp.pay.initiate"],
+  "data_visibility": "V2",
+  "hai": {
+    "suspend": {
+      "status": "RESUMED"
+    },
+    "agent_hint": "委托人已在 UI 中完成采购确认。后续执行应遵循该原语的普通响应契约。"
+  }
 }
 ```
 
 **规则**：
 
-1. 控制成功响应 MUST 至少表明：活跃挂起控制已解除，以及可用于定位业务资源的稳定引用仍然可得（如 `purchase_id`、`checkout_id`、`order_id`）。
+1. 控制成功响应 MUST 至少表明：活跃挂起控制已解除，以及可用于定位业务资源的稳定引用仍然可得（如 `output.purchase_id`、`output.checkout_id`、`output.order_id`）。
 2. Agent 可见响应 MUST NOT 包含 `suspend_id` 明文；挂起解除状态 SHOULD 由 `hai.suspend.status` 表达。
 3. 确认续跑业务 Action 的经校验 input SHOULD 作为受控决策结果进入后续执行链；其业务解释与后续动作约束由对应原语定义。
-4. 人工确认已完成且活跃挂起控制已解除这一事实 MUST 对 Agent 可见链可见；该响应 MUST NOT 仅停留在 UTP Runtime 内部。代表 Principal 的 UTP Runtime 续跑产生的标准响应（含 `state`、`valid_next_actions`、`hai.suspend.status`）MUST 进入绑定同一 `session_id` 的 Agent 可见链。交付可通过 session 事件、push 或等价机制实现；单独轮询 StateView MUST NOT 替代含 `valid_next_actions` 的控制结果交付。
-5. 控制边界说明 SHOULD 使用 `agent_hint`；面向 Agent 的自然语言说明 MAY 另行使用 `agent_text`。
-6. Cancel 响应同样 MUST 进入 Agent 可见的协议响应链；`reason=runtime_abort` 时同样适用。
+4. 人工确认已完成且活跃挂起控制已解除这一事实 MUST 对 Agent 可见链可见。代表 Principal 的 UTP Runtime 续跑产生的标准 P0 ActionResponse（含 `output`、`valid_next_actions`、`hai.suspend.status`；StateView 变更由状态机制并行提供）MUST 进入绑定同一 `session_id` 的 Agent 可见链。交付可通过 session 事件、push 或等价机制实现；单独轮询 StateView MUST NOT 替代含 `valid_next_actions` 的控制结果交付。
+5. 控制边界说明 SHOULD 使用 `hai.agent_hint`；面向 Agent 的自然语言说明 MAY 另行使用 `agent_text`。
+6. Cancel 响应同样 MUST 以标准 P0 ActionResponse 进入 Agent 可见的协议响应链；`reason=runtime_abort` 时同样适用。
 
 ---
 
