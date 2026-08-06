@@ -26,7 +26,7 @@ HAI 规定 Action 执行前后的**可观察控制语义**：如何组合**执�
 - **HAI 信封（HAI envelope）**：Action 响应中承载 Suspend Record、动作承接界面（Action Surface，本章简称 Surface）与 Data Source 等并行协议对象的出站对象（见本节、[Agent友好接口](agent-friendly-interface.md)）。
 - **挂起凭证（suspend credential）**：`suspend_id` 及其关联 Suspend Record，用于鉴别 Principal 的确认续跑（见 挂起记录）。身份、授权、证据和完整性要求分别适用相关章节及 Action/Profile 规则。
 
-`data_visibility` 是适用于所有 Action 的顶层静态声明，取值 `V0` / `V1` / `V2`。它不属于 `hai` 对象，也不构成交互控制剖面。HAI 信封、Surface、Data Source 与 Agent 可见响应处理数据时 MUST 遵守 数据可见性规范。运行时 Surface 的 `data_visibility` MUST NOT 高于其所服务 Action 的声明值；若使用 V2，权威读取、`data_source` 与适用的完整性校验仍必须满足 Data Source 的规则。
+`data_visibility` 声明 Action 所关联业务数据的可见性上限，取值 `V0` / `V1` / `V2`。Action 在原语定义中静态声明；ActionResponse MUST 在顶层回显该值（见[原语框架](primitive-framework.md)）。它不属于 `hai` 对象，也不构成交互控制剖面。HAI 信封、Surface、Data Source 与 Agent 可见响应 MUST 遵守 数据可见性规范。Surface 的 `data_visibility` MUST NOT 高于其所服务 Action 的声明值。取值为 `V2` 时，本 Action 涉及经分类为 V2 的敏感数据；权威读取、`data_source` 与适用的完整性校验 MUST 满足 Data Source 的规则。
 
 `interaction_level` 为 Action 级声明：**未声明 `hai` 的 Action 视为 `AUTONOMOUS`**；Action 在原语定义文件携带 `hai` 时 MUST 声明 `interaction_level`（取值 `AUTONOMOUS` / `SUPERVISED` / `CONFIRMED`）。具体配置由**实现方**决定，协议正文不作逐 Action 规定。显式声明 `AUTONOMOUS` 表示该 Action 支持**非阻断 UI 交互**（MAY 返回 HAI 信封供 Surface 或 `submission`，见 AUTONOMOUS 控制语义），但不改变其不以人工确认为继续执行前提的执行门语义。处理方 MUST 按适用的 `interaction_level` 及各控制等级应用相应控制语义。各参与方 MAY 通过最低控制要求所列来源声明 Action 的最低控制要求；若 Action 静态声明严格度低于适用最低要求，处理方 MUST 拒绝执行或返回能力不匹配错误（见能力求值与差异处理）。Mandate 校验以[认证与授权](identity-authorization.md)为准；Mandate 通过或拒绝不改变该 Action 所适用的 `interaction_level` 控制语义。
 
@@ -86,7 +86,7 @@ Principal 确认续跑所允许的具名业务 Action 由 Suspend Record 中的 
 
 ### 可见性分配原则 {#s-19-2-2}
 
-具体字段属于 V0、V1 或 V2，由 Handler / 角色绑定 Profile、会话能力声明共同确定。协议规定三级可见性语义及其隔离要求；字段级映射由能力声明与数据分类给出。
+具体字段属于 V0、V1 或 V2，由 Handler / 角色绑定 Profile、会话能力声明共同确定。协议规定三级可见性语义及其隔离要求；字段级映射由能力声明与数据分类给出。`data_visibility` 标识 Action 所触及数据的最高可见性等级，不替代字段级分类。
 
 本节适用于本章所有可能进入 Agent 可见链或其它后续执行链路的界面相关数据，包括 HAI 信封中的 Surface 预览或展示内容，以及 Submission 定义的 Submission 语义。凡是本章要求进入 Agent 可见链的内容，均 MUST 按本节执行可见性裁剪。
 
@@ -97,9 +97,9 @@ Principal 确认续跑所允许的具名业务 Action 由 Suspend Record 中的 
 
 ### 存在活跃 HAI 挂起时的 Agent 可见最小语义 {#s-19-2-3}
 
-涉及 V2 级数据且存在活跃 HAI 挂起控制的操作，Agent 可见响应 MUST 至少表达以下语义。
+当存在活跃 HAI 挂起控制且 `data_visibility` 为 `V2` 时，Agent 可见响应 MUST 至少表达下列语义。
 
-下列示例对应 Agent 首次调用声明为 `CONFIRMED` 的原语 Action（如 `utp.purchase.complete`）时，处理方创建活跃 Suspend Record、阻止业务副作用所返回的 [P0 ActionResponse](primitive-framework.md#s-1023-action-definition-format) 之 Agent 可见投影。`data_visibility` 为 ActionResponse 顶层字段（见 `action_response.json`），回显该 Action 的数据可见性上限，不属于 `hai` 对象。示例中 `output` 字段名与业务取值仅作说明，不构成字段级可见性注册表。以下示例不构成唯一合法格式：
+以下示例仅用于说明最小语义要素，不构成唯一合法格式：
 
 ```json
 {
@@ -131,14 +131,14 @@ Principal 确认续跑所允许的具名业务 Action 由 Suspend Record 中的 
 
 **规则**：
 
-1. `output` 中 MUST NOT 包含 V2 级数据的实际值（金额、地址、支付凭证等）
-2. `output` SHOULD 包含资源标识符与状态；当前控制语义说明 SHOULD 使用 `hai.agent_hint`。
-3. `suspend_id` MUST NOT 出现在 Agent 可见响应中供 LLM 复述；UTP Runtime MAY 从完整响应中提取，并仅在代表 Principal 提交后续 Action 时使用（见 安全考量）。
-4. V2 数据的完整内容通过 `data_source` 获取，仅进入 Surface renderer，MUST NOT 进入 Agent 可见内容
-5. `hai.agent_hint` MAY 出现在响应中，用于说明当前状态、约束与允许的对话边界；它不得覆盖协议中的 risk、confirmation、authorization 与控制通道约束。
-6. 若实现另行提供面向 Agent 的自然语言说明，该说明 SHOULD 使用 `agent_text`；`agent_text` 不承担结构化状态表达职责。
-7. 当前 StateView 由会话上下文或状态机制与 ActionResponse 并行提供；挂起响应中 StateView 的 `state` 与 `state_version` MUST 保持不变（见 CONFIRMED 协议行为）。活跃挂起控制由 `hai` 表达。
-8. Agent 可见响应 MAY 省略 `valid_next_actions`；活跃挂起期间允许的交互由状态语义与本章控制规则确定。
+1. Agent 可见链中的结构化内容 MUST 按 可见性分配原则 裁剪；经分类为 V2 的字段 MUST NOT 以实际值进入 Agent 推理上下文。
+2. Agent 可见链 SHOULD 包含资源标识符与状态；控制边界说明 SHOULD 使用 `hai.agent_hint`。
+3. `suspend_id` MUST NOT 出现在 Agent 可见响应中供 Agent 复述；UTP Runtime MAY 从完整响应中提取，并仅在代表 Principal 提交后续 Action 时使用（见 安全考量）。
+4. 完整业务明细经 Data Source 供 Surface 展示与确认重读；该明细 MUST NOT 原样进入 Agent 可见链。
+5. `hai.agent_hint` MAY 用于说明当前控制阶段与后续限制；MUST NOT 覆盖 risk、authorization 等协议约束。
+6. 面向 Agent 的自然语言事件说明 MAY 使用 `agent_text`；`agent_text` MUST NOT 承担结构化状态表达职责。
+7. 当前 StateView 与挂起响应并行提供；挂起期间 StateView 的 `state` 与 `state_version` MUST 保持不变（见 CONFIRMED 协议行为）。活跃挂起控制由 `hai` 表达。
+8. Agent 可见响应 MAY 省略 `valid_next_actions`。
 
 ---
 
@@ -302,7 +302,7 @@ Submission 的最小语义 MUST 满足以下要求：
 
 1. Submission MUST 显式携带一个 `action` 字段，用于标识该次 UI 交互结果所对应的 UTP action；该字段 MUST NOT 省略为隐式约定，也 MUST NOT 依赖 `description`、按钮文案或本地路由推断。
 2. 当同一 Surface 上存在多种后续交互结果时，不同结果 MUST 通过 Submission 中不同的 `action` 显式区分；MUST NOT 另设平行事件命名体系。
-3. 若提交结果进入 Agent 可见链，MUST 按 数据可见性规范 执行可见性裁剪；V2 级数据 MUST NOT 以原始值进入 Agent 可见内容，MAY 以资源标识符或经裁剪的 V1 摘要表达。
+3. 若提交结果进入 Agent 可见链，MUST 按 数据可见性规范 裁剪。
 4. 存在活跃挂起控制时，Submission MUST NOT 替代确认续跑所需的业务 Action 或 Resume/Cancel。
 5. 若提交结果进入 Agent 可见链，结构化提交事实 SHOULD 由 `payload` 承载；若同时需要面向 Agent 的自然语言说明，SHOULD 使用 `agent_text`。
 
@@ -476,22 +476,23 @@ Surface 负责承载 UI 表达（UI 表达要素）与协议互操作要素（�
 
 ### 确认后续跑（Confirmation Continuation） {#s-19-7-4}
 
-Principal 在 Confirmation Surface 中完成确认后，代表 Principal 的 UTP Runtime MUST 以标准 ActionRequest 调用 Suspend Record 中的 `suspended_action`，并在请求侧 `hai` attachment 中携带匹配的 `suspend_id`。该路径 MUST 触发对应原语的状态迁移；MUST NOT 依赖 `utp.hai.resume` 作为默认续跑机制。身份、授权、证据及完整性所需的信息由相应章节或 Action/Profile 规则处理，不是确认续跑 HAI attachment 的固定字段。
+Principal 在 Confirmation Surface 中完成确认后，代表 Principal 的 UTP Runtime MUST 以[原语框架](primitive-framework.md)定义的标准 ActionRequest 调用 Suspend Record 中的 `suspended_action`，并在 `hai` attachment 中携带匹配的 `suspend_id`。该路径 MUST 触发对应原语的状态迁移；MUST NOT 以 `utp.hai.resume` 作为默认续跑机制。身份、授权、证据及完整性要求由相应章节与 Action/Profile 规则处理，不是 `hai` attachment 的固定字段。
 
 以下示例仅用于说明确认后续跑的最小语义要素，不构成唯一合法格式：
 
 ```json
 {
   "action": "utp.purchase.complete",
-  "session_id": "utp-session-abc",
+  "session_id": "utp-session-abc123",
+  "transaction_id": "utp-txn-xyz789",
+  "idempotency_key": "idem_01J...",
   "input": {
     "purchase_id": "purchase-5-001",
     "shipping_address_id": "addr-002"
   },
   "hai": {
     "suspend_id": "sus_01J..."
-  },
-  "idempotency_key": "idem_01J..."
+  }
 }
 ```
 
@@ -499,16 +500,18 @@ Principal 在 Confirmation Surface 中完成确认后，代表 Principal 的 UTP
 
 | 要求 | 描述 |
 | --- | --- |
-| 发起方约束 | 请求 MUST 由代表 Principal 的 UTP Runtime 提交；Agent MUST NOT 以该路径提交带 `suspend_id` 的确认续跑 |
-| Action 匹配 | 请求 `action` MUST 等于 Suspend Record 的 `suspended_action`；MUST NOT 使用同一 `suspend_id` 提交其他具名业务 Action |
-| 挂起凭证 | `hai.suspend_id` MUST 有效、未过期，且与当前会话、Suspend Record 及 `suspended_action` 匹配 |
-| Input 约束 | 业务 input MUST 符合挂起 `suspended_action` 在原语章定义的 input schema |
-| 完整性 | 适用完整性 Profile 时，处理方 MUST 按其规则验证 Principal 确认时所见数据与当前权威数据的一致性（所见即所签） |
-| 证据绑定 | 适用的身份、授权、Mandate 与证据要求 MUST 按 Action、`SecurityRequirement` 与相应章节处理（见[认证与授权](identity-authorization.md)、[风控与审计](risk-audit.md)） |
+| 发起方 | MUST 由代表 Principal 的 UTP Runtime 提交；Agent MUST NOT 以该路径提交确认续跑 |
+| Action 匹配 | 请求 `action` MUST 等于 Suspend Record 的 `suspended_action` |
+| 挂起凭证 | `hai.suspend_id` MUST 有效、未过期，且与当前会话及 `suspended_action` 匹配 |
+| 请求结构 | MUST 符合 [原语框架](primitive-framework.md) ActionRequest；业务参数 MUST 在 `input` 中；`hai` attachment 在本路径 MUST 仅含 `suspend_id` |
+| 幂等 | 携带 `hai` 时 `idempotency_key` MUST |
+| Input | MUST 符合 `suspended_action` 在原语章定义的 input schema |
+| 完整性 | 适用完整性 Profile 时，处理方 MUST 验证 Principal 确认所见数据与当前权威数据一致 |
+| 证据 | 适用的身份、授权、Mandate 与证据要求 MUST 按相关章节处理 |
 
-处理方收到确认续跑业务 Action 后，MUST 在执行业务 Action 并触发状态迁移前完成：`suspend_id` 与 `suspended_action` 匹配校验、最新 StateView 与交易上下文重读、Action 合法性复验、input schema 校验，以及该 Action 适用的完整性、身份、授权、证据和 Mandate 校验；通过后 MUST 解除活跃挂起控制。具体业务状态迁移语义见[全局状态机](global-state-machine.md)。
+处理方收到确认续跑业务 Action 后，MUST 在执行业务 Action 并触发状态迁移前完成挂起校验、StateView 重读、input schema 校验，以及该 Action 适用的完整性、身份、授权、证据与 Mandate 校验；通过后 MUST 解除活跃挂起控制。状态迁移语义见[全局状态机](global-state-machine.md)。续跑成功的 Agent 可见响应 MUST 满足 控制结果与 Agent 可见响应。
 
-确认续跑采用[原语框架](primitive-framework.md)定义的标准请求与响应语义。Agent 侧后续可执行 Action 仍由[Agent友好接口](agent-friendly-interface.md) `valid_next_actions` 表达；挂起期间 Agent 仅见只读 Action，与代表 Principal 的 UTP Runtime 续跑所用 `suspended_action` 职责分离。
+确认续跑采用[原语框架](primitive-framework.md)定义的标准请求与响应语义。挂起期间 Agent 可执行 Action 由 [Agent友好接口](agent-friendly-interface.md) `valid_next_actions` 表达。
 
 若会话 HAI 快照（见 会话 HAI 快照）不含 `CONFIRMED`，Agent 无凭证调用 `CONFIRMED` Action 时处理方 MUST 返回 `HAI_CHANNEL_DENIED` 或 `HAI_CAPABILITY_UNSUPPORTED`。
 
@@ -590,7 +593,7 @@ Cancel 触发后，处理方 MUST：
 #### Resume/Cancel 约束 {#s-19-7-5-4}
 
 1. Resume/Cancel MUST 为幂等操作（同一 suspend_id + idempotency_key 重复发送无副作用）。
-2. `decision.modifications` 中 MUST NOT 包含 V2 级数据值，仅允许 ID 引用和枚举值。
+2. `decision.modifications` 中 MUST NOT 包含经分类为 V2 的字段实际值；仅允许 ID 引用和枚举值。
 3. 已超时的活跃挂起收到 Resume 时，MUST 返回 `SUSPEND_EXPIRED` 错误。
 4. 当 Resume 提供 `decision.timestamp` 时，其与 `created_at` 之差 MUST 小于 `timeout_ms`。
 5. Cancel 与 Resume 互斥，同一 suspend_id 只能接受其中之一（否则 `RESUME_CONFLICT`）。
@@ -598,13 +601,11 @@ Cancel 触发后，处理方 MUST：
 
 ### 控制结果与 Agent 可见响应 {#s-19-7-6}
 
-本节规定 **挂起解除之后** Agent 必须能感知到的结果，不定义独立的「控制结果对象」。
+确认续跑业务 Action 或 narrow Resume/Cancel 成功后，处理方 MUST 记录人工决策已被接受、解除活跃挂起控制，并将经校验的标准 ActionResponse 交付后续执行链。该响应 MUST 进入绑定同一 `session_id` 的 Agent 可见链，MUST NOT 仅由 UTP Runtime 内部消费。
 
-Principal 在 Confirmation Surface 完成确认后，代表 Principal 的 UTP Runtime 调用 [确认后续跑](#s-19-7-4) 中的 `suspended_action`（或 narrow Resume/Cancel 成功并触发等价后续执行）。处理方解除活跃 Suspend Record，并返回该业务 Action 的 **标准 P0 ActionResponse**——其中既含原语 `output` 与 `valid_next_actions`，也含 `hai.suspend.status = RESUMED` 或 `CANCELLED` 等挂起解除语义。该响应 MUST 进入绑定同一 `session_id` 的 Agent 可见链，MUST NOT 仅停留在 UTP Runtime 内部。
+成功响应 MUST 至少表明：活跃挂起控制已解除，以及可用于定位业务资源的稳定引用仍然可得。若处理方已知下一步动作的权威默认参数，SHOULD 在响应链中内联 `default_input`（见[Agent友好接口](agent-friendly-interface.md)）。
 
-成功响应属于[Agent友好接口](agent-friendly-interface.md)定义的状态迁移响应链；MUST 至少含可用于定位业务资源的稳定引用（见下列规则）。若服务端已知下一步动作的权威默认参数，SHOULD 在响应链中内联 `default_input`（见[Agent友好接口](agent-friendly-interface.md)）。
-
-以下示例对应 `utp.purchase.complete` 确认续跑成功后的 P0 ActionResponse Agent 可见投影；`output` 字段名与取值仅作说明。Cancel 场景下 `hai.suspend.status` 为 `CANCELLED`，`valid_next_actions` 与 `agent_hint` 按取消语义调整。以下示例不构成唯一合法格式：
+以下示例仅用于说明控制门解除后的 Agent 可见最小语义，不构成唯一合法格式：
 
 ```json
 {
@@ -628,12 +629,13 @@ Principal 在 Confirmation Surface 完成确认后，代表 Principal 的 UTP Ru
 
 **规则**：
 
-1. 控制成功响应 MUST 至少表明：活跃挂起控制已解除，以及可用于定位业务资源的稳定引用仍然可得（如 `output.purchase_id`、`output.checkout_id`、`output.order_id`）。
+1. 响应 MUST 为[原语框架](primitive-framework.md)标准 ActionResponse；Agent 可见链 MUST 包含 `output`、`valid_next_actions` 与 `hai.suspend.status`。
 2. Agent 可见响应 MUST NOT 包含 `suspend_id` 明文；挂起解除状态 SHOULD 由 `hai.suspend.status` 表达。
-3. 确认续跑业务 Action 的经校验 input SHOULD 作为受控决策结果进入后续执行链；其业务解释与后续动作约束由对应原语定义。
-4. 人工确认已完成且活跃挂起控制已解除这一事实 MUST 对 Agent 可见链可见。代表 Principal 的 UTP Runtime 续跑产生的标准 P0 ActionResponse（含 `output`、`valid_next_actions`、`hai.suspend.status`；StateView 变更由状态机制并行提供）MUST 进入绑定同一 `session_id` 的 Agent 可见链。交付可通过 session 事件、push 或等价机制实现；单独轮询 StateView MUST NOT 替代含 `valid_next_actions` 的控制结果交付。
-5. 控制边界说明 SHOULD 使用 `hai.agent_hint`；面向 Agent 的自然语言说明 MAY 另行使用 `agent_text`。
-6. Cancel 响应同样 MUST 以标准 P0 ActionResponse 进入 Agent 可见的协议响应链；`reason=runtime_abort` 时同样适用。
+3. 确认续跑业务 Action 的经校验 input SHOULD 作为受控决策结果进入后续执行链；其语义由对应原语定义。
+4. StateView 变更由状态机制并行提供；单独轮询 StateView MUST NOT 替代含 `valid_next_actions` 的控制结果交付。
+5. 控制边界说明 SHOULD 使用 `hai.agent_hint`；面向 Agent 的自然语言说明 MAY 使用 `agent_text`。
+6. Cancel 响应 MUST 同样进入 Agent 可见链；`reason=runtime_abort` 时亦适用。
+7. Agent 可见链 MUST 遵守 数据可见性规范。
 
 ---
 
@@ -679,7 +681,7 @@ Principal 在 Confirmation Surface 完成确认后，代表 Principal 的 UTP Ru
 1. 原语响应中用于后续步骤引用的业务数据，MUST 以资源标识符形式提供。
 2. Agent 后续操作中 MUST 通过 ID 引用资源，MUST NOT 传递来自先前上下文的业务数据值。
 3. 原语接收到 ID 后，MUST 从权威存储获取当前数据，MUST NOT 信任 Agent 传递的非 ID 字段。
-4. 当 Principal 需要在复杂业务结构中作出选择时，回传结果 SHOULD 收敛为资源标识符、枚举值或布尔值，以避免 V2 数据重新进入 Agent 推理上下文。
+4. 当 Principal 需要在复杂业务结构中作出选择时，回传结果 SHOULD 收敛为资源标识符、枚举值或布尔值。
 5. [活跃 HAI 挂起时的 Agent 可见最小语义](#s-19-2-3) 的挂起响应，与 [控制结果与 Agent 可见响应](#s-19-7-6) 的控制结果，共同记录"人工控制门"的前后状态；挂起解除后承接业务语义的引用链，应由对应原语的普通响应继续提供。
 
 例如，Agent 发起 `utp.purchase.complete` 时，input MUST 仅含 `purchase_id` 等资源标识符；处理方 MUST 忽略 Agent 传递的非 ID 业务字段，并从权威存储获取完整数据。
@@ -849,11 +851,11 @@ Mandate 的签发、验证与适用范围以[认证与授权](identity-authoriza
 | 无限期挂起 | 所有活跃挂起控制 MUST 设置 `timeout_ms`；超时 MUST 将 Suspend Record 置为 `EXPIRED` 并解除活跃挂起控制 |
 | 重放攻击 | 处理方 MUST 将 `suspend_id` 的有效性、会话、主体和目标 Action 进行关联校验；写 Action 的幂等性按原语框架规则处理 |
 | Surface 数据篡改 | 适用完整性 Profile 时，Data Source 响应 SHOULD 携带强完整性证明；处理方按该 Profile 校验数据或 Surface 的完整性绑定 |
-| V2 数据泄漏 | Agent 不得请求将 HAI 控制读取结果交付至其可见链；处理方 MUST 按数据可见性规则裁剪 V2 响应 |
+| V2 数据泄漏 | Agent MUST NOT 请求将 HAI 控制读取结果交付至其可见链；处理方 MUST 按 数据可见性规范 裁剪 Agent 可见响应 |
 | LLM 幻觉导致错误确认 | Confirmation Surface 数据来自权威源，非 Agent 推理输出 |
 | 过期数据确认 | refresh_strategy=strict 强制确认前重新获取或校验 |
 | 确认控制点证据不足 | 本次确认所需认证、授权与证据绑定结果必须可由《身份与授权》与《风控与审计》体系验证 |
-| 提交信息注入攻击 | 仅允许受控结构化提交；V2 数据禁入；不得直接触发状态迁移 |
+| 提交信息注入攻击 | 仅允许受控结构化提交；MUST NOT 以实际值暴露经分类为 V2 的字段；不得直接触发状态迁移 |
 | SUPERVISED 窗口绕过 | `interrupt_window_ms` 为权威窗口计时，Agent 无法缩短 |
 | Data Source 滥用 | 处理方仅向已认证会话交付受控数据，MUST 验证 `action_ref`、附加参数与业务锚点归属 |
 
