@@ -5,7 +5,7 @@
 <marker id="mEntArrowR" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#b85450"/></marker>
 </defs>
 <g>
-<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">M8.3 结算条目生命周期（Entry Lifecycle）</text>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">结算条目生命周期（Entry Lifecycle）</text>
 
 <!-- entry point -->
 <text x="120" y="52" text-anchor="middle" font-size="10" fill="#666">PaymentConfirmation（P4）</text>

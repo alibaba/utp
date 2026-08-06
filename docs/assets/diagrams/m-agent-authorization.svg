@@ -5,7 +5,7 @@
 <marker id="mAuthArrowR" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#b85450"/></marker>
 </defs>
 <g>
-<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">M10.4 Agent 授权链：每个签名可回溯到 Principal（策略即授权）</text>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">Agent 授权链：每个签名可回溯到 Principal（策略即授权）</text>
 
 <!-- Principal -->
 <rect x="30" y="60" width="160" height="70" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
@@ -25,7 +25,7 @@
 <rect x="540" y="60" width="190" height="70" rx="6" fill="#ffe6cc" stroke="#d79b00"/>
 <text x="635" y="84" text-anchor="middle" font-size="12" font-weight="bold">Merchant Agent</text>
 <text x="635" y="102" text-anchor="middle" font-size="9.5">持工作密钥 · 按策略决策</text>
-<text x="635" y="117" text-anchor="middle" font-size="9.5">AcceptancePolicy / 报价策略（M10.3）</text>
+<text x="635" y="117" text-anchor="middle" font-size="9.5">AcceptancePolicy / 报价策略</text>
 
 <path d="M 190 95 L 246 95" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mAuthArrow)"/>
 <g font-size="10" text-anchor="middle"><rect x="182" y="76" width="76" height="14" fill="#fff"/><text x="220" y="87">主密钥签发</text></g>
@@ -54,6 +54,6 @@
 <path d="M 300 180 L 130 134" fill="none" stroke="#b85450" stroke-dasharray="4 3" marker-end="url(#mAuthArrowR)"/>
 <g font-size="10" text-anchor="middle" fill="#b85450"><rect x="140" y="148" width="130" height="14" fill="#fff"/><text x="205" y="159">每个签名可回溯到授权</text></g>
 
-<text x="380" y="284" text-anchor="middle" font-size="10" fill="#666">注册与商户协议签署不在本链内（MUST 由 Principal 亲自完成，M2.4.3）· 控制点矩阵见 M10.5</text>
+<text x="380" y="284" text-anchor="middle" font-size="10" fill="#666">注册与商户协议签署不在本链内（MUST 由 Principal 亲自完成） · 控制点矩阵</text>
 </g>
 </svg>

@@ -5,7 +5,7 @@
 <marker id="mAsArrowG" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#666"/></marker>
 </defs>
 <g>
-<text x="440" y="24" text-anchor="middle" font-size="14" font-weight="bold">M8.3.1 售后单状态机（资源作用域：aftersale_id · 退款由 Marketplace 执行）</text>
+<text x="440" y="24" text-anchor="middle" font-size="14" font-weight="bold">售后单状态机（资源作用域：aftersale_id · 退款由 Marketplace 执行）</text>
 
 <!-- entry -->
 <text x="108" y="60" text-anchor="middle" font-size="11" fill="#666">售后请求路由</text>
