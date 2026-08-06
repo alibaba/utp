@@ -8,21 +8,6 @@ version: 2026-07-31
 
 # 库存原语（Inventory） {#s-m4}
 
-## 目录 {#s-m4-toc}
-
-- [Overview（概述）](#s-m41)
-- [库存模型（Inventory Model）](#s-m42)
-- [Error Handling（错误处理）](#s-m43)
-- [Scopes（权限范围）](#s-m44)
-- [Guidelines（角色职责指引）](#s-m45)
-- [Mode-Driven Behavior（模式驱动行为）](#s-m46)
-- [与 P3 Purchase 的库存一致性契约（Interlock with P3）](#s-m47)
-- [操作矩阵（Operations Matrix）](#s-m48)
-- [Entities（实体定义）](#s-m49)
-- [Use Case Walkthroughs（用例演练）](#s-m410)
-
----
-
 ## 原语身份 {#s-m4-identity}
 
 ```
@@ -284,5 +269,5 @@ POST /utp/m/v1/inventory/item-BT-NC-001/sku-X3-BLK/adjustments
   "source_ref": "ERP-OUT-20260722-118" }
 
 同一时刻平台侧 lock 扣减并发发生 → 增量语义无冲突，
-最终 available 一致收敛；对账以 revision 流水 + source_ref 核对（M10.6）。
+最终 available 一致收敛；对账以 revision 流水 + source_ref 核对（见 [幂等、顺序与容错](../../erp-bridge.md#s-m106)）。
 ```

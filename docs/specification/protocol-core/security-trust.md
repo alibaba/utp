@@ -860,7 +860,7 @@ format: html
   },
   "trust_profile": {
     "version": "2026-04-08",
-    "schema": "https://schemas.utp.example/common/trust_profile_reference.json",
+    "schema": "https://ut-protocol.com/schemas/discovery/trust_profile_reference.json",
     "endpoint": "https://seller.example.com/.well-known/utp/trust-profile",
     "format": "jws-json"
   }

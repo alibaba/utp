@@ -49,7 +49,7 @@ Bridge 从 ERP 物料主数据生成发布请求（完整示例见 [发布并上
 
 ```
 // Marketplace 将询盘转给供应商回调（P2 的 Seller handler 侧）；
-// Merchant Agent 按 M11.3.2 策略生成报价（阶梯价内，无需人工）：
+// Merchant Agent 按 M11 报价策略约束生成报价（阶梯价内，无需人工）：
 // negotiate.quote 应答
 {
   "quote": {
@@ -75,7 +75,7 @@ Bridge 从 ERP 物料主数据生成发布请求（完整示例见 [发布并上
 //    此刻库存视图：available=500, held=100, sellable=400
 
 // 2. 买方 purchase.complete（买方签名）→ P3 进入 SIGNING
-//    → Marketplace 路由受理任务（M6.7）：
+//    → Marketplace 路由受理任务（见 MP4 订单路由）：
 { "event": "utp.acceptance.order_routed", "routing_id": "route-20260722-0335",
   "purchase_id": "ORD-20260722-88721",
   "transaction_id": "utp-txn-01J4X7K9M2P5Q8R3V6W0YZ",
@@ -109,7 +109,7 @@ POST /utp/m/v1/deliveries
   "seller_signature": "eyJhbGciOiJFUzI1NiJ9..." }
 // → SHIPPED；lock 100 → CONSUMED；available 500→400
 
-// 2. Marketplace 转换为买方 fulfill.notify(SHIPPED)（M7.7 映射表）
+// 2. Marketplace 转换为买方 fulfill.notify(SHIPPED)（见 MP5 与 P5 事实传导契约的映射表）
 // 3. 承运商妥投回执 → DELIVERED → 买方 fulfill.receive 确认收货
 // 4. 供应商收到回调：
 { "event": "utp.delivery.receipt",

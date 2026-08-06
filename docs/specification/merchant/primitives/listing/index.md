@@ -8,20 +8,6 @@ version: 2026-07-31
 
 # 商品原语（Listing） {#s-m3}
 
-## 目录 {#s-m3-toc}
-
-- [Overview（概述）](#s-m31)
-- [Lifecycle / State Machine（生命周期 / 状态机）](#s-m32)
-- [Error Handling（错误处理）](#s-m33)
-- [Scopes（权限范围）](#s-m34)
-- [Guidelines（角色职责指引）](#s-m35)
-- [Mode-Driven Behavior（模式驱动行为）](#s-m36)
-- [Operations（操作定义）](#s-m37)
-- [Entities（实体定义）](#s-m39)
-- [Use Case Walkthroughs（用例演练）](#s-m310)
-
----
-
 ## 原语身份 {#s-m3-identity}
 
 ```

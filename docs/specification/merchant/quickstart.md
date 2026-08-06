@@ -21,7 +21,7 @@ UTP-M 的最简实现面（通用规则继承（Commons Inheritance） 传输绑
 ② 一个 Webhook 端点    → 接收回调推送（订单路由、审核结论、账单）
 
 不需要：MCP/A2A（可选）、Merchant Agent（可选）、ERP Bridge（有 ERP 才需要）
-Mode 配置：零配置即可跑通全流程（M1.8 Mode 默认无关性原则）
+Mode 配置：零配置即可跑通全流程（Mode 默认无关性原则，见 M1 架构总览）
 ```
 
 ## 2. 第一阶段：入驻（一次性，M2） {#s-mqs2}
@@ -39,11 +39,11 @@ Mode 配置：零配置即可跑通全流程（M1.8 Mode 默认无关性原则�
 ```
 N 个商品 = ⌈N / 500⌉ 个批次（单批 ≤ 500 条，整批一个 idempotency_key，逐条独立成败）
 
-POST /utp/m/v1/listings/batch   → batch_id → 轮询/回调取逐条结果     （M3.7.2）
-POST /utp/m/v1/inventory/batch  → 初始库存 set                      （M4.8.2）
+POST /utp/m/v1/listings/batch   → batch_id → 轮询/回调取逐条结果     （见 MP1 批量模式）
+POST /utp/m/v1/inventory/batch  → 初始库存 set                      （见 MP2 操作矩阵）
 
 商品数据来源三选一：
-  ERP 导出映射（M10.4） / AI 辅助录入 source_materials，确认后生效（M3.9.7） / 人工录入
+  ERP 导出映射（见 M10 同步模式） / AI 辅助录入 source_materials，确认后生效（见 MP1 SourceMaterials） / 人工录入
 ```
 
 商品经 `DRAFT → PENDING_REVIEW → LISTED`（[Error Handling（错误处理）](primitives/listing/index.md#s-m33)）后自动进入平台 P1 Source 可搜索范围；审核结论走 `review_result` 回调推送，无需轮询。
@@ -52,18 +52,18 @@ POST /utp/m/v1/inventory/batch  → 初始库存 set                      （M4.
 
 ```
 上行（你 → 平台，随 ERP 变化触发）：
-  库存变化   → inventory.adjust + commutative:true（最简路径，M4.1.2）
+  库存变化   → inventory.adjust + commutative:true（最简路径，见 MP2 关键设计原则）
   信息修改   → listing.update（major 变更重新送审）
   发货       → delivery.ship（运单号；平台转为买方侧 fulfill.notify）
 
 下行（平台 → 你的 Webhook）：
   order_routed      → 在 deadline 内 accept（附卖方签名）/ reject / hold    （接单原语）
 inquiry_routed    → （可选，声明 utp.quote 后）在 deadline 内 quote / decline （报价原语）
-  hold_created/…    → 核对库存占用                                        （M4.7）
+  hold_created/…    → 核对库存占用                                        （见 MP2 与 P3 库存一致性契约）
   statement_issued  → 对账，异议走 discrepancy.submit                      （结算与对账）
 
-兜底铁律：所有回调丢失均可通过 query/list 游标轮询补齐（M2.6.1）；
-接单超时平台按预设策略处置，订单永不悬挂（M6.3）。
+兜底铁律：所有回调丢失均可通过 query/list 游标轮询补齐（见 M2 回调事件类型注册表）；
+接单超时平台按预设策略处置，订单永不悬挂（见 MP4 错误处理）。
 ```
 
 ## 5. 什么时候才需要 Agent 和 Bridge {#s-mqs5}

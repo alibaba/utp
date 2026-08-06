@@ -8,21 +8,6 @@ version: 2026-07-31
 
 # 交付原语（Delivery） {#s-m7}
 
-## 目录 {#s-m7-toc}
-
-- [Overview（概述）](#s-m71)
-- [Lifecycle / State Machine（生命周期 / 状态机）](#s-m72)
-- [Error Handling（错误处理）](#s-m73)
-- [Scopes（权限范围）](#s-m74)
-- [Guidelines（角色职责指引）](#s-m75)
-- [Mode-Driven Behavior（模式驱动行为）](#s-m76)
-- [与 P5 Fulfill 的事实传导契约（Interlock with P5）](#s-m77)
-- [操作矩阵（Operations Matrix）](#s-m78)
-- [Entities（实体定义）](#s-m79)
-- [Use Case Walkthroughs（用例演练）](#s-m710)
-
----
-
 ## 原语身份 {#s-m7-identity}
 
 ```
@@ -76,7 +61,7 @@ Delivery 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商�
   "postconditions": [
     "delivery.shipment_id != null（ship 成功后）",
     "shipment.status == 'SHIPPED' → 买方收到 fulfill.notify(SHIPPED)",
-    "inventory.lock(对应数量) → CONSUMED（M4.7 核销映射）",
+    "inventory.lock(对应数量) → CONSUMED（MP2 核销映射）",
     "shipment ∈ evidence_bundle（含运单、签名、时间戳）"
   ],
   "invariants": [
