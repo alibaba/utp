@@ -100,7 +100,7 @@ UTP-M 的机器可读 Schema 与买方侧原语 Schema **同仓同标准**（JSO
 | # | 本规范内容 | 整合目标 | 联动修改 |
 | --- | --- | --- | --- |
 | 1 | M1 架构总览 | 并入 UTP 规范《架构总览》（新增"供应商侧视图"小节）+《商业拓扑》（角色） | architecture.html 六层图补充供应商侧调用方向 |
-| 2 | Marketplace 角色（新增角色：Marketplace） | UTP 规范 《R2：标准角色集与角色加入规则》 R2 标准角色表（走 RFC 治理流程；过渡期 R3 `marketplace.Marketplace`，《R3：领域角色扩展》） | topology.html 角色表、加入规则表、RoleDefinition 示例；`registries/roles.registry.json` |
+| 2 | Marketplace 角色（新增角色：Marketplace） | UTP 规范 《R2：标准角色集与角色加入规则》 R2 标准平台角色表；B 侧只通过 `role_domain_bindings` 声明平台 Business Domain 承担的 B 侧 Role | business-topology.md 角色表、B/M 侧别说明、RoleDefinition 示例；`registries/roles.registry.json` |
 | 3 | M2 入驻与能力声明 | 新增独立页面（建议置于《发现与协商》之后，作为"商户接入"） | 全部 26 个页面 sidebar 联动；供应商侧传输配置与回调端点直接沿用 《发现与协商》 既有 `utp.services` 传输配置模型，无需修改 UTP-B 规范 |
 | 4 | M3 MP1 / M4 MP2 / M5 MP3 / M6 MP4 / M7 MP5 六个原语章 | 交易原语组新增五个页面（P0 通用框架之后、或独立"供应商原语"分组） | index.html 目录表与统计；治理侧发布五个 `PrimitiveDefinition`；MessageEnvelope `primitive` 枚举扩展（transport.html 《MessageEnvelope》 + schemas.html 《Schema 索引》两处） |
 | 4a | MP3 与 P2 对偶（[与 P2 询盘原语的衔接（Interlock with P2）](primitives/quote/index.md#s-m56)） | primitive-negotiate.html 增补"卖方侧应答经 utp.quote 完成"的规范通道说明（平台托管拓扑） | negotiation_id 上下文共享、Quote 实体复用与 terms_hash [计算规则](primitives/quote/index.md#s-m5101a)的双向交叉引用 |
@@ -121,7 +121,7 @@ UTP-M 的机器可读 Schema 与买方侧原语 Schema **同仓同标准**（JSO
 
 | # | 问题 | 当前 RC 立场 | 待决策方 |
 | --- | --- | --- | --- |
-| 1 | Marketplace 进入 R2 核心角色集还是保持 R3 领域角色？ | 目标 R2（多数平台托管场景默认需要），过渡期 R3 试点 | RFC 治理流程（≥3 个独立实现方支持） |
+| 1 | Marketplace 进入 R2 还是保持 R3 领域角色？ | **已解决**：Marketplace 是 UTP-M 商家/平台侧的 R2 标准平台角色；UTP-B 不暴露 Marketplace 节点 | 已闭环（B 侧声明方式见《商业拓扑》） |
 | 2 | `fulfill.ship` 的既有不一致（ME 第 7 项） | **已解决**： UTP-B 规范已清除全部 `fulfill.ship` 残留，P5 Fulfill 保持纯买方视角，发货动作统一由 `utp.delivery.ship` 承载 | 已闭环（保留备忘） |
 | 3 | MP1 与 MP2 是否合并为单一原语？ | 保持分离（变更频率、授权粒度、限流特征差异大；见 MP 原语总表（Primitive Summary） 正交性检查） | 整合评审 |
 | 4 | 多仓（`warehouse_id`）与区域库存的 Source 投影规则 | 本版仅预留字段，投影规则未定义（Experimental） | 后续版本 |

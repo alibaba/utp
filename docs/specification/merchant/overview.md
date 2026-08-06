@@ -35,12 +35,12 @@ UTP UTP-B 规范是一个**交易执行协议**：P1—P6 原语覆盖从寻源�
 
 ### 新增角色：Marketplace {#s-m131}
 
-UTP 规范 R2 [标准角色集](../protocol-core/business-topology.md#s-922-standard-roles)没有承载商品目录与订单路由的平台角色。本规范按 R1 [角色元规则](../protocol-core/business-topology.md#s-924-r1)论证并新增扩展角色 `Marketplace`：
+UTP 规范 R2 [标准角色集](../protocol-core/business-topology.md#s-922-standard-roles)已将 `Marketplace` 定义为 UTP-M 平台托管场景的标准平台角色。本节按 R1 [角色元规则](../protocol-core/business-topology.md#s-924-r1)说明该角色的成立依据及其在供应商侧原语中的使用方式：
 
 | R1 条件 | 论证 |
 | --- | --- |
-| 职责可区分性 | Marketplace 托管商品目录、执行上架审核、路由订单、代收代付结算——与 Seller（供货）和 Buyer（采购）职责本质不同。 |
-| 原语绑定性 | Marketplace 是 MP1—MP6 全部六个原语的 `handler_role`，并在结算扩展中承担账单出具义务。 |
+| 职责可区分性 | Marketplace 托管商品目录、执行上架审核、路由订单并汇聚交付与售后事实——与 Seller（供货）和 Buyer（采购）职责本质不同。 |
+| 原语绑定性 | Marketplace 是 MP1—MP6 全部六个原语的 `handler_role`。 |
 | 权限差异性 | Marketplace 可见全量商品与订单路由信息，但 MUST NOT 可见供应商成本结构；对买方侧仅暴露已上架（LISTED）商品。 |
 
 **RoleDefinition（按 UTP 规范 [RoleDefinition 与 RolePermissions 实体](../protocol-core/business-topology.md#s-921-roledefinition) 格式）：**
@@ -49,13 +49,13 @@ UTP 规范 R2 [标准角色集](../protocol-core/business-topology.md#s-922-stan
 {
   "role_id": "Marketplace",
   "display_name": "平台方",
-  "description": "托管商品目录与订单路由的 UTP Server 运营方：受理商品发布与上下架、维护库存视图、向供应商路由订单并收集受理结果、汇聚发货事实、出具结算账单",
+  "description": "托管商品目录与订单路由的 UTP Server 运营方：受理商品发布与上下架、维护库存视图、向供应商路由订单并收集受理结果、汇聚交付与售后事实",
   "governance_layer": "R2",
-  "bound_primitives": ["utp.listing", "utp.inventory", "utp.acceptance", "utp.delivery", "utp.aftersale", "utp.pay"],
+  "bound_primitives": ["utp.listing", "utp.inventory", "utp.quote", "utp.acceptance", "utp.delivery", "utp.aftersale"],
   "default_permissions": {
-    "visible_primitives": ["utp.listing", "utp.inventory", "utp.acceptance", "utp.delivery", "utp.aftersale", "utp.pay"],
-    "visible_fields": ["listing.*", "inventory.*", "order.*", "delivery.*", "aftersale.*", "settlement.*"],
-    "executable_actions": ["listing.review", "acceptance.route", "settlement.issue"],
+    "visible_primitives": ["utp.listing", "utp.inventory", "utp.quote", "utp.acceptance", "utp.delivery", "utp.aftersale"],
+    "visible_fields": ["listing.*", "inventory.*", "order.*", "delivery.*", "aftersale.*"],
+    "executable_actions": ["listing.review", "acceptance.route", "delivery.update", "aftersale.route"],
     "data_restrictions": [
       { "field": "seller.cost_structure", "access": "denied" },
       { "field": "seller.profit_margin", "access": "denied" }
@@ -69,7 +69,9 @@ UTP 规范 R2 [标准角色集](../protocol-core/business-topology.md#s-922-stan
 }
 ```
 
-> 整合说明：`Marketplace` 进入 UTP 规范 R2 标准角色集 MUST 走 RFC 治理流程（UTP 规范 《R2：标准角色集与角色加入规则》 变更规则）。在进入 R2 前，实现方 MAY 以 R3 领域角色 `marketplace.Marketplace` 形式先行注册试点。
+> 整合说明：`Marketplace` 的主定义见 UTP 规范 R2 [标准角色集](../protocol-core/business-topology.md#s-922-standard-roles)；本章说明它在 UTP-M 中作为 MP1—MP6 `handler_role` 的使用方式。UTP-B 场景只识别接入方承担的 B 侧角色；平台对买方提供交易能力时，在 B 侧声明为承担相应 Role 的 Business Domain，不暴露 `Marketplace` 节点。
+
+若同一平台还承担代收、支付处理或托管职责，应在 UTP-B 拓扑中另行映射为 `Payee`、`PaymentProcessor` 或 `Escrow`；这些支付职责不由 `Marketplace` 角色承载。
 
 ### 既有角色的供应商侧职责 {#s-m132}
 

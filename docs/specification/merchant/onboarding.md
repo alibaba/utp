@@ -132,7 +132,7 @@ version: 2026-07-31
 }
 ```
 
-说明：`roles.marketplace` 列出其作为 MP 原语 handler 的承接集；`roles.seller` 是平台在买方侧的处理身份（平台托管拓扑，平台托管拓扑（Marketplace-Hosted））。同一 Profile、同一 `supported_mode_range`、同一安全能力声明覆盖全部角色（UTP 规范 《发现与协商》）；`marketplace` 为 R3 领域角色试点命名，进入 R2 后不变（新增角色：Marketplace）。
+说明：`roles.marketplace` 列出其作为 MP 原语 handler 的承接集；`roles.seller` 是平台在买方侧承担的 B 侧处理身份。同一 Profile、同一 `supported_mode_range`、同一安全能力声明覆盖全部角色（UTP 规范 《发现与协商》）。B 侧不声明 `Marketplace` 角色节点；平台对买方提供交易能力时，通过 `role_domain_bindings` 将平台 Business Domain 绑定到其实际承担的 B 侧 Role。
 
 ### 传输配置与回调端点（Transport Configurations） {#s-m231}
 

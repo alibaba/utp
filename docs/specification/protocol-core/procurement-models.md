@@ -15,7 +15,7 @@ format: html
 <figure id="s-811-mode-matrix" style="margin: 20px 0 28px;">
   <img src="../../assets/diagrams/procurement-mode-six-dimension-matrix.svg" alt="UTP 采购模式六维配置矩阵：价格模式、决策链路、付款结构、履约结构、关系模式和合规要求分别从简单端 L0 到复杂端 L3 取值。" style="width: 100%; display: block; border-radius: 8px;">
   <figcaption style="margin-top: 10px; color: #6b7280; font-size: 13px; text-align: center;">
-    图 8-1 采购模式六维配置矩阵
+    采购模式六维配置矩阵
   </figcaption>
 </figure>
 <h3 id="s-812">六维度定义表</h3>
@@ -287,9 +287,9 @@ format: html
 <p><code>compliance_level</code> 描述本次采购适用的合规要求及其协议行为，不决定其他 Mode 维度的 Level。L2 表示履约跨越关境时启用跨境清关合规校验，并在适用的主体与商品资质上继承 L1 要求；它不描述物流段数或关务复杂度。L3 对本次采购实际适用的合规事项形成完整审计，但不因 Level 升高而引入本次采购不适用的跨境清关义务。</p>
 <hr />
 <h2 id="s-82-mode-evaluation-upgrade">Mode 判定与升级（Mode Determination and Upgrade）</h2>
-<p>第三章发现与协商的结果为每个 Mode 维度确定一个可用 Level 交集集合，当前生效的 Mode 则为每个维度选择一个确定 Level。升级表示从当前 Level 切换到复杂度编号更高的 Level，不表示目标 Level 包含当前 Level 或任何中间 Level。升级目标 MUST 是该维度交集集合中明确存在的成员；例如交集为 <code>["L1", "L3"]</code> 时，可以从 L1 直接升级到 L3，但不得选择或隐含支持 L2。</p>
+<p>《发现与协商》的结果为每个 Mode 维度确定一个可用 Level 交集集合，当前生效的 Mode 则为每个维度选择一个确定 Level。升级表示从当前 Level 切换到复杂度编号更高的 Level，不表示目标 Level 包含当前 Level 或任何中间 Level。升级目标 MUST 是该维度交集集合中明确存在的成员；例如交集为 <code>["L1", "L3"]</code> 时，可以从 L1 直接升级到 L3，但不得选择或隐含支持 L2。</p>
 <h3 id="s-821-mode-evaluation-inputs">Mode 判定依据</h3>
-<p>Mode 决定 Agent 可以规划和执行哪些 Action，Action 不得反向触发 Mode 升级。买方 Agent MUST 在生成下一项 Action 之前，根据机器可读的采购目标、Mandate、当前交易计划、已经确认的结构化交易事实、本章定义的核心 Level 规则和已启用的领域扩展规则，重新判定本次交易所需的 Mode。相同输入和规则 MUST 产生相同的 Mode 判定结果。</p>
+<p>Mode 决定 Agent 可以规划和执行哪些 Action，Action 不得反向触发 Mode 升级。买方 Agent MUST 在生成下一项 Action 之前，根据机器可读的采购目标、Mandate、当前交易计划、已经确认的结构化交易事实、本文档定义的核心 Level 规则和已启用的领域扩展规则，重新判定本次交易所需的 Mode。相同输入和规则 MUST 产生相同的 Mode 判定结果。</p>
 <h3 id="s-823-modeupgrade">ModeUpgrade 实体</h3>
 <table>
 <thead>
@@ -335,7 +335,7 @@ format: html
 <td><code>target_level</code></td>
 <td>string</td>
 <td>MUST</td>
-<td>Mode 判定确定的目标 Level。其复杂度编号 MUST 高于 <code>current_level</code>，并且 MUST 是第三章协商结果中该维度 Level 交集集合的成员。</td>
+<td>Mode 判定确定的目标 Level。其复杂度编号 MUST 高于 <code>current_level</code>，并且 MUST 是《发现与协商》结果中该维度 Level 交集集合的成员。</td>
 </tr>
 <tr>
 <td><code>reason</code></td>
@@ -348,18 +348,18 @@ format: html
 <h3 id="s-824-upgrade-rules">Mode 升级约束</h3>
 <ol>
 <li>升级 MUST 仅允许切换至复杂度编号更高的 Level，不允许降级。</li>
-<li>目标 Level MUST 是第三章协商结果中该维度交集集合的成员。协议不得根据目标 Level 的编号推断任何未出现在集合中的中间 Level 可用。</li>
+<li>目标 Level MUST 是《发现与协商》结果中该维度交集集合的成员。协议不得根据目标 Level 的编号推断任何未出现在集合中的中间 Level 可用。</li>
 <li>Mode 判定及升级 MUST 在生成下一项 Action 之前完成。任何 Action 均不得超出当前生效 Mode 允许的行为。</li>
 <li>一次 Mode 判定要求多个维度升级时，所有相关维度 MUST 原子更新；任一目标 Level 不在对应交集集合中或超出 Mandate 时，不得执行部分升级。</li>
 <li>原语只负责返回其规范定义的业务结果和结构化交易事实，不负责判断、发起或批准 Mode 升级。</li>
-<li>升级完成后，相关参与方 MUST 更新本地 Mode 上下文。升级不改变第三章已经确定的 Level 交集集合。</li>
+<li>升级完成后，相关参与方 MUST 更新本地 Mode 上下文。升级不改变《发现与协商》已经确定的 Level 交集集合。</li>
 <li>升级不可逆；已经完成的原语不受后续升级影响。</li>
 <li>交集集合仅含当前 Level、目标 Level 不在交集集合中或超出 Mandate 时，Agent MUST 重新规划、重新发现协商或终止任务，不得自动扩大能力或授权边界。</li>
 </ol>
 <hr />
 <h2 id="s-83-mode-primitive-rules">Mode 与原语、角色关联规则（Mode-Based Primitive and Role Association Rules）</h2>
 <h3 id="s-831-primitive-constraints">Mode 对原语执行的约束</h3>
-<p>当前生效的 Mode 决定各交易原语可以执行的 Action、适用的处理流程和约束条件。原语 MUST 按当前 Mode 中各维度的确定 Level 执行，不得使用未在第三章协商交集集合中确认或尚未生效的 Level。</p>
+<p>当前生效的 Mode 决定各交易原语可以执行的 Action、适用的处理流程和约束条件。原语 MUST 按当前 Mode 中各维度的确定 Level 执行，不得使用未在《发现与协商》交集集合中确认或尚未生效的 Level。</p>
 <table>
 <thead>
 <tr>
@@ -396,7 +396,7 @@ format: html
 </tr>
 </tbody>
 </table>
-<p>详细的行为多态定义参见第 11—16 章各交易原语。</p>
+<p>详细的行为多态定义参见各交易原语文档。</p>
 <h3 id="s-832-role-primitive-associations">Mode Level 角色与原语关联定义</h3>
 <p>六维 Mode Level 关联定义 MUST 在根对象中声明 <code>base_roles</code>，并在每个 Level 中声明 <code>associated_roles</code> 与 <code>primitives</code>。角色值 MUST 引用角色注册表中的 <code>role_id</code>；<code>primitives</code> MUST 使用标准交易原语标识。</p>
 <p>字段结构如下：</p>
@@ -824,33 +824,33 @@ format: html
 }
 </code></pre>
 
-<h2 id="s-85">本章实体索引（Entity Index）</h2>
-<p>本章当前定义的完整实体列表如下。实体字段及其规范性约束以“所属节”中的定义为准，本节仅提供汇总索引，不重复定义实体。</p>
+<h2 id="s-85">实体索引（Entity Index）</h2>
+<p>本文档当前定义的完整实体列表如下。实体字段及其规范性约束以“定义位置”中的说明为准，本节仅提供汇总索引，不重复定义实体。</p>
 <table>
 <thead>
 <tr>
 <th>实体名称</th>
-<th>所属节</th>
+<th>定义位置</th>
 <th>说明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>ModeUpgrade</td>
-<td>8.2.3</td>
+<td>ModeUpgrade 实体</td>
 <td>买方 Agent 根据采购目标、Mandate、交易计划、结构化事实和适用 Mode 规则重新判定后生成的 Mode 升级记录</td>
 </tr>
 <tr>
 <td>DimensionDefinition</td>
-<td>8.4.5</td>
+<td>DimensionDefinition 实体</td>
 <td>Mode 维度的元数据定义，含治理层级和内嵌 Level 定义</td>
 </tr>
 </tbody>
 </table>
 <p><strong>交叉引用：</strong></p>
 <ul>
-<li>Mode 协商在会话建立中的时序位置见<a href="transport-communication.md">《传输与通信》</a></li>
-<li>Mode 与原语执行规则详见第 11—16 章各交易原语</li>
-<li>履约结构（<code>fulfillment_structure</code>）维度与商业拓扑中履约角色、角色关系边的关系见<a href="business-topology.md">《商业拓扑》</a></li>
-<li>合规要求（<code>compliance_level</code>）维度与资质认证的关系见<a href="risk-audit.md">《风控与审计》</a></li>
+<li>Mode 协商在会话建立中的时序位置见<a href="transport-communication.html">《传输与通信》</a></li>
+<li>Mode 与原语执行规则详见各交易原语文档</li>
+<li>履约结构（<code>fulfillment_structure</code>）维度与商业拓扑中履约角色、角色关系边的关系见<a href="business-topology.html">《商业拓扑》</a></li>
+<li>合规要求（<code>compliance_level</code>）维度与资质认证的关系见<a href="risk-audit.html">《风控与审计》</a></li>
 </ul>

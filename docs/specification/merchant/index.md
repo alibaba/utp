@@ -83,5 +83,5 @@ UTP-B 规范定义的六大交易原语（P1—P6）以采购方（Buyer）为�
 - **版本：** 2026-08-04（日期版本，Draft；按上述稳定性分级承诺发布，稳定后随 UTP 规范按季度发布正式版）
 - **基础：** UTP Protocol Specification v1.0（2026-07-03）
 - **原语版本基线：** 2026-07-31（MP1—MP6 统一取值，与 UTP-B 规范 P1—P6 的原语版本对齐）
-- **状态：** Release Candidate——Stable 面冻结；转正式版前待办：Marketplace 角色 RFC 流程（附录 ME 第 2 项）与 UTP 规范引用冻结点后的一致性复扫
+- **状态：** Release Candidate——Stable 面冻结；Marketplace 已按 R2 标准平台角色纳入主规范口径；转正式版前待办：UTP 规范引用冻结点后的一致性复扫
 - **机读契约：** 实体 Schema、原语定义文件与状态机见[附录 MD](appendices.md#s-md)；一致性校验工具（validate_schemas / test_fixtures）随本规范同源发布

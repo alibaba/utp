@@ -25,7 +25,7 @@ format: html
 <tbody>
 <tr><td><code>topology_id</code></td><td>string</td><td>MUST</td><td>拓扑模板的稳定标识；在同一注册表作用域内 MUST 唯一。</td></tr>
 <tr><td><code>roles</code></td><td>RoleId[]</td><td>MUST</td><td>本类交易需要的完整抽象责任集合。<code>RoleId</code> 是角色注册表中 <code>RoleDefinition.role_id</code> 的字符串值。</td></tr>
-<tr><td><code>role_relationships</code></td><td>RoleRelationship[]</td><td>MUST</td><td>角色之间的无向业务关系集合；字段和关系类型以 9.3 节为唯一规范性定义。</td></tr>
+<tr><td><code>role_relationships</code></td><td>RoleRelationship[]</td><td>MUST</td><td>角色之间的无向业务关系集合；字段和关系类型以“RoleRelationship 实体与关系类型”为唯一规范性定义。</td></tr>
 </tbody>
 </table>
 <p><strong>整体约束：</strong></p>
@@ -172,7 +172,7 @@ format: html
 
 <span id="s-933-r2"></span>
 <h3 id="s-922-standard-roles">R2：标准角色集与角色加入规则</h3>
-<p>协议 1.0 版本定义以下角色。Buyer、Seller、Payer、Payee、PaymentProcessor 是始终显式进入拓扑的基础角色；即使同一 Business Domain 同时承担多个角色，也不得在商业拓扑中省略或合并角色节点。Escrow、Shipper、Inspector、Arbiter 等扩展角色只有承担相应独立协议责任时才进入拓扑。</p>
+<p>协议 1.0 版本定义以下角色。Buyer、Seller、Payer、Payee、PaymentProcessor 是 UTP-B（买方/交易侧）始终显式进入拓扑的基础角色；即使同一 Business Domain 同时承担多个角色，也不得在商业拓扑中省略或合并角色节点。Escrow、Shipper、Inspector、Arbiter 等条件角色只有承担相应独立协议责任时才进入拓扑。Marketplace 是 UTP-M（商家/平台侧）的 R2 标准平台角色，用于供应商侧 MP1—MP6 接入，不进入 UTP-B 交易拓扑。</p>
 <table>
 <thead>
 <tr>
@@ -226,6 +226,14 @@ format: html
 <td><code>utp.pay</code>, <code>utp.resolve</code></td>
 </tr>
 <tr>
+<td>平台角色</td>
+<td><code>Marketplace</code></td>
+<td>平台方</td>
+<td>否</td>
+<td>托管商品目录、执行上架审核、维护库存视图、路由订单受理并汇聚交付与售后事实</td>
+<td><code>utp.listing</code>, <code>utp.inventory</code>, <code>utp.quote</code>, <code>utp.acceptance</code>, <code>utp.delivery</code>, <code>utp.aftersale</code></td>
+</tr>
+<tr>
 <td>扩展角色</td>
 <td><code>Escrow</code></td>
 <td>托管方</td>
@@ -259,13 +267,60 @@ format: html
 </tr>
 </tbody>
 </table>
+<p><strong>UTP-B / UTP-M 角色侧别：</strong>侧别用于说明角色在哪一类协议上下文中出现，不是 <code>RoleId</code> 后缀。角色标识仍使用注册表中的稳定名称。</p>
+<table>
+<thead>
+<tr>
+<th>侧别</th>
+<th>角色集合</th>
+<th>使用范围</th>
+<th>声明方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UTP-B（买方/交易侧）</td>
+<td><code>Buyer</code>, <code>Seller</code>, <code>Payer</code>, <code>Payee</code>, <code>PaymentProcessor</code></td>
+<td>P1—P6 交易主链</td>
+<td>始终显式进入 CommerceTopology。</td>
+</tr>
+<tr>
+<td>UTP-B 条件角色</td>
+<td><code>Escrow</code>, <code>Shipper</code>, <code>Inspector</code>, <code>Arbiter</code></td>
+<td>托管、履约、检验、争议等独立责任</td>
+<td>仅在本次交易存在相应独立协议责任时加入。</td>
+</tr>
+<tr>
+<td>UTP-M（商家/平台侧）</td>
+<td><code>Seller</code>, <code>Marketplace</code></td>
+<td>MP1—MP6 供应商侧接入</td>
+<td>在 UTP-M 的 MP 原语定义与 Profile 能力中作为 <code>handler_role</code> 声明；不进入 UTP-B CommerceTopology。</td>
+</tr>
+</tbody>
+</table>
 <p><strong>角色映射说明：</strong></p>
 <ul>
 <li>Buyer、Seller、Payer、Payee、PaymentProcessor MUST 作为五个不同的职责角色显式声明，不得通过默认兼任规则省略 Payer、Payee 或 PaymentProcessor。</li>
 <li>同一 Business Domain MAY 在 <code>role_domain_bindings</code> 中同时映射 Buyer 与 Payer，或同时映射 Seller、Payee 与 PaymentProcessor；这些 Domain 映射不改变商业拓扑中的五个角色节点。</li>
 <li>Payer、Payee、PaymentProcessor 分别承担付款、收款和支付处理职责；Buyer、Seller 分别承担采购和供货职责。角色是否由同一主体或同一 Business Domain 承担不改变职责边界。</li>
 <li>同一个平台或机构可以同时承担 <code>PaymentProcessor</code> 和 <code>Escrow</code> 两个角色；协议层按职责拆角色，不按平台数量拆角色。</li>
+<li>在 UTP-B 场景中，路径编排只识别接入方承担的 B 侧角色。接入方背后是否为平台托管、商家自托管或平台代理，不改变其在 B 侧被映射为 <code>Seller</code>、<code>Payee</code>、<code>PaymentProcessor</code> 或其他 B 侧角色的结果。</li>
+<li><code>Marketplace</code> 只用于 UTP-M 中 Seller → Marketplace 的供应商侧原语，不作为 UTP-B CommerceTopology 节点暴露。</li>
+<li>若同一平台承担收款、支付处理或托管职责，应在 UTP-B 拓扑中另行映射为 <code>Payee</code>、<code>PaymentProcessor</code> 或 <code>Escrow</code>；这些支付职责不由 <code>Marketplace</code> 角色承载。</li>
+<li>当平台作为 B 侧接入方对买方提供交易能力时，平台 MUST 以 Business Domain 进入 <code>role_domain_bindings</code>，并绑定它实际承担的 B 侧 Role；不得把 <code>Marketplace</code> 写入 B 侧 <code>roles</code>、<code>required_roles</code> 或 <code>role_relationships</code>。</li>
 </ul>
+<p><strong>Marketplace 在 UTP-B 场景中的声明方式：</strong>如果买方访问的是平台接入方，B 侧仍只声明该接入方承担的 B 侧角色。平台的域名作为 Business Domain 写入 <code>role_domain_bindings</code>；该 Domain 的 Profile 再在对应角色下声明 P1—P6 的 Action 能力和 Service。<code>Marketplace</code> 这个 RoleId 不出现在 B 侧 <code>CommerceTopology.roles</code>、<code>required_roles</code> 或 <code>role_relationships</code> 中。</p>
+<pre class="highlight"><code class="language-json">{
+  "role_domain_bindings": {
+    "Buyer": "buyer.example.com",
+    "Payer": "buyer.example.com",
+    "Seller": "marketplace.example.com",
+    "Payee": "marketplace.example.com",
+    "PaymentProcessor": "payment.example.com"
+  }
+}
+</code></pre>
+<p>上例中 <code>marketplace.example.com</code> 是承担 <code>Seller</code> 与 <code>Payee</code> 的 Business Domain，不是 B 侧角色节点；如果它同时承担支付处理或托管职责，也应继续通过 <code>PaymentProcessor</code> 或 <code>Escrow</code> 绑定表达。</p>
 <p><strong>同一 Business Domain 承担多个角色时的 Action 声明边界：</strong></p>
 <ul>
 <li>角色定义与实现能力声明 MUST 分离。<code>RoleDefinition</code> 中的 <code>bound_primitives</code> 和 <code>default_permissions</code> 描述角色的标准职责与默认权限边界，不表示同一 Business Domain 必须在其映射的每个角色下重复声明相同 Action。</li>
@@ -337,7 +392,7 @@ Resolve.raise -&gt; Escrow.freeze
 
 <span id="s-931"></span>
 <h3 id="s-923-governance-overview">治理模型概述</h3>
-<p>与 Mode 维度治理类似（参见<a href="procurement-models.md#s-84-dimension-governance">《采购模式》维度扩展与治理</a>），角色集合 R 采用三层治理模型（R1 / R2 / R3）。其中 R1 是判断角色能否成立的元规则，不是 <code>RoleDefinition.governance_layer</code> 的实例取值；可注册的角色实体只属于 R2 或 R3，在通用性与领域适应性之间取得平衡。</p>
+<p>与 Mode 维度治理类似（参见<a href="procurement-models.html#s-84-dimension-governance">《采购模式》维度扩展与治理</a>），角色集合 R 采用三层治理模型（R1 / R2 / R3）。其中 R1 是判断角色能否成立的元规则，不是 <code>RoleDefinition.governance_layer</code> 的实例取值；可注册的角色实体只属于 R2 或 R3，在通用性与领域适应性之间取得平衡。</p>
 <div class="state-machine-diagram" style="width: 100%; max-width: 900px; border: 1px solid #e5e7eb; border-radius: 8px;">
 <img src="../../assets/diagrams/role-governance.svg" alt="R 角色治理三层模型 R1/R2/R3：R3 领域角色扩展由行业联盟注册，R2 核心角色集需 RFC 治理，R1 角色元规则是极难变更的协议宪法" style="width: 100%; display: block;">
 </div>
@@ -368,7 +423,7 @@ Resolve.raise -&gt; Escrow.freeze
 <span id="s-934-r3"></span>
 <h3 id="s-925-r3">R3：领域角色扩展</h3>
 <p>行业联盟 MAY 在角色注册表中注册领域角色。领域角色注册需满足 R1 元规则，但"职责可区分性"的判定标准在领域内评估（不需要跨行业通用）。</p>
-<p>当前 UTP 采购协议以 Buyer、Seller、Payer、Payee、PaymentProcessor 为始终显式声明的基础角色，并定义 Escrow、Shipper、Inspector、Arbiter 等按责任加入的标准角色。供应链金融、碳排放交易、数据交易等行业角色不属于当前采购协议的角色集合，后续如要支持，应作为独立行业扩展重新评审。</p>
+<p>当前 UTP 采购协议以 Buyer、Seller、Payer、Payee、PaymentProcessor 为 UTP-B 始终显式声明的基础角色，并定义 Escrow、Shipper、Inspector、Arbiter 等按责任加入的标准角色。Marketplace 属于 UTP-M 商家/平台侧的 R2 标准平台角色，不作为行业私有 R3 角色处理，也不进入 UTP-B 交易拓扑。供应链金融、碳排放交易、数据交易等行业角色不属于当前采购协议的角色集合，后续如要支持，应作为独立行业扩展重新评审。</p>
 <p>跨境清关通常先作为 <code>Fulfill</code> 的单证/清关证据流表达；只有当关务服务方需要独立签署清关结果、承担可审计协议责任，并影响 Pay、Fulfill 或 Resolve 的状态时，才应注册为 R3 领域角色。</p>
 <p><strong>角色注册表约束：</strong></p>
 <ol>
@@ -381,8 +436,9 @@ Resolve.raise -&gt; Escrow.freeze
 <span id="s-94-role-edges"></span>
 <h2 id="s-93-role-relationships">Role Relationships（角色关系）</h2>
 <div class="state-machine-diagram" style="width: 100%; max-width: 1120px; border: 1px solid #e5e7eb; border-radius: 8px;">
-<img src="../../assets/diagrams/utp-role-relationship-topology.png" alt="UTP 无向角色关系矩阵：以 Buyer、Seller、Payer、Payee、PaymentProcessor、Escrow、Shipper、Inspector、Arbiter 为行列，其中 Buyer、Seller、Payer、Payee、PaymentProcessor 始终显式声明，并使用 data_flow、authorization（职责授权关系）、payment、fulfillment 四种封闭类型标记允许的直接关系类型上界" style="width: 100%; display: block; border-radius: 8px;">
+<img src="../../assets/diagrams/utp-role-relationship-topology.png" alt="UTP-B 无向角色关系矩阵：以 Buyer、Seller、Payer、Payee、PaymentProcessor、Escrow、Shipper、Inspector、Arbiter 为行列，其中 Buyer、Seller、Payer、Payee、PaymentProcessor 始终显式声明，并使用 data_flow、authorization（职责授权关系）、payment、fulfillment 四种封闭类型标记允许的直接关系类型上界" style="width: 100%; display: block; border-radius: 8px;">
 </div>
+<p>上图展示 UTP-B 基础交易角色及常用条件角色的关系矩阵；Marketplace 属于 UTP-M 商家/平台侧角色，不进入该 B 侧关系矩阵。</p>
 
 <span id="s-941"></span>
 <h3 id="s-931-role-relationship">RoleRelationship 实体与关系类型</h3>
@@ -473,7 +529,7 @@ Resolve.raise -&gt; Escrow.freeze
 ]
 </code></pre>
 
-<p><strong>标准角色关系全集：</strong>下表定义协议 1.0 九个标准角色之间允许的直接角色对及其关系类型上界。Buyer、Seller、Payer、Payee、PaymentProcessor 始终显式进入 CommerceTopology；Escrow、Shipper、Inspector、Arbiter 及其关系按本次交易实际责任选择，不得因为关系在本表中存在就默认全部启用。</p>
+<p><strong>标准角色关系全集：</strong>下表定义 UTP-B CommerceTopology 中允许的直接角色对及其关系类型上界。Buyer、Seller、Payer、Payee、PaymentProcessor 始终显式进入 UTP-B CommerceTopology；Escrow、Shipper、Inspector、Arbiter 及其关系按本次交易实际责任选择，不得因为关系在本表中存在就默认全部启用。Marketplace 不属于 UTP-B 关系矩阵。</p>
 <table>
 <thead>
 <tr>
@@ -509,16 +565,17 @@ Resolve.raise -&gt; Escrow.freeze
 <tr><td><code>[Arbiter, Inspector]</code></td><td>data_flow</td><td>提交检验、验收报告并接收相关裁决结论。</td></tr>
 </tbody>
 </table>
+<p>标准角色之间未列出的角色对在协议 1.0 中没有标准直接关系，包括 Buyer–Payee、Buyer–PaymentProcessor、Buyer–Escrow、Payer–Seller、PaymentProcessor–Seller、Escrow–Seller，以及支付服务角色与 Shipper/Inspector 之间未由上表定义的组合。Marketplace 不参与 UTP-B 角色关系枚举。关系类型始终受四种封闭枚举约束；新增关系类型 MUST 触发协议版本升级。</p>
 <hr />
-<h2 id="s-96">本章实体索引（Entity Index）</h2>
-<p>本章当前定义的完整实体列表如下。实体字段及其规范性约束以“所属节”中的定义为准，本节仅提供汇总索引，不重复定义实体。</p>
+<h2 id="s-96">实体索引（Entity Index）</h2>
+<p>本文档当前定义的完整实体列表如下。实体字段及其规范性约束以“定义位置”中的说明为准，本节仅提供汇总索引，不重复定义实体。</p>
 <table>
-<thead><tr><th>实体名称</th><th>所属节</th><th>说明</th></tr></thead>
+<thead><tr><th>实体名称</th><th>定义位置</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>RoleId</td><td>9.1.1</td><td>引用 <code>RoleDefinition.role_id</code> 的角色字符串标识</td></tr>
-<tr><td>CommerceTopology</td><td>9.1.1</td><td>无向角色关系模板图 <code>G=(R,U)</code>，包含 topology_id、roles 和 role_relationships</td></tr>
-<tr><td>RoleDefinition</td><td>9.2.1</td><td>角色元数据定义，含治理层级、原语绑定和默认权限</td></tr>
-<tr><td>RolePermissions</td><td>9.2.1</td><td>角色注册表提供的默认可见原语、字段、Action 和数据限制</td></tr>
-<tr><td>RoleRelationship</td><td>9.3.1</td><td>两个角色之间的无向业务关系，不绑定原语、Business Domain 或交互方向</td></tr>
+<tr><td>RoleId</td><td>RoleDefinition 与 RolePermissions 实体</td><td>引用 <code>RoleDefinition.role_id</code> 的角色字符串标识</td></tr>
+<tr><td>CommerceTopology</td><td>CommerceTopology 形式定义</td><td>无向角色关系模板图 <code>G=(R,U)</code>，包含 topology_id、roles 和 role_relationships</td></tr>
+<tr><td>RoleDefinition</td><td>RoleDefinition 与 RolePermissions 实体</td><td>角色元数据定义，含治理层级、原语绑定和默认权限</td></tr>
+<tr><td>RolePermissions</td><td>RoleDefinition 与 RolePermissions 实体</td><td>角色注册表提供的默认可见原语、字段、Action 和数据限制</td></tr>
+<tr><td>RoleRelationship</td><td>RoleRelationship 实体与关系类型</td><td>两个角色之间的无向业务关系，不绑定原语、Business Domain 或交互方向</td></tr>
 </tbody>
 </table>
