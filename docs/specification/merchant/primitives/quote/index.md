@@ -8,22 +8,6 @@ version: 2026-07-31
 
 # 报价原语（Quote） {#s-m5}
 
-## 目录 {#s-m5-toc}
-
-- [Overview（概述）](#s-m51)
-- [Lifecycle / State Machine（生命周期 / 状态机）](#s-m52)
-- [Error Handling（错误处理）](#s-m53)
-- [Scopes（权限范围）](#s-m54)
-- [Guidelines（角色职责指引）](#s-m55)
-- [与 P2 询盘原语的衔接（Interlock with P2）](#s-m56)
-- [询盘路由（Inquiry Routing）](#s-m57)
-- [Mode-Driven Behavior（模式驱动行为）](#s-m58)
-- [操作矩阵（Operations Matrix）](#s-m59)
-- [Entities（实体定义）](#s-m510)
-- [Use Case Walkthroughs（用例演练）](#s-m511)
-
----
-
 ## 原语身份 {#s-m5-identity}
 
 ```

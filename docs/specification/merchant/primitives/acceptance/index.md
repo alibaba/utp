@@ -8,23 +8,6 @@ version: 2026-07-31
 
 # 接单原语（Acceptance） {#s-m6}
 
-## 目录 {#s-m6-toc}
-
-- [Overview（概述）](#s-m61)
-- [Lifecycle / State Machine（生命周期 / 状态机）](#s-m62)
-- [Error Handling（错误处理）](#s-m63)
-- [Scopes（权限范围）](#s-m64)
-- [Guidelines（角色职责指引）](#s-m65)
-- [与 P3 Purchase 签名流程的衔接（Interlock with P3）](#s-m66)
-- [订单路由（Order Routing）](#s-m67)
-- [Mode-Driven Behavior（模式驱动行为）](#s-m68)
-- [操作矩阵（Operations Matrix）](#s-m69)
-- [Entities（实体定义）](#s-m610)
-- [Use Case Walkthroughs（用例演练）](#s-m611a2)
-- [改价提议（Price Amendment）](#s-m-6-12)
-
----
-
 ## 原语身份 {#s-m6-identity}
 
 ```
@@ -90,7 +73,7 @@ MP4 不覆盖：订购草案的创建与修改（Buyer 专属， UTP-B 规范 �
     "受理结论 MUST 在 deadline 前给出，否则按 timeout_policy 自动处置"
   ],
   "side_effects": [
-    "ACCEPTED：卖方签名注入 purchase.complete 流程，库存 hold → LOCKED（M4.7）",
+    "ACCEPTED：卖方签名注入 purchase.complete 流程，库存 hold → LOCKED（MP2 库存一致性契约）",
     "REJECTED：hold → RELEASED，买方收到结构化拒绝通知",
     "LEADTIME_AMENDED：买方收到确认请求，确认后按新交期成立"
   ],

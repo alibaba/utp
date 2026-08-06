@@ -41,7 +41,7 @@ format: html
 
       <h3 id="profile-example">Profile 示例</h3>
       <pre><code>{
-  "$schema": "https://schemas.utp.dev/profile.json",
+  "$schema": "https://ut-protocol.com/schemas/discovery/profile.json",
   "utp": {
     "version": "2026-07-01",
     "supported_mode_range": {
@@ -63,8 +63,8 @@ format: html
       "utp.source": [
         {
           "version": "2026-07-01",
-          "spec": "https://utp.dev/primitives/source",
-          "schema": "https://schemas.utp.dev/source.json"
+          "spec": "https://ut-protocol.com/specification/latest/primitives/source/index.html",
+          "schema": "https://ut-protocol.com/schemas/primitives/source/primitive.json"
         }
       ]
     },
@@ -157,16 +157,16 @@ Buyer → 按角色对求能力交集 → NegotiationResult
           "selected_version": "2026-07-01",
           "negotiated_extensions": [
             {
-              "id": "utp.payment.escrow",
+              "id": "utp.source_cart",
               "version": "1.0",
-              "spec": "https://utp.dev/extensions/payment-escrow",
-              "schema": "https://schemas.utp.dev/extensions/payment-escrow-1.0.json"
+              "spec": "https://ut-protocol.com/specification/latest/primitives/source/index.html",
+              "schema": "https://ut-protocol.com/schemas/extensions/source/cart/cart.schema.json"
             },
             {
-              "id": "utp.audit.trace",
+              "id": "com.example.utp.source_audit",
               "version": "1.1",
-              "spec": "https://utp.dev/extensions/audit-trace",
-              "schema": "https://schemas.utp.dev/extensions/audit-trace-1.1.json"
+              "spec": "https://ext.example.com/utp/source-audit",
+              "schema": "https://ext.example.com/utp/schemas/source-audit-1.1.json"
             }
           ]
         }

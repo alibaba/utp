@@ -56,12 +56,12 @@ version: 2026-07-31
       }
     ],
     "primitives": {
-      "utp.listing":    [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/listing", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
-      "utp.inventory":  [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/inventory", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
-      "utp.quote":      [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/quote", "schema": "https://ut-protocol.com/schemas/primitives/quote/primitive.json", "authorization": { "scope": "quote", "required": true } } ],
-      "utp.acceptance": [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/acceptance", "schema": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json", "authorization": { "scope": "acceptance", "required": true } } ],
-      "utp.delivery":   [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/delivery", "schema": "https://ut-protocol.com/schemas/primitives/delivery/primitive.json", "authorization": { "scope": "delivery", "required": true } } ],
-      "utp.aftersale":  [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/aftersale", "schema": "https://ut-protocol.com/schemas/primitives/aftersale/primitive.json", "authorization": { "scope": "aftersale", "required": true } } ]
+      "utp.listing":    [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/listing/index.html", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
+      "utp.inventory":  [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/inventory/index.html", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
+      "utp.quote":      [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/quote/index.html", "schema": "https://ut-protocol.com/schemas/primitives/quote/primitive.json", "authorization": { "scope": "quote", "required": true } } ],
+      "utp.acceptance": [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/acceptance/index.html", "schema": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json", "authorization": { "scope": "acceptance", "required": true } } ],
+      "utp.delivery":   [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/delivery/index.html", "schema": "https://ut-protocol.com/schemas/primitives/delivery/primitive.json", "authorization": { "scope": "delivery", "required": true } } ],
+      "utp.aftersale":  [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/aftersale/index.html", "schema": "https://ut-protocol.com/schemas/primitives/aftersale/primitive.json", "authorization": { "scope": "aftersale", "required": true } } ]
     },
     "roles": {
       "seller": {
@@ -112,12 +112,12 @@ version: 2026-07-31
       }
     ],
     "primitives": {
-      "utp.listing":    [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/listing", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
-      "utp.inventory":  [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/inventory", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
-      "utp.quote":      [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/quote", "schema": "https://ut-protocol.com/schemas/primitives/quote/primitive.json", "authorization": { "scope": "quote", "required": true } } ],
-      "utp.acceptance": [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/acceptance", "schema": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json", "authorization": { "scope": "acceptance", "required": true } } ],
-      "utp.delivery":   [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/delivery", "schema": "https://ut-protocol.com/schemas/primitives/delivery/primitive.json", "authorization": { "scope": "delivery", "required": true } } ],
-      "utp.aftersale":  [ { "version": "2026-07-31", "spec": "https://utp.dev/2026-07-31/primitives/aftersale", "schema": "https://ut-protocol.com/schemas/primitives/aftersale/primitive.json", "authorization": { "scope": "aftersale", "required": true } } ]
+      "utp.listing":    [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/listing/index.html", "schema": "https://ut-protocol.com/schemas/primitives/listing/primitive.json", "authorization": { "scope": "listing", "required": true } } ],
+      "utp.inventory":  [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/inventory/index.html", "schema": "https://ut-protocol.com/schemas/primitives/inventory/primitive.json", "authorization": { "scope": "inventory", "required": true } } ],
+      "utp.quote":      [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/quote/index.html", "schema": "https://ut-protocol.com/schemas/primitives/quote/primitive.json", "authorization": { "scope": "quote", "required": true } } ],
+      "utp.acceptance": [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/acceptance/index.html", "schema": "https://ut-protocol.com/schemas/primitives/acceptance/primitive.json", "authorization": { "scope": "acceptance", "required": true } } ],
+      "utp.delivery":   [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/delivery/index.html", "schema": "https://ut-protocol.com/schemas/primitives/delivery/primitive.json", "authorization": { "scope": "delivery", "required": true } } ],
+      "utp.aftersale":  [ { "version": "2026-07-31", "spec": "https://ut-protocol.com/specification/latest/merchant/primitives/aftersale/index.html", "schema": "https://ut-protocol.com/schemas/primitives/aftersale/primitive.json", "authorization": { "scope": "aftersale", "required": true } } ]
     },
     "roles": {
       "marketplace": {
