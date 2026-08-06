@@ -112,6 +112,8 @@
     },
     "amend_price": {
       "description": "卖方提出价格调整提议（运费重算、规格差价、阶梯价变化等），进入 AMEND_PROPOSED 等待买方确认。改价 MUST NOT 单方生效：买方确认后 proposed_terms_hash 成为订购权威条款哈希，卖方需在新条款下完成 accept；买方拒绝则任务按 AMEND_PROPOSED 的既有收敛规则处置。",
+      "initiator_role": "Seller",
+      "handler_role": "Marketplace",
       "input_schema": {
         "$ref": "entities/amend_price_input.json"
       },

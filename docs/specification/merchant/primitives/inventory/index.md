@@ -98,6 +98,16 @@ MP2 定义三层数量视图，粒度为 `listing_id + sku_id`（可选叠加 `w
 
 Inventory 无独立资源状态机；`hold` 记录具有生命周期：`HELD → LOCKED → CONSUMED` 或 `HELD/LOCKED → RELEASED`，全部由交易事件驱动，供应商通过 `hold.query` 只读核验。
 
+**InventoryHold 生命周期的非 Action 触发（机读事件名）**。InventoryHold 的状态迁移全部由买方侧 P3 / MP5 事实与 TTL 驱动，**供应商侧不存在 hold 的写操作**（只有只读的 `hold.query`）；在原语定义文件中均以 `event` 字段（裸名）表达，**MUST NOT 被理解为可调用 Action**（载体约定见 通用规则继承（Commons Inheritance））：
+
+| 机读事件名 | 类型 | 迁移 | 说明 |
+| --- | --- | --- | --- |
+| `purchase_created` | 回调事件 | — → `HELD` | 买方 `purchase.create` 创建临时占用（带 TTL）；对外全限定名 `utp.inventory.hold_created` |
+| `purchase_completed` | 回调事件 | — / `HELD` → `LOCKED` | 订购原子成立；无先行 hold 时直接创建 `LOCKED` 记录 |
+| `ttl_expired` | 系统事件 | `HELD` → `RELEASED` | hold TTL 到期自动释放；MUST 推送 `utp.inventory.hold_released` |
+| `compensation` | 回调事件 | `HELD` / `LOCKED` → `RELEASED` | P3 补偿链释放已占用或已锁库存；MUST 推送 `hold_released` |
+| `delivery_shipped` | 系统事件 | `LOCKED` → `CONSUMED` | MP5 `utp.delivery.ship` 确认后按实际交付数量核销（[核销映射](#s-m47)） |
+
 ---
 
 ## Error Handling（错误处理） {#s-m43}

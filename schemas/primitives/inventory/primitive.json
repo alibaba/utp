@@ -163,7 +163,7 @@
         "from": null,
         "event": "purchase_created",
         "to": "HELD",
-        "condition": "UTP-B 规范 purchase.create 创建临时库存占用（13.5.2）。"
+        "condition": "UTP-B 规范 P3 Purchase 的 purchase.create 创建临时库存占用。"
       },
       {
         "from": null,
@@ -186,7 +186,7 @@
         "from": "HELD",
         "event": "compensation",
         "to": "RELEASED",
-        "condition": "P3 补偿链释放（13.3.2）；释放后 MUST 推送 hold_released 回调。"
+        "condition": "P3 补偿链释放；释放后 MUST 推送 hold_released 回调。"
       },
       {
         "from": "LOCKED",
@@ -198,7 +198,7 @@
         "from": "LOCKED",
         "event": "compensation",
         "to": "RELEASED",
-        "condition": "P3 补偿链『释放已锁库存』（13.3.2）"
+        "condition": "P3 补偿链『释放已锁库存』"
       }
     ]
   }

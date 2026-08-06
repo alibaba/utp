@@ -205,6 +205,11 @@ Marketplace 在注册受理时 MUST：验证 `utp_endpoint` 可达且 Profile �
 | `utp.quote.withdrawn` | Marketplace | 买方撤回询盘，在途报价作废 | [后置条件与语义契约](primitives/quote/index.md#s-m515) |
 | `utp.resolve.dispute_routed` | Marketplace | 争议答辩透传路由（同上） | Handler 侧执行模式：平台代答与透传（Delegation Mode） |
 | `utp.delivery.receipt` | Marketplace | 物流妥投/买方收货回执 | [与 P5 Fulfill 的事实传导契约（Interlock with P5）](primitives/delivery/index.md#s-m77) |
+| `utp.aftersale.request_routed` | Marketplace | 买方售后请求待处置（仅声明 `utp.aftersale` 的商户推送） | [Callbacks（回调事件）](primitives/aftersale/index.md#s-m88) |
+| `utp.aftersale.proposal_result` | Marketplace | 买方对替代方案的回应（`accepted` / `countered` / `rejected`） | [Callbacks（回调事件）](primitives/aftersale/index.md#s-m88) |
+| `utp.aftersale.return_shipped` | Marketplace | 买方已寄回退货（附物流单号） | [Callbacks（回调事件）](primitives/aftersale/index.md#s-m88) |
+| `utp.aftersale.refund_completed` | Marketplace | 退款完成（附退款凭据） | [Callbacks（回调事件）](primitives/aftersale/index.md#s-m88) |
+| `utp.aftersale.closed` | Marketplace | 售后关闭（撤回 / 超时 / 退货逾期 / 升级争议） | [Callbacks（回调事件）](primitives/aftersale/index.md#s-m88) |
 | `utp.settlement.statement_issued` | Marketplace | 结算账单出具 | [账单出具与查询（Statements）](settlement.md#s-m94) |
 | `utp.settlement.paid` | Marketplace | 账单打款成功（条目 BILLED → PAID_OUT） | [打款动作（Payout）](settlement.md#s-m99) |
 

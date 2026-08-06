@@ -80,25 +80,44 @@ compensation:   处置超时 → 按 timeout_policy 自动收敛（auto_approve 
 | `REJECTED` | 供应商拒绝，本售后单终结 | **是** | 仅 `query` |
 | `CLOSED` | 买方撤回 / 回应超时 / 退货逾期 / 升级争议 | **是** | 仅 `query` |
 
+**迁移触发的三类载体**
+
+下表「触发」列包含三类载体，机读定义中 MUST NOT 混用（与其余 MP 原语及 UTP-B 规范 P1—P6 一致）：
+
+| 类型 | 机读载体 | 命名 | 供应商能否调用 |
+| --- | --- | --- | --- |
+| **Action** | `primitive.json` 迁移的 `action` 字段 | 全限定名 `utp.aftersale.*` | **可调用**，定义见 [Actions（动作定义）](#s-m84) |
+| **回调事件** | `primitive.json` 迁移的 `event` 字段 | 裸名，对应 [Callbacks（回调事件）](#s-m88) 的全限定事件名 | **不可调用**，只能接收推送 |
+| **系统事件** | `primitive.json` 迁移的 `event` 字段 | 裸名 | **不可调用**，由平台时限与资金事实触发 |
+
+> `deadline_expired`、`buyer_accept_proposal`、`refund_completed` 等 MUST NOT 被理解为本原语的 Action——供应商无法调用它们，只能通过回调或 `query`/`list` 观测其结果。供应商可调用的动作仅限 [Actions（动作定义）](#s-m84) 列出的六个。
+
 **迁移规则**
 
-| From | 触发 | To | 条件 |
-| --- | --- | --- | --- |
-| — | `request_routed`（回调） | `REQUESTED` | Marketplace 校验售后窗口与订单状态后路由 |
-| `REQUESTED` | `utp.aftersale.approve` | `APPROVED` | 方案未超出买方诉求范围且签名覆盖 `resolution_hash` |
-| `REQUESTED` | `utp.aftersale.reject` | `REJECTED` | 已提供结构化拒绝原因码 |
-| `REQUESTED` | `utp.aftersale.propose` | `PROPOSED` | 未超出协商轮次上限 |
-| `REQUESTED` | `deadline_expired` | `APPROVED` | `timeout_policy = auto_approve`（方案取买方诉求原样） |
-| `REQUESTED` | `deadline_expired` | `REJECTED` | `timeout_policy = auto_reject` |
-| `PROPOSED` | `buyer_accept_proposal` | `APPROVED` | 买方接受替代方案 |
-| `PROPOSED` | `buyer_counter_proposal` | `REQUESTED` | 买方再议，`round_no` 递增 |
-| `APPROVED` | `buyer_return_shipped` | `RETURNING` | 方案 `return_required = true` 且买方已寄回 |
-| `APPROVED` | `refund_completed` | `COMPLETED` | 方案不需退货，平台已退款或重发已完成 |
-| `RETURNING` | `utp.aftersale.confirm_return` | `RETURN_RECEIVED` | 已提交验货结论 |
-| `RETURN_RECEIVED` | `refund_completed` | `COMPLETED` | 验货 `pass` 或 `partial`，平台按结论退款 |
-| `RETURN_RECEIVED` | `dispute_escalated` | `CLOSED` | 验货 `fail` 且供应商已升级 P6 |
+| From | 类型 | 触发 | To | 条件 |
+| --- | --- | --- | --- | --- |
+| — | 回调事件 | `request_routed` | `REQUESTED` | Marketplace 校验售后窗口与订单状态后路由 |
+| `REQUESTED` | **Action** | `utp.aftersale.approve` | `APPROVED` | 方案未超出买方诉求范围且签名覆盖 `resolution_hash` |
+| `REQUESTED` | **Action** | `utp.aftersale.reject` | `REJECTED` | 已提供结构化拒绝原因码 |
+| `REQUESTED` | **Action** | `utp.aftersale.propose` | `PROPOSED` | 未超出协商轮次上限 |
+| `REQUESTED` | 回调事件 | `buyer_withdraw` | `CLOSED` | 买方主动撤回售后申请（`close_reason = buyer_withdrawn`） |
+| `REQUESTED` | 系统事件 | `deadline_expired` | `APPROVED` | `timeout_policy = auto_approve`（方案取买方诉求原样，`arrived_via = timeout_auto`） |
+| `REQUESTED` | 系统事件 | `deadline_expired` | `REJECTED` | `timeout_policy = auto_reject`（`arrived_via = timeout_auto`） |
+| `PROPOSED` | 回调事件 | `buyer_accept_proposal` | `APPROVED` | 买方接受替代方案；对应回调 `utp.aftersale.proposal_result`（`result = accepted`） |
+| `PROPOSED` | 回调事件 | `buyer_counter_proposal` | `REQUESTED` | 买方再议，`round_no` 递增；对应回调 `proposal_result`（`result = countered`） |
+| `PROPOSED` | 回调事件 | `buyer_reject_proposal` | `CLOSED` | 买方拒绝方案并撤回或升级 P6；对应回调 `proposal_result`（`result = rejected`） |
+| `PROPOSED` | 系统事件 | `deadline_expired` | `CLOSED` | 买方回应超时按关闭收敛（`arrived_via = timeout_auto`） |
+| `APPROVED` | 回调事件 | `buyer_return_shipped` | `RETURNING` | 方案 `return_required = true` 且买方已寄回 |
+| `APPROVED` | 回调事件 | `refund_completed` | `COMPLETED` | 方案 `return_required = false`，Marketplace 已退款或换货/补发已发出 |
+| `APPROVED` | 系统事件 | `return_window_expired` | `CLOSED` | 方案 `return_required = true` 但买方在退货窗口内未寄回 |
+| `RETURNING` | **Action** | `utp.aftersale.confirm_return` | `RETURN_RECEIVED` | 已提交验货结论 |
+| `RETURNING` | 系统事件 | `return_window_expired` | `CLOSED` | 退货逾期未达 |
+| `RETURN_RECEIVED` | 回调事件 | `refund_completed` | `COMPLETED` | 验货 `pass` 或 `partial`，Marketplace 已按结论执行退款 |
+| `RETURN_RECEIVED` | 回调事件 | `dispute_escalated` | `CLOSED` | 验货 `fail` 且供应商已通过 P6 Resolve 提出异议，由裁决接管 |
 
-**确定性保证**。同一状态下同一触发 MUST 只有一条可用迁移。`deadline_expired` 的多目标迁移由互斥的 `timeout_policy` 条件区分（见 通用规则继承（Commons Inheritance） 通用规则）。状态机迁移触发器的载体约定（与其余 MP 原语及 UTP-B 规范 P1—P6 一致）：**供应商可调用动作置于 `action` 字段并用全限定名**（`utp.aftersale.*`），**回调与系统触发置于 `event` 字段并用裸名**（`request_routed` / `refund_completed` / `deadline_expired`），二者 MUST NOT 混用。
+**确定性保证**。同一状态下同一触发 MUST 只有一条可用迁移。`deadline_expired` 的多目标迁移由互斥的 `timeout_policy` 条件区分（见 通用规则继承（Commons Inheritance） 通用规则）。
+
+**退款权限边界**。退款资金动作 MUST 由 Marketplace（代收代付方）执行；**供应商侧不存在退款 Action**，只通过 `refund_completed` 回调观测结果。
 
 **轮次上限**。协商轮次上限由 Marketplace 受理策略声明。超限后 Marketplace MUST 拒绝新的 `propose` 并返回 `AFTERSALE.MAX_ROUNDS`，售后单停留在 `REQUESTED`——**本原语不因轮次超限自动迁移，供应商无需为此 `reject`**。
 

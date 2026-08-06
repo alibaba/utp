@@ -120,6 +120,14 @@ Delivery 是 UTP-M 第五个供应商原语（MP5），其意图是让供应商�
 
 **确定性约束：**`ship` 对已 `SHIPPED` 批次 MUST 幂等返回既有凭证；`DELIVERED`/`CLOSED` 由回执与买方动作驱动，供应商 MUST NOT 直接声明（与 UTP-B 规范 《全局状态机》"状态不能因参与方直接声明目标状态而推进"一致）。
 
+**非 Action 触发（机读事件名）**。上表「允许的操作」列仅列供应商可调用的 Action；下列迁移由物流回执与买方侧动作驱动，在原语定义文件中以 `event` 字段（裸名）表达，**MUST NOT 被理解为可调用 Action**（载体约定见 通用规则继承（Commons Inheritance））：
+
+| 机读事件名 | 类型 | 迁移 | 说明 |
+| --- | --- | --- | --- |
+| `prepare_completed` | 系统事件 | `PREPARING` → `READY` | 由 `prepare(completed)` 的处理结果触发（不是独立 Action） |
+| `carrier_delivery_receipt` | 回调事件 | `SHIPPED` → `DELIVERED` | 承运商妥投回执经 Marketplace 确认；对外全限定名 `utp.delivery.receipt` |
+| `buyer_receive_or_resolved` | 回调事件 | `DELIVERED` → `CLOSED` | 买方 `fulfill.receive`；或 `reject` 进入 P6 Resolve 后裁决完毕 |
+
 ---
 
 ## Error Handling（错误处理） {#s-m73}

@@ -121,6 +121,15 @@ MP4 不覆盖：订购草案的创建与修改（Buyer 专属， UTP-B 规范 �
 
 **确定性约束**：终态到达后任何写操作 MUST 返回 `ACCEPTANCE.STATE_CONFLICT`（幂等重放同一 `idempotency_key` 除外）。`deadline` 由订单路由时的 Mode 超时配置决定（UTP 规范 [会话超时上下文](../../../protocol-core/transport-communication.md#s-424) Mode 协商确定的超时配置），挂起不延长时限；延时需求 MUST 走 `amend_leadtime` 或买方侧 HAI 超时扩展。
 
+**非 Action 触发（机读事件名）**。上表「允许的操作」列仅列供应商可调用的 Action；下列迁移由买方侧动作或平台时限驱动，在原语定义文件中以 `event` 字段（裸名）表达，**MUST NOT 被理解为可调用 Action**（载体约定见 通用规则继承（Commons Inheritance））：
+
+| 机读事件名 | 类型 | 迁移 | 说明 |
+| --- | --- | --- | --- |
+| `order_routed` | 回调事件 | — → `PENDING_ACCEPT` | 订单路由送达；对外全限定名 `utp.acceptance.order_routed` |
+| `buyer_confirm_amendment` | 回调事件 | `AMEND_PROPOSED` → `ACCEPTED` | 买方确认交期/价格变更，`proposed_terms_hash` 成为权威条款 |
+| `buyer_reject_amendment` | 回调事件 | `AMEND_PROPOSED` → `REJECTED` | 买方拒绝变更 |
+| `deadline_expired` | 系统事件 | 任意非终态 → `ACCEPTED`/`REJECTED` | 按 `timeout_policy` 互斥收敛，`arrived_via = timeout_auto`；对外推送 `utp.acceptance.expired` |
+
 ---
 
 ## Error Handling（错误处理） {#s-m63}

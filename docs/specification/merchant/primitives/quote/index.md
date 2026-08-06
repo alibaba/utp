@@ -121,6 +121,17 @@ MP3 不覆盖：询盘的发起与撤回（Buyer 专属，P2）、条款绑定�
 
 **确定性约束**：终态到达后任何写操作 MUST 返回 `QUOTE.STATE_CONFLICT`（幂等重放同一 `idempotency_key` 除外）。多轮议价 = `QUOTED ⇄ BUYER_COUNTERED` 循环，轮次 `round_no` 单调递增；**轮次上限由 UTP-B 规范 P2 引擎执行**（拒绝超限的买方 `counter-offer` 并返回 `NEGOTIATE.COUNTER_OFFER.MAX_ROUNDS`，协商停留 `QUOTED`），本原语不因轮次超限产生迁移。各状态与 UTP-B 规范 P2 协商状态的对应见 [状态映射（State Correspondence）](#s-m562)。
 
+**非 Action 触发（机读事件名）**。上表「允许的操作」列仅列供应商可调用的 Action；下列迁移由买方侧 P2 动作或平台时限驱动，在原语定义文件中以 `event` 字段（裸名）表达，**MUST NOT 被理解为可调用 Action**（载体约定见 通用规则继承（Commons Inheritance））：
+
+| 机读事件名 | 类型 | 迁移 | 说明 |
+| --- | --- | --- | --- |
+| `inquiry_routed` | 回调事件 | — → `INQUIRY_PENDING` | 询盘路由送达；对外全限定名 `utp.quote.inquiry_routed` |
+| `buyer_countered` | 回调事件 | `QUOTED` → `BUYER_COUNTERED` | 买方还价，`round_no` 递增 |
+| `buyer_accepted` | 回调事件 | `QUOTED` → `BOUND` | `valid_until` 内接受且 P2 绑定核查通过 |
+| `inquiry_withdrawn` | 回调事件 | `INQUIRY_PENDING`/`QUOTED` → `EXPIRED` | 买方撤回询盘，在途报价作废；对外推送 `utp.quote.withdrawn` |
+| `quote_expired` | 系统事件 | `QUOTED` → `EXPIRED` | `valid_until` 到期买方未接受 |
+| `timeout` | 系统事件 | `INQUIRY_PENDING` → `DECLINED` | 应答超时且 `quote_policy.on_timeout = auto_decline`；对外推送 `utp.quote.expired` |
+
 ---
 
 ## Error Handling（错误处理） {#s-m53}

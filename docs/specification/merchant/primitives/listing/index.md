@@ -137,6 +137,16 @@ Listing 不覆盖：库存数量（MP2）、订单处理（MP4）、类目体系
 | `SUSPENDED_BY_PLATFORM` | 平台强制下架（治理动作） | 资质过期、违规、风控触发 | `query`；整改通过后由平台恢复至 `PUBLISHED` |
 | `ARCHIVED` | 永久退出（终态） | `archive` 成功执行 | `query`（只读） |
 
+**非 Action 触发（机读事件名）**。上表「允许的操作」列仅列供应商可调用的 Action；下列迁移由平台审核与治理动作驱动，在原语定义文件中以 `event` 字段（裸名）表达，**MUST NOT 被理解为可调用 Action**（载体约定见 通用规则继承（Commons Inheritance））：
+
+| 机读事件名 | 类型 | 迁移 | 说明 |
+| --- | --- | --- | --- |
+| `review_pass` | 回调事件 | `PENDING_REVIEW` → `PUBLISHED` / `LISTED` | 审核通过；`publish` 声明 `auto_list: true` 时直达 `LISTED`。对外全限定名 `utp.listing.review_result` |
+| `review_reject` | 回调事件 | `PENDING_REVIEW` → `REJECTED` | 审核驳回并附原因码（同上回调） |
+| `update_major` | 系统事件 | `LISTED` → `PENDING_REVIEW` | 重大变更走新版本送审，旧版本保持 `LISTED` 继续可售（[版本化与变更分级](#s-m324)） |
+| `platform_suspend` | 系统事件 | `LISTED` → `SUSPENDED_BY_PLATFORM` | 资质过期、违规或风控触发的治理下架 |
+| `platform_reinstate` | 系统事件 | `SUSPENDED_BY_PLATFORM` → `PUBLISHED` | 整改通过后由平台恢复（恢复后需供应商自行 `list`） |
+
 ### 状态迁移的确定性 {#s-m323}
 
 同一状态下同一操作 MUST 产生唯一确定的迁移结果（继承 UTP 规范状态机确定性约束）。特别地：

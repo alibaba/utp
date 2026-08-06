@@ -204,4 +204,10 @@ MP 原语 MUST 完整继承 UTP 规范 P0 原语通用框架（[原语通用框�
 - **幂等**：全部写操作 MUST 携带 `idempotency_key`；重复请求 MUST 返回首次执行的缓存结果。幂等键 MUST 保留不短于 24 小时；同一键携带不同请求体 MUST 返回冲突错误（HTTP 409，不执行）。
 - **错误响应**：使用 UTP 规范 《标准错误响应格式》 标准错误响应格式；本规范错误码统一登记在[附录 MB](appendices.md#s-mb)。
 - **响应自描述**：遵循 UTP 规范 [Agent 友好界面](../protocol-core/agent-friendly-interface.md) 自描述响应原则（《总览（Overview）》）：响应 MUST 携带 `valid_next_actions`，元素 MUST 为全限定 Action 名（如 `utp.acceptance.query`；Schema 约束见 `primitives/common/valid_next_actions.json`）。列表操作的分页 MUST 使用游标语义（`cursor`/`limit`，`primitives/common/pagination.json`）。
+- **迁移触发载体（适用于全部 MP 原语）**：原语定义文件的状态机迁移 MUST 将三类触发分开承载，三者 MUST NOT 混用：
+  - **供应商可调用的动作** 置于 `action` 字段，使用全限定名（`utp.{primitive}.{action}`），且 MUST 在本原语 `actions` 中有定义；
+  - **回调事件**（Marketplace → Seller 推送的事实）置于 `event` 字段并用裸名，其对外全限定事件名 MUST 登记于[回调事件类型注册表](onboarding.md#s-m261)；
+  - **系统事件**（时限到期、资金事实、平台治理动作等）置于 `event` 字段并用裸名。
+
+  `event` 取值 MUST NOT 被实现方理解为可调用 Action——供应商只能接收回调或用 `query`/`list` 观测其结果；各原语可调用的动作以该原语 Actions 小节为唯一权威清单。
 - **传输绑定支持要求**：MP 原语的 REST Binding 为 MUST（基线，所有 Marketplace 必须提供）；MCP / A2A Binding 为 MAY（面向 Agent 原生接入）；Embedded SDK Binding 不适用于供应商侧（无对应场景，不定义）。供应商只需实现 REST 客户端 + 回调接收端即可完整接入。
