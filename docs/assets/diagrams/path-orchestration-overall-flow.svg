@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1110" viewBox="0 0 1120 1110" role="img" aria-labelledby="title desc">
   <title id="title">路径编排总体时序</title>
-  <desc id="desc">纵向主路径展示路径编排从编排输入到状态机推进的总体时序；右侧展示拒绝、挂起和调用结果未知时的处理分支。</desc>
+  <desc id="desc">纵向主路径展示路径编排从编排输入到状态机推进的总体时序；右侧展示前置校验拒绝和调用结果未知时的处理分支。</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#475569"/></marker>
     <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#b85450"/></marker>
@@ -27,7 +27,7 @@
   <path class="edge" d="M460 810V842"/>
   <path class="edge" d="M460 932V964"/>
 
-  <!-- 异常与恢复分支 -->
+  <!-- 前置校验与通信恢复分支 -->
   <path class="edge-red" d="M610 608H735"/>
   <path class="edge-red" d="M670 765H735"/>
   <path class="edge-yellow" d="M840 800V840"/>
@@ -58,7 +58,7 @@
   <!-- 约束校验 -->
   <polygon points="460,540 610,608 460,675 310,608" fill="#fff5e8" stroke="#d97706" stroke-width="2.5"/>
   <text class="label" x="460" y="600">约束校验</text>
-  <text class="sub" x="460" y="624">DAG · 状态 · 授权/风控 · HAI</text>
+  <text class="sub" x="460" y="624">DAG · 状态 · 调用方前置校验</text>
 
   <!-- 执行与状态推进 -->
   <rect class="node" x="250" y="720" width="420" height="90" fill="#e9f7e8" stroke="#4d9b58"/>
@@ -67,7 +67,7 @@
 
   <rect class="node" x="250" y="842" width="420" height="90" fill="#e9f7e8" stroke="#4d9b58"/>
   <text class="label" x="460" y="878">标准 ActionResponse</text>
-  <text class="sub" x="460" y="904">Handler 返回；PENDING 也是标准响应</text>
+  <text class="sub" x="460" y="904">Handler 返回</text>
 
   <rect class="node" x="250" y="964" width="420" height="90" fill="#e9f7e8" stroke="#4d9b58"/>
   <text class="label" x="460" y="1000">状态机推进</text>
@@ -75,8 +75,8 @@
 
   <!-- 右侧分支 -->
   <rect class="node" x="735" y="570" width="280" height="76" fill="#fdebea" stroke="#b85450"/>
-  <text class="label" x="875" y="601">拒绝或 HAI 挂起</text>
-  <text class="sub" x="875" y="626">不投递 · 不提交状态</text>
+  <text class="label" x="875" y="601">前置校验拒绝</text>
+  <text class="sub" x="875" y="626">不投递 · 保持当前 StateView</text>
 
   <rect class="node" x="735" y="727" width="280" height="73" fill="#fdebea" stroke="#b85450"/>
   <text class="label" x="875" y="757">调用结果未知</text>
@@ -89,7 +89,7 @@
 
   <!-- 连线注记 -->
   <text class="note" x="485" y="704">通过</text>
-  <text class="note" x="634" y="595" fill="#b85450">拒绝 / 挂起</text>
+  <text class="note" x="634" y="595" fill="#b85450">前置校验拒绝</text>
   <text class="note" x="158" y="730">下一轮</text>
   <text class="note" x="250" y="1088">调用结果未知时，不伪造 ActionResponse 或推进状态；取得标准响应后才继续路径。</text>
 </svg>
