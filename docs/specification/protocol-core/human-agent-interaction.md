@@ -742,9 +742,9 @@ Mandate 的签发、验证与适用范围以[认证与授权](identity-authoriza
 
 ---
 
-## 附录 H：Confirmation Surface 实现方案参考 {#s-appendix-h}
+## 附录：Confirmation Surface 实现方案参考 {#s-appendix-h}
 
-### H.5 Confirmation Surface 实现方案选型指南 {#s-h-5}
+### Confirmation Surface 实现方案选型指南 {#s-h-5}
 
 | 维度 | 沙箱化应用卡片 | 协议化声明式 UI | Web 页面重定向 | 原生组件 |
 | --- | --- | --- | --- | --- |
