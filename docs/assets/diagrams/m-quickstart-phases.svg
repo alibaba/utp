@@ -30,7 +30,7 @@
 <path d="M 240 106 L 272 106" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mQsArrow)"/>
 <path d="M 486 106 L 518 106" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mQsArrow)"/>
 
-<text x="380" y="196" text-anchor="middle" font-size="10" fill="#666">最小实现面：一个 REST 客户端 + 一个 Webhook 端点 · 零 Mode 配置即可跑通（M1.8）</text>
+<text x="380" y="196" text-anchor="middle" font-size="10" fill="#666">最小实现面：一个 REST 客户端 + 一个 Webhook 端点 · 零 Mode 配置即可跑通</text>
 <text x="380" y="214" text-anchor="middle" font-size="10" fill="#666">Agent 与 ERP Bridge 均为可选组件，可在任意阶段后补（本页第 5 节选型表）</text>
 </g>
 </svg>

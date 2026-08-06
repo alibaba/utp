@@ -5,7 +5,7 @@
 <marker id="mLoopArrowG" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="#82b366"/></marker>
 </defs>
 <g>
-<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">M1.6 商品—交易闭环：供应商侧（UTP-M）与买方侧（P1—P6）的咬合</text>
+<text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold">商品—交易闭环：供应商侧（UTP-M）与买方侧（P1—P6）的咬合</text>
 
 <!-- Supplier band top -->
 <rect x="20" y="40" width="720" height="92" rx="8" fill="none" stroke="#d79b00" stroke-dasharray="6 3"/>
@@ -33,7 +33,7 @@
 
 <rect x="250" y="196" width="180" height="48" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
 <text x="340" y="216" text-anchor="middle" font-size="12" font-weight="bold">P1 search / P2 询盘</text>
-<text x="340" y="232" text-anchor="middle" font-size="10">选品 · 报价（M1.4.4 模式）</text>
+<text x="340" y="232" text-anchor="middle" font-size="10">选品 · 报价（模式）</text>
 
 <rect x="490" y="196" width="180" height="48" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
 <text x="580" y="216" text-anchor="middle" font-size="12" font-weight="bold">P3 create / complete</text>
@@ -60,7 +60,7 @@
 <path d="M 340 116 L 340 192" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLoopArrow)"/>
 <g font-size="10" text-anchor="middle"><rect x="346" y="146" width="118" height="14" fill="#fff"/><text x="405" y="157">LISTED 才可被搜索</text></g>
 <path d="M 580 116 L 580 192" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLoopArrow)"/>
-<g font-size="10" text-anchor="middle"><rect x="586" y="146" width="130" height="14" fill="#fff"/><text x="651" y="157">sellable 同源（M4.7）</text></g>
+<g font-size="10" text-anchor="middle"><rect x="586" y="146" width="130" height="14" fill="#fff"/><text x="651" y="157">sellable 同源</text></g>
 
 <path d="M 580 244 L 200 320" fill="none" stroke="rgb(0,0,0)" marker-end="url(#mLoopArrow)"/>
 <g font-size="10" text-anchor="middle"><rect x="330" y="272" width="130" height="14" fill="#fff"/><text x="395" y="283">订单路由 order_routed</text></g>
@@ -73,6 +73,6 @@
 <text x="738" y="220" text-anchor="middle" font-size="10" fill="#82b366" transform="rotate(90 738 220)">货款回流 · 闭环成立</text>
 
 <!-- invariants note -->
-<text x="380" y="412" text-anchor="middle" font-size="10" fill="#666">六条闭环不变式（M1.6）：能被搜到即可被订购 · 库存同源 · 签名同一 · 事实传导 · 结算可对账 · Mode 能力过滤</text>
+<text x="380" y="412" text-anchor="middle" font-size="10" fill="#666">六条闭环不变式：能被搜到即可被订购 · 库存同源 · 签名同一 · 事实传导 · 结算可对账 · Mode 能力过滤</text>
 </g>
 </svg>

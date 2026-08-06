@@ -237,133 +237,128 @@
           "path": "merchant/settlement.html"
         },
         {
-          "title": "供应商原语",
+          "title": "商品原语",
           "children": [
             {
-              "title": "商品原语",
-              "children": [
-                {
-                  "title": "概览",
-                  "path": "merchant/primitives/listing/index.html"
-                },
-                {
-                  "title": "REST 绑定",
-                  "path": "merchant/primitives/listing/transports/rest.html"
-                },
-                {
-                  "title": "MCP 绑定",
-                  "path": "merchant/primitives/listing/transports/mcp.html"
-                },
-                {
-                  "title": "A2A 绑定",
-                  "path": "merchant/primitives/listing/transports/a2a.html"
-                }
-              ]
+              "title": "概览",
+              "path": "merchant/primitives/listing/index.html"
             },
             {
-              "title": "库存原语",
-              "children": [
-                {
-                  "title": "概览",
-                  "path": "merchant/primitives/inventory/index.html"
-                },
-                {
-                  "title": "REST 绑定",
-                  "path": "merchant/primitives/inventory/transports/rest.html"
-                },
-                {
-                  "title": "MCP 绑定",
-                  "path": "merchant/primitives/inventory/transports/mcp.html"
-                },
-                {
-                  "title": "A2A 绑定",
-                  "path": "merchant/primitives/inventory/transports/a2a.html"
-                }
-              ]
+              "title": "REST 绑定",
+              "path": "merchant/primitives/listing/transports/rest.html"
             },
             {
-              "title": "报价原语",
-              "children": [
-                {
-                  "title": "概览",
-                  "path": "merchant/primitives/quote/index.html"
-                },
-                {
-                  "title": "REST 绑定",
-                  "path": "merchant/primitives/quote/transports/rest.html"
-                },
-                {
-                  "title": "MCP 绑定",
-                  "path": "merchant/primitives/quote/transports/mcp.html"
-                },
-                {
-                  "title": "A2A 绑定",
-                  "path": "merchant/primitives/quote/transports/a2a.html"
-                }
-              ]
+              "title": "MCP 绑定",
+              "path": "merchant/primitives/listing/transports/mcp.html"
             },
             {
-              "title": "接单原语",
-              "children": [
-                {
-                  "title": "概览",
-                  "path": "merchant/primitives/acceptance/index.html"
-                },
-                {
-                  "title": "REST 绑定",
-                  "path": "merchant/primitives/acceptance/transports/rest.html"
-                },
-                {
-                  "title": "MCP 绑定",
-                  "path": "merchant/primitives/acceptance/transports/mcp.html"
-                },
-                {
-                  "title": "A2A 绑定",
-                  "path": "merchant/primitives/acceptance/transports/a2a.html"
-                }
-              ]
+              "title": "A2A 绑定",
+              "path": "merchant/primitives/listing/transports/a2a.html"
+            }
+          ]
+        },
+        {
+          "title": "库存原语",
+          "children": [
+            {
+              "title": "概览",
+              "path": "merchant/primitives/inventory/index.html"
             },
             {
-              "title": "交付原语",
-              "children": [
-                {
-                  "title": "概览",
-                  "path": "merchant/primitives/delivery/index.html"
-                },
-                {
-                  "title": "REST 绑定",
-                  "path": "merchant/primitives/delivery/transports/rest.html"
-                },
-                {
-                  "title": "MCP 绑定",
-                  "path": "merchant/primitives/delivery/transports/mcp.html"
-                },
-                {
-                  "title": "A2A 绑定",
-                  "path": "merchant/primitives/delivery/transports/a2a.html"
-                }
-              ]
+              "title": "REST 绑定",
+              "path": "merchant/primitives/inventory/transports/rest.html"
             },
             {
-              "title": "售后原语",
-              "children": [
-                {
-                  "title": "概览",
-                  "path": "merchant/primitives/aftersale/index.html"
-                },
-                {
-                  "title": "REST 绑定",
-                  "path": "merchant/primitives/aftersale/transports/rest.html"
-                },
-                {
-                  "title": "MCP 绑定",
-                  "path": "merchant/primitives/aftersale/transports/mcp.html"
-                },
-                {
-                  "title": "A2A 绑定",
-                  "path": "merchant/primitives/aftersale/transports/a2a.html"
-                }
-              ]
+              "title": "MCP 绑定",
+              "path": "merchant/primitives/inventory/transports/mcp.html"
+            },
+            {
+              "title": "A2A 绑定",
+              "path": "merchant/primitives/inventory/transports/a2a.html"
+            }
+          ]
+        },
+        {
+          "title": "报价原语",
+          "children": [
+            {
+              "title": "概览",
+              "path": "merchant/primitives/quote/index.html"
+            },
+            {
+              "title": "REST 绑定",
+              "path": "merchant/primitives/quote/transports/rest.html"
+            },
+            {
+              "title": "MCP 绑定",
+              "path": "merchant/primitives/quote/transports/mcp.html"
+            },
+            {
+              "title": "A2A 绑定",
+              "path": "merchant/primitives/quote/transports/a2a.html"
+            }
+          ]
+        },
+        {
+          "title": "接单原语",
+          "children": [
+            {
+              "title": "概览",
+              "path": "merchant/primitives/acceptance/index.html"
+            },
+            {
+              "title": "REST 绑定",
+              "path": "merchant/primitives/acceptance/transports/rest.html"
+            },
+            {
+              "title": "MCP 绑定",
+              "path": "merchant/primitives/acceptance/transports/mcp.html"
+            },
+            {
+              "title": "A2A 绑定",
+              "path": "merchant/primitives/acceptance/transports/a2a.html"
+            }
+          ]
+        },
+        {
+          "title": "交付原语",
+          "children": [
+            {
+              "title": "概览",
+              "path": "merchant/primitives/delivery/index.html"
+            },
+            {
+              "title": "REST 绑定",
+              "path": "merchant/primitives/delivery/transports/rest.html"
+            },
+            {
+              "title": "MCP 绑定",
+              "path": "merchant/primitives/delivery/transports/mcp.html"
+            },
+            {
+              "title": "A2A 绑定",
+              "path": "merchant/primitives/delivery/transports/a2a.html"
+            }
+          ]
+        },
+        {
+          "title": "售后原语",
+          "children": [
+            {
+              "title": "概览",
+              "path": "merchant/primitives/aftersale/index.html"
+            },
+            {
+              "title": "REST 绑定",
+              "path": "merchant/primitives/aftersale/transports/rest.html"
+            },
+            {
+              "title": "MCP 绑定",
+              "path": "merchant/primitives/aftersale/transports/mcp.html"
+            },
+            {
+              "title": "A2A 绑定",
+              "path": "merchant/primitives/aftersale/transports/a2a.html"
             }
           ]
         }

@@ -5,7 +5,7 @@
 </defs>
 
 <!-- 标题 -->
-<text x="350" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">M6.2.1 受理任务状态机（资源作用域：routing_id · deadline 内收敛）</text>
+<text x="350" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#222">受理任务状态机（资源作用域：routing_id · deadline 内收敛）</text>
 
 <!-- 入口 -->
 <text x="115" y="40" text-anchor="middle" font-size="11" fill="#666">订单路由（order_routed 回调）</text>

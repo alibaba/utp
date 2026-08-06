@@ -4,7 +4,7 @@
 <marker id="mOnbArrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="rgb(0,0,0)"/></marker>
 </defs>
 <g>
-<text x="380" y="24" text-anchor="middle" font-size="14" font-weight="bold">M2.1 供应商入驻五步流程（每步产出是下一步的前置条件）</text>
+<text x="380" y="24" text-anchor="middle" font-size="14" font-weight="bold">供应商入驻五步流程（每步产出是下一步的前置条件）</text>
 
 <!-- Step boxes -->
 <rect x="20" y="60" width="128" height="56" rx="6" fill="#dae8fc" stroke="#6c8ebf"/>
@@ -44,7 +44,7 @@
 <text x="528" y="140">SupplierCredentials</text>
 <text x="528" y="155">QUALIFIED → SANDBOX</text>
 <text x="676" y="140">验收 7 项通过</text>
-<text x="676" y="155">（M2.6.2）</text>
+<text x="676" y="155"></text>
 </g>
 
 <!-- ACTIVE result -->
@@ -56,6 +56,6 @@
 <!-- Gate note -->
 <rect x="20" y="204" width="540" height="48" rx="6" fill="none" stroke="#b85450" stroke-dasharray="4 3"/>
 <text x="290" y="224" text-anchor="middle" font-size="11" fill="#b85450">全部步骤完成前，Marketplace MUST 拒绝 publish（LISTING.PUBLISH.MERCHANT_NOT_ACTIVE）</text>
-<text x="290" y="241" text-anchor="middle" font-size="11" fill="#b85450">Step 3 注册与商户协议签署 MUST 由商家主体完成，MUST NOT 委托 Agent（M2.4.3）</text>
+<text x="290" y="241" text-anchor="middle" font-size="11" fill="#b85450">Step 3 注册与商户协议签署 MUST 由商家主体完成，MUST NOT 委托 Agent</text>
 </g>
 </svg>
